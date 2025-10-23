@@ -75,19 +75,36 @@ function App() {
         {user ? (
           <Route element={<Layout user={user} onLogout={handleLogout} />}>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/production" element={<ProductionBoard />} />
-            <Route path="/returns" element={<Returns />} />
-            <Route path="/marketing" element={<MarketingTasks />} />
-            <Route path="/purchase-requests" element={<PurchaseRequests />} />
+            
+            {/* Marketplace */}
+            <Route path="/marketplace/production" element={<ProductionBoard />} />
+            <Route path="/marketplace/returns" element={<Returns />} />
+            <Route path="/marketplace/marketing" element={<MarketingTasks />} />
+            <Route path="/marketplace/purchases" element={<PurchaseRequests />} />
             <Route path="/purchase-orders" element={<PurchaseOrders />} />
+            
+            {/* Factory & Stores */}
+            <Route path="/factory" element={<Factory />} />
+            <Route path="/factory/production" element={<CustomProduction />} />
+            <Route path="/store/:storeId" element={<StoreView />} />
+            <Route path="/store/:storeId/production" element={<CustomProduction />} />
+            
+            {/* Financial */}
             <Route path="/accounts-payable" element={<AccountsPayable />} />
             <Route path="/sales" element={<Sales />} />
             <Route path="/cost-center" element={<CostCenter />} />
             <Route path="/breakeven" element={<Breakeven />} />
-            <Route path="/stores" element={<StoresMenu />} />
-            <Route path="/stores/:storeId/production" element={<StoreProduction />} />
+            
+            {/* Customer Service */}
             <Route path="/complaints" element={<Complaints />} />
             <Route path="/crm" element={<CRM />} />
+            
+            {/* Legacy routes - redirect to marketplace */}
+            <Route path="/production" element={<Navigate to="/marketplace/production" replace />} />
+            <Route path="/returns" element={<Navigate to="/marketplace/returns" replace />} />
+            <Route path="/marketing" element={<Navigate to="/marketplace/marketing" replace />} />
+            <Route path="/purchase-requests" element={<Navigate to="/marketplace/purchases" replace />} />
+            
             <Route path="*" element={<NotFound />} />
           </Route>
         ) : (
