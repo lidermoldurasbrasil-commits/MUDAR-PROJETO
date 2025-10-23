@@ -170,59 +170,99 @@ export default function ProductionBoard() {
       </div>
 
       <div className="card">
-        <div className="table-container">
-          <table data-testid="production-items-table">
-            <thead>
-              <tr>
-                <th>Nome do Projeto</th>
-                <th>SKU</th>
-                <th>Quantidade</th>
-                <th>Cliente</th>
-                <th>Cor da Moldura</th>
-                <th>Data de Entrega</th>
-                <th>Plataforma</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(item => (
-                <tr key={item.id} data-testid={`production-item-${item.id}`}>
-                  <td>{item.project_name}</td>
-                  <td>{item.sku}</td>
-                  <td>{item.quantity}</td>
-                  <td>{item.client_name}</td>
-                  <td>{item.frame_color}</td>
-                  <td>{item.delivery_date}</td>
-                  <td>{item.platform}</td>
-                  <td>
-                    <span className={`status-badge ${getStatusClass(item.status)}`}>
-                      {item.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button
-                        onClick={() => openEditModal(item)}
-                        className="btn-icon"
-                        data-testid={`edit-item-${item.id}`}
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="btn-icon btn-danger"
-                        data-testid={`delete-item-${item.id}`}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
+        {viewMode === 'list' ? (
+          <div className="table-container">
+            <table data-testid="production-items-table">
+              <thead>
+                <tr>
+                  <th>Projeto</th>
+                  <th>Pedido</th>
+                  <th>SKU</th>
+                  <th>Qtd</th>
+                  <th>Cliente</th>
+                  <th>Cor Moldura</th>
+                  <th>Entrega</th>
+                  <th>Plataforma</th>
+                  <th>Status</th>
+                  <th>Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {items.map(item => (
+                  <tr key={item.id} data-testid={`production-item-${item.id}`}>
+                    <td>{item.project_name}</td>
+                    <td>{item.order_number || '-'}</td>
+                    <td>{item.sku}</td>
+                    <td>{item.quantity}</td>
+                    <td>{item.client_name}</td>
+                    <td>{item.frame_color}</td>
+                    <td>{item.delivery_date}</td>
+                    <td>{item.platform}</td>
+                    <td>
+                      <span className={`status-badge ${getStatusClass(item.status)}`}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          onClick={() => openEditModal(item)}
+                          className="btn-icon"
+                          data-testid={`edit-item-${item.id}`}
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="btn-icon btn-danger"
+                          data-testid={`delete-item-${item.id}`}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="kanban-board" data-testid="kanban-view">
+            {STATUS_OPTIONS.map(status => (
+              <div key={status} className="kanban-column">
+                <div className="kanban-header">
+                  <h3>{status}</h3>
+                  <span className="item-count">{groupedByStatus[status]?.length || 0}</span>
+                </div>
+                <div className="kanban-items">
+                  {groupedByStatus[status]?.map(item => (
+                    <div key={item.id} className="kanban-card" data-testid={`kanban-card-${item.id}`}>
+                      <div className="kanban-card-header">
+                        <h4>{item.project_name}</h4>
+                        <div className="card-actions">
+                          <button onClick={() => openEditModal(item)} className="btn-icon-small">
+                            <Edit size={14} />
+                          </button>
+                          <button onClick={() => handleDelete(item.id)} className="btn-icon-small">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="kanban-card-body">
+                        <p><strong>Pedido:</strong> {item.order_number || '-'}</p>
+                        <p><strong>Cliente:</strong> {item.client_name}</p>
+                        <p><strong>SKU:</strong> {item.sku}</p>
+                        <p><strong>Qtd:</strong> {item.quantity}</p>
+                        <p><strong>Entrega:</strong> {item.delivery_date}</p>
+                        <span className={`badge-small ${item.platform.toLowerCase()}`}>{item.platform}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Modal */}
