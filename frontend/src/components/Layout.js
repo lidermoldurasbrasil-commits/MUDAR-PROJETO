@@ -8,14 +8,18 @@ export default function Layout({ user, onLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const navItems = [
-    { path: '/', icon: Home, label: 'Dashboard Geral', testId: 'nav-dashboard' },
+    { path: '/', icon: Home, label: 'Painel do Diretor', testId: 'nav-dashboard' },
     
     // === MARKETPLACE ===
     { section: 'Marketplace', items: [
-      { path: '/marketplace/production', icon: Package, label: 'Produção Marketplace', testId: 'nav-marketplace-production' },
+      { path: '/marketplace/production', icon: Package, label: 'Produção', testId: 'nav-marketplace-production' },
       { path: '/marketplace/returns', icon: RefreshCcw, label: 'Devoluções', testId: 'nav-returns' },
       { path: '/marketplace/marketing', icon: Megaphone, label: 'Marketing', testId: 'nav-marketing' },
       { path: '/marketplace/purchases', icon: ShoppingCart, label: 'Compras', testId: 'nav-purchases' },
+      { path: '/marketplace/accounts-payable', icon: DollarSign, label: 'Contas a Pagar', testId: 'nav-accounts-payable' },
+      { path: '/marketplace/sales', icon: TrendingUp, label: 'Vendas', testId: 'nav-sales' },
+      { path: '/marketplace/cost-center', icon: Calculator, label: 'Centro de Custos', testId: 'nav-cost-center' },
+      { path: '/marketplace/breakeven', icon: TrendingUp, label: 'Ponto de Equilíbrio', testId: 'nav-breakeven' },
     ]},
     
     // === FÁBRICA E LOJAS ===
@@ -24,14 +28,6 @@ export default function Layout({ user, onLogout }) {
       { path: '/store/1', icon: Store, label: 'Loja 1', testId: 'nav-store-1' },
       { path: '/store/2', icon: Store, label: 'Loja 2', testId: 'nav-store-2' },
       { path: '/store/3', icon: Store, label: 'Loja 3', testId: 'nav-store-3' },
-    ]},
-    
-    // === FINANCEIRO ===
-    { section: 'Financeiro', items: [
-      { path: '/accounts-payable', icon: DollarSign, label: 'Contas a Pagar', testId: 'nav-accounts-payable' },
-      { path: '/sales', icon: TrendingUp, label: 'Vendas', testId: 'nav-sales' },
-      { path: '/cost-center', icon: Calculator, label: 'Centro de Custos', testId: 'nav-cost-center' },
-      { path: '/breakeven', icon: TrendingUp, label: 'Ponto de Equilíbrio', testId: 'nav-breakeven' },
     ]},
     
     // === ATENDIMENTO ===
