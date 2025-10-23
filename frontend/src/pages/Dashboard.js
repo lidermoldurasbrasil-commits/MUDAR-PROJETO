@@ -37,12 +37,12 @@ export default function Dashboard() {
   }
 
   const statCards = [
-    { icon: ShoppingBag, label: 'Total Sales', value: metrics?.total_sales || 0, color: '#667eea', testId: 'metric-total-sales' },
-    { icon: DollarSign, label: 'Total Revenue', value: `$${metrics?.total_revenue?.toFixed(2) || 0}`, color: '#56ab2f', testId: 'metric-total-revenue' },
-    { icon: Package, label: 'In Production', value: metrics?.orders_in_production || 0, color: '#764ba2', testId: 'metric-in-production' },
-    { icon: TrendingUp, label: 'Shipped', value: metrics?.orders_shipped || 0, color: '#4facfe', testId: 'metric-shipped' },
-    { icon: RefreshCcw, label: 'Returns', value: metrics?.returns || 0, color: '#f093fb', testId: 'metric-returns' },
-    { icon: AlertCircle, label: 'Pending Complaints', value: metrics?.pending_complaints || 0, color: '#eb3349', testId: 'metric-complaints' },
+    { icon: ShoppingBag, label: 'Total de Vendas', value: metrics?.total_sales || 0, color: '#667eea', testId: 'metric-total-sales' },
+    { icon: DollarSign, label: 'Receita Total', value: `$${metrics?.total_revenue?.toFixed(2) || 0}`, color: '#56ab2f', testId: 'metric-total-revenue' },
+    { icon: Package, label: 'Em Produção', value: metrics?.orders_in_production || 0, color: '#764ba2', testId: 'metric-in-production' },
+    { icon: TrendingUp, label: 'Enviados', value: metrics?.orders_shipped || 0, color: '#4facfe', testId: 'metric-shipped' },
+    { icon: RefreshCcw, label: 'Devoluções', value: metrics?.returns || 0, color: '#f093fb', testId: 'metric-returns' },
+    { icon: AlertCircle, label: 'Reclamações Pendentes', value: metrics?.pending_complaints || 0, color: '#eb3349', testId: 'metric-complaints' },
   ];
 
   return (
