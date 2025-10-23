@@ -286,6 +286,19 @@ export default function ProductionBoard() {
                   />
                 </div>
                 <div className="form-group">
+                  <label>Número do Pedido</label>
+                  <input
+                    type="text"
+                    value={formData.order_number}
+                    onChange={(e) => setFormData({ ...formData, order_number: e.target.value })}
+                    data-testid="input-order-number"
+                    placeholder="Opcional"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
                   <label>SKU</label>
                   <input
                     type="text"
@@ -295,9 +308,6 @@ export default function ProductionBoard() {
                     data-testid="input-sku"
                   />
                 </div>
-              </div>
-
-              <div className="form-row">
                 <div className="form-group">
                   <label>Quantidade</label>
                   <input
@@ -308,6 +318,9 @@ export default function ProductionBoard() {
                     data-testid="input-quantity"
                   />
                 </div>
+              </div>
+
+              <div className="form-row">
                 <div className="form-group">
                   <label>Nome do Cliente</label>
                   <input
@@ -318,9 +331,6 @@ export default function ProductionBoard() {
                     data-testid="input-client-name"
                   />
                 </div>
-              </div>
-
-              <div className="form-row">
                 <div className="form-group">
                   <label>Cor da Moldura</label>
                   <input
@@ -331,6 +341,9 @@ export default function ProductionBoard() {
                     data-testid="input-frame-color"
                   />
                 </div>
+              </div>
+
+              <div className="form-row">
                 <div className="form-group">
                   <label>Data de Entrega</label>
                   <input
@@ -341,9 +354,6 @@ export default function ProductionBoard() {
                     data-testid="input-delivery-date"
                   />
                 </div>
-              </div>
-
-              <div className="form-row">
                 <div className="form-group">
                   <label>Plataforma</label>
                   <select
@@ -354,16 +364,17 @@ export default function ProductionBoard() {
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    data-testid="select-status"
-                  >
-                    {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Status</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  data-testid="select-status"
+                >
+                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
               </div>
 
               <div className="modal-actions">
