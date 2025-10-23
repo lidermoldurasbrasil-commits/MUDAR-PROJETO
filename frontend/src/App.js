@@ -88,6 +88,7 @@ function App() {
             <Route path="/stores/:storeId/production" element={<StoreProduction />} />
             <Route path="/complaints" element={<Complaints />} />
             <Route path="/crm" element={<CRM />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         ) : (
           <Route path="*" element={<Navigate to="/login" />} />
