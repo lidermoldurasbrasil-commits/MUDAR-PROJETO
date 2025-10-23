@@ -246,6 +246,8 @@ class StoreProduction(BaseModel):
     store: str  # Store 1, Store 2, Store 3, Factory
     customer_name: str
     order_id: str
+    project_name: str = ""
+    responsible: str = ""
     status: str = "Artwork Creation"  # Artwork Creation, Client Approval, Printing, Production, Ready, Delivered
     delivery_deadline: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -254,6 +256,8 @@ class StoreProductionCreate(BaseModel):
     store: str
     customer_name: str
     order_id: str
+    project_name: str = ""
+    responsible: str = ""
     status: str = "Artwork Creation"
     delivery_deadline: str
 
