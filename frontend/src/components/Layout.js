@@ -28,10 +28,6 @@ export default function Layout({ user, onLogout }) {
       { path: '/store/1', icon: Store, label: 'Loja 1', testId: 'nav-store-1' },
       { path: '/store/2', icon: Store, label: 'Loja 2', testId: 'nav-store-2' },
       { path: '/store/3', icon: Store, label: 'Loja 3', testId: 'nav-store-3' },
-    ]},
-    
-    // === ATENDIMENTO ===
-    { section: 'Atendimento', items: [
       { path: '/complaints', icon: AlertCircle, label: 'Reclamações', testId: 'nav-complaints' },
       { path: '/crm', icon: Users, label: 'CRM / Leads', testId: 'nav-crm' },
     ]},
