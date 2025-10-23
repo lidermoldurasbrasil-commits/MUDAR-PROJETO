@@ -9,17 +9,17 @@ export default function Layout({ user, onLogout }) {
 
   const navItems = [
     { path: '/', icon: Home, label: 'Dashboard', testId: 'nav-dashboard' },
-    { path: '/production', icon: Package, label: 'Production Board', testId: 'nav-production' },
-    { path: '/returns', icon: RefreshCcw, label: 'Returns', testId: 'nav-returns' },
-    { path: '/marketing', icon: Megaphone, label: 'Marketing Tasks', testId: 'nav-marketing' },
-    { path: '/purchase-requests', icon: ShoppingCart, label: 'Purchase Requests', testId: 'nav-purchase-requests' },
-    { path: '/purchase-orders', icon: FileText, label: 'Purchase Orders', testId: 'nav-purchase-orders' },
-    { path: '/accounts-payable', icon: DollarSign, label: 'Accounts Payable', testId: 'nav-accounts-payable' },
-    { path: '/sales', icon: TrendingUp, label: 'Sales', testId: 'nav-sales' },
-    { path: '/cost-center', icon: Calculator, label: 'Cost Center', testId: 'nav-cost-center' },
-    { path: '/breakeven', icon: TrendingUp, label: 'Break-even', testId: 'nav-breakeven' },
-    { path: '/stores', icon: Store, label: 'Stores & Factory', testId: 'nav-stores' },
-    { path: '/complaints', icon: AlertCircle, label: 'Complaints', testId: 'nav-complaints' },
+    { path: '/production', icon: Package, label: 'Quadro de Produção', testId: 'nav-production' },
+    { path: '/returns', icon: RefreshCcw, label: 'Devoluções', testId: 'nav-returns' },
+    { path: '/marketing', icon: Megaphone, label: 'Tarefas de Marketing', testId: 'nav-marketing' },
+    { path: '/purchase-requests', icon: ShoppingCart, label: 'Solicitações de Compra', testId: 'nav-purchase-requests' },
+    { path: '/purchase-orders', icon: FileText, label: 'Pedidos de Compra', testId: 'nav-purchase-orders' },
+    { path: '/accounts-payable', icon: DollarSign, label: 'Contas a Pagar', testId: 'nav-accounts-payable' },
+    { path: '/sales', icon: TrendingUp, label: 'Vendas', testId: 'nav-sales' },
+    { path: '/cost-center', icon: Calculator, label: 'Centro de Custos', testId: 'nav-cost-center' },
+    { path: '/breakeven', icon: TrendingUp, label: 'Ponto de Equilíbrio', testId: 'nav-breakeven' },
+    { path: '/stores', icon: Store, label: 'Lojas & Fábrica', testId: 'nav-stores' },
+    { path: '/complaints', icon: AlertCircle, label: 'Reclamações', testId: 'nav-complaints' },
     { path: '/crm', icon: Users, label: 'CRM / Leads', testId: 'nav-crm' },
   ];
 
