@@ -97,8 +97,8 @@ export default function ProductionBoard() {
     <div data-testid="production-board-page">
       <div className="page-header">
         <div>
-          <h2>Production Board</h2>
-          <p>Monday.com style production tracking</p>
+          <h2>Quadro de Produção</h2>
+          <p>Rastreamento de produção estilo Monday.com</p>
         </div>
         <button
           className="btn-primary"
@@ -106,7 +106,7 @@ export default function ProductionBoard() {
           data-testid="add-production-item-btn"
         >
           <Plus size={20} />
-          <span>Add Item</span>
+          <span>Adicionar Item</span>
         </button>
       </div>
 
@@ -115,15 +115,15 @@ export default function ProductionBoard() {
           <table data-testid="production-items-table">
             <thead>
               <tr>
-                <th>Project Name</th>
+                <th>Nome do Projeto</th>
                 <th>SKU</th>
-                <th>Quantity</th>
-                <th>Client</th>
-                <th>Frame Color</th>
-                <th>Delivery Date</th>
-                <th>Platform</th>
+                <th>Quantidade</th>
+                <th>Cliente</th>
+                <th>Cor da Moldura</th>
+                <th>Data de Entrega</th>
+                <th>Plataforma</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
