@@ -34,47 +34,47 @@ export default function Login({ onLogin }) {
     <div className="login-container" data-testid="login-page">
       <div className="login-box">
         <div className="login-header">
-          <h1 data-testid="login-title">Manufacturing Management</h1>
-          <p>Complete business control in one place</p>
+          <h1 data-testid="login-title">Gestão de Manufatura</h1>
+          <p>Controle completo do negócio em um só lugar</p>
         </div>
 
         <form onSubmit={handleSubmit} data-testid="login-form">
           <div className="form-group">
-            <label>Username</label>
+            <label>Usuário</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
               data-testid="username-input"
-              placeholder="Enter your username"
+              placeholder="Digite seu usuário"
             />
           </div>
 
           <div className="form-group">
-            <label>Password</label>
+            <label>Senha</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               data-testid="password-input"
-              placeholder="Enter your password"
+              placeholder="Digite sua senha"
             />
           </div>
 
           {isRegister && (
             <div className="form-group">
-              <label>Role</label>
+              <label>Função</label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 data-testid="role-select"
               >
-                <option value="manager">Manager</option>
-                <option value="director">Director</option>
-                <option value="production">Production</option>
-                <option value="logistics">Logistics</option>
+                <option value="manager">Gerente</option>
+                <option value="director">Diretor</option>
+                <option value="production">Produção</option>
+                <option value="logistics">Logística</option>
                 <option value="marketing">Marketing</option>
               </select>
             </div>
@@ -86,7 +86,7 @@ export default function Login({ onLogin }) {
             disabled={loading}
             data-testid="submit-button"
           >
-            {loading ? 'Processing...' : isRegister ? 'Create Account' : 'Sign In'}
+            {loading ? 'Processando...' : isRegister ? 'Criar Conta' : 'Entrar'}
           </button>
         </form>
 
@@ -96,7 +96,7 @@ export default function Login({ onLogin }) {
             className="toggle-link"
             data-testid="toggle-auth-mode"
           >
-            {isRegister ? 'Already have an account? Sign In' : 'Need an account? Register'}
+            {isRegister ? 'Já tem uma conta? Entre' : 'Precisa de uma conta? Registre-se'}
           </button>
         </div>
       </div>
