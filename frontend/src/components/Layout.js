@@ -8,19 +8,37 @@ export default function Layout({ user, onLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const navItems = [
-    { path: '/', icon: Home, label: 'Dashboard', testId: 'nav-dashboard' },
-    { path: '/production', icon: Package, label: 'Quadro de Produção', testId: 'nav-production' },
-    { path: '/returns', icon: RefreshCcw, label: 'Devoluções', testId: 'nav-returns' },
-    { path: '/marketing', icon: Megaphone, label: 'Tarefas de Marketing', testId: 'nav-marketing' },
-    { path: '/purchase-requests', icon: ShoppingCart, label: 'Solicitações de Compra', testId: 'nav-purchase-requests' },
-    { path: '/purchase-orders', icon: FileText, label: 'Pedidos de Compra', testId: 'nav-purchase-orders' },
-    { path: '/accounts-payable', icon: DollarSign, label: 'Contas a Pagar', testId: 'nav-accounts-payable' },
-    { path: '/sales', icon: TrendingUp, label: 'Vendas', testId: 'nav-sales' },
-    { path: '/cost-center', icon: Calculator, label: 'Centro de Custos', testId: 'nav-cost-center' },
-    { path: '/breakeven', icon: TrendingUp, label: 'Ponto de Equilíbrio', testId: 'nav-breakeven' },
-    { path: '/stores', icon: Store, label: 'Lojas & Fábrica', testId: 'nav-stores' },
-    { path: '/complaints', icon: AlertCircle, label: 'Reclamações', testId: 'nav-complaints' },
-    { path: '/crm', icon: Users, label: 'CRM / Leads', testId: 'nav-crm' },
+    { path: '/', icon: Home, label: 'Dashboard Geral', testId: 'nav-dashboard' },
+    
+    // === MARKETPLACE ===
+    { section: 'Marketplace', items: [
+      { path: '/marketplace/production', icon: Package, label: 'Produção Marketplace', testId: 'nav-marketplace-production' },
+      { path: '/marketplace/returns', icon: RefreshCcw, label: 'Devoluções', testId: 'nav-returns' },
+      { path: '/marketplace/marketing', icon: Megaphone, label: 'Marketing', testId: 'nav-marketing' },
+      { path: '/marketplace/purchases', icon: ShoppingCart, label: 'Compras', testId: 'nav-purchases' },
+    ]},
+    
+    // === FÁBRICA E LOJAS ===
+    { section: 'Fábrica & Lojas', items: [
+      { path: '/factory', icon: Factory, label: 'Fábrica', testId: 'nav-factory' },
+      { path: '/store/1', icon: Store, label: 'Loja 1', testId: 'nav-store-1' },
+      { path: '/store/2', icon: Store, label: 'Loja 2', testId: 'nav-store-2' },
+      { path: '/store/3', icon: Store, label: 'Loja 3', testId: 'nav-store-3' },
+    ]},
+    
+    // === FINANCEIRO ===
+    { section: 'Financeiro', items: [
+      { path: '/accounts-payable', icon: DollarSign, label: 'Contas a Pagar', testId: 'nav-accounts-payable' },
+      { path: '/sales', icon: TrendingUp, label: 'Vendas', testId: 'nav-sales' },
+      { path: '/cost-center', icon: Calculator, label: 'Centro de Custos', testId: 'nav-cost-center' },
+      { path: '/breakeven', icon: TrendingUp, label: 'Ponto de Equilíbrio', testId: 'nav-breakeven' },
+    ]},
+    
+    // === ATENDIMENTO ===
+    { section: 'Atendimento', items: [
+      { path: '/complaints', icon: AlertCircle, label: 'Reclamações', testId: 'nav-complaints' },
+      { path: '/crm', icon: Users, label: 'CRM / Leads', testId: 'nav-crm' },
+    ]},
   ];
 
   return (
