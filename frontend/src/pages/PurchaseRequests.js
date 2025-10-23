@@ -71,11 +71,17 @@ export default function PurchaseRequests() {
                 <td>${req.estimated_cost}</td><td>{req.requested_by}</td>
                 <td><span className={`status-badge status-${req.approval_status.toLowerCase()}`}>{req.approval_status}</span></td>
                 <td>
-                  {req.approval_status === 'Pending' && (
+                  {req.approval_status === 'Pending' ? (
                     <div className="action-buttons">
-                      <button onClick={() => handleApprove(req.id)} className="btn-success" data-testid={`approve-request-${req.id}`}><Check size={16} /></button>
-                      <button onClick={() => handleReject(req.id)} className="btn-danger" data-testid={`reject-request-${req.id}`}><X size={16} /></button>
+                      <button onClick={() => handleApprove(req.id)} className="btn-success" data-testid={`approve-request-${req.id}`} title="Approve">
+                        <Check size={16} />
+                      </button>
+                      <button onClick={() => handleReject(req.id)} className="btn-danger" data-testid={`reject-request-${req.id}`} title="Reject">
+                        <X size={16} />
+                      </button>
                     </div>
+                  ) : (
+                    <span>-</span>
                   )}
                 </td>
               </tr>
