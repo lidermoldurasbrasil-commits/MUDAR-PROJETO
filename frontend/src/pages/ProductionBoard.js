@@ -81,6 +81,7 @@ export default function ProductionBoard() {
     setEditingItem(null);
     setFormData({
       project_name: '',
+      order_number: '',
       sku: '',
       quantity: 0,
       client_name: '',
@@ -94,6 +95,36 @@ export default function ProductionBoard() {
   const getStatusClass = (status) => {
     return `status-${status.toLowerCase().replace(' ', '-')}`;
   };
+
+  const handleExport = () => {
+    const csv = [
+      ['Projeto', 'Pedido', 'SKU', 'Quantidade', 'Cliente', 'Cor da Moldura', 'Data de Entrega', 'Plataforma', 'Status'],
+      ...items.map(item => [
+        item.project_name,
+        item.order_number || '',
+        item.sku,
+        item.quantity,
+        item.client_name,
+        item.frame_color,
+        item.delivery_date,
+        item.platform,
+        item.status
+      ])
+    ].map(row => row.join(',')).join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'producao_' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    toast.success('Planilha exportada com sucesso!');
+  };
+
+  const groupedByStatus = STATUS_OPTIONS.reduce((acc, status) => {
+    acc[status] = items.filter(item => item.status === status);
+    return acc;
+  }, {});
 
   return (
     <div data-testid="production-board-page">
