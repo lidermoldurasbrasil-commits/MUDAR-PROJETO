@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const STATUS_OPTIONS = ['Designing', 'Printing', 'In Production', 'Quality Check', 'Shipped'];
+const STATUS_OPTIONS = ['Projetando', 'Imprimindo', 'Em Produção', 'Controle de Qualidade', 'Enviado'];
 const PLATFORMS = ['Shopee', 'Mercado Livre', 'TikTok'];
 
 export default function ProductionBoard() {
