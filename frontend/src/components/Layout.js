@@ -55,17 +55,40 @@ export default function Layout({ user, onLogout }) {
         </div>
 
         <nav className="sidebar-nav">
-          {navItems.map(item => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
-              data-testid={item.testId}
-            >
-              <item.icon size={20} />
-              {sidebarOpen && <span>{item.label}</span>}
-            </Link>
-          ))}
+          {navItems.map((item, idx) => {
+            if (item.section) {
+              // Render section with items
+              return (
+                <div key={idx} className="nav-section">
+                  {sidebarOpen && <div className="nav-section-title">{item.section}</div>}
+                  {item.items.map(subItem => (
+                    <Link
+                      key={subItem.path}
+                      to={subItem.path}
+                      className={`nav-item ${location.pathname === subItem.path ? 'active' : ''}`}
+                      data-testid={subItem.testId}
+                    >
+                      <subItem.icon size={20} />
+                      {sidebarOpen && <span>{subItem.label}</span>}
+                    </Link>
+                  ))}
+                </div>
+              );
+            } else {
+              // Render single item
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                  data-testid={item.testId}
+                >
+                  <item.icon size={20} />
+                  {sidebarOpen && <span>{item.label}</span>}
+                </Link>
+              );
+            }
+          })}
         </nav>
       </aside>
 
