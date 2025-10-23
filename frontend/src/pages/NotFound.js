@@ -30,7 +30,7 @@ export default function NotFound() {
         color: '#2d3748',
         marginBottom: '16px'
       }}>
-        Page Not Found
+        Página Não Encontrada
       </h2>
       
       <p style={{
@@ -39,7 +39,7 @@ export default function NotFound() {
         marginBottom: '32px',
         maxWidth: '500px'
       }}>
-        The page you're looking for doesn't exist or has been moved. Please check the URL or navigate back to the dashboard.
+        A página que você está procurando não existe ou foi movida. Por favor, verifique a URL ou navegue de volta ao dashboard.
       </p>
       
       <div style={{ display: 'flex', gap: '16px' }}>
@@ -50,7 +50,7 @@ export default function NotFound() {
           data-testid="go-back-button"
         >
           <ArrowLeft size={20} />
-          <span>Go Back</span>
+          <span>Voltar</span>
         </button>
         
         <button
@@ -60,7 +60,7 @@ export default function NotFound() {
           data-testid="home-button"
         >
           <Home size={20} />
-          <span>Home</span>
+          <span>Início</span>
         </button>
       </div>
     </div>
