@@ -16,6 +16,7 @@ import StoreProduction from './pages/StoreProduction';
 import Complaints from './pages/Complaints';
 import CRM from './pages/CRM';
 import Layout from './components/Layout';
+import NotFound from './pages/NotFound';
 import axios from 'axios';
 import './App.css';
 
