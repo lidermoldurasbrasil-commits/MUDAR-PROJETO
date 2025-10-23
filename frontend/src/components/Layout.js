@@ -67,7 +67,7 @@ export default function Layout({ user, onLogout }) {
             </div>
             <button onClick={onLogout} className="btn-logout" data-testid="logout-button">
               <LogOut size={18} />
-              <span>Logout</span>
+              <span>Sair</span>
             </button>
           </div>
         </header>
