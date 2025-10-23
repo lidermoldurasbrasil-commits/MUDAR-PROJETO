@@ -24,7 +24,7 @@ export default function Login({ onLogin }) {
       onLogin(response.data.token, response.data.user);
       toast.success(isRegister ? 'Conta criada!' : 'Bem-vindo de volta!');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Authentication failed');
+      toast.error(error.response?.data?.detail || 'Falha na autenticação');
     } finally {
       setLoading(false);
     }
