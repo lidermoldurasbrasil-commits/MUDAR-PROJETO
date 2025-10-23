@@ -15,8 +15,10 @@ export default function ProductionBoard() {
   const [items, setItems] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'kanban'
   const [formData, setFormData] = useState({
     project_name: '',
+    order_number: '',
     sku: '',
     quantity: 0,
     client_name: '',
