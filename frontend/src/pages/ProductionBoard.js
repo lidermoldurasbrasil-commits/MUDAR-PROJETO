@@ -171,13 +171,13 @@ export default function ProductionBoard() {
         <div className="modal-overlay" data-testid="production-modal">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>{editingItem ? 'Edit Item' : 'New Production Item'}</h3>
+              <h3>{editingItem ? 'Editar Item' : 'Novo Item de Produção'}</h3>
               <button onClick={() => setShowModal(false)} className="close-btn">&times;</button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Project Name</label>
+                  <label>Nome do Projeto</label>
                   <input
                     type="text"
                     value={formData.project_name}
@@ -200,7 +200,7 @@ export default function ProductionBoard() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Quantity</label>
+                  <label>Quantidade</label>
                   <input
                     type="number"
                     value={formData.quantity}
@@ -210,7 +210,7 @@ export default function ProductionBoard() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Client Name</label>
+                  <label>Nome do Cliente</label>
                   <input
                     type="text"
                     value={formData.client_name}
@@ -223,7 +223,7 @@ export default function ProductionBoard() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Frame Color</label>
+                  <label>Cor da Moldura</label>
                   <input
                     type="text"
                     value={formData.frame_color}
@@ -233,7 +233,7 @@ export default function ProductionBoard() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Delivery Date</label>
+                  <label>Data de Entrega</label>
                   <input
                     type="date"
                     value={formData.delivery_date}
@@ -246,7 +246,7 @@ export default function ProductionBoard() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Platform</label>
+                  <label>Plataforma</label>
                   <select
                     value={formData.platform}
                     onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
@@ -269,10 +269,10 @@ export default function ProductionBoard() {
 
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowModal(false)} className="btn-secondary">
-                  Cancel
+                  Cancelar
                 </button>
                 <button type="submit" className="btn-primary" data-testid="submit-production-form">
-                  {editingItem ? 'Update' : 'Create'}
+                  {editingItem ? 'Atualizar' : 'Criar'}
                 </button>
               </div>
             </form>
