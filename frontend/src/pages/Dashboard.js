@@ -33,7 +33,7 @@ export default function Dashboard() {
   };
 
   if (loading) {
-    return <div className="text-center py-20">Loading...</div>;
+    return <div className="text-center py-20">Carregando...</div>;
   }
 
   const statCards = [
