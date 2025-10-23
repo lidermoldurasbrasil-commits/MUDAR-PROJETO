@@ -48,8 +48,8 @@ export default function Dashboard() {
   return (
     <div data-testid="dashboard-page">
       <div className="dashboard-header">
-        <h1>Director Dashboard</h1>
-        <p>Real-time overview of all operations</p>
+        <h1>Dashboard do Diretor</h1>
+        <p>Visão em tempo real de todas as operações</p>
       </div>
 
       {/* Stat Cards */}
