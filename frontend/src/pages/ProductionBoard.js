@@ -133,14 +133,40 @@ export default function ProductionBoard() {
           <h2>Quadro de Produção</h2>
           <p>Rastreamento de produção estilo Monday.com</p>
         </div>
-        <button
-          className="btn-primary"
-          onClick={() => { resetForm(); setShowModal(true); }}
-          data-testid="add-production-item-btn"
-        >
-          <Plus size={20} />
-          <span>Adicionar Item</span>
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="view-toggle" data-testid="view-toggle">
+            <button 
+              className={viewMode === 'list' ? 'active' : ''}
+              onClick={() => setViewMode('list')}
+              title="Visualização em Lista"
+            >
+              <List size={20} />
+            </button>
+            <button 
+              className={viewMode === 'kanban' ? 'active' : ''}
+              onClick={() => setViewMode('kanban')}
+              title="Visualização Kanban"
+            >
+              <LayoutGrid size={20} />
+            </button>
+          </div>
+          <button
+            className="btn-secondary"
+            onClick={handleExport}
+            data-testid="export-btn"
+          >
+            <Download size={20} />
+            <span>Exportar</span>
+          </button>
+          <button
+            className="btn-primary"
+            onClick={() => { resetForm(); setShowModal(true); }}
+            data-testid="add-production-item-btn"
+          >
+            <Plus size={20} />
+            <span>Adicionar Item</span>
+          </button>
+        </div>
       </div>
 
       <div className="card">
