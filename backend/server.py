@@ -63,6 +63,7 @@ class ProductionItem(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     project_name: str
+    order_number: str = ""
     sku: str
     quantity: int
     client_name: str
@@ -74,6 +75,7 @@ class ProductionItem(BaseModel):
 
 class ProductionItemCreate(BaseModel):
     project_name: str
+    order_number: str = ""
     sku: str
     quantity: int
     client_name: str
