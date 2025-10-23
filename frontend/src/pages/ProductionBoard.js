@@ -22,7 +22,7 @@ export default function ProductionBoard() {
     client_name: '',
     frame_color: '',
     delivery_date: '',
-    status: 'Designing',
+    status: 'Projetando',
     platform: 'Shopee'
   });
 
@@ -35,7 +35,7 @@ export default function ProductionBoard() {
       const res = await axios.get(`${API}/production`);
       setItems(res.data);
     } catch (error) {
-      toast.error('Error loading items');
+      toast.error('Erro ao carregar itens');
     }
   };
 
@@ -44,27 +44,27 @@ export default function ProductionBoard() {
     try {
       if (editingItem) {
         await axios.put(`${API}/production/${editingItem.id}`, formData);
-        toast.success('Item updated');
+        toast.success('Item atualizado');
       } else {
         await axios.post(`${API}/production`, formData);
-        toast.success('Item created');
+        toast.success('Item criado');
       }
       fetchItems();
       setShowModal(false);
       resetForm();
     } catch (error) {
-      toast.error('Error saving item');
+      toast.error('Erro ao salvar item');
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Delete this item?')) {
+    if (window.confirm('Excluir este item?')) {
       try {
         await axios.delete(`${API}/production/${id}`);
-        toast.success('Item deleted');
+        toast.success('Item excluído');
         fetchItems();
       } catch (error) {
-        toast.error('Error deleting item');
+        toast.error('Erro ao excluir item');
       }
     }
   };
@@ -84,7 +84,7 @@ export default function ProductionBoard() {
       client_name: '',
       frame_color: '',
       delivery_date: '',
-      status: 'Designing',
+      status: 'Projetando',
       platform: 'Shopee'
     });
   };
