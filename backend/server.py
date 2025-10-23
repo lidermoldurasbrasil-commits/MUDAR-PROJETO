@@ -692,6 +692,11 @@ async def update_store_production(item_id: str, item: StoreProductionCreate, cur
     await db.store_production.update_one({"id": item_id}, {"$set": item.model_dump()})
     return {"message": "Updated successfully"}
 
+@api_router.delete("/store-production/{item_id}")
+async def delete_store_production(item_id: str, current_user: dict = Depends(get_current_user)):
+    await db.store_production.delete_one({"id": item_id})
+    return {"message": "Deleted successfully"}
+
 # ============= COMPLAINTS =============
 
 @api_router.post("/complaints", response_model=Complaint)
