@@ -71,7 +71,7 @@ export default function Dashboard() {
       <div className="charts-grid">
         {/* Sales by Channel */}
         <div className="chart-card" data-testid="sales-by-channel-chart">
-          <h3>Sales by Channel</h3>
+          <h3>Vendas por Canal</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={charts?.sales_by_channel || []}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -79,15 +79,15 @@ export default function Dashboard() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="count" fill="#667eea" name="Orders" />
-              <Bar dataKey="revenue" fill="#56ab2f" name="Revenue" />
+              <Bar dataKey="count" fill="#667eea" name="Pedidos" />
+              <Bar dataKey="revenue" fill="#56ab2f" name="Receita" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         {/* Production Status */}
         <div className="chart-card" data-testid="production-status-chart">
-          <h3>Production Status</h3>
+          <h3>Status de Produção</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
