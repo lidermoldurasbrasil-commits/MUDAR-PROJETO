@@ -22,7 +22,7 @@ export default function Login({ onLogin }) {
       
       const response = await axios.post(`${API}${endpoint}`, data);
       onLogin(response.data.token, response.data.user);
-      toast.success(isRegister ? 'Account created!' : 'Welcome back!');
+      toast.success(isRegister ? 'Conta criada!' : 'Bem-vindo de volta!');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Authentication failed');
     } finally {
