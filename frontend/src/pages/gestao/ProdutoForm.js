@@ -717,6 +717,41 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
           background: #4db89a;
         }
 
+        /* New layout classes */
+        .form-group-full {
+          flex: 2;
+        }
+
+        .form-row-3 {
+          display: flex;
+          gap: 15px;
+          align-items: flex-end;
+        }
+
+        .form-row-3 .form-group {
+          flex: 1;
+        }
+
+        .form-row-4 {
+          display: flex;
+          gap: 15px;
+          align-items: flex-end;
+        }
+
+        .form-row-4 .form-group {
+          flex: 1;
+        }
+
+        .form-row-with-check {
+          display: flex;
+          gap: 15px;
+          align-items: flex-end;
+        }
+
+        .form-row-with-check .form-group {
+          flex: 1;
+        }
+
         @media (max-width: 1024px) {
           .form-two-columns {
             grid-template-columns: 1fr;
