@@ -1185,6 +1185,178 @@ class PedidoManufatura(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: Optional[str] = ""
 
+# ============= CLIENTES =============
+
+class Cliente(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    loja_id: str  # fabrica, loja1, loja2, etc.
+    
+    # Dados pessoais
+    nome: str
+    cpf: Optional[str] = ""
+    rg: Optional[str] = ""
+    data_nascimento: Optional[str] = ""
+    
+    # Contato
+    telefone: str
+    celular: Optional[str] = ""
+    email: Optional[str] = ""
+    
+    # Endereço de entrega
+    cep: Optional[str] = ""
+    endereco: str = ""
+    numero: Optional[str] = ""
+    complemento: Optional[str] = ""
+    bairro: Optional[str] = ""
+    cidade: Optional[str] = ""
+    estado: Optional[str] = ""
+    
+    # Dados adicionais
+    observacoes: Optional[str] = ""
+    ativo: bool = True
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Endpoints de Clientes
+@api_router.get("/gestao/clientes")
+async def get_clientes(loja: Optional[str] = None, busca: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna clientes filtrados"""
+    query = {"ativo": True}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    
+    if busca:
+        query['$or'] = [
+            {'nome': {'$regex': busca, '$options': 'i'}},
+            {'cpf': {'$regex': busca, '$options': 'i'}},
+            {'telefone': {'$regex': busca, '$options': 'i'}}
+        ]
+    
+    clientes = await db.clientes.find(query).sort("nome", 1).to_list(None)
+    for cliente in clientes:
+        if '_id' in cliente:
+            del cliente['_id']
+    return clientes
+
+@api_router.post("/gestao/clientes")
+async def create_cliente(cliente: Cliente, current_user: dict = Depends(get_current_user)):
+    """Cria um novo cliente"""
+    cliente_dict = cliente.model_dump()
+    await db.clientes.insert_one(cliente_dict)
+    if '_id' in cliente_dict:
+        del cliente_dict['_id']
+    return cliente_dict
+
+@api_router.get("/gestao/clientes/{cliente_id}")
+async def get_cliente(cliente_id: str, current_user: dict = Depends(get_current_user)):
+    """Retorna um cliente específico"""
+    cliente = await db.clientes.find_one({"id": cliente_id})
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+    if '_id' in cliente:
+        del cliente['_id']
+    return cliente
+
+@api_router.put("/gestao/clientes/{cliente_id}")
+async def update_cliente(cliente_id: str, cliente: Cliente, current_user: dict = Depends(get_current_user)):
+    """Atualiza um cliente existente"""
+    cliente_dict = cliente.model_dump()
+    cliente_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+    await db.clientes.update_one({"id": cliente_id}, {"$set": cliente_dict})
+    return {"message": "Cliente atualizado com sucesso"}
+
+@api_router.delete("/gestao/clientes/{cliente_id}")
+async def delete_cliente(cliente_id: str, current_user: dict = Depends(get_current_user)):
+    """Desativa um cliente (soft delete)"""
+    await db.clientes.update_one({"id": cliente_id}, {"$set": {"ativo": False}})
+    return {"message": "Cliente desativado com sucesso"}
+
+# ============= PEDIDOS DE MANUFATURA =============
+
+class HistoricoStatus(BaseModel):
+    status: str
+    data: datetime
+    usuario: str
+    observacao: Optional[str] = ""
+
+class PedidoManufatura(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_pedido: int = 0  # Auto-incremental
+    loja_id: str  # fabrica, loja1, loja2, loja3, loja4, loja5
+    
+    # Dados básicos
+    data_abertura: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    cliente_id: Optional[str] = ""  # ID do cliente cadastrado
+    cliente_nome: str
+    tipo_produto: str  # Quadro, Espelho, Moldura avulsa, Fine-Art
+    quantidade: int = 1
+    
+    # Dimensões
+    altura: float  # cm
+    largura: float  # cm
+    
+    # Insumos selecionados
+    moldura_id: Optional[str] = None
+    moldura_descricao: Optional[str] = ""
+    usar_vidro: bool = False
+    vidro_id: Optional[str] = None
+    vidro_descricao: Optional[str] = ""
+    usar_mdf: bool = False
+    mdf_id: Optional[str] = None
+    mdf_descricao: Optional[str] = ""
+    usar_papel: bool = False
+    papel_id: Optional[str] = None
+    papel_descricao: Optional[str] = ""
+    usar_passepartout: bool = False
+    passepartout_id: Optional[str] = None
+    passepartout_descricao: Optional[str] = ""
+    usar_acessorios: bool = False
+    acessorios_ids: Optional[List[str]] = []
+    acessorios_descricoes: Optional[List[str]] = []
+    
+    # NOVOS CAMPOS
+    produto_pronto_id: Optional[str] = None  # Produto pronto
+    produto_pronto_descricao: Optional[str] = ""
+    promocao_id: Optional[str] = None  # Promoção
+    promocao_descricao: Optional[str] = ""
+    espelho_organico_id: Optional[str] = None  # Espelho orgânico
+    espelho_organico_descricao: Optional[str] = ""
+    
+    # Cálculos automáticos
+    area: float = 0  # m²
+    perimetro: float = 0  # cm
+    barras_necessarias: int = 0
+    sobra: float = 0  # cm
+    custo_perda: float = 0
+    
+    # Composição detalhada
+    itens: List[ItemOrcamento] = []
+    
+    # Custos e valores
+    custo_total: float = 0
+    markup: float = 3.0
+    preco_venda: float = 0
+    margem_percentual: float = 0
+    
+    # Controle de produção (movido para seção separada)
+    status: str = "Criado"  # Criado, Em Análise, Corte, Montagem, Acabamento, Pronto, Entregue, Cancelado
+    vendedor: Optional[str] = ""  # Mudado de responsavel para vendedor
+    prazo_entrega: Optional[datetime] = None
+    observacoes: Optional[str] = ""
+    observacoes_loja: Optional[str] = ""
+    observacoes_cliente: Optional[str] = ""
+    
+    # Histórico
+    historico_status: List[HistoricoStatus] = []
+    
+    # Metadata
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: Optional[str] = ""
+
 # Contador para número de pedido
 async def get_next_numero_pedido():
     """Gera o próximo número de pedido sequencial"""
