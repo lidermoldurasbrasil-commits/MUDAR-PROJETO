@@ -75,7 +75,7 @@ function App() {
         
         {user ? (
           <Route element={<Layout user={user} onLogout={handleLogout} />}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<DirectorDashboard />} />
             
             {/* Marketplace */}
             <Route path="/marketplace/production" element={<ProductionBoard />} />
