@@ -333,6 +333,23 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     payload = decode_token(token)
     return payload
 
+def is_director_or_manager(user: dict) -> bool:
+    """Verifica se o usuário é Diretor ou Gerente"""
+    role = user.get('role', '').lower()
+    return role in ['diretor', 'gerente', 'director', 'manager']
+
+# ============= AUTH ROUTES =============
+
+@api_router.get("/auth/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    """Retorna informações do usuário atual incluindo permissões"""
+    return {
+        "id": current_user.get('id'),
+        "username": current_user.get('username'),
+        "role": current_user.get('role'),
+        "can_view_costs": is_director_or_manager(current_user)
+    }
+
 # ============= AUTH ROUTES =============
 
 @api_router.post("/auth/register", response_model=TokenResponse)
