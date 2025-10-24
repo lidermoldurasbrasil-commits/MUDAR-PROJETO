@@ -319,6 +319,24 @@ export default function Produtos() {
           min-height: 400px;
         }
 
+        .loading {
+          text-align: center;
+          padding: 60px 20px;
+          color: #718096;
+          font-size: 16px;
+        }
+
+        .empty-state {
+          text-align: center;
+          padding: 80px 20px;
+        }
+
+        .empty-state p {
+          color: #718096;
+          font-size: 18px;
+          margin-bottom: 20px;
+        }
+
         .table-container {
           background: white;
           border-radius: 12px;
