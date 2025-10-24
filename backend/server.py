@@ -1260,7 +1260,8 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
                 'id': moldura_produto['id'],
                 'descricao': moldura_produto['descricao'],
                 'custo_unitario': custo_por_cm,
-                'barra_padrao': 270
+                'barra_padrao': 270,
+                'largura_moldura': moldura_produto.get('largura', 0)  # Largura da frente da moldura
             }
         elif moldura:
             # Usar insumo direto
@@ -1276,11 +1277,22 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
             # Calcular sobra e perda
             pedido.sobra = (pedido.barras_necessarias * barra_padrao) - pedido.perimetro
             
-            # Se sobra < 100cm, considerar como perda e cobrar
-            perimetro_cobrado = pedido.perimetro
+            # PERDA TÉCNICA 1: Perda de corte baseada na largura da moldura
+            # Largura da moldura × 8 (padrão da indústria para corte de molduras)
+            largura_moldura = moldura.get('largura_moldura', 0)
+            perda_corte_cm = largura_moldura * 8 if largura_moldura > 0 else 0
+            
+            # PERDA TÉCNICA 2: Se sobra < 100cm, considerar como perda adicional
+            perda_sobra_cm = 0
             if pedido.sobra < 100:
-                pedido.custo_perda = pedido.sobra * moldura['custo_unitario']
-                perimetro_cobrado += pedido.sobra
+                perda_sobra_cm = pedido.sobra
+            
+            # Total de perda a cobrar
+            perda_total_cm = perda_corte_cm + perda_sobra_cm
+            pedido.custo_perda = perda_total_cm * moldura['custo_unitario']
+            
+            # Perímetro cobrado = perímetro + perdas
+            perimetro_cobrado = pedido.perimetro + perda_total_cm
             
             # Custo da moldura
             custo_moldura = perimetro_cobrado * moldura['custo_unitario'] * pedido.quantidade
@@ -1288,7 +1300,7 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
             
             itens.append(ItemOrcamento(
                 insumo_id=moldura['id'],
-                insumo_descricao=moldura['descricao'],
+                insumo_descricao=f"{moldura['descricao']} (Perda corte: {perda_corte_cm:.0f}cm, Sobra: {perda_sobra_cm:.0f}cm)",
                 tipo_insumo='Moldura',
                 quantidade=perimetro_cobrado,
                 unidade='cm',
