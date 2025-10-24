@@ -772,9 +772,9 @@ class Produto(BaseModel):
     familia: Optional[str] = "Molduras"
     tipo_produto: Optional[str] = ""
     ref_loja: Optional[str] = ""
-    largura: Optional[float] = 2.00
-    comprimento: Optional[float] = 270.00
-    espessura: Optional[float] = 1.00
+    largura: Optional[float] = 0
+    comprimento: Optional[float] = 0
+    espessura: Optional[float] = 0
     ncm: Optional[str] = ""
     cfop: Optional[str] = ""
     saldo_estoque: Optional[float] = 0
