@@ -1083,6 +1083,10 @@ async def get_orcamentos(loja: Optional[str] = None, current_user: dict = Depend
         query['loja_id'] = loja
     
     orcamentos = await db.orcamentos.find(query).to_list(None)
+    # Remove _id do MongoDB
+    for orcamento in orcamentos:
+        if '_id' in orcamento:
+            del orcamento['_id']
     return orcamentos
 
 @api_router.get("/gestao/orcamentos/{orcamento_id}")
