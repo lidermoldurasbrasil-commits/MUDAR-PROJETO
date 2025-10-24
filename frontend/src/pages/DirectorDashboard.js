@@ -141,6 +141,9 @@ export default function DirectorDashboard() {
           <p>Visão consolidada de todas as operações em tempo real</p>
         </div>
         <div className="header-actions">
+          <a href="/gestao/produtos" className="btn-gestao">
+            🏭 Sistema de Gestão Multiloja
+          </a>
           <select 
             value={timeFilter} 
             onChange={(e) => setTimeFilter(e.target.value)}
