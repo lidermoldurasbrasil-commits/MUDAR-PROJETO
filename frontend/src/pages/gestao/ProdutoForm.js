@@ -90,38 +90,29 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
     setFormData(prev => {
       const updated = { ...prev, [name]: newValue };
       
-      // Recalcular custo base quando mudar:
-      // - Prazo selecionado
-      // - Família
-      // - Dimensões (largura, comprimento)
-      // - Custos de prazos
-      if (name === 'prazo_selecionado' || name === 'familia' || 
-          name === 'largura' || name === 'comprimento' ||
-          name === 'custo_vista' || name === 'custo_30dias' || 
+      // Calcular markup automaticamente quando mudar:
+      // - Custos de prazo
+      // - Preços de venda
+      if (name === 'custo_vista' || name === 'custo_30dias' || 
           name === 'custo_60dias' || name === 'custo_90dias' || 
-          name === 'custo_120dias' || name === 'custo_150dias') {
-        updated.custo_base = calcularCustoBase(updated);
-      }
-      
-      // Calcular markup automaticamente
-      if (name === 'custo_base' || name === 'preco_manufatura' || name === 'preco_varejo' ||
-          name === 'prazo_selecionado' || name === 'familia' || 
-          name === 'largura' || name === 'comprimento') {
-        const custoBase = parseFloat(updated.custo_base) || 0;
+          name === 'custo_120dias' || name === 'custo_150dias' ||
+          name === 'preco_manufatura' || name === 'preco_varejo') {
+        
+        const custoSelecionado = getCustoSelecionado(updated);
         const precoManufatura = parseFloat(updated.preco_manufatura) || 0;
         const precoVarejo = parseFloat(updated.preco_varejo) || 0;
         
         // Calcular Markup Manufatura
-        if (custoBase > 0 && precoManufatura > 0) {
-          const markupManufatura = ((precoManufatura - custoBase) / custoBase * 100).toFixed(2);
+        if (custoSelecionado > 0 && precoManufatura > 0) {
+          const markupManufatura = ((precoManufatura - custoSelecionado) / custoSelecionado * 100).toFixed(2);
           updated.markup_manufatura = markupManufatura;
         } else {
           updated.markup_manufatura = '';
         }
         
         // Calcular Markup Varejo
-        if (custoBase > 0 && precoVarejo > 0) {
-          const markupVarejo = ((precoVarejo - custoBase) / custoBase * 100).toFixed(2);
+        if (custoSelecionado > 0 && precoVarejo > 0) {
+          const markupVarejo = ((precoVarejo - custoSelecionado) / custoSelecionado * 100).toFixed(2);
           updated.markup_varejo = markupVarejo;
         } else {
           updated.markup_varejo = '';
