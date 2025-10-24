@@ -35,12 +35,17 @@ export default function ProductionBoardV2() {
     { id: 's9', label: 'CANVAS', color: '#784bd1' },
     { id: 's10', label: 'FEITO', color: '#06ffa5' }
   ]);
+  const [productionStatusList, setProductionStatusList] = useState([
+    { id: 'ps1', label: 'AGUARDANDO IMPRESSÃO', color: '#fdab3d' },
+    { id: 'ps2', label: 'IMPRESSO', color: '#00c875' },
+    { id: 'ps3', label: 'EXPEDIÇÃO', color: '#579bfc' },
+    { id: 'ps4', label: 'ENVIADO', color: '#00d647' }
+  ]);
   const [customColumns, setCustomColumns] = useState([
     { id: 'qty', label: 'Quantit', type: 'dropdown', required: true },
     { id: 'sku', label: 'SKU', type: 'text', required: true },
     { id: 'text', label: 'Texto', type: 'text', required: true },
-    { id: 'glass', label: 'Vidro', type: 'dropdown', required: true },
-    { id: 'date', label: 'Data', type: 'date', required: true }
+    { id: 'production_status', label: 'Status de Produção', type: 'production_status', required: true }
   ]);
 
   // Estados de UI
