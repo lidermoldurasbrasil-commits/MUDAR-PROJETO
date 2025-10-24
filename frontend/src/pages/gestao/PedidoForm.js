@@ -769,6 +769,19 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           color: #5dceaa;
         }
 
+        .markup-info {
+          margin-top: 15px;
+          padding: 12px;
+          background: #e0f2fe;
+          border-left: 3px solid #3b82f6;
+          border-radius: 4px;
+        }
+
+        .markup-info small {
+          color: #1e40af;
+          font-size: 13px;
+        }
+
         .form-actions {
           display: flex;
           justify-content: flex-end;
