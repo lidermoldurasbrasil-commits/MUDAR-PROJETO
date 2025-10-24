@@ -1210,6 +1210,19 @@ async def get_pedidos(loja: Optional[str] = None, status: Optional[str] = None, 
             del pedido['_id']
     return pedidos
 
+def get_custo_por_prazo(produto, prazo_selecionado):
+    """Obtém o custo unitário baseado no prazo selecionado do produto"""
+    prazo_map = {
+        'vista': 'custo_vista',
+        '30dias': 'custo_30dias',
+        '60dias': 'custo_60dias',
+        '90dias': 'custo_90dias',
+        '120dias': 'custo_120dias',
+        '150dias': 'custo_150dias'
+    }
+    campo_custo = prazo_map.get(prazo_selecionado, 'custo_120dias')
+    return produto.get(campo_custo, 0)
+
 @api_router.post("/gestao/pedidos/calcular")
 async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends(get_current_user)):
     """Calcula automaticamente os custos do pedido com base nos insumos selecionados"""
@@ -1224,22 +1237,34 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
     # 3. Buscar insumos e calcular custos
     itens = []
     custo_total = 0
+    markup_sugerido = 3.0  # Markup padrão
     
     # 3.1 Moldura
     if pedido.moldura_id:
+        moldura_produto = await db.produtos_gestao.find_one({"id": pedido.moldura_id})
         moldura = await db.insumos.find_one({"id": pedido.moldura_id})
-        if not moldura:
-            # Tentar buscar em produtos
-            moldura = await db.produtos_gestao.find_one({"id": pedido.moldura_id})
-            if moldura:
-                # Adaptar produto para formato de insumo
-                custo_unitario = moldura.get('custo_120dias', 0)  # Usar custo padrão
-                moldura = {
-                    'id': moldura['id'],
-                    'descricao': moldura['descricao'],
-                    'custo_unitario': custo_unitario / 270 if custo_unitario > 0 else 0,  # Converter para custo por cm
-                    'barra_padrao': 270
-                }
+        
+        if moldura_produto:
+            # Usar prazo selecionado no produto
+            prazo = moldura_produto.get('prazo_selecionado', '120dias')
+            custo_unitario_barra = get_custo_por_prazo(moldura_produto, prazo)
+            
+            # Converter custo de barra para custo por cm
+            custo_por_cm = custo_unitario_barra / 270 if custo_unitario_barra > 0 else 0
+            
+            # Pegar markup do produto (usar markup_manufatura)
+            if moldura_produto.get('markup_manufatura'):
+                markup_sugerido = (moldura_produto['markup_manufatura'] / 100) + 1  # Converter % para multiplicador
+            
+            moldura = {
+                'id': moldura_produto['id'],
+                'descricao': moldura_produto['descricao'],
+                'custo_unitario': custo_por_cm,
+                'barra_padrao': 270
+            }
+        elif moldura:
+            # Usar insumo direto
+            pass
         
         if moldura:
             pedido.moldura_descricao = moldura['descricao']
