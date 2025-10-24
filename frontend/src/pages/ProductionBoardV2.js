@@ -100,8 +100,7 @@ export default function ProductionBoardV2() {
       // Inicializar campos customizados
       customFields: customColumns.reduce((acc, col) => {
         if (col.id === 'qty') acc[col.id] = 1;
-        else if (col.id === 'glass') acc[col.id] = 'Não';
-        else if (col.id === 'date') acc[col.id] = new Date().toISOString().split('T')[0];
+        else if (col.id === 'production_status') acc[col.id] = productionStatusList[0].id;
         else acc[col.id] = '';
         return acc;
       }, {})
