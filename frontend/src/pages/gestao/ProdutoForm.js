@@ -110,249 +110,276 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
       </div>
 
       <form onSubmit={handleSubmit} className="produto-form">
-        {/* Características do Produto */}
-        <div className="form-section">
-          <h3 className="section-title">Características do Produto</h3>
-          
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Referência: *</label>
-              <input
-                type="text"
-                name="referencia"
-                value={formData.referencia}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Descrição: *</label>
-              <input
-                type="text"
-                name="descricao"
-                value={formData.descricao}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Código Produto:</label>
-              <input
-                type="text"
-                name="codigo"
-                value={formData.codigo}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Fornecedor:</label>
-              <input
-                type="text"
-                name="fornecedor"
-                value={formData.fornecedor}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Localização:</label>
-              <input
-                type="text"
-                name="localizacao"
-                value={formData.localizacao}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Família:</label>
-              <select
-                name="familia"
-                value={formData.familia}
-                onChange={handleChange}
-              >
-                {FAMILIAS.map(f => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Tipo Produto:</label>
-              <input
-                type="text"
-                name="tipo_produto"
-                value={formData.tipo_produto}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Referência Loja:</label>
-              <input
-                type="text"
-                name="ref_loja"
-                value={formData.ref_loja}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Largura (cm):</label>
-              <input
-                type="number"
-                step="0.01"
-                name="largura"
-                value={formData.largura}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Comprimento (cm):</label>
-              <input
-                type="number"
-                step="0.01"
-                name="comprimento"
-                value={formData.comprimento}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Espessura (cm):</label>
-              <input
-                type="number"
-                step="0.01"
-                name="espessura"
-                value={formData.espessura}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>NCM:</label>
-              <input
-                type="text"
-                name="ncm"
-                value={formData.ncm}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>CFOP:</label>
-              <input
-                type="text"
-                name="cfop"
-                value={formData.cfop}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Saldo Estoque:</label>
-              <input
-                type="number"
-                step="0.01"
-                name="saldo_estoque"
-                value={formData.saldo_estoque}
-                onChange={handleChange}
-                className="field-readonly"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Ponto Compra:</label>
-              <input
-                type="text"
-                name="ponto_compra"
-                value={formData.ponto_compra}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group checkbox-group">
-              <label>
+        {/* Layout de Duas Colunas */}
+        <div className="form-two-columns">
+          {/* Coluna Esquerda - Características do Produto */}
+          <div className="form-column">
+            <h3 className="section-title">Características do Produto</h3>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Referência:</label>
                 <input
-                  type="checkbox"
-                  name="ativo"
-                  checked={formData.ativo}
+                  type="text"
+                  name="referencia"
+                  value={formData.referencia}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Descrição:</label>
+                <input
+                  type="text"
+                  name="descricao"
+                  value={formData.descricao}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Código Produto:</label>
+                <input
+                  type="text"
+                  name="codigo"
+                  value={formData.codigo}
                   onChange={handleChange}
                 />
-                <span>Ativo</span>
-              </label>
+              </div>
+              <div className="form-group">
+                <label>Fornecedor:</label>
+                <input
+                  type="text"
+                  name="fornecedor"
+                  value={formData.fornecedor}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Localização:</label>
+                <input
+                  type="text"
+                  name="localizacao"
+                  value={formData.localizacao}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Família:</label>
+                <select
+                  name="familia"
+                  value={formData.familia}
+                  onChange={handleChange}
+                >
+                  {FAMILIAS.map(f => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Tipo Produto:</label>
+                <input
+                  type="text"
+                  name="tipo_produto"
+                  value={formData.tipo_produto}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Referência Loja:</label>
+                <input
+                  type="text"
+                  name="ref_loja"
+                  value={formData.ref_loja}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Largura (cm):</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="largura"
+                  value={formData.largura}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Comprimento (cm):</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="comprimento"
+                  value={formData.comprimento}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>NCM:</label>
+                <input
+                  type="text"
+                  name="ncm"
+                  value={formData.ncm}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Espessura (cm):</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="espessura"
+                  value={formData.espessura}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Saldo Estoque:</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="saldo_estoque"
+                  value={formData.saldo_estoque}
+                  onChange={handleChange}
+                  className="field-readonly"
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>CFOP:</label>
+                <input
+                  type="text"
+                  name="cfop"
+                  value={formData.cfop}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Ponto Compra:</label>
+                <input
+                  type="text"
+                  name="ponto_compra"
+                  value={formData.ponto_compra}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group checkbox-group-inline">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="ativo"
+                    checked={formData.ativo}
+                    onChange={handleChange}
+                  />
+                  <span>Ativo</span>
+                </label>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Precificação do Produto */}
-        <div className="form-section">
-          <h3 className="section-title">Precificação do Produto</h3>
-          
-          <div className="form-grid pricing-grid">
-            <div className="form-group">
-              <label>Custo à Vista:</label>
-              <input
-                type="number"
-                step="0.01"
-                name="custo_vista"
-                value={formData.custo_vista}
-                onChange={handleChange}
-              />
+          {/* Coluna Direita - Precificação */}
+          <div className="form-column">
+            <h3 className="section-title">Precificação do Produto</h3>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Custo à Vista:</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="custo_vista"
+                  value={formData.custo_vista}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group-checkbox">
+                <input type="checkbox" disabled />
+              </div>
+              <div className="form-group">
+                <label>Desconto Lista (%):</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="desconto_lista"
+                  value={formData.desconto_lista}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Desconto Lista (%):</label>
-              <input
-                type="number"
-                step="0.01"
-                name="desconto_lista"
-                value={formData.desconto_lista}
-                onChange={handleChange}
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label>30 dias:</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="custo_30dias"
+                  value={formData.custo_30dias}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group-checkbox">
+                <input type="checkbox" disabled />
+              </div>
+              <div className="form-group">
+                <label>Custo Base:</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="custo_base"
+                  value={formData.custo_base}
+                  onChange={handleChange}
+                  className="field-readonly"
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>30 dias:</label>
-              <input
-                type="number"
-                step="0.01"
-                name="custo_30dias"
-                value={formData.custo_30dias}
-                onChange={handleChange}
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label>60 dias:</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="custo_60dias"
+                  value={formData.custo_60dias}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group-checkbox">
+                <input type="checkbox" disabled />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Custo Base:</label>
-              <input
-                type="number"
-                step="0.01"
-                name="custo_base"
-                value={formData.custo_base}
-                onChange={handleChange}
-                className="field-readonly"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>60 dias:</label>
-              <input
-                type="number"
-                step="0.01"
-                name="custo_60dias"
-                value={formData.custo_60dias}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Preço de Venda Manufatura:</label>
-              <div className="input-with-currency">
+            <div className="form-row">
+              <div className="form-group">
+                <label>90 dias:</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="custo_90dias"
+                  value={formData.custo_90dias}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group-checkbox">
+                <input type="checkbox" disabled />
+              </div>
+              <div className="form-group">
+                <label>Preço de Venda Manufatura:</label>
                 <input
                   type="number"
                   step="0.01"
@@ -360,24 +387,9 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   value={formData.preco_manufatura}
                   onChange={handleChange}
                 />
-                <span className="currency">R$</span>
               </div>
-            </div>
-
-            <div className="form-group">
-              <label>90 dias:</label>
-              <input
-                type="number"
-                step="0.01"
-                name="custo_90dias"
-                value={formData.custo_90dias}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Preço de Venda Varejo:</label>
-              <div className="input-with-currency">
+              <div className="form-group">
+                <label>Preço de Venda Varejo:</label>
                 <input
                   type="number"
                   step="0.01"
@@ -385,52 +397,65 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   value={formData.preco_varejo}
                   onChange={handleChange}
                 />
-                <span className="currency">R$</span>
               </div>
             </div>
 
-            <div className="form-group">
-              <label>120 dias:</label>
-              <input
-                type="number"
-                step="0.01"
-                name="custo_120dias"
-                value={formData.custo_120dias}
-                onChange={handleChange}
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label>120 dias:</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="custo_120dias"
+                  value={formData.custo_120dias}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group-checkbox">
+                <input type="checkbox" checked readOnly />
+              </div>
+              <div className="form-group-currency">
+                <button type="button" className="btn-currency">$</button>
+              </div>
+              <div className="form-group-currency">
+                <button type="button" className="btn-currency">$</button>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Markup de Manufatura (%):</label>
-              <input
-                type="number"
-                step="0.01"
-                name="markup_manufatura"
-                value={formData.markup_manufatura}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>150 dias:</label>
-              <input
-                type="number"
-                step="0.01"
-                name="custo_150dias"
-                value={formData.custo_150dias}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Markup de Varejo (%):</label>
-              <input
-                type="number"
-                step="0.01"
-                name="markup_varejo"
-                value={formData.markup_varejo}
-                onChange={handleChange}
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label>150 dias:</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="custo_150dias"
+                  value={formData.custo_150dias}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group-checkbox">
+                <input type="checkbox" disabled />
+              </div>
+              <div className="form-group">
+                <label>Markup de Manufatura (%):</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="markup_manufatura"
+                  value={formData.markup_manufatura}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Markup de Varejo (%):</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="markup_varejo"
+                  value={formData.markup_varejo}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
           </div>
         </div>
