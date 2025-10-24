@@ -455,8 +455,3 @@ export default function Produtos() {
     </div>
   );
 }
-
-// Componente do Formulário (será criado separadamente)
-function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
-  return <div>Formulário de Produto (em desenvolvimento)</div>;
-}
