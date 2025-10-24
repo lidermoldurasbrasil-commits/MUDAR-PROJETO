@@ -46,6 +46,9 @@ export default function StoreView() {
             <p>Gestão completa da loja física</p>
           </div>
         </div>
+        <a href="/gestao/produtos" className="btn-gestao-access">
+          🏭 Sistema de Gestão Multiloja
+        </a>
       </div>
 
       <div className="modules-grid">
