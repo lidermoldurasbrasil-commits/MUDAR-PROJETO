@@ -82,6 +82,10 @@ function App() {
             <Route path="/marketplace/returns" element={<Returns />} />
             <Route path="/marketplace/marketing" element={<MarketingTasks />} />
             <Route path="/marketplace/purchases" element={<PurchaseRequests />} />
+            <Route path="/marketplace/accounts-payable" element={<AccountsPayable />} />
+            <Route path="/marketplace/sales" element={<Sales />} />
+            <Route path="/marketplace/cost-center" element={<CostCenter />} />
+            <Route path="/marketplace/breakeven" element={<Breakeven />} />
             <Route path="/purchase-orders" element={<PurchaseOrders />} />
             
             {/* Factory & Stores */}
@@ -89,14 +93,6 @@ function App() {
             <Route path="/factory/production" element={<CustomProduction />} />
             <Route path="/store/:storeId" element={<StoreView />} />
             <Route path="/store/:storeId/production" element={<CustomProduction />} />
-            
-            {/* Financial */}
-            <Route path="/accounts-payable" element={<AccountsPayable />} />
-            <Route path="/sales" element={<Sales />} />
-            <Route path="/cost-center" element={<CostCenter />} />
-            <Route path="/breakeven" element={<Breakeven />} />
-            
-            {/* Customer Service */}
             <Route path="/complaints" element={<Complaints />} />
             <Route path="/crm" element={<CRM />} />
             
@@ -105,6 +101,10 @@ function App() {
             <Route path="/returns" element={<Navigate to="/marketplace/returns" replace />} />
             <Route path="/marketing" element={<Navigate to="/marketplace/marketing" replace />} />
             <Route path="/purchase-requests" element={<Navigate to="/marketplace/purchases" replace />} />
+            <Route path="/accounts-payable" element={<Navigate to="/marketplace/accounts-payable" replace />} />
+            <Route path="/sales" element={<Navigate to="/marketplace/sales" replace />} />
+            <Route path="/cost-center" element={<Navigate to="/marketplace/cost-center" replace />} />
+            <Route path="/breakeven" element={<Navigate to="/marketplace/breakeven" replace />} />
             
             <Route path="*" element={<NotFound />} />
           </Route>
