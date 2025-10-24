@@ -807,6 +807,10 @@ async def get_produtos(loja: Optional[str] = None, current_user: dict = Depends(
         query['loja_id'] = loja
     
     produtos = await db.produtos_gestao.find(query).to_list(None)
+    # Remove _id do MongoDB para evitar problemas de serialização
+    for produto in produtos:
+        if '_id' in produto:
+            del produto['_id']
     return produtos
 
 @api_router.post("/gestao/produtos")
