@@ -126,19 +126,22 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
   const handlePrazoChange = (prazo) => {
     setFormData(prev => {
       const updated = { ...prev, prazo_selecionado: prazo };
-      updated.custo_base = calcularCustoBase(updated);
       
-      // Recalcular markups
-      const custoBase = parseFloat(updated.custo_base) || 0;
+      // Recalcular markups com o novo prazo selecionado
+      const custoSelecionado = getCustoSelecionado(updated);
       const precoManufatura = parseFloat(updated.preco_manufatura) || 0;
       const precoVarejo = parseFloat(updated.preco_varejo) || 0;
       
-      if (custoBase > 0 && precoManufatura > 0) {
-        updated.markup_manufatura = ((precoManufatura - custoBase) / custoBase * 100).toFixed(2);
+      if (custoSelecionado > 0 && precoManufatura > 0) {
+        updated.markup_manufatura = ((precoManufatura - custoSelecionado) / custoSelecionado * 100).toFixed(2);
+      } else {
+        updated.markup_manufatura = '';
       }
       
-      if (custoBase > 0 && precoVarejo > 0) {
-        updated.markup_varejo = ((precoVarejo - custoBase) / custoBase * 100).toFixed(2);
+      if (custoSelecionado > 0 && precoVarejo > 0) {
+        updated.markup_varejo = ((precoVarejo - custoSelecionado) / custoSelecionado * 100).toFixed(2);
+      } else {
+        updated.markup_varejo = '';
       }
       
       return updated;
