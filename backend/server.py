@@ -830,6 +830,276 @@ async def delete_produto(produto_id: str, current_user: dict = Depends(get_curre
     await db.produtos_gestao.delete_one({"id": produto_id})
     return {"message": "Produto excluído com sucesso"}
 
+# ============= INSUMOS E ORÇAMENTOS =============
+
+class Insumo(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    loja_id: str  # fabrica, loja1, loja2, loja3, loja4, loja5
+    
+    codigo: str
+    tipo_insumo: str  # Moldura, Vidro, MDF, Espelho, Papel, Adesivo, Acessório, Passe-partout
+    descricao: str
+    unidade_medida: str  # cm, m², unidade
+    custo_unitario: float  # Custo por cm, m² ou unidade
+    barra_padrao: Optional[float] = 270.0  # Para molduras
+    fornecedor: Optional[str] = ""
+    ativo: bool = True
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ItemOrcamento(BaseModel):
+    insumo_id: str
+    insumo_descricao: str
+    tipo_insumo: str
+    quantidade: float
+    unidade: str
+    custo_unitario: float
+    subtotal: float
+
+class Orcamento(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    loja_id: str
+    
+    # Dimensões
+    altura: float  # cm
+    largura: float  # cm
+    quantidade: int = 1
+    tipo_produto: str  # Quadro, Espelho, Moldura avulsa, Fine-Art
+    
+    # Insumos selecionados
+    moldura_id: Optional[str] = None
+    usar_vidro: bool = False
+    vidro_id: Optional[str] = None
+    usar_mdf: bool = False
+    mdf_id: Optional[str] = None
+    usar_papel: bool = False
+    papel_id: Optional[str] = None
+    usar_acessorios: bool = False
+    acessorios_ids: Optional[List[str]] = []
+    
+    # Cálculos
+    area: float = 0  # m²
+    perimetro: float = 0  # cm
+    barras_necessarias: int = 0
+    sobra: float = 0  # cm
+    custo_perda: float = 0
+    
+    # Custos
+    itens: List[ItemOrcamento] = []
+    custo_total: float = 0
+    markup: float = 3.0
+    preco_venda: float = 0
+    margem_percentual: float = 0
+    
+    # Metadata
+    cliente_nome: Optional[str] = ""
+    observacoes: Optional[str] = ""
+    status: str = "Rascunho"  # Rascunho, Aprovado, Enviado para Produção
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Endpoints de Insumos
+@api_router.get("/gestao/insumos")
+async def get_insumos(loja: Optional[str] = None, tipo: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna insumos filtrados por loja e tipo"""
+    query = {"ativo": True}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    if tipo:
+        query['tipo_insumo'] = tipo
+    
+    insumos = await db.insumos.find(query).to_list(None)
+    return insumos
+
+@api_router.post("/gestao/insumos")
+async def create_insumo(insumo: Insumo, current_user: dict = Depends(get_current_user)):
+    """Cria um novo insumo"""
+    insumo_dict = insumo.model_dump()
+    await db.insumos.insert_one(insumo_dict)
+    return insumo
+
+@api_router.put("/gestao/insumos/{insumo_id}")
+async def update_insumo(insumo_id: str, insumo: Insumo, current_user: dict = Depends(get_current_user)):
+    """Atualiza um insumo existente"""
+    insumo_dict = insumo.model_dump()
+    insumo_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+    await db.insumos.update_one({"id": insumo_id}, {"$set": insumo_dict})
+    return {"message": "Insumo atualizado com sucesso"}
+
+@api_router.delete("/gestao/insumos/{insumo_id}")
+async def delete_insumo(insumo_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta um insumo"""
+    await db.insumos.delete_one({"id": insumo_id})
+    return {"message": "Insumo excluído com sucesso"}
+
+# Endpoints de Orçamentos
+@api_router.post("/gestao/orcamentos/calcular")
+async def calcular_orcamento(orcamento: Orcamento, current_user: dict = Depends(get_current_user)):
+    """Calcula automaticamente o orçamento com base nos insumos selecionados"""
+    import math
+    
+    # 1. Calcular área (m²)
+    orcamento.area = (orcamento.altura * orcamento.largura) / 10000
+    
+    # 2. Calcular perímetro (cm)
+    orcamento.perimetro = (2 * orcamento.altura) + (2 * orcamento.largura)
+    
+    # 3. Buscar insumos e calcular custos
+    itens = []
+    custo_total = 0
+    
+    # 3.1 Moldura
+    if orcamento.moldura_id:
+        moldura = await db.insumos.find_one({"id": orcamento.moldura_id})
+        if moldura:
+            # Calcular barras necessárias
+            barra_padrao = moldura.get('barra_padrao', 270)
+            orcamento.barras_necessarias = math.ceil(orcamento.perimetro / barra_padrao)
+            
+            # Calcular sobra e perda
+            orcamento.sobra = (orcamento.barras_necessarias * barra_padrao) - orcamento.perimetro
+            
+            # Se sobra < 100cm, considerar como perda e cobrar
+            perimetro_cobrado = orcamento.perimetro
+            if orcamento.sobra < 100:
+                orcamento.custo_perda = orcamento.sobra * moldura['custo_unitario']
+                perimetro_cobrado += orcamento.sobra
+            
+            # Custo da moldura
+            custo_moldura = perimetro_cobrado * moldura['custo_unitario'] * orcamento.quantidade
+            custo_total += custo_moldura
+            
+            itens.append(ItemOrcamento(
+                insumo_id=moldura['id'],
+                insumo_descricao=moldura['descricao'],
+                tipo_insumo='Moldura',
+                quantidade=perimetro_cobrado,
+                unidade='cm',
+                custo_unitario=moldura['custo_unitario'],
+                subtotal=custo_moldura
+            ))
+    
+    # 3.2 Vidro
+    if orcamento.usar_vidro and orcamento.vidro_id:
+        vidro = await db.insumos.find_one({"id": orcamento.vidro_id})
+        if vidro:
+            custo_vidro = orcamento.area * vidro['custo_unitario'] * orcamento.quantidade
+            custo_total += custo_vidro
+            
+            itens.append(ItemOrcamento(
+                insumo_id=vidro['id'],
+                insumo_descricao=vidro['descricao'],
+                tipo_insumo='Vidro',
+                quantidade=orcamento.area,
+                unidade='m²',
+                custo_unitario=vidro['custo_unitario'],
+                subtotal=custo_vidro
+            ))
+    
+    # 3.3 MDF
+    if orcamento.usar_mdf and orcamento.mdf_id:
+        mdf = await db.insumos.find_one({"id": orcamento.mdf_id})
+        if mdf:
+            custo_mdf = orcamento.area * mdf['custo_unitario'] * orcamento.quantidade
+            custo_total += custo_mdf
+            
+            itens.append(ItemOrcamento(
+                insumo_id=mdf['id'],
+                insumo_descricao=mdf['descricao'],
+                tipo_insumo='MDF',
+                quantidade=orcamento.area,
+                unidade='m²',
+                custo_unitario=mdf['custo_unitario'],
+                subtotal=custo_mdf
+            ))
+    
+    # 3.4 Papel/Adesivo
+    if orcamento.usar_papel and orcamento.papel_id:
+        papel = await db.insumos.find_one({"id": orcamento.papel_id})
+        if papel:
+            custo_papel = orcamento.area * papel['custo_unitario'] * orcamento.quantidade
+            custo_total += custo_papel
+            
+            itens.append(ItemOrcamento(
+                insumo_id=papel['id'],
+                insumo_descricao=papel['descricao'],
+                tipo_insumo='Papel/Adesivo',
+                quantidade=orcamento.area,
+                unidade='m²',
+                custo_unitario=papel['custo_unitario'],
+                subtotal=custo_papel
+            ))
+    
+    # 3.5 Acessórios
+    if orcamento.usar_acessorios and orcamento.acessorios_ids:
+        for acessorio_id in orcamento.acessorios_ids:
+            acessorio = await db.insumos.find_one({"id": acessorio_id})
+            if acessorio:
+                custo_acessorio = acessorio['custo_unitario'] * orcamento.quantidade
+                custo_total += custo_acessorio
+                
+                itens.append(ItemOrcamento(
+                    insumo_id=acessorio['id'],
+                    insumo_descricao=acessorio['descricao'],
+                    tipo_insumo='Acessório',
+                    quantidade=orcamento.quantidade,
+                    unidade='unidade',
+                    custo_unitario=acessorio['custo_unitario'],
+                    subtotal=custo_acessorio
+                ))
+    
+    # 4. Calcular totais
+    orcamento.itens = itens
+    orcamento.custo_total = custo_total
+    orcamento.preco_venda = custo_total * orcamento.markup
+    orcamento.margem_percentual = ((orcamento.preco_venda - custo_total) / orcamento.preco_venda * 100) if orcamento.preco_venda > 0 else 0
+    
+    return orcamento
+
+@api_router.post("/gestao/orcamentos")
+async def create_orcamento(orcamento: Orcamento, current_user: dict = Depends(get_current_user)):
+    """Salva um orçamento"""
+    orcamento_dict = orcamento.model_dump()
+    await db.orcamentos.insert_one(orcamento_dict)
+    return orcamento
+
+@api_router.get("/gestao/orcamentos")
+async def get_orcamentos(loja: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna orçamentos filtrados por loja"""
+    query = {}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    
+    orcamentos = await db.orcamentos.find(query).to_list(None)
+    return orcamentos
+
+@api_router.get("/gestao/orcamentos/{orcamento_id}")
+async def get_orcamento(orcamento_id: str, current_user: dict = Depends(get_current_user)):
+    """Retorna um orçamento específico"""
+    orcamento = await db.orcamentos.find_one({"id": orcamento_id})
+    if not orcamento:
+        raise HTTPException(status_code=404, detail="Orçamento não encontrado")
+    return orcamento
+
+@api_router.put("/gestao/orcamentos/{orcamento_id}")
+async def update_orcamento(orcamento_id: str, orcamento: Orcamento, current_user: dict = Depends(get_current_user)):
+    """Atualiza um orçamento"""
+    orcamento_dict = orcamento.model_dump()
+    orcamento_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+    await db.orcamentos.update_one({"id": orcamento_id}, {"$set": orcamento_dict})
+    return {"message": "Orçamento atualizado com sucesso"}
+
+@api_router.delete("/gestao/orcamentos/{orcamento_id}")
+async def delete_orcamento(orcamento_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta um orçamento"""
+    await db.orcamentos.delete_one({"id": orcamento_id})
+    return {"message": "Orçamento excluído com sucesso"}
+    return {"message": "Produto excluído com sucesso"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
