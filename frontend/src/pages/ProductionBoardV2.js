@@ -205,6 +205,10 @@ export default function ProductionBoardV2() {
     return statusList.find(s => s.id === statusId) || statusList[0];
   };
 
+  const getProductionStatusById = (statusId) => {
+    return productionStatusList.find(s => s.id === statusId) || productionStatusList[0];
+  };
+
   // Calcular largura da grid dinamicamente
   const gridColumns = `120px 180px ${customColumns.map(() => '150px').join(' ')}`;
 
