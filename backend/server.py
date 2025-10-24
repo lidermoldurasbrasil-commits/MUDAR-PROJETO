@@ -764,9 +764,8 @@ class Produto(BaseModel):
     loja_id: str  # fabrica, loja1, loja2, loja3, loja4, loja5
     
     # Características
-    referencia: str
+    referencia: str  # SKU
     descricao: str
-    codigo: Optional[str] = ""
     fornecedor: Optional[str] = ""
     localizacao: Optional[str] = ""
     familia: Optional[str] = "Molduras"
