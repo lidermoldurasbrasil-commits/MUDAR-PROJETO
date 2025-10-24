@@ -48,7 +48,6 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
     custo_120dias: produto?.custo_120dias || '',
     custo_150dias: produto?.custo_150dias || '',
     desconto_lista: produto?.desconto_lista || '',
-    custo_base: produto?.custo_base || '',
     preco_manufatura: produto?.preco_manufatura || '',
     preco_varejo: produto?.preco_varejo || '',
     markup_manufatura: produto?.markup_manufatura || '',
@@ -62,56 +61,25 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
 
   const [loading, setLoading] = useState(false);
 
-  // Função para calcular o custo base baseado na família e dimensões
-  const calcularCustoBase = (data) => {
-    const familia = data.familia || '';
-    const largura = parseFloat(data.largura) || 0;
-    const comprimento = parseFloat(data.comprimento) || 0;
+  // Função para obter o custo do prazo selecionado
+  const getCustoSelecionado = (data) => {
     const prazoSelecionado = data.prazo_selecionado || '120dias';
     
-    // Pegar o custo do prazo selecionado
-    let custoUnitario = 0;
     switch(prazoSelecionado) {
       case 'vista':
-        custoUnitario = parseFloat(data.custo_vista) || 0;
-        break;
+        return parseFloat(data.custo_vista) || 0;
       case '30dias':
-        custoUnitario = parseFloat(data.custo_30dias) || 0;
-        break;
+        return parseFloat(data.custo_30dias) || 0;
       case '60dias':
-        custoUnitario = parseFloat(data.custo_60dias) || 0;
-        break;
+        return parseFloat(data.custo_60dias) || 0;
       case '90dias':
-        custoUnitario = parseFloat(data.custo_90dias) || 0;
-        break;
+        return parseFloat(data.custo_90dias) || 0;
       case '120dias':
-        custoUnitario = parseFloat(data.custo_120dias) || 0;
-        break;
+        return parseFloat(data.custo_120dias) || 0;
       case '150dias':
-        custoUnitario = parseFloat(data.custo_150dias) || 0;
-        break;
+        return parseFloat(data.custo_150dias) || 0;
       default:
-        custoUnitario = parseFloat(data.custo_120dias) || 0;
-    }
-    
-    if (custoUnitario === 0) return 0;
-    
-    // Calcular baseado na família
-    if (familia.includes('Moldura')) {
-      // Moldura: cálculo por metro linear (perímetro)
-      const perimetroMetros = ((largura * 2) + (comprimento * 2)) / 100;
-      return (custoUnitario * perimetroMetros).toFixed(2);
-    } 
-    else if (familia.includes('Vidro') || familia.includes('Espelho') || 
-             familia.includes('MDF') || familia.includes('Papel') || 
-             familia.includes('Adesivo') || familia.includes('Substrato')) {
-      // Planos: cálculo por m² (área)
-      const areaM2 = (largura * comprimento) / 10000;
-      return (custoUnitario * areaM2).toFixed(2);
-    }
-    else {
-      // Outros: custo direto
-      return custoUnitario.toFixed(2);
+        return parseFloat(data.custo_120dias) || 0;
     }
   };
 
