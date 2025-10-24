@@ -160,7 +160,7 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
             
             <div className="form-row">
               <div className="form-group">
-                <label>Referência:</label>
+                <label>SKU:</label>
                 <input
                   type="text"
                   name="referencia"
@@ -182,15 +182,6 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
             </div>
 
             <div className="form-row">
-              <div className="form-group">
-                <label>Código Produto:</label>
-                <input
-                  type="text"
-                  name="codigo"
-                  value={formData.codigo}
-                  onChange={handleChange}
-                />
-              </div>
               <div className="form-group">
                 <label>Fornecedor:</label>
                 <input
