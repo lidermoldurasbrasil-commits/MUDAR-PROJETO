@@ -464,6 +464,8 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
             {formData.sobra < 100 && formData.sobra > 0 && (
               <div className="alerta-perda">
                 ⚠️ Perda técnica cobrada: {formatCurrency(formData.custo_perda)}
+                <br />
+                <small>Perda de corte (largura × 8) + Sobra de barra (&lt;100cm)</small>
               </div>
             )}
 
