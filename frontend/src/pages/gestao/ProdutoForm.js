@@ -76,16 +76,37 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
       return;
     }
 
+    // Converter strings vazias em 0 para campos numéricos
+    const cleanedData = {
+      ...formData,
+      largura: parseFloat(formData.largura) || 0,
+      comprimento: parseFloat(formData.comprimento) || 0,
+      espessura: parseFloat(formData.espessura) || 0,
+      saldo_estoque: parseFloat(formData.saldo_estoque) || 0,
+      custo_vista: parseFloat(formData.custo_vista) || 0,
+      custo_30dias: parseFloat(formData.custo_30dias) || 0,
+      custo_60dias: parseFloat(formData.custo_60dias) || 0,
+      custo_90dias: parseFloat(formData.custo_90dias) || 0,
+      custo_120dias: parseFloat(formData.custo_120dias) || 0,
+      custo_150dias: parseFloat(formData.custo_150dias) || 0,
+      desconto_lista: parseFloat(formData.desconto_lista) || 0,
+      custo_base: parseFloat(formData.custo_base) || 0,
+      preco_manufatura: parseFloat(formData.preco_manufatura) || 0,
+      preco_varejo: parseFloat(formData.preco_varejo) || 0,
+      markup_manufatura: parseFloat(formData.markup_manufatura) || 0,
+      markup_varejo: parseFloat(formData.markup_varejo) || 0
+    };
+
     setLoading(true);
 
     try {
       if (produto?.id) {
         // Atualizar produto existente
-        await axios.put(`${API}/produtos/${produto.id}`, formData);
+        await axios.put(`${API}/produtos/${produto.id}`, cleanedData);
         toast.success('Produto atualizado com sucesso!');
       } else {
         // Criar novo produto
-        await axios.post(`${API}/produtos`, formData);
+        await axios.post(`${API}/produtos`, cleanedData);
         toast.success('Produto cadastrado com sucesso!');
       }
       onSave();
