@@ -750,6 +750,16 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
 
         .form-row-with-check .form-group {
           flex: 1;
+          min-width: 0;
+        }
+
+        /* Garantir que campos de prazo tenham mesmo tamanho */
+        .form-row-with-check .form-group:first-child,
+        .form-row .form-group:first-child,
+        .form-row-4 .form-group:first-child {
+          flex: 0 0 140px;
+          min-width: 140px;
+          max-width: 140px;
         }
 
         @media (max-width: 1024px) {
