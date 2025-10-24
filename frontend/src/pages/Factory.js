@@ -43,6 +43,9 @@ export default function Factory() {
             <p>Central de produção e gestão</p>
           </div>
         </div>
+        <a href="/gestao/produtos" className="btn-gestao-access">
+          🏭 Sistema de Gestão Multiloja
+        </a>
       </div>
 
       <div className="modules-grid">
