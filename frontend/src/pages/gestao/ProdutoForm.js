@@ -445,7 +445,11 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                 />
               </div>
               <div className="form-group-checkbox">
-                <input type="checkbox" disabled />
+                <input 
+                  type="checkbox" 
+                  checked={formData.prazo_selecionado === 'vista'}
+                  onChange={() => handlePrazoChange('vista')}
+                />
               </div>
               <div className="form-group">
                 <label>Desconto Lista (%):</label>
@@ -474,7 +478,11 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                 />
               </div>
               <div className="form-group-checkbox">
-                <input type="checkbox" disabled />
+                <input 
+                  type="checkbox" 
+                  checked={formData.prazo_selecionado === '30dias'}
+                  onChange={() => handlePrazoChange('30dias')}
+                />
               </div>
               <div className="form-group">
                 <label>Custo Base:</label>
@@ -483,8 +491,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   step="0.01"
                   name="custo_base"
                   value={formData.custo_base}
-                  onChange={handleChange}
                   className="field-readonly"
+                  readOnly
                 />
               </div>
             </div>
@@ -502,7 +510,11 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                 />
               </div>
               <div className="form-group-checkbox">
-                <input type="checkbox" disabled />
+                <input 
+                  type="checkbox" 
+                  checked={formData.prazo_selecionado === '60dias'}
+                  onChange={() => handlePrazoChange('60dias')}
+                />
               </div>
             </div>
 
@@ -519,7 +531,11 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                 />
               </div>
               <div className="form-group-checkbox">
-                <input type="checkbox" disabled />
+                <input 
+                  type="checkbox" 
+                  checked={formData.prazo_selecionado === '90dias'}
+                  onChange={() => handlePrazoChange('90dias')}
+                />
               </div>
               <div className="form-group">
                 <label>Preço de Venda Manufatura:</label>
@@ -556,7 +572,11 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                 />
               </div>
               <div className="form-group-checkbox">
-                <input type="checkbox" checked readOnly />
+                <input 
+                  type="checkbox" 
+                  checked={formData.prazo_selecionado === '120dias'}
+                  onChange={() => handlePrazoChange('120dias')}
+                />
               </div>
               <div className="form-group-currency">
                 <button type="button" className="btn-currency">$</button>
@@ -579,7 +599,11 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                 />
               </div>
               <div className="form-group-checkbox">
-                <input type="checkbox" disabled />
+                <input 
+                  type="checkbox" 
+                  checked={formData.prazo_selecionado === '150dias'}
+                  onChange={() => handlePrazoChange('150dias')}
+                />
               </div>
               <div className="form-group">
                 <label>Markup de Manufatura (%):</label>
