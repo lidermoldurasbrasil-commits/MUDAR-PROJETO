@@ -1494,7 +1494,28 @@ async def update_status_pedido(pedido_id: str, novo_status: str, observacao: Opt
         }
     )
     
-    # Se status for "Pronto" ou "Entregue", gerar lançamento financeiro (será implementado na fase 4)
+    # Se status for "Pronto" ou "Entregue", gerar lançamento financeiro
+    if novo_status in ["Pronto", "Entregue"]:
+        try:
+            lancamento = {
+                'id': str(uuid.uuid4()),
+                'pedido_id': pedido_id,
+                'numero_pedido': pedido['numero_pedido'],
+                'tipo': 'Receita',
+                'categoria': 'Venda de Manufatura',
+                'descricao': f"Pedido #{pedido['numero_pedido']} - {pedido.get('cliente_nome', 'Cliente')}",
+                'valor_custo': pedido.get('custo_total', 0),
+                'valor_venda': pedido.get('preco_venda', 0),
+                'margem_percentual': pedido.get('margem_percentual', 0),
+                'loja_id': pedido.get('loja_id', 'fabrica'),
+                'data': datetime.now(timezone.utc).isoformat(),
+                'status': 'Concluído' if novo_status == 'Entregue' else 'Pendente',
+                'created_at': datetime.now(timezone.utc).isoformat(),
+                'created_by': current_user.get('username', '')
+            }
+            await db.lancamentos_financeiros.insert_one(lancamento)
+        except Exception as e:
+            print(f"Erro ao criar lançamento financeiro: {e}")
     
     return {"message": f"Status atualizado para {novo_status}"}
 
@@ -1503,6 +1524,64 @@ async def delete_pedido(pedido_id: str, current_user: dict = Depends(get_current
     """Deleta um pedido"""
     await db.pedidos_manufatura.delete_one({"id": pedido_id})
     return {"message": "Pedido excluído com sucesso"}
+
+# ============= LANÇAMENTOS FINANCEIROS =============
+
+class LancamentoFinanceiro(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    pedido_id: Optional[str] = ""
+    numero_pedido: Optional[int] = 0
+    tipo: str  # Receita, Despesa
+    categoria: str  # Venda de Manufatura, Compra de Insumos, etc.
+    descricao: str
+    valor_custo: float = 0
+    valor_venda: float = 0
+    margem_percentual: float = 0
+    loja_id: str
+    data: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    status: str = "Pendente"  # Pendente, Concluído, Cancelado
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = ""
+
+@api_router.get("/gestao/financeiro/lancamentos")
+async def get_lancamentos(loja: Optional[str] = None, tipo: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna lançamentos financeiros filtrados"""
+    query = {}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    if tipo:
+        query['tipo'] = tipo
+    
+    lancamentos = await db.lancamentos_financeiros.find(query).sort("data", -1).to_list(None)
+    for lancamento in lancamentos:
+        if '_id' in lancamento:
+            del lancamento['_id']
+    return lancamentos
+
+@api_router.get("/gestao/financeiro/resumo")
+async def get_resumo_financeiro(loja: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna resumo financeiro consolidado"""
+    query = {}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    
+    lancamentos = await db.lancamentos_financeiros.find(query).to_list(None)
+    
+    total_receitas = sum(l.get('valor_venda', 0) for l in lancamentos if l.get('tipo') == 'Receita')
+    total_custos = sum(l.get('valor_custo', 0) for l in lancamentos if l.get('tipo') == 'Receita')
+    total_despesas = sum(l.get('valor_venda', 0) for l in lancamentos if l.get('tipo') == 'Despesa')
+    lucro_bruto = total_receitas - total_custos - total_despesas
+    margem_media = ((lucro_bruto / total_receitas) * 100) if total_receitas > 0 else 0
+    
+    return {
+        'total_receitas': total_receitas,
+        'total_custos': total_custos,
+        'total_despesas': total_despesas,
+        'lucro_bruto': lucro_bruto,
+        'margem_media': margem_media,
+        'quantidade_lancamentos': len(lancamentos)
+    }
 
 # Include the router in the main app
 app.include_router(api_router)
