@@ -319,68 +319,83 @@ export default function Produtos() {
           min-height: 400px;
         }
 
-        .loading {
-          text-align: center;
-          padding: 60px 20px;
-          color: #718096;
-          font-size: 16px;
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 80px 20px;
-        }
-
-        .empty-state p {
-          color: #718096;
-          font-size: 18px;
-          margin-bottom: 20px;
-        }
-
-        .produtos-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-          gap: 20px;
-        }
-
-        .produto-card {
+        .table-container {
           background: white;
           border-radius: 12px;
-          padding: 20px;
+          overflow: hidden;
           box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-          transition: all 0.2s;
         }
 
-        .produto-card:hover {
-          box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-          transform: translateY(-2px);
+        .produtos-table {
+          width: 100%;
+          border-collapse: collapse;
         }
 
-        .produto-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 15px;
-          padding-bottom: 15px;
-          border-bottom: 1px solid #e2e8f0;
+        .produtos-table thead {
+          background: #f7fafc;
+          border-bottom: 2px solid #e2e8f0;
         }
 
-        .produto-header h3 {
-          font-size: 18px;
+        .produtos-table th {
+          padding: 14px 16px;
+          text-align: left;
+          font-size: 13px;
+          font-weight: 600;
+          color: #4a5568;
+          text-transform: uppercase;
+        }
+
+        .produtos-table td {
+          padding: 16px;
+          border-bottom: 1px solid #f0f0f0;
+          font-size: 14px;
           color: #2d3748;
-          margin: 0 0 5px 0;
+        }
+
+        .produtos-table tbody tr:hover {
+          background: #f7fafc;
+        }
+
+        .font-bold {
+          font-weight: 600;
+          color: #2d3748;
+        }
+
+        .text-right {
+          text-align: right;
+        }
+
+        .text-center {
+          text-align: center;
+        }
+
+        .badge-familia {
+          background: #edf2f7;
+          color: #2d3748;
+          padding: 4px 12px;
+          border-radius: 6px;
+          font-size: 12px;
           font-weight: 600;
         }
 
-        .produto-descricao {
-          font-size: 13px;
-          color: #718096;
-          margin: 0;
+        .badge-markup {
+          background: #5dceaa;
+          color: white;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        .preco-destaque {
+          color: #5dceaa;
+          font-weight: 600;
         }
 
         .produto-actions {
           display: flex;
           gap: 8px;
+          justify-content: center;
         }
 
         .produto-actions button {
@@ -404,39 +419,6 @@ export default function Produtos() {
           background: #fff5f5;
           border-color: #fc8181;
           color: #e53e3e;
-        }
-
-        .produto-info {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-
-        .info-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 14px;
-        }
-
-        .info-row .label {
-          color: #718096;
-          font-weight: 500;
-        }
-
-        .estoque-badge {
-          background: #edf2f7;
-          color: #2d3748;
-          padding: 4px 12px;
-          border-radius: 6px;
-          font-weight: 600;
-          font-size: 13px;
-        }
-
-        .preco {
-          color: #5dceaa;
-          font-weight: 600;
-          font-size: 15px;
         }
 
         .status-badge {
