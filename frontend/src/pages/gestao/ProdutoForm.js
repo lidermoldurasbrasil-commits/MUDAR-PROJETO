@@ -18,7 +18,9 @@ const FAMILIAS = [
   '9-PasseParTouts',
   '10-Embalagens',
   '11-Sarrafos',
-  '12-Acessórios'
+  '12-Produto Pronto',
+  '13-Promoção',
+  '14-Espelho Orgânico'
 ];
 
 export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
