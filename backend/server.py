@@ -1109,7 +1109,400 @@ async def delete_orcamento(orcamento_id: str, current_user: dict = Depends(get_c
     """Deleta um orçamento"""
     await db.orcamentos.delete_one({"id": orcamento_id})
     return {"message": "Orçamento excluído com sucesso"}
-    return {"message": "Produto excluído com sucesso"}
+
+# ============= PEDIDOS DE MANUFATURA =============
+
+class HistoricoStatus(BaseModel):
+    status: str
+    data: datetime
+    usuario: str
+    observacao: Optional[str] = ""
+
+class PedidoManufatura(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_pedido: int = 0  # Auto-incremental
+    loja_id: str  # fabrica, loja1, loja2, loja3, loja4, loja5
+    
+    # Dados básicos
+    data_abertura: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    cliente_nome: str
+    tipo_produto: str  # Quadro, Espelho, Moldura avulsa, Fine-Art
+    quantidade: int = 1
+    
+    # Dimensões
+    altura: float  # cm
+    largura: float  # cm
+    
+    # Insumos selecionados
+    moldura_id: Optional[str] = None
+    moldura_descricao: Optional[str] = ""
+    usar_vidro: bool = False
+    vidro_id: Optional[str] = None
+    vidro_descricao: Optional[str] = ""
+    usar_mdf: bool = False
+    mdf_id: Optional[str] = None
+    mdf_descricao: Optional[str] = ""
+    usar_papel: bool = False
+    papel_id: Optional[str] = None
+    papel_descricao: Optional[str] = ""
+    usar_passepartout: bool = False
+    passepartout_id: Optional[str] = None
+    passepartout_descricao: Optional[str] = ""
+    usar_acessorios: bool = False
+    acessorios_ids: Optional[List[str]] = []
+    acessorios_descricoes: Optional[List[str]] = []
+    
+    # Cálculos automáticos
+    area: float = 0  # m²
+    perimetro: float = 0  # cm
+    barras_necessarias: int = 0
+    sobra: float = 0  # cm
+    custo_perda: float = 0
+    
+    # Composição detalhada
+    itens: List[ItemOrcamento] = []
+    
+    # Custos e valores
+    custo_total: float = 0
+    markup: float = 3.0
+    preco_venda: float = 0
+    margem_percentual: float = 0
+    
+    # Controle de produção
+    status: str = "Criado"  # Criado, Em Análise, Corte, Montagem, Acabamento, Pronto, Entregue, Cancelado
+    responsavel: Optional[str] = ""
+    prazo_entrega: Optional[datetime] = None
+    observacoes: Optional[str] = ""
+    observacoes_loja: Optional[str] = ""
+    observacoes_cliente: Optional[str] = ""
+    
+    # Histórico
+    historico_status: List[HistoricoStatus] = []
+    
+    # Metadata
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: Optional[str] = ""
+
+# Contador para número de pedido
+async def get_next_numero_pedido():
+    """Gera o próximo número de pedido sequencial"""
+    ultimo_pedido = await db.pedidos_manufatura.find_one(sort=[("numero_pedido", -1)])
+    if ultimo_pedido and 'numero_pedido' in ultimo_pedido:
+        return ultimo_pedido['numero_pedido'] + 1
+    return 1
+
+# Endpoints de Pedidos de Manufatura
+@api_router.get("/gestao/pedidos")
+async def get_pedidos(loja: Optional[str] = None, status: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna pedidos filtrados por loja e status"""
+    query = {}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    if status:
+        query['status'] = status
+    
+    pedidos = await db.pedidos_manufatura.find(query).sort("numero_pedido", -1).to_list(None)
+    # Remove _id do MongoDB
+    for pedido in pedidos:
+        if '_id' in pedido:
+            del pedido['_id']
+    return pedidos
+
+@api_router.post("/gestao/pedidos/calcular")
+async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends(get_current_user)):
+    """Calcula automaticamente os custos do pedido com base nos insumos selecionados"""
+    import math
+    
+    # 1. Calcular área (m²)
+    pedido.area = (pedido.altura * pedido.largura) / 10000
+    
+    # 2. Calcular perímetro (cm)
+    pedido.perimetro = (2 * pedido.altura) + (2 * pedido.largura)
+    
+    # 3. Buscar insumos e calcular custos
+    itens = []
+    custo_total = 0
+    
+    # 3.1 Moldura
+    if pedido.moldura_id:
+        moldura = await db.insumos.find_one({"id": pedido.moldura_id})
+        if not moldura:
+            # Tentar buscar em produtos
+            moldura = await db.produtos_gestao.find_one({"id": pedido.moldura_id})
+            if moldura:
+                # Adaptar produto para formato de insumo
+                custo_unitario = moldura.get('custo_120dias', 0)  # Usar custo padrão
+                moldura = {
+                    'id': moldura['id'],
+                    'descricao': moldura['descricao'],
+                    'custo_unitario': custo_unitario / 270 if custo_unitario > 0 else 0,  # Converter para custo por cm
+                    'barra_padrao': 270
+                }
+        
+        if moldura:
+            pedido.moldura_descricao = moldura['descricao']
+            
+            # Calcular barras necessárias
+            barra_padrao = moldura.get('barra_padrao', 270)
+            pedido.barras_necessarias = math.ceil(pedido.perimetro / barra_padrao)
+            
+            # Calcular sobra e perda
+            pedido.sobra = (pedido.barras_necessarias * barra_padrao) - pedido.perimetro
+            
+            # Se sobra < 100cm, considerar como perda e cobrar
+            perimetro_cobrado = pedido.perimetro
+            if pedido.sobra < 100:
+                pedido.custo_perda = pedido.sobra * moldura['custo_unitario']
+                perimetro_cobrado += pedido.sobra
+            
+            # Custo da moldura
+            custo_moldura = perimetro_cobrado * moldura['custo_unitario'] * pedido.quantidade
+            custo_total += custo_moldura
+            
+            itens.append(ItemOrcamento(
+                insumo_id=moldura['id'],
+                insumo_descricao=moldura['descricao'],
+                tipo_insumo='Moldura',
+                quantidade=perimetro_cobrado,
+                unidade='cm',
+                custo_unitario=moldura['custo_unitario'],
+                subtotal=custo_moldura
+            ))
+    
+    # 3.2 Vidro
+    if pedido.usar_vidro and pedido.vidro_id:
+        vidro = await db.insumos.find_one({"id": pedido.vidro_id})
+        if not vidro:
+            vidro = await db.produtos_gestao.find_one({"id": pedido.vidro_id})
+            if vidro:
+                custo_unitario = vidro.get('custo_120dias', 0)
+                vidro = {
+                    'id': vidro['id'],
+                    'descricao': vidro['descricao'],
+                    'custo_unitario': custo_unitario
+                }
+        
+        if vidro:
+            pedido.vidro_descricao = vidro['descricao']
+            custo_vidro = pedido.area * vidro['custo_unitario'] * pedido.quantidade
+            custo_total += custo_vidro
+            
+            itens.append(ItemOrcamento(
+                insumo_id=vidro['id'],
+                insumo_descricao=vidro['descricao'],
+                tipo_insumo='Vidro',
+                quantidade=pedido.area,
+                unidade='m²',
+                custo_unitario=vidro['custo_unitario'],
+                subtotal=custo_vidro
+            ))
+    
+    # 3.3 MDF
+    if pedido.usar_mdf and pedido.mdf_id:
+        mdf = await db.insumos.find_one({"id": pedido.mdf_id})
+        if not mdf:
+            mdf = await db.produtos_gestao.find_one({"id": pedido.mdf_id})
+            if mdf:
+                custo_unitario = mdf.get('custo_120dias', 0)
+                mdf = {
+                    'id': mdf['id'],
+                    'descricao': mdf['descricao'],
+                    'custo_unitario': custo_unitario
+                }
+        
+        if mdf:
+            pedido.mdf_descricao = mdf['descricao']
+            custo_mdf = pedido.area * mdf['custo_unitario'] * pedido.quantidade
+            custo_total += custo_mdf
+            
+            itens.append(ItemOrcamento(
+                insumo_id=mdf['id'],
+                insumo_descricao=mdf['descricao'],
+                tipo_insumo='MDF',
+                quantidade=pedido.area,
+                unidade='m²',
+                custo_unitario=mdf['custo_unitario'],
+                subtotal=custo_mdf
+            ))
+    
+    # 3.4 Papel/Adesivo
+    if pedido.usar_papel and pedido.papel_id:
+        papel = await db.insumos.find_one({"id": pedido.papel_id})
+        if not papel:
+            papel = await db.produtos_gestao.find_one({"id": pedido.papel_id})
+            if papel:
+                custo_unitario = papel.get('custo_120dias', 0)
+                papel = {
+                    'id': papel['id'],
+                    'descricao': papel['descricao'],
+                    'custo_unitario': custo_unitario
+                }
+        
+        if papel:
+            pedido.papel_descricao = papel['descricao']
+            custo_papel = pedido.area * papel['custo_unitario'] * pedido.quantidade
+            custo_total += custo_papel
+            
+            itens.append(ItemOrcamento(
+                insumo_id=papel['id'],
+                insumo_descricao=papel['descricao'],
+                tipo_insumo='Papel/Adesivo',
+                quantidade=pedido.area,
+                unidade='m²',
+                custo_unitario=papel['custo_unitario'],
+                subtotal=custo_papel
+            ))
+    
+    # 3.5 Passe-partout
+    if pedido.usar_passepartout and pedido.passepartout_id:
+        passepartout = await db.insumos.find_one({"id": pedido.passepartout_id})
+        if not passepartout:
+            passepartout = await db.produtos_gestao.find_one({"id": pedido.passepartout_id})
+            if passepartout:
+                custo_unitario = passepartout.get('custo_120dias', 0)
+                passepartout = {
+                    'id': passepartout['id'],
+                    'descricao': passepartout['descricao'],
+                    'custo_unitario': custo_unitario
+                }
+        
+        if passepartout:
+            pedido.passepartout_descricao = passepartout['descricao']
+            custo_passepartout = pedido.area * passepartout['custo_unitario'] * pedido.quantidade
+            custo_total += custo_passepartout
+            
+            itens.append(ItemOrcamento(
+                insumo_id=passepartout['id'],
+                insumo_descricao=passepartout['descricao'],
+                tipo_insumo='Passe-partout',
+                quantidade=pedido.area,
+                unidade='m²',
+                custo_unitario=passepartout['custo_unitario'],
+                subtotal=custo_passepartout
+            ))
+    
+    # 3.6 Acessórios
+    if pedido.usar_acessorios and pedido.acessorios_ids:
+        descricoes = []
+        for acessorio_id in pedido.acessorios_ids:
+            acessorio = await db.insumos.find_one({"id": acessorio_id})
+            if not acessorio:
+                acessorio = await db.produtos_gestao.find_one({"id": acessorio_id})
+                if acessorio:
+                    custo_unitario = acessorio.get('custo_120dias', 0)
+                    acessorio = {
+                        'id': acessorio['id'],
+                        'descricao': acessorio['descricao'],
+                        'custo_unitario': custo_unitario
+                    }
+            
+            if acessorio:
+                descricoes.append(acessorio['descricao'])
+                custo_acessorio = acessorio['custo_unitario'] * pedido.quantidade
+                custo_total += custo_acessorio
+                
+                itens.append(ItemOrcamento(
+                    insumo_id=acessorio['id'],
+                    insumo_descricao=acessorio['descricao'],
+                    tipo_insumo='Acessório',
+                    quantidade=pedido.quantidade,
+                    unidade='unidade',
+                    custo_unitario=acessorio['custo_unitario'],
+                    subtotal=custo_acessorio
+                ))
+        pedido.acessorios_descricoes = descricoes
+    
+    # 4. Calcular totais
+    pedido.itens = itens
+    pedido.custo_total = custo_total
+    pedido.preco_venda = custo_total * pedido.markup
+    pedido.margem_percentual = ((pedido.preco_venda - custo_total) / pedido.preco_venda * 100) if pedido.preco_venda > 0 else 0
+    
+    return pedido
+
+@api_router.post("/gestao/pedidos")
+async def create_pedido(pedido: PedidoManufatura, current_user: dict = Depends(get_current_user)):
+    """Cria um novo pedido de manufatura"""
+    # Gerar número do pedido
+    pedido.numero_pedido = await get_next_numero_pedido()
+    pedido.created_by = current_user.get('username', '')
+    
+    # Adicionar primeiro histórico
+    pedido.historico_status = [
+        HistoricoStatus(
+            status="Criado",
+            data=datetime.now(timezone.utc),
+            usuario=current_user.get('username', ''),
+            observacao="Pedido criado"
+        )
+    ]
+    
+    pedido_dict = pedido.model_dump()
+    await db.pedidos_manufatura.insert_one(pedido_dict)
+    
+    # Remove _id
+    if '_id' in pedido_dict:
+        del pedido_dict['_id']
+    
+    return pedido_dict
+
+@api_router.get("/gestao/pedidos/{pedido_id}")
+async def get_pedido(pedido_id: str, current_user: dict = Depends(get_current_user)):
+    """Retorna um pedido específico"""
+    pedido = await db.pedidos_manufatura.find_one({"id": pedido_id})
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    if '_id' in pedido:
+        del pedido['_id']
+    return pedido
+
+@api_router.put("/gestao/pedidos/{pedido_id}")
+async def update_pedido(pedido_id: str, pedido: PedidoManufatura, current_user: dict = Depends(get_current_user)):
+    """Atualiza um pedido existente"""
+    pedido_dict = pedido.model_dump()
+    pedido_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+    await db.pedidos_manufatura.update_one({"id": pedido_id}, {"$set": pedido_dict})
+    return {"message": "Pedido atualizado com sucesso"}
+
+@api_router.put("/gestao/pedidos/{pedido_id}/status")
+async def update_status_pedido(pedido_id: str, novo_status: str, observacao: Optional[str] = "", current_user: dict = Depends(get_current_user)):
+    """Atualiza o status de um pedido e registra no histórico"""
+    pedido = await db.pedidos_manufatura.find_one({"id": pedido_id})
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    
+    # Adicionar ao histórico
+    historico = pedido.get('historico_status', [])
+    historico.append({
+        'status': novo_status,
+        'data': datetime.now(timezone.utc).isoformat(),
+        'usuario': current_user.get('username', ''),
+        'observacao': observacao
+    })
+    
+    # Atualizar pedido
+    await db.pedidos_manufatura.update_one(
+        {"id": pedido_id},
+        {
+            "$set": {
+                "status": novo_status,
+                "historico_status": historico,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+        }
+    )
+    
+    # Se status for "Pronto" ou "Entregue", gerar lançamento financeiro (será implementado na fase 4)
+    
+    return {"message": f"Status atualizado para {novo_status}"}
+
+@api_router.delete("/gestao/pedidos/{pedido_id}")
+async def delete_pedido(pedido_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta um pedido"""
+    await db.pedidos_manufatura.delete_one({"id": pedido_id})
+    return {"message": "Pedido excluído com sucesso"}
 
 # Include the router in the main app
 app.include_router(api_router)
