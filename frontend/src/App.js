@@ -79,7 +79,7 @@ function App() {
             
             {/* Marketplace */}
             <Route path="/marketplace/production" element={<ProductionBoardMonday />} />
-            <Route path="/marketplace/returns" element={<Returns />} />
+            <Route path="/marketplace/returns" element={<ReturnsManagement />} />
             <Route path="/marketplace/marketing" element={<MarketingTasks />} />
             <Route path="/marketplace/purchases" element={<PurchaseRequests />} />
             <Route path="/marketplace/accounts-payable" element={<AccountsPayableAdvanced />} />
