@@ -82,7 +82,7 @@ function App() {
             <Route path="/marketplace/returns" element={<Returns />} />
             <Route path="/marketplace/marketing" element={<MarketingTasks />} />
             <Route path="/marketplace/purchases" element={<PurchaseRequests />} />
-            <Route path="/marketplace/accounts-payable" element={<AccountsPayable />} />
+            <Route path="/marketplace/accounts-payable" element={<AccountsPayableAdvanced />} />
             <Route path="/marketplace/sales" element={<Sales />} />
             <Route path="/marketplace/cost-center" element={<CostCenter />} />
             <Route path="/marketplace/breakeven" element={<Breakeven />} />
