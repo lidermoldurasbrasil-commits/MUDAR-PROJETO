@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import DirectorDashboard from './pages/DirectorDashboard';
 import ProductionBoard from './pages/ProductionBoard';
 import Returns from './pages/Returns';
 import MarketingTasks from './pages/MarketingTasks';
