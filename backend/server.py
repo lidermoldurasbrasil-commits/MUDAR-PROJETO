@@ -69,8 +69,11 @@ class ProductionItem(BaseModel):
     client_name: str
     frame_color: str
     delivery_date: str
-    status: str = "Designing"  # Designing, Printing, In Production, Quality Check, Shipped
-    platform: str = "Shopee"  # Shopee, Mercado Livre, TikTok
+    status: str = "Designing"
+    priority: str = "Média"
+    assigned_to: str = ""
+    budget: float = 0
+    platform: str = "Shopee"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ProductionItemCreate(BaseModel):
@@ -82,6 +85,9 @@ class ProductionItemCreate(BaseModel):
     frame_color: str
     delivery_date: str
     status: str = "Designing"
+    priority: str = "Média"
+    assigned_to: str = ""
+    budget: float = 0
     platform: str = "Shopee"
 
 # Returns
