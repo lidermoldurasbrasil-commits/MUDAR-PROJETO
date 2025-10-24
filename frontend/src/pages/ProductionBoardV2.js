@@ -353,34 +353,30 @@ export default function ProductionBoardV2() {
                               )}
                             </div>
                           )}
-                          {col.type === 'dropdown' && col.id === 'glass' && (
-                            <div 
-                              className="cell-value clickable"
-                              onClick={() => setShowDropdown({ type: `custom_${col.id}`, groupId: group.id, itemId: item.id })}
-                            >
-                              {item.customFields[col.id]}
+                          {col.type === 'production_status' && (
+                            <div className="cell">
+                              <div
+                                className="status-badge"
+                                style={{ backgroundColor: getProductionStatusById(item.customFields[col.id]).color }}
+                                onClick={() => setShowDropdown({ type: `custom_${col.id}`, groupId: group.id, itemId: item.id })}
+                              >
+                                {getProductionStatusById(item.customFields[col.id]).label}
+                              </div>
                               {showDropdown?.type === `custom_${col.id}` && showDropdown?.itemId === item.id && (
-                                <div className="dropdown-menu">
-                                  {GLASS_OPTIONS.map(glass => (
+                                <div className="dropdown-menu status-dropdown">
+                                  {productionStatusList.map(prodStatus => (
                                     <div
-                                      key={glass}
+                                      key={prodStatus.id}
                                       className="dropdown-item"
-                                      onClick={() => updateItemField(group.id, item.id, `custom_${col.id}`, glass)}
+                                      onClick={() => updateItemField(group.id, item.id, `custom_${col.id}`, prodStatus.id)}
                                     >
-                                      {glass}
+                                      <div className="status-badge-small" style={{ backgroundColor: prodStatus.color }} />
+                                      {prodStatus.label}
                                     </div>
                                   ))}
                                 </div>
                               )}
                             </div>
-                          )}
-                          {col.type === 'date' && (
-                            <input
-                              type="date"
-                              value={item.customFields[col.id] || ''}
-                              onChange={(e) => updateItemField(group.id, item.id, `custom_${col.id}`, e.target.value)}
-                              className="cell-input"
-                            />
                           )}
                           {col.type === 'email' && (
                             <input
