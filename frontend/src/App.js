@@ -84,40 +84,54 @@ function App() {
         } />
         
         {user ? (
-          <Route element={<Layout user={user} onLogout={handleLogout} />}>
-            <Route path="/" element={<DirectorDashboard />} />
-            
-            {/* Marketplace */}
-            <Route path="/marketplace/production" element={<ProductionBoardV2 />} />
-            <Route path="/marketplace/returns" element={<ReturnsManagement />} />
-            <Route path="/marketplace/marketing" element={<MarketingTasks />} />
-            <Route path="/marketplace/purchases" element={<PurchaseRequests />} />
-            <Route path="/marketplace/accounts-payable" element={<AccountsPayableAdvanced />} />
-            <Route path="/marketplace/sales" element={<Sales />} />
-            <Route path="/marketplace/cost-center" element={<CostCenter />} />
-            <Route path="/marketplace/breakeven" element={<Breakeven />} />
-            <Route path="/purchase-orders" element={<PurchaseOrders />} />
-            
-            {/* Factory & Stores */}
-            <Route path="/factory" element={<Factory />} />
-            <Route path="/factory/production" element={<CustomProduction />} />
-            <Route path="/store/:storeId" element={<StoreView />} />
-            <Route path="/store/:storeId/production" element={<CustomProduction />} />
-            <Route path="/complaints" element={<Complaints />} />
-            <Route path="/crm" element={<CRM />} />
-            
-            {/* Legacy routes - redirect to marketplace */}
-            <Route path="/production" element={<Navigate to="/marketplace/production" replace />} />
-            <Route path="/returns" element={<Navigate to="/marketplace/returns" replace />} />
-            <Route path="/marketing" element={<Navigate to="/marketplace/marketing" replace />} />
-            <Route path="/purchase-requests" element={<Navigate to="/marketplace/purchases" replace />} />
-            <Route path="/accounts-payable" element={<Navigate to="/marketplace/accounts-payable" replace />} />
-            <Route path="/sales" element={<Navigate to="/marketplace/sales" replace />} />
-            <Route path="/cost-center" element={<Navigate to="/marketplace/cost-center" replace />} />
-            <Route path="/breakeven" element={<Navigate to="/marketplace/breakeven" replace />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Route>
+          <>
+            {/* Sistema de Gestão - Nova estrutura */}
+            <Route path="/gestao" element={<GestaoLayout user={user} onLogout={handleLogout} />}>
+              <Route index element={<Navigate to="/gestao/produtos" replace />} />
+              <Route path="produtos" element={<Produtos />} />
+              <Route path="pedidos" element={<Pedidos />} />
+              <Route path="estoque" element={<Estoque />} />
+              <Route path="financeiro" element={<Financeiro />} />
+              <Route path="cadastros" element={<Cadastros />} />
+              <Route path="relatorios" element={<Relatorios />} />
+            </Route>
+
+            {/* Sistema Antigo - Layout anterior */}
+            <Route element={<Layout user={user} onLogout={handleLogout} />}>
+              <Route path="/" element={<DirectorDashboard />} />
+              
+              {/* Marketplace */}
+              <Route path="/marketplace/production" element={<ProductionBoardV2 />} />
+              <Route path="/marketplace/returns" element={<ReturnsManagement />} />
+              <Route path="/marketplace/marketing" element={<MarketingTasks />} />
+              <Route path="/marketplace/purchases" element={<PurchaseRequests />} />
+              <Route path="/marketplace/accounts-payable" element={<AccountsPayableAdvanced />} />
+              <Route path="/marketplace/sales" element={<Sales />} />
+              <Route path="/marketplace/cost-center" element={<CostCenter />} />
+              <Route path="/marketplace/breakeven" element={<Breakeven />} />
+              <Route path="/purchase-orders" element={<PurchaseOrders />} />
+              
+              {/* Factory & Stores */}
+              <Route path="/factory" element={<Factory />} />
+              <Route path="/factory/production" element={<CustomProduction />} />
+              <Route path="/store/:storeId" element={<StoreView />} />
+              <Route path="/store/:storeId/production" element={<CustomProduction />} />
+              <Route path="/complaints" element={<Complaints />} />
+              <Route path="/crm" element={<CRM />} />
+              
+              {/* Legacy routes - redirect to marketplace */}
+              <Route path="/production" element={<Navigate to="/marketplace/production" replace />} />
+              <Route path="/returns" element={<Navigate to="/marketplace/returns" replace />} />
+              <Route path="/marketing" element={<Navigate to="/marketplace/marketing" replace />} />
+              <Route path="/purchase-requests" element={<Navigate to="/marketplace/purchases" replace />} />
+              <Route path="/accounts-payable" element={<Navigate to="/marketplace/accounts-payable" replace />} />
+              <Route path="/sales" element={<Navigate to="/marketplace/sales" replace />} />
+              <Route path="/cost-center" element={<Navigate to="/marketplace/cost-center" replace />} />
+              <Route path="/breakeven" element={<Navigate to="/marketplace/breakeven" replace />} />
+              
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </>
         ) : (
           <Route path="*" element={<Navigate to="/login" />} />
         )}
