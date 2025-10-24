@@ -755,6 +755,81 @@ async def delete_lead(lead_id: str, current_user: dict = Depends(get_current_use
     await db.leads.delete_one({"id": lead_id})
     return {"message": "Deleted successfully"}
 
+# ============= SISTEMA DE GESTÃO =============
+
+# Models para Sistema de Gestão
+class Produto(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    loja_id: str  # fabrica, loja1, loja2, loja3, loja4, loja5
+    
+    # Características
+    referencia: str
+    descricao: str
+    codigo: Optional[str] = ""
+    fornecedor: Optional[str] = ""
+    localizacao: Optional[str] = ""
+    familia: Optional[str] = "Molduras"
+    tipo_produto: Optional[str] = ""
+    ref_loja: Optional[str] = ""
+    largura: Optional[float] = 2.00
+    comprimento: Optional[float] = 270.00
+    espessura: Optional[float] = 1.00
+    ncm: Optional[str] = ""
+    cfop: Optional[str] = ""
+    saldo_estoque: Optional[float] = 0
+    ponto_compra: Optional[str] = ""
+    ativo: bool = True
+    
+    # Precificação
+    custo_vista: Optional[float] = 0
+    custo_30dias: Optional[float] = 0
+    custo_60dias: Optional[float] = 0
+    custo_90dias: Optional[float] = 0
+    custo_120dias: Optional[float] = 0
+    custo_150dias: Optional[float] = 0
+    desconto_lista: Optional[float] = 0
+    custo_base: Optional[float] = 0
+    preco_manufatura: Optional[float] = 0
+    preco_varejo: Optional[float] = 0
+    markup_manufatura: Optional[float] = 0
+    markup_varejo: Optional[float] = 0
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Endpoints de Produtos
+@api_router.get("/gestao/produtos")
+async def get_produtos(loja: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna produtos filtrados por loja. Fábrica vê todos."""
+    query = {}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    
+    produtos = await db.produtos_gestao.find(query).to_list(None)
+    return produtos
+
+@api_router.post("/gestao/produtos")
+async def create_produto(produto: Produto, current_user: dict = Depends(get_current_user)):
+    """Cria um novo produto"""
+    produto_dict = produto.model_dump()
+    await db.produtos_gestao.insert_one(produto_dict)
+    return produto
+
+@api_router.put("/gestao/produtos/{produto_id}")
+async def update_produto(produto_id: str, produto: Produto, current_user: dict = Depends(get_current_user)):
+    """Atualiza um produto existente"""
+    produto_dict = produto.model_dump()
+    produto_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+    await db.produtos_gestao.update_one({"id": produto_id}, {"$set": produto_dict})
+    return {"message": "Produto atualizado com sucesso"}
+
+@api_router.delete("/gestao/produtos/{produto_id}")
+async def delete_produto(produto_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta um produto"""
+    await db.produtos_gestao.delete_one({"id": produto_id})
+    return {"message": "Produto excluído com sucesso"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
