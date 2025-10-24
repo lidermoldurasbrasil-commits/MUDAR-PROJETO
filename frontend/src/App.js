@@ -18,6 +18,16 @@ import Complaints from './pages/Complaints';
 import CRM from './pages/CRM';
 import Layout from './components/Layout';
 import NotFound from './pages/NotFound';
+
+// Novos componentes do Sistema de Gestão
+import GestaoLayout from './components/gestao/GestaoLayout';
+import Produtos from './pages/gestao/Produtos';
+import Pedidos from './pages/gestao/Pedidos';
+import Estoque from './pages/gestao/Estoque';
+import Financeiro from './pages/gestao/Financeiro';
+import Cadastros from './pages/gestao/Cadastros';
+import Relatorios from './pages/gestao/Relatorios';
+
 import axios from 'axios';
 import './App.css';
 
