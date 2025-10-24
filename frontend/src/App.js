@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Login from './pages/Login';
 import DirectorDashboard from './pages/DirectorDashboard';
-import ProductionBoardMondayNew from './pages/ProductionBoardMondayNew';
+import ProductionBoardV2 from './pages/ProductionBoardV2';
 import ReturnsManagement from './pages/ReturnsManagement';
 import MarketingTasks from './pages/MarketingTasks';
 import PurchaseRequests from './pages/PurchaseRequests';
