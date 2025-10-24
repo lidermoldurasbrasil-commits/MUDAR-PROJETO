@@ -653,9 +653,34 @@ export default function DirectorDashboard() {
             flex-direction: column;
           }
           .time-filter,
-          .btn-primary {
+          .btn-primary,
+          .btn-gestao {
             width: 100%;
           }
+        }
+
+        .btn-gestao {
+          background: linear-gradient(135deg, #5dceaa 0%, #4db89a 100%);
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          text-decoration: none;
+          transition: all 0.3s;
+          box-shadow: 0 4px 12px rgba(93, 206, 170, 0.3);
+        }
+
+        .btn-gestao:hover {
+          background: linear-gradient(135deg, #4db89a 0%, #3da788 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(93, 206, 170, 0.4);
         }
       `}</style>
     </div>
