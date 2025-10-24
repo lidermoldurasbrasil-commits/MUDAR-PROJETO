@@ -574,15 +574,7 @@ export default function AccountsPayableAdvanced() {
                         Ocorrência
                         <button type="button" className="btn-info">i</button>
                       </label>
-                      <select
-                        value={formData.occurrence_type}
-                        onChange={(e) => setFormData({...formData, occurrence_type: e.target.value})}
-                        data-testid="select-occurrence"
-                      >
-                        <option value="Única">Única</option>
-                        <option value="Parcelada">Parcelada</option>
-                        <option value="Recorrente">Recorrente</option>
-                      </select>
+const OCCURRENCE_OPTIONS = ['Única', 'Semanal', 'Quinzenal', 'Mensal', 'Anual'];
                     </div>
 
                     <div className="occurrence-summary">
