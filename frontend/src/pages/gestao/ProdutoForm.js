@@ -477,6 +477,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   name="markup_manufatura"
                   value={formData.markup_manufatura}
                   onChange={handleChange}
+                  className="field-readonly"
+                  readOnly
                 />
               </div>
               <div className="form-group">
@@ -487,6 +489,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   name="markup_varejo"
                   value={formData.markup_varejo}
                   onChange={handleChange}
+                  className="field-readonly"
+                  readOnly
                 />
               </div>
             </div>
