@@ -497,8 +497,8 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
                 <strong>{formatCurrency(formData.custo_total)}</strong>
               </div>
               <div className="total-item">
-                <span>Markup (3x):</span>
-                <strong>{formData.markup.toFixed(1)}x</strong>
+                <span>Markup:</span>
+                <strong>{formData.markup.toFixed(2)}x ({((formData.markup - 1) * 100).toFixed(1)}%)</strong>
               </div>
               <div className="total-item destaque">
                 <span>Preço de Venda:</span>
@@ -507,6 +507,9 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
               <div className="total-item">
                 <span>Margem:</span>
                 <strong>{formData.margem_percentual.toFixed(1)}%</strong>
+              </div>
+              <div className="markup-info">
+                <small>💡 Markup calculado automaticamente baseado no prazo de pagamento selecionado em cada produto</small>
               </div>
             </div>
           </div>
