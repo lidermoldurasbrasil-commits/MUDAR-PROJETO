@@ -147,7 +147,7 @@ export default function Produtos() {
         </select>
       </div>
 
-      {/* Lista de Produtos */}
+      {/* Lista de Produtos - Tabela */}
       <div className="produtos-lista">
         {loading ? (
           <div className="loading">Carregando produtos...</div>
@@ -159,57 +159,61 @@ export default function Produtos() {
             </button>
           </div>
         ) : (
-          <div className="produtos-grid">
-            {filteredProdutos.map(produto => (
-              <div key={produto.id} className="produto-card">
-                <div className="produto-header">
-                  <div>
-                    <h3>{produto.referencia}</h3>
-                    <p className="produto-descricao">{produto.descricao}</p>
-                  </div>
-                  <div className="produto-actions">
-                    <button onClick={() => handleEdit(produto)} title="Editar">
-                      <Edit2 size={16} />
-                    </button>
-                    <button onClick={() => handleDuplicate(produto)} title="Duplicar">
-                      <Copy size={16} />
-                    </button>
-                    <button onClick={() => handleDelete(produto.id)} title="Excluir" className="btn-delete">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="produto-info">
-                  <div className="info-row">
-                    <span className="label">Código:</span>
-                    <span>{produto.codigo || '-'}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">Família:</span>
-                    <span>{produto.familia || '-'}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">Fornecedor:</span>
-                    <span>{produto.fornecedor || '-'}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">Estoque:</span>
-                    <span className="estoque-badge">{produto.saldo_estoque || 0}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">Preço Varejo:</span>
-                    <span className="preco">R$ {produto.preco_varejo || '0,00'}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">Status:</span>
-                    <span className={`status-badge ${produto.ativo ? 'ativo' : 'inativo'}`}>
-                      {produto.ativo ? 'Ativo' : 'Inativo'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="table-container">
+            <table className="produtos-table">
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Descrição</th>
+                  <th>Família</th>
+                  <th>Fornecedor</th>
+                  <th className="text-right">Estoque</th>
+                  <th className="text-right">Custo Base</th>
+                  <th className="text-right">Preço Manufatura</th>
+                  <th className="text-right">Preço Varejo</th>
+                  <th className="text-center">Markup</th>
+                  <th className="text-center">Status</th>
+                  <th className="text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProdutos.map(produto => (
+                  <tr key={produto.id}>
+                    <td className="font-bold">{produto.referencia}</td>
+                    <td>{produto.descricao}</td>
+                    <td><span className="badge-familia">{produto.familia}</span></td>
+                    <td>{produto.fornecedor || '-'}</td>
+                    <td className="text-right">{produto.saldo_estoque || 0}</td>
+                    <td className="text-right">R$ {Number(produto.custo_base || 0).toFixed(2)}</td>
+                    <td className="text-right">R$ {Number(produto.preco_manufatura || 0).toFixed(2)}</td>
+                    <td className="text-right preco-destaque">R$ {Number(produto.preco_varejo || 0).toFixed(2)}</td>
+                    <td className="text-center">
+                      {produto.markup_varejo ? (
+                        <span className="badge-markup">{Number(produto.markup_varejo).toFixed(0)}%</span>
+                      ) : '-'}
+                    </td>
+                    <td className="text-center">
+                      <span className={`status-badge ${produto.ativo ? 'ativo' : 'inativo'}`}>
+                        {produto.ativo ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </td>
+                    <td className="text-center">
+                      <div className="produto-actions">
+                        <button onClick={() => handleEdit(produto)} title="Editar">
+                          <Edit2 size={16} />
+                        </button>
+                        <button onClick={() => handleDuplicate(produto)} title="Duplicar">
+                          <Copy size={16} />
+                        </button>
+                        <button onClick={() => handleDelete(produto.id)} title="Excluir" className="btn-delete">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
