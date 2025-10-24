@@ -1,14 +1,33 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, Search, Filter, MoreHorizontal, ChevronDown, Settings, Users, Calendar } from 'lucide-react';
+import { Plus, Search, Filter, ChevronDown, ChevronRight, X, Eye, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const STATUS_OPTIONS = ['Projetando', 'Imprimindo', 'Em Produção', 'Controle de Qualidade', 'Enviado'];
-const PRIORITY_OPTIONS = ['Baixa', 'Média', 'Alta', 'Crítica'];
-const PLATFORMS = ['Shopee', 'Mercado Livre', 'TikTok'];
+const STATUS_OPTIONS = [
+  { label: 'AGUARDANDO ARTE', color: '#ff6b6b' },
+  { label: 'MÃO DE OBRA', color: '#fdab3d' },
+  { label: 'PRONTO PARA IMPRIMIR', color: '#4ecdc4' },
+  { label: 'IMPRESSO', color: '#00c875' },
+  { label: 'AGUARDANDO RETIRADA', color: '#a25ddc' },
+  { label: 'ENTREGUE', color: '#00d647' },
+  { label: 'EM MONTAGEM', color: '#579bfc' },
+  { label: 'MOLDURA', color: '#ff9f1c' },
+  { label: 'CANVAS', color: '#784bd1' },
+  { label: 'MANTIQUEIRA', color: '#66d9ef' },
+  { label: 'MOLDURA CRV', color: '#fb8500' },
+  { label: 'MDF CRU', color: '#a89c94' },
+  { label: 'ESPELHO', color: '#91a3b0' },
+  { label: 'CAIXA ALTA', color: '#ff006e' },
+  { label: 'FEITO', color: '#06ffa5' }
+];
+
+const QUANTITY_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 50, 100];
+const BOX_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const GLASS_OPTIONS = ['Sim', 'Não', 'Fotos', 'Acrílico'];
+const PLATFORMS = ['FULL', 'MERCADO LIVRE', 'SHOPEE', 'TIK TOK'];
 
 export default function ProductionBoardMonday() {
   const [items, setItems] = useState([]);
