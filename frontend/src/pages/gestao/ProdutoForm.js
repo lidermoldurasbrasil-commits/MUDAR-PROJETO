@@ -158,6 +158,7 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
           <div className="form-column">
             <h3 className="section-title">Características do Produto</h3>
             
+            {/* Linha 1: SKU e Descrição */}
             <div className="form-row">
               <div className="form-group">
                 <label>SKU:</label>
@@ -181,8 +182,9 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
               </div>
             </div>
 
+            {/* Linha 2: Fornecedor (span 2) */}
             <div className="form-row">
-              <div className="form-group">
+              <div className="form-group form-group-full">
                 <label>Fornecedor:</label>
                 <input
                   type="text"
@@ -193,7 +195,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
               </div>
             </div>
 
-            <div className="form-row">
+            {/* Linha 3: Localização, Família, Tipo Produto */}
+            <div className="form-row form-row-3">
               <div className="form-group">
                 <label>Localização:</label>
                 <input
@@ -226,7 +229,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
               </div>
             </div>
 
-            <div className="form-row">
+            {/* Linha 4: Ref Loja, Largura, Comprimento */}
+            <div className="form-row form-row-3">
               <div className="form-group">
                 <label>Referência Loja:</label>
                 <input
@@ -258,7 +262,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
               </div>
             </div>
 
-            <div className="form-row">
+            {/* Linha 5: NCM, Espessura, Saldo Estoque */}
+            <div className="form-row form-row-3">
               <div className="form-group">
                 <label>NCM:</label>
                 <input
@@ -287,11 +292,13 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   value={formData.saldo_estoque}
                   onChange={handleChange}
                   className="field-readonly"
+                  readOnly
                 />
               </div>
             </div>
 
-            <div className="form-row">
+            {/* Linha 6: CFOP, Ponto Compra, Ativo */}
+            <div className="form-row form-row-3">
               <div className="form-group">
                 <label>CFOP:</label>
                 <input
@@ -328,7 +335,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
           <div className="form-column">
             <h3 className="section-title">Precificação do Produto</h3>
             
-            <div className="form-row">
+            {/* Linha 1: Custo à Vista (com checkbox) e Desconto Lista */}
+            <div className="form-row form-row-with-check">
               <div className="form-group">
                 <label>Custo à Vista:</label>
                 <input
@@ -350,11 +358,14 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   name="desconto_lista"
                   value={formData.desconto_lista}
                   onChange={handleChange}
+                  className="field-readonly"
+                  readOnly
                 />
               </div>
             </div>
 
-            <div className="form-row">
+            {/* Linha 2: 30 dias (com checkbox) e Custo Base */}
+            <div className="form-row form-row-with-check">
               <div className="form-group">
                 <label>30 dias:</label>
                 <input
@@ -381,6 +392,7 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
               </div>
             </div>
 
+            {/* Linha 3: 60 dias (com checkbox) */}
             <div className="form-row">
               <div className="form-group">
                 <label>60 dias:</label>
@@ -397,7 +409,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
               </div>
             </div>
 
-            <div className="form-row">
+            {/* Linha 4: 90 dias (com checkbox), Preço Manufatura, Preço Varejo */}
+            <div className="form-row form-row-4">
               <div className="form-group">
                 <label>90 dias:</label>
                 <input
@@ -433,7 +446,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
               </div>
             </div>
 
-            <div className="form-row">
+            {/* Linha 5: 120 dias (com checkbox marcado), botões $ */}
+            <div className="form-row form-row-4">
               <div className="form-group">
                 <label>120 dias:</label>
                 <input
@@ -455,7 +469,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
               </div>
             </div>
 
-            <div className="form-row">
+            {/* Linha 6: 150 dias (com checkbox), Markup Manufatura, Markup Varejo */}
+            <div className="form-row form-row-4">
               <div className="form-group">
                 <label>150 dias:</label>
                 <input
@@ -476,7 +491,6 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   step="0.01"
                   name="markup_manufatura"
                   value={formData.markup_manufatura}
-                  onChange={handleChange}
                   className="field-readonly"
                   readOnly
                 />
@@ -488,7 +502,6 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   step="0.01"
                   name="markup_varejo"
                   value={formData.markup_varejo}
-                  onChange={handleChange}
                   className="field-readonly"
                   readOnly
                 />
