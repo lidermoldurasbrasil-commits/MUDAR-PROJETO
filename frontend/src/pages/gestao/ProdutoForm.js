@@ -475,7 +475,7 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
 
       <style jsx>{`
         .produto-form-container {
-          max-width: 1200px;
+          max-width: 1400px;
           margin: 0 auto;
         }
 
@@ -503,40 +503,94 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
           box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
 
-        .form-section {
-          margin-bottom: 35px;
+        .form-two-columns {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 30px;
         }
 
-        .form-section:last-of-type {
-          margin-bottom: 0;
+        .form-column {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
         }
 
         .section-title {
-          font-size: 18px;
+          font-size: 16px;
           color: #2d3748;
-          margin-bottom: 20px;
+          margin-bottom: 15px;
           padding-bottom: 10px;
           border-bottom: 2px solid #e2e8f0;
           font-weight: 600;
         }
 
-        .form-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 20px;
-        }
-
-        .pricing-grid {
-          grid-template-columns: repeat(2, 1fr);
+        .form-row {
+          display: flex;
+          gap: 15px;
+          align-items: flex-end;
         }
 
         .form-group {
+          flex: 1;
           display: flex;
           flex-direction: column;
         }
 
-        .form-group label {
+        .form-group-checkbox {
+          width: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding-bottom: 10px;
+        }
+
+        .form-group-checkbox input[type="checkbox"] {
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+        }
+
+        .form-group-currency {
+          width: 50px;
+          display: flex;
+          align-items: flex-end;
+          padding-bottom: 10px;
+        }
+
+        .btn-currency {
+          background: #5dceaa;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          padding: 10px;
           font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          width: 100%;
+        }
+
+        .checkbox-group-inline {
+          display: flex;
+          align-items: center;
+          padding-top: 28px;
+        }
+
+        .checkbox-group-inline label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          margin: 0;
+        }
+
+        .checkbox-group-inline input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+        }
+
+        .form-group label {
+          font-size: 13px;
           color: #4a5568;
           margin-bottom: 6px;
           font-weight: 500;
@@ -544,7 +598,7 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
 
         .form-group input,
         .form-group select {
-          padding: 10px 14px;
+          padding: 10px 12px;
           border: 1px solid #cbd5e0;
           border-radius: 6px;
           font-size: 14px;
@@ -561,46 +615,9 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
         }
 
         .field-readonly {
-          background: #e6fffa !important;
-          color: #234e52;
+          background: #b2dfdb !important;
+          color: #00695c;
           font-weight: 500;
-        }
-
-        .input-with-currency {
-          position: relative;
-        }
-
-        .input-with-currency .currency {
-          position: absolute;
-          right: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: #5dceaa;
-          color: white;
-          padding: 4px 10px;
-          border-radius: 4px;
-          font-size: 12px;
-          font-weight: 600;
-          pointer-events: none;
-        }
-
-        .checkbox-group {
-          flex-direction: row;
-          align-items: center;
-        }
-
-        .checkbox-group label {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          cursor: pointer;
-          margin: 0;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-          width: 18px;
-          height: 18px;
-          cursor: pointer;
         }
 
         .form-actions {
@@ -614,7 +631,7 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
 
         .btn-save,
         .btn-cancel {
-          padding: 12px 24px;
+          padding: 12px 32px;
           border-radius: 8px;
           font-size: 15px;
           font-weight: 500;
@@ -642,12 +659,18 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
         }
 
         .btn-cancel {
-          background: #f56565;
+          background: #5dceaa;
           color: white;
         }
 
         .btn-cancel:hover {
-          background: #e53e3e;
+          background: #4db89a;
+        }
+
+        @media (max-width: 1024px) {
+          .form-two-columns {
+            grid-template-columns: 1fr;
+          }
         }
       `}</style>
     </div>
