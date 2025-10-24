@@ -917,6 +917,10 @@ async def get_insumos(loja: Optional[str] = None, tipo: Optional[str] = None, cu
         query['tipo_insumo'] = tipo
     
     insumos = await db.insumos.find(query).to_list(None)
+    # Remove _id do MongoDB
+    for insumo in insumos:
+        if '_id' in insumo:
+            del insumo['_id']
     return insumos
 
 @api_router.post("/gestao/insumos")
