@@ -25,7 +25,7 @@ import Produtos from './pages/gestao/Produtos';
 import Pedidos from './pages/gestao/Pedidos';
 import Estoque from './pages/gestao/Estoque';
 import Financeiro from './pages/gestao/Financeiro';
-import Cadastros from './pages/gestao/Cadastros';
+import Clientes from './pages/gestao/Clientes';
 import Relatorios from './pages/gestao/Relatorios';
 
 import axios from 'axios';
