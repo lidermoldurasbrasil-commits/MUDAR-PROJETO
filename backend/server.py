@@ -1583,6 +1583,144 @@ async def get_resumo_financeiro(loja: Optional[str] = None, current_user: dict =
         'quantidade_lancamentos': len(lancamentos)
     }
 
+# ============= DASHBOARD E RELATÓRIOS =============
+
+@api_router.get("/gestao/pedidos/estatisticas")
+async def get_estatisticas_pedidos(loja: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna estatísticas consolidadas dos pedidos"""
+    from datetime import timedelta
+    
+    query = {}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    
+    # Buscar todos os pedidos
+    pedidos = await db.pedidos_manufatura.find(query).to_list(None)
+    
+    # Contadores por status
+    status_count = {}
+    for status in ["Criado", "Em Análise", "Corte", "Montagem", "Acabamento", "Pronto", "Entregue", "Cancelado"]:
+        status_count[status] = len([p for p in pedidos if p.get('status') == status])
+    
+    # Pedidos em produção (todos exceto Entregue e Cancelado)
+    em_producao = len([p for p in pedidos if p.get('status') not in ['Entregue', 'Cancelado']])
+    
+    # Pedidos em atraso (prazo vencido e não entregue)
+    hoje = datetime.now(timezone.utc)
+    em_atraso = 0
+    for p in pedidos:
+        if p.get('status') not in ['Entregue', 'Cancelado'] and p.get('prazo_entrega'):
+            prazo = p['prazo_entrega']
+            if isinstance(prazo, str):
+                prazo = datetime.fromisoformat(prazo.replace('Z', '+00:00'))
+            if prazo < hoje:
+                em_atraso += 1
+    
+    # Calcular perdas técnicas do mês
+    primeiro_dia_mes = hoje.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    pedidos_mes = [p for p in pedidos if p.get('created_at')]
+    
+    perda_total_cm = 0
+    perda_total_valor = 0
+    for p in pedidos_mes:
+        created = p.get('created_at')
+        if isinstance(created, str):
+            created = datetime.fromisoformat(created.replace('Z', '+00:00'))
+        if created >= primeiro_dia_mes:
+            sobra = p.get('sobra', 0)
+            if sobra > 0 and sobra < 100:
+                perda_total_cm += sobra
+                perda_total_valor += p.get('custo_perda', 0)
+    
+    # Total de pedidos finalizados
+    finalizados = len([p for p in pedidos if p.get('status') in ['Pronto', 'Entregue']])
+    
+    # Lucro médio
+    lucro_total = sum(p.get('preco_venda', 0) - p.get('custo_total', 0) for p in pedidos if p.get('status') == 'Entregue')
+    lucro_medio = (lucro_total / finalizados) if finalizados > 0 else 0
+    
+    # Margem média
+    margem_total = sum(p.get('margem_percentual', 0) for p in pedidos if p.get('status') == 'Entregue')
+    margem_media = (margem_total / finalizados) if finalizados > 0 else 0
+    
+    return {
+        'cards': {
+            'em_producao': em_producao,
+            'em_atraso': em_atraso,
+            'perdas_tecnicas_cm': round(perda_total_cm, 2),
+            'perdas_tecnicas_valor': round(perda_total_valor, 2),
+            'finalizados': finalizados,
+            'lucro_medio': round(lucro_medio, 2),
+            'margem_media': round(margem_media, 2)
+        },
+        'por_status': status_count,
+        'total_pedidos': len(pedidos)
+    }
+
+@api_router.get("/gestao/pedidos/consumo-insumos")
+async def get_consumo_insumos(loja: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna consumo consolidado de insumos por tipo"""
+    query = {}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    
+    pedidos = await db.pedidos_manufatura.find(query).to_list(None)
+    
+    consumo = {
+        'Moldura': {'quantidade': 0, 'unidade': 'cm', 'custo': 0},
+        'Vidro': {'quantidade': 0, 'unidade': 'm²', 'custo': 0},
+        'MDF': {'quantidade': 0, 'unidade': 'm²', 'custo': 0},
+        'Papel/Adesivo': {'quantidade': 0, 'unidade': 'm²', 'custo': 0},
+        'Passe-partout': {'quantidade': 0, 'unidade': 'm²', 'custo': 0},
+        'Acessório': {'quantidade': 0, 'unidade': 'unidade', 'custo': 0}
+    }
+    
+    for pedido in pedidos:
+        if pedido.get('status') in ['Entregue', 'Pronto']:
+            for item in pedido.get('itens', []):
+                tipo = item.get('tipo_insumo', '')
+                if tipo in consumo:
+                    consumo[tipo]['quantidade'] += item.get('quantidade', 0)
+                    consumo[tipo]['custo'] += item.get('subtotal', 0)
+    
+    return consumo
+
+@api_router.get("/gestao/pedidos/evolucao-diaria")
+async def get_evolucao_diaria(dias: int = 30, loja: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna evolução de pedidos criados por dia"""
+    from datetime import timedelta
+    
+    query = {}
+    if loja and loja != 'fabrica':
+        query['loja_id'] = loja
+    
+    hoje = datetime.now(timezone.utc)
+    inicio = hoje - timedelta(days=dias)
+    
+    pedidos = await db.pedidos_manufatura.find(query).to_list(None)
+    
+    # Agrupar por data
+    evolucao = {}
+    for i in range(dias):
+        data = inicio + timedelta(days=i)
+        data_str = data.strftime('%Y-%m-%d')
+        evolucao[data_str] = 0
+    
+    for pedido in pedidos:
+        created = pedido.get('created_at')
+        if created:
+            if isinstance(created, str):
+                created = datetime.fromisoformat(created.replace('Z', '+00:00'))
+            if created >= inicio:
+                data_str = created.strftime('%Y-%m-%d')
+                if data_str in evolucao:
+                    evolucao[data_str] += 1
+    
+    return {
+        'labels': list(evolucao.keys()),
+        'valores': list(evolucao.values())
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
