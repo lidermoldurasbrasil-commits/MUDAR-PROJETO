@@ -170,7 +170,6 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
       custo_120dias: parseFloat(formData.custo_120dias) || 0,
       custo_150dias: parseFloat(formData.custo_150dias) || 0,
       desconto_lista: parseFloat(formData.desconto_lista) || 0,
-      custo_base: parseFloat(formData.custo_base) || 0,
       preco_manufatura: parseFloat(formData.preco_manufatura) || 0,
       preco_varejo: parseFloat(formData.preco_varejo) || 0,
       markup_manufatura: parseFloat(formData.markup_manufatura) || 0,
