@@ -1298,16 +1298,24 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
     
     # 3.2 Vidro
     if pedido.usar_vidro and pedido.vidro_id:
+        vidro_produto = await db.produtos_gestao.find_one({"id": pedido.vidro_id})
         vidro = await db.insumos.find_one({"id": pedido.vidro_id})
-        if not vidro:
-            vidro = await db.produtos_gestao.find_one({"id": pedido.vidro_id})
-            if vidro:
-                custo_unitario = vidro.get('custo_120dias', 0)
-                vidro = {
-                    'id': vidro['id'],
-                    'descricao': vidro['descricao'],
-                    'custo_unitario': custo_unitario
-                }
+        
+        if vidro_produto:
+            prazo = vidro_produto.get('prazo_selecionado', '120dias')
+            custo_unitario = get_custo_por_prazo(vidro_produto, prazo)
+            
+            # Pegar markup do produto
+            if vidro_produto.get('markup_manufatura'):
+                markup_item = (vidro_produto['markup_manufatura'] / 100) + 1
+                if markup_item > markup_sugerido:
+                    markup_sugerido = markup_item
+            
+            vidro = {
+                'id': vidro_produto['id'],
+                'descricao': vidro_produto['descricao'],
+                'custo_unitario': custo_unitario
+            }
         
         if vidro:
             pedido.vidro_descricao = vidro['descricao']
@@ -1326,16 +1334,23 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
     
     # 3.3 MDF
     if pedido.usar_mdf and pedido.mdf_id:
+        mdf_produto = await db.produtos_gestao.find_one({"id": pedido.mdf_id})
         mdf = await db.insumos.find_one({"id": pedido.mdf_id})
-        if not mdf:
-            mdf = await db.produtos_gestao.find_one({"id": pedido.mdf_id})
-            if mdf:
-                custo_unitario = mdf.get('custo_120dias', 0)
-                mdf = {
-                    'id': mdf['id'],
-                    'descricao': mdf['descricao'],
-                    'custo_unitario': custo_unitario
-                }
+        
+        if mdf_produto:
+            prazo = mdf_produto.get('prazo_selecionado', '120dias')
+            custo_unitario = get_custo_por_prazo(mdf_produto, prazo)
+            
+            if mdf_produto.get('markup_manufatura'):
+                markup_item = (mdf_produto['markup_manufatura'] / 100) + 1
+                if markup_item > markup_sugerido:
+                    markup_sugerido = markup_item
+            
+            mdf = {
+                'id': mdf_produto['id'],
+                'descricao': mdf_produto['descricao'],
+                'custo_unitario': custo_unitario
+            }
         
         if mdf:
             pedido.mdf_descricao = mdf['descricao']
@@ -1354,16 +1369,23 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
     
     # 3.4 Papel/Adesivo
     if pedido.usar_papel and pedido.papel_id:
+        papel_produto = await db.produtos_gestao.find_one({"id": pedido.papel_id})
         papel = await db.insumos.find_one({"id": pedido.papel_id})
-        if not papel:
-            papel = await db.produtos_gestao.find_one({"id": pedido.papel_id})
-            if papel:
-                custo_unitario = papel.get('custo_120dias', 0)
-                papel = {
-                    'id': papel['id'],
-                    'descricao': papel['descricao'],
-                    'custo_unitario': custo_unitario
-                }
+        
+        if papel_produto:
+            prazo = papel_produto.get('prazo_selecionado', '120dias')
+            custo_unitario = get_custo_por_prazo(papel_produto, prazo)
+            
+            if papel_produto.get('markup_manufatura'):
+                markup_item = (papel_produto['markup_manufatura'] / 100) + 1
+                if markup_item > markup_sugerido:
+                    markup_sugerido = markup_item
+            
+            papel = {
+                'id': papel_produto['id'],
+                'descricao': papel_produto['descricao'],
+                'custo_unitario': custo_unitario
+            }
         
         if papel:
             pedido.papel_descricao = papel['descricao']
@@ -1382,16 +1404,23 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
     
     # 3.5 Passe-partout
     if pedido.usar_passepartout and pedido.passepartout_id:
+        passepartout_produto = await db.produtos_gestao.find_one({"id": pedido.passepartout_id})
         passepartout = await db.insumos.find_one({"id": pedido.passepartout_id})
-        if not passepartout:
-            passepartout = await db.produtos_gestao.find_one({"id": pedido.passepartout_id})
-            if passepartout:
-                custo_unitario = passepartout.get('custo_120dias', 0)
-                passepartout = {
-                    'id': passepartout['id'],
-                    'descricao': passepartout['descricao'],
-                    'custo_unitario': custo_unitario
-                }
+        
+        if passepartout_produto:
+            prazo = passepartout_produto.get('prazo_selecionado', '120dias')
+            custo_unitario = get_custo_por_prazo(passepartout_produto, prazo)
+            
+            if passepartout_produto.get('markup_manufatura'):
+                markup_item = (passepartout_produto['markup_manufatura'] / 100) + 1
+                if markup_item > markup_sugerido:
+                    markup_sugerido = markup_item
+            
+            passepartout = {
+                'id': passepartout_produto['id'],
+                'descricao': passepartout_produto['descricao'],
+                'custo_unitario': custo_unitario
+            }
         
         if passepartout:
             pedido.passepartout_descricao = passepartout['descricao']
@@ -1412,16 +1441,23 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
     if pedido.usar_acessorios and pedido.acessorios_ids:
         descricoes = []
         for acessorio_id in pedido.acessorios_ids:
+            acessorio_produto = await db.produtos_gestao.find_one({"id": acessorio_id})
             acessorio = await db.insumos.find_one({"id": acessorio_id})
-            if not acessorio:
-                acessorio = await db.produtos_gestao.find_one({"id": acessorio_id})
-                if acessorio:
-                    custo_unitario = acessorio.get('custo_120dias', 0)
-                    acessorio = {
-                        'id': acessorio['id'],
-                        'descricao': acessorio['descricao'],
-                        'custo_unitario': custo_unitario
-                    }
+            
+            if acessorio_produto:
+                prazo = acessorio_produto.get('prazo_selecionado', '120dias')
+                custo_unitario = get_custo_por_prazo(acessorio_produto, prazo)
+                
+                if acessorio_produto.get('markup_manufatura'):
+                    markup_item = (acessorio_produto['markup_manufatura'] / 100) + 1
+                    if markup_item > markup_sugerido:
+                        markup_sugerido = markup_item
+                
+                acessorio = {
+                    'id': acessorio_produto['id'],
+                    'descricao': acessorio_produto['descricao'],
+                    'custo_unitario': custo_unitario
+                }
             
             if acessorio:
                 descricoes.append(acessorio['descricao'])
@@ -1439,10 +1475,11 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
                 ))
         pedido.acessorios_descricoes = descricoes
     
-    # 4. Calcular totais
+    # 4. Calcular totais com markup do produto
     pedido.itens = itens
     pedido.custo_total = custo_total
-    pedido.preco_venda = custo_total * pedido.markup
+    pedido.markup = markup_sugerido
+    pedido.preco_venda = custo_total * markup_sugerido
     pedido.margem_percentual = ((pedido.preco_venda - custo_total) / pedido.preco_venda * 100) if pedido.preco_venda > 0 else 0
     
     return pedido
