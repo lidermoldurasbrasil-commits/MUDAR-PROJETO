@@ -426,8 +426,8 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
               </div>
             </div>
 
-            {/* Linha 2: 30 dias (com checkbox) e Custo Base */}
-            <div className="form-row form-row-with-check">
+            {/* Linha 2: 30 dias (com checkbox) */}
+            <div className="form-row">
               <div className="form-group">
                 <label>30 dias:</label>
                 <input
@@ -443,17 +443,6 @@ export default function ProdutoForm({ produto, lojaAtual, onClose, onSave }) {
                   type="checkbox" 
                   checked={formData.prazo_selecionado === '30dias'}
                   onChange={() => handlePrazoChange('30dias')}
-                />
-              </div>
-              <div className="form-group">
-                <label>Custo Base:</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  name="custo_base"
-                  value={formData.custo_base}
-                  className="field-readonly"
-                  readOnly
                 />
               </div>
             </div>
