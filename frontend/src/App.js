@@ -78,7 +78,7 @@ function App() {
             <Route path="/" element={<DirectorDashboard />} />
             
             {/* Marketplace */}
-            <Route path="/marketplace/production" element={<ProductionBoard />} />
+            <Route path="/marketplace/production" element={<ProductionBoardMonday />} />
             <Route path="/marketplace/returns" element={<Returns />} />
             <Route path="/marketplace/marketing" element={<MarketingTasks />} />
             <Route path="/marketplace/purchases" element={<PurchaseRequests />} />
