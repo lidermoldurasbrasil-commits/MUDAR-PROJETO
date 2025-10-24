@@ -7,7 +7,7 @@ import Returns from './pages/Returns';
 import MarketingTasks from './pages/MarketingTasks';
 import PurchaseRequests from './pages/PurchaseRequests';
 import PurchaseOrders from './pages/PurchaseOrders';
-import AccountsPayable from './pages/AccountsPayable';
+import AccountsPayableAdvanced from './pages/AccountsPayableAdvanced';
 import Sales from './pages/Sales';
 import CostCenter from './pages/CostCenter';
 import Breakeven from './pages/Breakeven';
