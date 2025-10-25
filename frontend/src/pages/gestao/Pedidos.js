@@ -231,6 +231,30 @@ export default function Pedidos() {
             <option key={status} value={status}>{status}</option>
           ))}
         </select>
+        
+        {/* NOVO: Botão de exclusão em lote */}
+        {selectedIds.length > 0 && (
+          <button 
+            className="btn-delete-selected"
+            onClick={handleDeleteSelected}
+            style={{
+              marginLeft: '10px',
+              padding: '10px 20px',
+              background: '#dc2626',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <Trash2 size={18} />
+            Excluir {selectedIds.length} selecionado(s)
+          </button>
+        )}
       </div>
 
       {/* Tabela de Pedidos */}
