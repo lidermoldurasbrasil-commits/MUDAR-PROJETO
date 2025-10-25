@@ -1008,6 +1008,7 @@ export default function MarketplaceProjetoDetalhes() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">SKU</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome Variação</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[130px]">Data Prevista Envio</th>
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
