@@ -525,7 +525,7 @@ export default function MarketplaceProjetoDetalhes() {
                       <input type="checkbox" className="rounded" />
                     </td>
                     
-                    {/* Elemento - Editável */}
+                    {/* ID do Pedido - Editável */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white transition-opacity">
@@ -560,16 +560,6 @@ export default function MarketplaceProjetoDetalhes() {
                       </select>
                     </td>
                     
-                    {/* Quantidade - Editável */}
-                    <td className="px-4 py-3">
-                      <input
-                        type="number"
-                        defaultValue={pedido.quantidade}
-                        onBlur={(e) => handleUpdatePedido(pedido.id, 'quantidade', parseInt(e.target.value))}
-                        className="w-20 bg-transparent text-white text-center border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1"
-                      />
-                    </td>
-                    
                     {/* SKU - Editável */}
                     <td className="px-4 py-3">
                       <input
@@ -581,50 +571,78 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
-                    {/* Cliente - Editável */}
+                    {/* Nome Variação - Editável */}
                     <td className="px-4 py-3">
                       <input
                         type="text"
-                        defaultValue={pedido.cliente_nome}
-                        onBlur={(e) => handleUpdatePedido(pedido.id, 'cliente_nome', e.target.value)}
-                        placeholder="Nome do cliente"
-                        className="bg-transparent text-white border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
+                        defaultValue={pedido.nome_variacao}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'nome_variacao', e.target.value)}
+                        placeholder="Variação"
+                        className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
                       />
                     </td>
                     
-                    {/* Sala de Impressão - Badge */}
-                    <td className="px-4 py-3 text-center">
-                      {pedido.status === 'Sala de Impressão' ? (
-                        <span className="inline-block px-3 py-1 bg-teal-600 text-white text-xs rounded font-medium">
-                          Impresso
-                        </span>
-                      ) : pedido.status === 'Aguardando Impressão' ? (
-                        <span className="inline-block px-3 py-1 bg-yellow-600 text-white text-xs rounded font-medium">
-                          Aguardando
-                        </span>
-                      ) : (
-                        <span className="text-gray-500 text-xs">-</span>
-                      )}
+                    {/* Quantidade - Editável */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        defaultValue={pedido.quantidade}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'quantidade', parseInt(e.target.value))}
+                        className="w-20 bg-transparent text-white text-center border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1"
+                      />
                     </td>
                     
-                    {/* Prazo - Editável */}
+                    {/* Preço Acordado - Editável */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        step="0.01"
+                        defaultValue={pedido.preco_acordado}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'preco_acordado', parseFloat(e.target.value))}
+                        placeholder="0.00"
+                        className="w-24 bg-transparent text-green-400 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1"
+                      />
+                    </td>
+                    
+                    {/* Taxa Comissão - Somente Leitura */}
+                    <td className="px-4 py-3">
+                      <span className="text-orange-400 text-sm">
+                        R$ {pedido.valor_taxa_comissao?.toFixed(2) || '0.00'}
+                      </span>
+                    </td>
+                    
+                    {/* Taxa Serviço - Somente Leitura */}
+                    <td className="px-4 py-3">
+                      <span className="text-orange-400 text-sm">
+                        R$ {pedido.valor_taxa_servico?.toFixed(2) || '0.00'}
+                      </span>
+                    </td>
+                    
+                    {/* Valor Líquido - Somente Leitura */}
+                    <td className="px-4 py-3">
+                      <span className="text-green-400 text-sm font-medium">
+                        R$ {pedido.valor_liquido?.toFixed(2) || '0.00'}
+                      </span>
+                    </td>
+                    
+                    {/* Opção de Envio - Editável */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        defaultValue={pedido.opcao_envio}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'opcao_envio', e.target.value)}
+                        placeholder="Ex: Normal"
+                        className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
+                      />
+                    </td>
+                    
+                    {/* Data Prevista Envio - Editável */}
                     <td className="px-4 py-3">
                       <input
                         type="date"
-                        defaultValue={pedido.prazo_entrega ? new Date(pedido.prazo_entrega).toISOString().split('T')[0] : ''}
-                        onBlur={(e) => handleUpdatePedido(pedido.id, 'prazo_entrega', e.target.value)}
+                        defaultValue={pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toISOString().split('T')[0] : ''}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'data_prevista_envio', e.target.value)}
                         className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1"
-                      />
-                    </td>
-                    
-                    {/* Responsável - Editável */}
-                    <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        defaultValue={pedido.responsavel}
-                        onBlur={(e) => handleUpdatePedido(pedido.id, 'responsavel', e.target.value)}
-                        placeholder="Responsável"
-                        className="bg-transparent text-white border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
                       />
                     </td>
                   </tr>
