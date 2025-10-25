@@ -1552,8 +1552,8 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             prazo = mdf_produto.get('prazo_selecionado', '120dias')
             custo_unitario = get_custo_por_prazo(mdf_produto, prazo)
             
-            # NOVO: Pegar preço de venda
-            preco_unitario = mdf_produto.get('preco_venda', custo_unitario)
+            # NOVO: Pegar preço de manufatura
+            preco_unitario = mdf_produto.get('preco_manufatura', custo_unitario)
             
             if mdf_produto.get('markup_manufatura'):
                 markup_item = (mdf_produto['markup_manufatura'] / 100) + 1
