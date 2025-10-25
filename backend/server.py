@@ -2955,6 +2955,96 @@ async def delete_conta_receber(conta_id: str, current_user: dict = Depends(get_c
     await db.contas_receber.delete_one({"id": conta_id})
     return {"message": "Conta excluída com sucesso"}
 
+@api_router.post("/gestao/financeiro/contas-receber/{conta_id}/baixa")
+async def baixar_conta_receber(
+    conta_id: str, 
+    data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Realiza baixa (confirmação de recebimento) de uma conta a receber"""
+    try:
+        # Buscar conta a receber
+        conta = await db.contas_receber.find_one({"id": conta_id})
+        if not conta:
+            raise HTTPException(status_code=404, detail="Conta a receber não encontrada")
+        
+        # Verificar se já está baixada
+        if conta.get('status') == 'Recebido':
+            return {"message": "Conta já foi baixada anteriormente", "conta": conta}
+        
+        # Extrair dados da baixa
+        data_baixa = data.get('data_baixa')
+        if data_baixa:
+            data_recebimento = datetime.fromisoformat(data_baixa)
+        else:
+            data_recebimento = datetime.now(timezone.utc)
+        
+        valor_recebido = data.get('valor_recebido', conta.get('valor_liquido', 0))
+        observacoes_baixa = data.get('observacoes', '')
+        
+        # Atualizar status e datas
+        update_data = {
+            'status': 'Recebido',
+            'data_recebimento': data_recebimento.isoformat(),
+            'data_pago_loja': data_recebimento.isoformat(),
+            'observacoes': conta.get('observacoes', '') + f" | Baixa: {observacoes_baixa}" if observacoes_baixa else conta.get('observacoes', ''),
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Atualizar saldo da conta bancária (crédito)
+        if conta.get('conta_bancaria_id'):
+            conta_bancaria = await db.contas_bancarias.find_one({"id": conta['conta_bancaria_id']})
+            if conta_bancaria:
+                saldo_anterior = conta_bancaria.get('saldo_atual', 0)
+                novo_saldo = saldo_anterior + valor_recebido
+                
+                await db.contas_bancarias.update_one(
+                    {"id": conta['conta_bancaria_id']},
+                    {"$set": {"saldo_atual": novo_saldo}}
+                )
+                
+                # Criar movimentação no extrato
+                movimentacao = {
+                    'id': str(uuid.uuid4()),
+                    'conta_bancaria_id': conta['conta_bancaria_id'],
+                    'tipo': 'Crédito',
+                    'categoria': conta.get('categoria_nome', 'Recebimento'),
+                    'descricao': f"Recebimento: {conta.get('cliente_origem', '')} - {conta.get('descricao', '')}",
+                    'valor': valor_recebido,
+                    'saldo_anterior': saldo_anterior,
+                    'saldo_posterior': novo_saldo,
+                    'data': data_recebimento.isoformat(),
+                    'origem_tipo': 'ContaReceber',
+                    'origem_id': conta_id,
+                    'loja_id': conta.get('loja_id', 'fabrica'),
+                    'created_at': datetime.now(timezone.utc).isoformat()
+                }
+                await db.movimentacoes_financeiras.insert_one(movimentacao)
+                
+                print(f"✅ Saldo da conta bancária atualizado: R${saldo_anterior:.2f} → R${novo_saldo:.2f}")
+        
+        # Atualizar conta a receber
+        await db.contas_receber.update_one({"id": conta_id}, {"$set": update_data})
+        
+        # Buscar conta atualizada
+        conta_atualizada = await db.contas_receber.find_one({"id": conta_id})
+        if '_id' in conta_atualizada:
+            del conta_atualizada['_id']
+        
+        print(f"✅ Baixa realizada com sucesso para conta {conta_id}")
+        return {
+            "message": "Baixa realizada com sucesso", 
+            "conta": conta_atualizada
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Erro ao realizar baixa: {e}")
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Erro ao realizar baixa: {str(e)}")
+
 # TRANSFERÊNCIAS
 @api_router.get("/gestao/financeiro/transferencias")
 async def get_transferencias(current_user: dict = Depends(get_current_user)):
