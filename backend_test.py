@@ -3484,8 +3484,8 @@ class BusinessManagementSystemTester:
 def main():
     tester = BusinessManagementSystemTester()
     
-    # Run only the Production Order automation test as requested
-    print("🚀 Starting Production Order Automation Test...")
+    # Run only the Marketplace Spreadsheet Upload test as requested
+    print("🚀 Starting Marketplace Spreadsheet Upload Test...")
     print(f"🌐 Testing against: {tester.base_url}")
     
     # Authentication is required
@@ -3493,8 +3493,8 @@ def main():
         print("❌ Authentication failed - stopping tests")
         return 1
     
-    # Run only the Production Order automation test
-    success = tester.test_production_order_automation()
+    # Run only the Marketplace Spreadsheet Upload test
+    success = tester.test_marketplace_spreadsheet_upload()
     
     # Print final results
     all_passed = tester.print_summary()
