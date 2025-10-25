@@ -183,6 +183,96 @@ export default function ContasBancarias() {
     setFiltros({ banco: '', status: '' });
   };
 
+  // Funções para gerenciar formas de pagamento
+  const toggleExpand = async (contaId) => {
+    if (expandedId === contaId) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(contaId);
+      if (!formasPagamento[contaId]) {
+        await fetchFormasPagamento(contaId);
+      }
+    }
+  };
+
+  const fetchFormasPagamento = async (contaId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API}/contas-bancarias/${contaId}/formas-pagamento`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setFormasPagamento(prev => ({ ...prev, [contaId]: response.data }));
+    } catch (error) {
+      console.error('Erro ao buscar formas de pagamento:', error);
+      toast.error('Erro ao carregar formas de pagamento');
+    }
+  };
+
+  const handleAddForma = (contaId) => {
+    setIsAddingForma(contaId);
+    setFormaData({
+      forma_pagamento: 'Cartão Crédito',
+      tipo: 'C',
+      tef: false,
+      pagamento_sefaz: false,
+      bandeira: '',
+      numero_parcelas: 1,
+      espaco_parcelas_dias: 30,
+      taxa_banco_percentual: 0,
+      ativa: true
+    });
+  };
+
+  const handleEditForma = (forma) => {
+    setEditingFormaId(forma.id);
+    setFormaData({ ...forma });
+  };
+
+  const handleCancelForma = () => {
+    setIsAddingForma(false);
+    setEditingFormaId(null);
+  };
+
+  const handleSaveForma = async (contaId) => {
+    try {
+      const token = localStorage.getItem('token');
+
+      if (isAddingForma) {
+        await axios.post(`${API}/contas-bancarias/${contaId}/formas-pagamento`, formaData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Forma de pagamento criada com sucesso!');
+      } else if (editingFormaId) {
+        await axios.put(`${API}/formas-pagamento/${editingFormaId}`, formaData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Forma de pagamento atualizada com sucesso!');
+      }
+
+      handleCancelForma();
+      await fetchFormasPagamento(contaId);
+    } catch (error) {
+      console.error('Erro ao salvar forma de pagamento:', error);
+      toast.error('Erro ao salvar forma de pagamento');
+    }
+  };
+
+  const handleDeleteForma = async (formaId, contaId) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta forma de pagamento?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API}/formas-pagamento/${formaId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Forma de pagamento excluída com sucesso!');
+      await fetchFormasPagamento(contaId);
+    } catch (error) {
+      console.error('Erro ao excluir forma de pagamento:', error);
+      toast.error('Erro ao excluir forma de pagamento');
+    }
+  };
+
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
