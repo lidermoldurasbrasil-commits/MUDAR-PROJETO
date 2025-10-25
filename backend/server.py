@@ -1387,12 +1387,15 @@ def get_custo_por_prazo(produto, prazo_selecionado):
     return produto.get(campo_custo, 0)
 
 @api_router.post("/gestao/pedidos/calcular")
-async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends(get_current_user)):
+async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Depends(get_current_user)):
     """Calcula automaticamente os custos do pedido com base nos insumos selecionados"""
     import math
     
+    # Criar um dicionário para armazenar resultados
+    resultado = pedido.model_dump()
+    
     # 1. Calcular área (m²)
-    pedido.area = (pedido.altura * pedido.largura) / 10000
+    resultado['area'] = (pedido.altura * pedido.largura) / 10000
     
     # 2. Calcular perímetro (cm)
     pedido.perimetro = (2 * pedido.altura) + (2 * pedido.largura)
