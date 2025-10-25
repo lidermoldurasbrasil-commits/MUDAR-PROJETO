@@ -1762,6 +1762,253 @@ class BusinessManagementSystemTester:
         
         return all_valid
 
+    def test_production_order_automation(self):
+        """Test Production Order automation when pedido status changes to 'Montagem'"""
+        print("\n🏭 TESTING PRODUCTION ORDER AUTOMATION...")
+        print("📋 Testing automatic creation of Production Order when pedido status changes to 'Montagem'")
+        
+        # Step 1: Login to get authentication token
+        print("\n📋 Step 1: Login for authentication...")
+        if not self.token:
+            print("❌ No authentication token available")
+            self.log_test("Production Order Automation", False, "No authentication token")
+            return False
+        print("✅ Authentication token available")
+        
+        # Step 2: Create a simple client
+        print("\n📋 Step 2: Creating test client...")
+        cliente_data = {
+            "loja_id": "fabrica",
+            "nome": "Cliente Teste Automação",
+            "telefone": "(11) 99999-9999",
+            "endereco": "Rua Teste, 123",
+            "cidade": "São Paulo"
+        }
+        
+        success_cliente, cliente_response = self.run_test(
+            "Create Test Client for Automation",
+            "POST",
+            "gestao/clientes",
+            200,
+            data=cliente_data
+        )
+        
+        if not success_cliente or 'id' not in cliente_response:
+            print("❌ Failed to create client for automation test")
+            self.log_test("Production Order Automation - Client Creation", False, "Failed to create client")
+            return False
+        
+        cliente_id = cliente_response['id']
+        print(f"✅ Client created with ID: {cliente_id}")
+        
+        # Step 3: Create pedido with minimal data
+        print("\n📋 Step 3: Creating test pedido...")
+        pedido_data = {
+            "loja_id": "fabrica",
+            "cliente_id": cliente_id,
+            "cliente_nome": "Cliente Teste Automação",
+            "tipo_produto": "Quadro",
+            "altura": 50,
+            "largura": 70,
+            "quantidade": 1
+        }
+        
+        success_pedido, pedido_response = self.run_test(
+            "Create Test Pedido for Automation",
+            "POST",
+            "gestao/pedidos",
+            200,
+            data=pedido_data
+        )
+        
+        if not success_pedido or 'id' not in pedido_response:
+            print("❌ Failed to create pedido for automation test")
+            self.log_test("Production Order Automation - Pedido Creation", False, "Failed to create pedido")
+            return False
+        
+        pedido_id = pedido_response['id']
+        numero_pedido = pedido_response.get('numero_pedido', 0)
+        print(f"✅ Pedido created with ID: {pedido_id}, Number: {numero_pedido}")
+        
+        # Step 4: Change pedido status to "Montagem" to trigger automation
+        print("\n📋 Step 4: Changing pedido status to 'Montagem' to trigger automation...")
+        status_data = {
+            "novo_status": "Montagem",
+            "observacao": "Teste de automação"
+        }
+        
+        success_status, status_response = self.run_test(
+            "Change Pedido Status to Montagem",
+            "PUT",
+            f"gestao/pedidos/{pedido_id}/status",
+            200,
+            data=status_data
+        )
+        
+        if not success_status:
+            print("❌ Failed to change pedido status to Montagem")
+            self.log_test("Production Order Automation - Status Change", False, "Failed to change status")
+            return False
+        
+        print("✅ Pedido status changed to 'Montagem'")
+        
+        # Step 5: Verify Production Order was created automatically
+        print("\n📋 Step 5: Verifying Production Order was created automatically...")
+        success_get_orders, orders_response = self.run_test(
+            "Get Production Orders",
+            "GET",
+            "gestao/producao",
+            200
+        )
+        
+        if not success_get_orders or not isinstance(orders_response, list):
+            print("❌ Failed to retrieve production orders")
+            self.log_test("Production Order Automation - Get Orders", False, "Failed to retrieve orders")
+            return False
+        
+        # Find the production order for our pedido
+        production_order = None
+        for order in orders_response:
+            if order.get('id_pedido_origem') == pedido_id:
+                production_order = order
+                break
+        
+        if not production_order:
+            print(f"❌ No production order found for pedido ID: {pedido_id}")
+            self.log_test("Production Order Automation - Order Creation", False, "Production order not created")
+            return False
+        
+        print(f"✅ Production Order found with ID: {production_order.get('id')}")
+        
+        # Step 6: Validate Production Order fields
+        print("\n📋 Step 6: Validating Production Order fields...")
+        validation_results = []
+        
+        # Check numero_ordem is generated
+        if 'numero_ordem' in production_order and production_order['numero_ordem'] > 0:
+            print(f"✅ numero_ordem generated: {production_order['numero_ordem']}")
+            validation_results.append(True)
+        else:
+            print("❌ numero_ordem not generated or invalid")
+            validation_results.append(False)
+        
+        # Check cliente_nome is correct
+        if production_order.get('cliente_nome') == "Cliente Teste Automação":
+            print("✅ cliente_nome is correct")
+            validation_results.append(True)
+        else:
+            print(f"❌ cliente_nome incorrect: {production_order.get('cliente_nome')}")
+            validation_results.append(False)
+        
+        # Check loja_origem is "fabrica"
+        if production_order.get('loja_origem') == "fabrica":
+            print("✅ loja_origem is 'fabrica'")
+            validation_results.append(True)
+        else:
+            print(f"❌ loja_origem incorrect: {production_order.get('loja_origem')}")
+            validation_results.append(False)
+        
+        # Check status_producao is "Em Fila"
+        if production_order.get('status_producao') == "Em Fila":
+            print("✅ status_producao is 'Em Fila'")
+            validation_results.append(True)
+        else:
+            print(f"❌ status_producao incorrect: {production_order.get('status_producao')}")
+            validation_results.append(False)
+        
+        # Check timeline has creation entry
+        timeline = production_order.get('timeline', [])
+        if timeline and len(timeline) > 0:
+            creation_entry = timeline[0]
+            if 'Ordem criada automaticamente' in creation_entry.get('mudanca', ''):
+                print("✅ Timeline has creation entry")
+                validation_results.append(True)
+            else:
+                print("❌ Timeline missing proper creation entry")
+                validation_results.append(False)
+        else:
+            print("❌ Timeline is empty")
+            validation_results.append(False)
+        
+        # Check checklist is initialized
+        checklist = production_order.get('checklist', {})
+        if isinstance(checklist, dict) and 'arte_aprovada' in checklist:
+            print("✅ Checklist is initialized")
+            validation_results.append(True)
+        else:
+            print("❌ Checklist not properly initialized")
+            validation_results.append(False)
+        
+        # Step 7: Test duplicate prevention - try changing status to "Montagem" again
+        print("\n📋 Step 7: Testing duplicate prevention...")
+        success_duplicate, duplicate_response = self.run_test(
+            "Change Status to Montagem Again (Duplicate Test)",
+            "PUT",
+            f"gestao/pedidos/{pedido_id}/status",
+            200,
+            data=status_data
+        )
+        
+        if success_duplicate:
+            # Get production orders again to check for duplicates
+            success_get_orders2, orders_response2 = self.run_test(
+                "Get Production Orders (Duplicate Check)",
+                "GET",
+                "gestao/producao",
+                200
+            )
+            
+            if success_get_orders2:
+                # Count orders for our pedido
+                order_count = 0
+                for order in orders_response2:
+                    if order.get('id_pedido_origem') == pedido_id:
+                        order_count += 1
+                
+                if order_count == 1:
+                    print("✅ No duplicate production order created")
+                    validation_results.append(True)
+                else:
+                    print(f"❌ Duplicate production orders found: {order_count}")
+                    validation_results.append(False)
+            else:
+                print("❌ Failed to check for duplicates")
+                validation_results.append(False)
+        else:
+            print("❌ Failed to test duplicate prevention")
+            validation_results.append(False)
+        
+        # Step 8: Verify pedido still has "Montagem" status
+        print("\n📋 Step 8: Verifying pedido status remains 'Montagem'...")
+        success_get_pedido, pedido_check = self.run_test(
+            "Get Pedido to Check Status",
+            "GET",
+            f"gestao/pedidos/{pedido_id}",
+            200
+        )
+        
+        if success_get_pedido and pedido_check.get('status') == "Montagem":
+            print("✅ Pedido status remains 'Montagem'")
+            validation_results.append(True)
+        else:
+            print(f"❌ Pedido status incorrect: {pedido_check.get('status') if success_get_pedido else 'Failed to get pedido'}")
+            validation_results.append(False)
+        
+        # Overall result
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ ALL PRODUCTION ORDER AUTOMATION TESTS PASSED!")
+            print(f"✅ Production Order #{production_order.get('numero_ordem')} created successfully!")
+            print("✅ Automation working correctly - no duplicates created")
+            self.log_test("Production Order Automation - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ PRODUCTION ORDER AUTOMATION FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("Production Order Automation - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
