@@ -345,6 +345,14 @@ export default function Pedidos() {
                     <td>{formatDate(pedido.prazo_entrega)}</td>
                     <td className="actions">
                       <button
+                        className="btn-icon btn-view"
+                        onClick={() => handleViewOrcamento(pedido)}
+                        title="Visualizar Orçamento"
+                        style={{background: '#3b82f6', color: 'white'}}
+                      >
+                        <Eye size={16} />
+                      </button>
+                      <button
                         className="btn-icon btn-edit"
                         onClick={() => handleEditPedido(pedido)}
                         title="Editar"
