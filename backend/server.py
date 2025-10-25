@@ -3945,13 +3945,121 @@ async def create_pedidos_bulk(pedidos: list[PedidoMarketplace], current_user: di
     pedidos_dict = []
     for pedido in pedidos:
         pedido.created_by = current_user.get('username', '')
+        
+        # Calcular valores de taxas se houver
+        if pedido.preco_acordado > 0:
+            if pedido.taxa_comissao > 0:
+                pedido.valor_taxa_comissao = pedido.preco_acordado * (pedido.taxa_comissao / 100)
+            if pedido.taxa_servico > 0:
+                pedido.valor_taxa_servico = pedido.preco_acordado * (pedido.taxa_servico / 100)
+            
+            # Calcular valor líquido
+            pedido.valor_liquido = pedido.preco_acordado - pedido.valor_taxa_comissao - pedido.valor_taxa_servico
+        
         pedido_dict = pedido.model_dump()
         pedidos_dict.append(pedido_dict)
     
     if pedidos_dict:
         await db.pedidos_marketplace.insert_many(pedidos_dict)
     
-    return {"message": f"{len(pedidos_dict)} pedidos criados com sucesso"}
+    return {"message": f"{len(pedidos_dict)} pedidos criados com sucesso", "pedidos": pedidos_dict}
+
+@api_router.post("/gestao/marketplaces/pedidos/upload-planilha")
+async def upload_planilha_pedidos(
+    projeto_id: str,
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload de planilha Excel/CSV com pedidos do marketplace"""
+    try:
+        import pandas as pd
+        import io
+        
+        # Ler o arquivo
+        contents = await file.read()
+        
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(io.BytesIO(contents))
+        else:
+            df = pd.read_excel(io.BytesIO(contents))
+        
+        # Buscar projeto
+        projeto = await db.projetos_marketplace.find_one({"id": projeto_id})
+        if not projeto:
+            raise HTTPException(status_code=404, detail="Projeto não encontrado")
+        
+        pedidos_criados = []
+        
+        # Processar cada linha
+        for index, row in df.iterrows():
+            try:
+                # Mapear colunas da planilha para o modelo
+                pedido_data = {
+                    'id': str(uuid.uuid4()),
+                    'projeto_id': projeto_id,
+                    'plataforma': projeto['plataforma'],
+                    'numero_pedido': str(row.get('ID do Pedido', row.get('Número do Pedido', ''))),
+                    'numero_referencia_sku': str(row.get('Número de Referência SKU', '')),
+                    'sku': str(row.get('SKU', '')),
+                    'nome_variacao': str(row.get('Nome Variação', row.get('Nome da Variação', ''))),
+                    'produto_nome': str(row.get('Nome do Produto', row.get('Produto', ''))),
+                    'quantidade': int(row.get('Quantidade', 1)),
+                    'preco_acordado': float(row.get('Preço Acordado', 0)),
+                    'valor_unitario': float(row.get('Valor Unitário', row.get('Preço Acordado', 0))),
+                    'taxa_comissao': float(row.get('Taxa de Comissão', 0)),
+                    'taxa_servico': float(row.get('Taxa de Serviço', 0)),
+                    'opcao_envio': str(row.get('Opção de Envio', '')),
+                    'cliente_nome': str(row.get('Nome do Cliente', row.get('Cliente', ''))),
+                    'status': 'Aguardando Impressão',
+                    'loja_id': projeto.get('loja_id', 'fabrica'),
+                    'created_by': current_user.get('username', ''),
+                    'created_at': datetime.now(timezone.utc).isoformat(),
+                    'updated_at': datetime.now(timezone.utc).isoformat()
+                }
+                
+                # Calcular data prevista de envio
+                if 'Data Prevista de Envio' in row and pd.notna(row['Data Prevista de Envio']):
+                    pedido_data['data_prevista_envio'] = pd.to_datetime(row['Data Prevista de Envio']).isoformat()
+                
+                # Calcular taxas
+                if pedido_data['preco_acordado'] > 0:
+                    if pedido_data['taxa_comissao'] > 0:
+                        pedido_data['valor_taxa_comissao'] = pedido_data['preco_acordado'] * (pedido_data['taxa_comissao'] / 100)
+                    else:
+                        pedido_data['valor_taxa_comissao'] = 0
+                    
+                    if pedido_data['taxa_servico'] > 0:
+                        pedido_data['valor_taxa_servico'] = pedido_data['preco_acordado'] * (pedido_data['taxa_servico'] / 100)
+                    else:
+                        pedido_data['valor_taxa_servico'] = 0
+                    
+                    pedido_data['valor_liquido'] = pedido_data['preco_acordado'] - pedido_data['valor_taxa_comissao'] - pedido_data['valor_taxa_servico']
+                    pedido_data['valor_total'] = pedido_data['preco_acordado'] * pedido_data['quantidade']
+                
+                # Adicionar prazo de entrega padrão
+                pedido_data['prazo_entrega'] = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+                
+                pedidos_criados.append(pedido_data)
+                
+            except Exception as e:
+                print(f"Erro ao processar linha {index}: {e}")
+                continue
+        
+        # Inserir no banco
+        if pedidos_criados:
+            await db.pedidos_marketplace.insert_many(pedidos_criados)
+        
+        return {
+            "message": f"{len(pedidos_criados)} pedidos importados com sucesso",
+            "total": len(pedidos_criados),
+            "erros": len(df) - len(pedidos_criados)
+        }
+        
+    except Exception as e:
+        print(f"Erro ao processar planilha: {e}")
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Erro ao processar planilha: {str(e)}")
 
 @api_router.put("/gestao/marketplaces/pedidos/{pedido_id}")
 async def update_pedido_marketplace(pedido_id: str, pedido: PedidoMarketplace, current_user: dict = Depends(get_current_user)):
