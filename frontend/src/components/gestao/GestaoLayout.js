@@ -19,6 +19,7 @@ export default function GestaoLayout({ user, onLogout }) {
   const menuItems = [
     { path: '/gestao/produtos', icon: Package, label: 'Produtos' },
     { path: '/gestao/pedidos', icon: ShoppingCart, label: 'Pedidos' },
+    { path: '/gestao/producao', icon: Factory, label: 'Produção' },
     { path: '/gestao/estoque', icon: Archive, label: 'Estoque' },
     { path: '/gestao/financeiro', icon: DollarSign, label: 'Financeiro' },
     { path: '/gestao/cadastros', icon: Users, label: 'Cadastros' },
