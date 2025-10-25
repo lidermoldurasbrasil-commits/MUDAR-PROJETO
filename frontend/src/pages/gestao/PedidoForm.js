@@ -200,6 +200,67 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     }
   };
 
+  const fetchFormasPagamento = async (bancoId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${API}/financeiro/formas-pagamento-ativas?banco_id=${bancoId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setFormasPagamentoDisponiveis(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar formas de pagamento:', error);
+      toast.error('Erro ao carregar formas de pagamento');
+    }
+  };
+
+  const handleBancoChange = (bancoId) => {
+    setContaBancariaSelecionada(bancoId);
+    setFormaPagamentoSelecionada(null);
+    
+    const banco = contasBancarias.find(c => c.id === bancoId);
+    setFormData(prev => ({
+      ...prev,
+      conta_bancaria_id: bancoId,
+      conta_bancaria_nome: banco?.nome || '',
+      forma_pagamento_id: '',
+      forma_pagamento_nome: '',
+      taxa_percentual: 0,
+      taxa_valor_real: 0,
+      valor_liquido_empresa: prev.valor_final
+    }));
+    
+    if (bancoId) {
+      fetchFormasPagamento(bancoId);
+    } else {
+      setFormasPagamentoDisponiveis([]);
+    }
+  };
+
+  const handleFormaPagamentoChange = (formaId) => {
+    const forma = formasPagamentoDisponiveis.find(f => f.id === formaId);
+    if (!forma) return;
+    
+    setFormaPagamentoSelecionada(forma);
+    
+    // Calcular valores
+    const valorBruto = formData.valor_final;
+    const taxaValor = valorBruto * (forma.taxa_banco_percentual / 100);
+    const valorLiquido = valorBruto - taxaValor;
+    
+    setFormData(prev => ({
+      ...prev,
+      forma_pagamento_id: forma.id,
+      forma_pagamento_nome: forma.nome_formatado || forma.forma_pagamento,
+      forma_pagamento_parcelas: forma.numero_parcelas,
+      forma_pagamento_bandeira: forma.bandeira,
+      taxa_percentual: forma.taxa_banco_percentual,
+      taxa_valor_real: taxaValor,
+      valor_bruto: valorBruto,
+      valor_liquido_empresa: valorLiquido
+    }));
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
