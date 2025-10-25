@@ -3434,6 +3434,10 @@ class BusinessManagementSystemTester:
         print("\n🚨 RUNNING PRODUCTION ORDER AUTOMATION TEST...")
         self.test_production_order_automation()
         
+        # PRIORITY: Test Marketplace Spreadsheet Upload (USER REQUEST)
+        print("\n🚨 RUNNING MARKETPLACE SPREADSHEET UPLOAD TEST...")
+        self.test_marketplace_spreadsheet_upload()
+        
         # Run all module tests
         self.test_dashboard()
         self.test_production_board()
