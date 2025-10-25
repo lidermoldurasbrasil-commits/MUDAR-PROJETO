@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Testar o módulo financeiro - Contas Bancárias. Fluxo: Login → Criar conta bancária → Listar contas → Criar mais 2 contas → Atualizar conta → Filtrar por banco → Deletar conta. Validar CRUD completo e filtros funcionando."
+user_problem_statement: "Implementar e testar funcionalidade de upload de planilha de pedidos para o módulo Marketplaces. A planilha Shopee (Order.toship.xlsx) deve ser processada corretamente, importando todos os pedidos com os campos mapeados (ID do pedido, SKU, nome variação, quantidade, preço acordado, taxa de comissão, taxa de serviço, opção de envio, data prevista de envio). Fluxo: Login → Acessar projeto marketplace → Upload planilha → Validar importação dos pedidos."
 
 backend:
   - task: "Endpoint de cálculo de pedidos (/api/gestao/pedidos/calcular)"
