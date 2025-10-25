@@ -170,7 +170,16 @@ export default function MarketplaceProjetoDetalhes() {
         }
       );
       
-      toast.success(response.data.message);
+      // Mensagem de sucesso com info sobre duplicados
+      const data = response.data;
+      toast.success(data.message);
+      
+      if (data.total_duplicados > 0) {
+        toast.info(`${data.total_duplicados} pedidos duplicados foram ignorados`, {
+          duration: 5000
+        });
+      }
+      
       setShowUploadModal(false);
       setUploadFile(null);
       fetchDados();
