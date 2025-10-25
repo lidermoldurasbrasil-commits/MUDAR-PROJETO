@@ -975,6 +975,18 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
                   {FORMAS_PAGAMENTO.map(f => <option key={f} value={f}>{f}</option>)}
                 </select>
               </div>
+              <div className="input-group">
+                <label>Valor de Entrada (Sinal/Adiantamento)</label>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  name="valor_entrada"
+                  value={formData.valor_entrada} 
+                  onChange={handleChange}
+                  placeholder="R$ 0,00"
+                  style={{fontWeight: '600'}}
+                />
+              </div>
             </div>
 
             <div className="adjustments-grid">
