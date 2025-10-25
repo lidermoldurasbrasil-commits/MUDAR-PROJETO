@@ -2038,6 +2038,10 @@ class BusinessManagementSystemTester:
         print("\n🚨 RUNNING CRITICAL TEST...")
         self.test_preco_manufatura_validation()
         
+        # PRIORITY: Test Production Order automation (NEW TEST)
+        print("\n🚨 RUNNING PRODUCTION ORDER AUTOMATION TEST...")
+        self.test_production_order_automation()
+        
         # Run all module tests
         self.test_dashboard()
         self.test_production_board()
