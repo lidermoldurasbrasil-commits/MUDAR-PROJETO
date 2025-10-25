@@ -3205,6 +3205,10 @@ class BusinessManagementSystemTester:
         # Test Payment Methods CRUD as requested
         self.test_payment_methods_crud()
         
+        # NEW: Test complete Contas a Receber module
+        print("\n🚨 RUNNING CONTAS A RECEBER COMPLETE FLOW TEST...")
+        self.test_contas_receber_complete_flow()
+        
         return True
 
     def print_summary(self):
