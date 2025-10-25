@@ -1928,6 +1928,64 @@ async def update_status_pedido(pedido_id: str, novo_status: str, observacao: Opt
         }
     )
     
+    # AUTOMAÇÃO: Se status for "Montagem", criar Ordem de Produção automaticamente
+    if novo_status == "Montagem":
+        try:
+            print(f"\n🏭 AUTOMAÇÃO: Criando Ordem de Produção para pedido #{pedido['numero_pedido']}")
+            
+            # Verificar se já existe ordem de produção para este pedido
+            ordem_existente = await db.ordens_producao.find_one({"id_pedido_origem": pedido_id})
+            
+            if not ordem_existente:
+                # Gerar número da ordem
+                ultimo_numero = await db.ordens_producao.find_one({}, sort=[("numero_ordem", -1)])
+                numero_ordem = (ultimo_numero['numero_ordem'] + 1) if ultimo_numero and 'numero_ordem' in ultimo_numero else 1
+                
+                # Criar ordem de produção
+                ordem_producao = {
+                    'id': str(uuid.uuid4()),
+                    'numero_ordem': numero_ordem,
+                    'cliente_nome': pedido.get('cliente_nome', 'Cliente não informado'),
+                    'loja_origem': pedido.get('loja_id', 'fabrica'),
+                    'id_pedido_origem': pedido_id,
+                    'numero_pedido_origem': pedido.get('numero_pedido', 0),
+                    'status_producao': 'Em Fila',  # Status inicial
+                    'responsavel_atual': '',
+                    'timeline': [{
+                        'data_hora': datetime.now(timezone.utc).isoformat(),
+                        'usuario': current_user.get('username', ''),
+                        'mudanca': 'Ordem criada automaticamente',
+                        'comentario': f'Pedido #{pedido.get("numero_pedido")} entrou em Montagem'
+                    }],
+                    'checklist': {
+                        'arte_aprovada': False,
+                        'insumos_conferidos': False,
+                        'pagamento_confirmado': False,
+                        'qualidade_concluida': False,
+                        'embalado': False
+                    },
+                    'observacoes': f"Tipo: {pedido.get('tipo_produto', 'Quadro')}, Dimensões: {pedido.get('altura', 0)}x{pedido.get('largura', 0)}cm",
+                    'anexos': [],
+                    'sla_status': 'No Prazo',
+                    'prioridade': 'Normal',
+                    'dias_em_producao': 0,
+                    'data_entrada': datetime.now(timezone.utc).isoformat(),
+                    'data_previsao': None,
+                    'data_conclusao': None,
+                    'created_at': datetime.now(timezone.utc).isoformat(),
+                    'updated_at': datetime.now(timezone.utc).isoformat(),
+                    'created_by': current_user.get('username', '')
+                }
+                
+                await db.ordens_producao.insert_one(ordem_producao)
+                print(f"✅ Ordem de Produção #{numero_ordem} criada com sucesso!")
+            else:
+                print(f"⚠️ Ordem de Produção já existe para este pedido")
+                
+        except Exception as e:
+            print(f"❌ Erro ao criar ordem de produção: {e}")
+            # Não interromper o fluxo, apenas logar o erro
+    
     # Se status for "Pronto" ou "Entregue", gerar lançamento financeiro
     if novo_status in ["Pronto", "Entregue"]:
         try:
