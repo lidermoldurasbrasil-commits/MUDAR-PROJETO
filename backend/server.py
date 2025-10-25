@@ -1527,6 +1527,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             custo_vidro = resultado['area'] * vidro['custo_unitario'] * pedido.quantidade
             custo_total += custo_vidro
             
+            # NOVO: Preço de venda do vidro
+            preco_venda_vidro = resultado['area'] * vidro['preco_unitario'] * pedido.quantidade
+            
             itens.append({
                 'insumo_id': vidro['id'],
                 'insumo_descricao': vidro['descricao'],
@@ -1534,7 +1537,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
                 'quantidade': resultado['area'],
                 'unidade': 'm²',
                 'custo_unitario': vidro['custo_unitario'],
-                'subtotal': custo_vidro
+                'preco_unitario': vidro['preco_unitario'],  # NOVO
+                'subtotal': custo_vidro,
+                'subtotal_venda': preco_venda_vidro  # NOVO
             })
     
     # 3.3 MDF
