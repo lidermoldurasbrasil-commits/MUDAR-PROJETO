@@ -356,7 +356,15 @@ export default function ContasBancarias() {
                                     <button className="btn-icon danger" onClick={handleCancelForma}><X size={16} /></button>
                                   </div>
                                 </td>
-                                <td><select value={formaData.forma_pagamento} onChange={(e) => setFormaData(p => ({...p, forma_pagamento: e.target.value}))}>{FORMAS_PAGAMENTO.map(f => <option key={f} value={f}>{f}</option>)}</select></td>
+                                <td>
+                                  <input 
+                                    type="text" 
+                                    value={formaData.forma_pagamento} 
+                                    onChange={(e) => setFormaData(p => ({...p, forma_pagamento: e.target.value}))}
+                                    placeholder="Ex: Mercado Pago Crédito 6x"
+                                    style={{width: '100%'}}
+                                  />
+                                </td>
                                 <td><select value={formaData.tipo} onChange={(e) => setFormaData(p => ({...p, tipo: e.target.value}))}><option value="D">D</option><option value="C">C</option></select></td>
                                 <td><select value={formaData.bandeira} onChange={(e) => setFormaData(p => ({...p, bandeira: e.target.value}))}><option value="">Selecione</option>{BANDEIRAS.map(b => <option key={b} value={b}>{b}</option>)}</select></td>
                                 <td><input type="number" min="1" value={formaData.numero_parcelas} onChange={(e) => setFormaData(p => ({...p, numero_parcelas: parseInt(e.target.value) || 1}))} /></td>
