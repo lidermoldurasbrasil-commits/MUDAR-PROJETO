@@ -48,12 +48,12 @@ export default function MarketplaceProjetoDetalhes() {
     numero_pedido: '',
     quantidade: 1,
     sku: '',
-    cliente_nome: '',
-    sala_impressao: 'Aguardando Impressão',
+    nome_variacao: '',
+    preco_acordado: 0,
+    opcao_envio: '',
+    data_prevista_envio: '',
     status: 'Aguardando Impressão',
-    prioridade: 'Normal',
-    prazo_entrega: '',
-    responsavel: ''
+    prioridade: 'Normal'
   });
   const [showAddModal, setShowAddModal] = useState(false);
   const [novoPedido, setNovoPedido] = useState({
