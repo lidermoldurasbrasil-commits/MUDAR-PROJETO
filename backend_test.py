@@ -2357,6 +2357,9 @@ class BusinessManagementSystemTester:
         # Test the new Sistema de Gestão (Manufacturing Management)
         self.test_gestao_system()
         
+        # Test Payment Methods CRUD as requested
+        self.test_payment_methods_crud()
+        
         return True
 
     def print_summary(self):
