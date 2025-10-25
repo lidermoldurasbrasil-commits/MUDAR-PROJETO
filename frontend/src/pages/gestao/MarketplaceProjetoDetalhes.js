@@ -1468,7 +1468,7 @@ export default function MarketplaceProjetoDetalhes() {
       {/* Kanban View */}
       {viewMode === 'kanban' && (
         <div className="grid grid-cols-6 gap-4">
-          {STATUS_OPTIONS.map(statusOption => (
+          {statusOptions.map(statusOption => (
             <div key={statusOption.value} className="bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-700">
               <div className="flex items-center gap-2 mb-4">
                 <div
