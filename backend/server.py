@@ -1506,6 +1506,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             prazo = vidro_produto.get('prazo_selecionado', '120dias')
             custo_unitario = get_custo_por_prazo(vidro_produto, prazo)
             
+            # NOVO: Pegar preço de venda
+            preco_unitario = vidro_produto.get('preco_venda', custo_unitario)
+            
             # Pegar markup do produto
             if vidro_produto.get('markup_manufatura'):
                 markup_item = (vidro_produto['markup_manufatura'] / 100) + 1
@@ -1515,7 +1518,8 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             vidro = {
                 'id': vidro_produto['id'],
                 'descricao': vidro_produto['descricao'],
-                'custo_unitario': custo_unitario
+                'custo_unitario': custo_unitario,
+                'preco_unitario': preco_unitario  # NOVO
             }
         
         if vidro:
