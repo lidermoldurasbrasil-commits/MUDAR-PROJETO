@@ -633,25 +633,27 @@ class BusinessManagementSystemTester:
         """Test Sistema de Gestão - Products, Insumos and Manufacturing Orders"""
         print("\n🏭 Testing Sistema de Gestão...")
         
-        # First, create some test products for Moldura and Vidro families
+        # First, create some test products for Moldura and Vidro families with pricing
         moldura_data = {
             "loja_id": "fabrica",
-            "referencia": "MOLD-001",
-            "descricao": "Moldura Madeira Marrom 3cm",
+            "referencia": "MOLD-TEST-001",
+            "descricao": "Moldura Madeira Premium 3cm",
             "familia": "Moldura",
             "largura": 3.0,
             "comprimento": 270.0,
-            "custo_120dias": 2.50,
+            "custo_120dias": 2.50,  # Cost per bar
+            "preco_venda": 7.50,    # Selling price per bar (3x markup)
             "markup_manufatura": 200.0,
             "ativo": True
         }
         
         vidro_data = {
             "loja_id": "fabrica", 
-            "referencia": "VID-001",
-            "descricao": "Vidro Comum 3mm",
+            "referencia": "VID-TEST-001",
+            "descricao": "Vidro Temperado Premium 4mm",
             "familia": "Vidro",
-            "custo_120dias": 45.00,
+            "custo_120dias": 45.00,  # Cost per m²
+            "preco_venda": 112.50,   # Selling price per m² (2.5x markup)
             "markup_manufatura": 150.0,
             "ativo": True
         }
