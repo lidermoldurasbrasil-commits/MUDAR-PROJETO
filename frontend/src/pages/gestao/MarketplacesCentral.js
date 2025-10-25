@@ -312,9 +312,80 @@ export default function MarketplacesCentral() {
       </div>
 
       {/* Placeholder para Gráficos (Fase 2) */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">📊 Dashboards e Gráficos</h3>
-        <p className="text-gray-600">Gráficos de desempenho serão implementados na Fase 2</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Gráfico 1: Volume de Produção */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">📊 Volume de Produção (Últimos 7 Dias)</h3>
+          {graficos.volume_producao && graficos.volume_producao.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={graficos.volume_producao}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="data" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="quantidade" fill="#3B82F6" name="Pedidos Produzidos" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-gray-500">
+              <p>Sem dados de produção nos últimos 7 dias</p>
+            </div>
+          )}
+        </div>
+
+        {/* Gráfico 2: Status Atual dos Pedidos */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">🔥 Status Atual dos Pedidos</h3>
+          {statusData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {statusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS_PIE[index % COLORS_PIE.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-gray-500">
+              <p>Sem pedidos no sistema</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Gráfico 3: Desempenho por Plataforma */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">📈 Desempenho por Plataforma</h3>
+        {graficos.desempenho_plataformas && graficos.desempenho_plataformas.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={graficos.desempenho_plataformas} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" />
+              <YAxis dataKey="plataforma" type="category" width={100} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="vendas" fill="#8B5CF6" name="Vendas" />
+              <Bar dataKey="producao" fill="#F59E0B" name="Em Produção" />
+              <Bar dataKey="entregas" fill="#10B981" name="Entregas" />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-64 text-gray-500">
+            <p>Sem dados de desempenho por plataforma</p>
+          </div>
+        )}
       </div>
     </div>
   );
