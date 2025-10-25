@@ -1482,6 +1482,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             custo_moldura = perimetro_cobrado * moldura['custo_unitario'] * pedido.quantidade
             custo_total += custo_moldura
             
+            # NOVO: Preço de venda da moldura
+            preco_venda_moldura = perimetro_cobrado * moldura['preco_unitario'] * pedido.quantidade
+            
             itens.append({
                 'insumo_id': moldura['id'],
                 'insumo_descricao': f"{moldura['descricao']} (Perda corte: {perda_corte_cm:.0f}cm, Sobra: {perda_sobra_cm:.0f}cm)",
@@ -1489,7 +1492,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
                 'quantidade': perimetro_cobrado,
                 'unidade': 'cm',
                 'custo_unitario': moldura['custo_unitario'],
-                'subtotal': custo_moldura
+                'preco_unitario': moldura['preco_unitario'],  # NOVO
+                'subtotal': custo_moldura,
+                'subtotal_venda': preco_venda_moldura  # NOVO
             })
     
     # 3.2 Vidro
