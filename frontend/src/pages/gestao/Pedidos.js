@@ -101,6 +101,12 @@ export default function Pedidos() {
     setSelectedPedido(pedido);
     setShowForm(true);
   };
+  
+  // NOVA: Visualizar orçamento
+  const handleViewOrcamento = (pedido) => {
+    setPedidoOrcamento(pedido);
+    setShowOrcamento(true);
+  };
 
   const handleDeletePedido = async (id) => {
     if (!window.confirm('Tem certeza que deseja excluir este pedido?')) return;
