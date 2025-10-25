@@ -288,6 +288,7 @@ export default function Pedidos() {
                 <th>Tipo</th>
                 <th>Dimensões</th>
                 <th>Status</th>
+                <th>Total</th>
                 <th>Custo</th>
                 <th>Entrada</th>
                 <th>Venda</th>
