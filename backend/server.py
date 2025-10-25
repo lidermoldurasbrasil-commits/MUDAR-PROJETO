@@ -1353,6 +1353,77 @@ class PedidoManufatura(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: Optional[str] = ""
 
+# ============= ORDEM DE PRODUÇÃO (FÁBRICA) =============
+
+class TimelineEntry(BaseModel):
+    """Entrada do histórico de andamento"""
+    data_hora: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    usuario: str
+    mudanca: str
+    comentario: Optional[str] = ""
+
+class ChecklistProducao(BaseModel):
+    """Checklist de etapas técnicas"""
+    arte_aprovada: bool = False
+    insumos_conferidos: bool = False
+    pagamento_confirmado: bool = False
+    qualidade_concluida: bool = False
+    embalado: bool = False
+
+class OrdemProducao(BaseModel):
+    """Ordem de Produção da Fábrica"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_ordem: int = 0  # Auto-incremental
+    
+    # Dados do pedido original
+    pedido_id: str  # ID do pedido de manufatura original
+    numero_pedido: int = 0  # Número do pedido original
+    
+    # Cliente e Loja
+    cliente_nome: str
+    loja_origem: str = "fabrica"  # fabrica, loja1, loja2, loja3, loja4, loja5
+    
+    # Datas
+    data_pedido: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    data_pagamento: Optional[datetime] = None
+    data_entrega_prometida: Optional[datetime] = None
+    
+    # Descrição dos itens
+    descricao_itens: str = ""  # Resumo dos produtos/itens
+    valor_total: float = 0
+    
+    # Controle de Produção
+    responsavel_atual: str = "Vendedor"  # Vendedor, Arte, Subgerente Fábrica, Molduraria, Acabamento, Qualidade, Embalagem, Expedição, Reparo
+    status_interno: str = "Aguardando Arte"  # Aguardando Arte, Armazenado Fábrica, Produção, Acabamento, Pronto, Entregue, Reparo
+    
+    # Checklist
+    checklist: ChecklistProducao = Field(default_factory=ChecklistProducao)
+    
+    # Urgência
+    prioridade: str = "Normal"  # Normal, Urgente, Reentrega
+    
+    # Observações e arquivos
+    observacoes_internas: str = ""
+    arquivo_anexo_url: Optional[str] = None
+    
+    # Timeline / Histórico
+    timeline: List[TimelineEntry] = []
+    
+    # Metadata
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: Optional[str] = ""
+
+# Contador para número de ordem
+async def get_next_numero_ordem():
+    """Gera o próximo número de ordem sequencial"""
+    ultima_ordem = await db.ordens_producao.find_one(sort=[("numero_ordem", -1)])
+    if ultima_ordem and 'numero_ordem' in ultima_ordem:
+        return ultima_ordem['numero_ordem'] + 1
+    return 1
+
 # Contador para número de pedido
 async def get_next_numero_pedido():
     """Gera o próximo número de pedido sequencial"""
