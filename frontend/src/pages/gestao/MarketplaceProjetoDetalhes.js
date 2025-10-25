@@ -322,6 +322,12 @@ export default function MarketplaceProjetoDetalhes() {
       <div className="flex justify-end mb-4">
         <div className="bg-gray-800 rounded-lg shadow-lg p-1 inline-flex border border-gray-700">
           <button
+            onClick={() => setViewMode('monday')}
+            className={`px-4 py-2 rounded-lg ${viewMode === 'monday' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
+          >
+            Monday
+          </button>
+          <button
             onClick={() => setViewMode('kanban')}
             className={`px-4 py-2 rounded-lg ${viewMode === 'kanban' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
           >
@@ -335,6 +341,111 @@ export default function MarketplaceProjetoDetalhes() {
           </button>
         </div>
       </div>
+
+      {/* Monday View */}
+      {viewMode === 'monday' && (
+        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-gray-900 border-b border-gray-700">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
+                    <input type="checkbox" className="rounded" />
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Elemento</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Quantidade</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">SKU</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Cliente</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Sala de Impressão</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Prazo</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Responsável</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-800 divide-y divide-gray-700">
+                {pedidos.map((pedido) => (
+                  <tr key={pedido.id} className="hover:bg-gray-700/50 group">
+                    <td className="px-4 py-3">
+                      <input type="checkbox" className="rounded" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <button className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                        <input
+                          type="text"
+                          defaultValue={pedido.numero_pedido}
+                          className="bg-transparent text-white border-none focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-2 py-1"
+                        />
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <select
+                        value={pedido.status}
+                        onChange={(e) => handleStatusChange(pedido.id, e.target.value)}
+                        className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        style={{
+                          backgroundColor: STATUS_OPTIONS.find(s => s.value === pedido.status)?.color || '#94A3B8',
+                          color: 'white'
+                        }}
+                      >
+                        {STATUS_OPTIONS.map(s => (
+                          <option key={s.value} value={s.value}>{s.label}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        defaultValue={pedido.quantidade}
+                        className="w-20 bg-transparent text-white border-none focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-2 py-1"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-gray-300 text-sm">{pedido.sku || '-'}</td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        defaultValue={pedido.cliente_nome}
+                        placeholder="Nome do cliente"
+                        className="bg-transparent text-white border-none focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-2 py-1"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className="inline-block px-3 py-1 bg-teal-600 text-white text-xs rounded">
+                        {pedido.status === 'Sala de Impressão' ? 'Impresso' : '-'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-300 text-sm">{formatDate(pedido.prazo_entrega)}</td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        defaultValue={pedido.responsavel}
+                        placeholder="Responsável"
+                        className="bg-transparent text-white border-none focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-2 py-1"
+                      />
+                    </td>
+                  </tr>
+                ))}
+                
+                {/* Linha de Adicionar */}
+                <tr className="hover:bg-gray-700/50">
+                  <td className="px-4 py-3"></td>
+                  <td className="px-4 py-3" colSpan="8">
+                    <button
+                      onClick={() => setShowAddModal(true)}
+                      className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span className="text-sm">Adicionar</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Kanban View */}
       {viewMode === 'kanban' && (
