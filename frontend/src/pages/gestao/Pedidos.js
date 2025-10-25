@@ -195,6 +195,7 @@ export default function Pedidos() {
                 <th>Dimensões</th>
                 <th>Status</th>
                 <th>Custo</th>
+                <th>Entrada</th>
                 <th>Venda</th>
                 <th>Margem</th>
                 <th>Responsável</th>
