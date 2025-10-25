@@ -306,7 +306,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Upload de Planilha de Pedidos Marketplace (Backend)"
     - "Upload de Planilha de Pedidos Marketplace (Frontend)"
   stuck_tasks: []
   test_all: false
