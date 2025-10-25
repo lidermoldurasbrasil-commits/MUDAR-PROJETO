@@ -23,6 +23,7 @@ import NotFound from './pages/NotFound';
 import GestaoLayout from './components/gestao/GestaoLayout';
 import Produtos from './pages/gestao/Produtos';
 import Pedidos from './pages/gestao/Pedidos';
+import Producao from './pages/gestao/Producao';
 import Estoque from './pages/gestao/Estoque';
 import Financeiro from './pages/gestao/Financeiro';
 import Clientes from './pages/gestao/Clientes';
