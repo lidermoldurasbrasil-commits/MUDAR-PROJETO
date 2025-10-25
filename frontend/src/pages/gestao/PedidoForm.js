@@ -104,38 +104,47 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     fetchData();
     
     // NOVO: Reconstruir produtosPedido ao editar um pedido existente
-    if (pedido && pedido.itens && pedido.itens.length > 0) {
-      // Calcular total dos itens
-      const totalItens = pedido.itens.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0);
+    if (pedido) {
+      console.log('Carregando pedido para edição:', pedido);
       
-      // Criar um produto a partir dos dados do pedido
-      const produtoReconstruido = {
-        id: Date.now(),
-        tipo_produto: pedido.tipo_produto || 'Quadro',
-        altura: pedido.altura || 0,
-        largura: pedido.largura || 0,
-        quantidade: pedido.quantidade || 1,
-        area: pedido.area || 0,
-        perimetro: pedido.perimetro || 0,
-        itens: pedido.itens || [],
-        total: totalItens,
-        moldura_descricao: pedido.moldura_descricao,
-        vidro_descricao: pedido.vidro_descricao,
-        mdf_descricao: pedido.mdf_descricao,
-        papel_descricao: pedido.papel_descricao,
-        passepartout_descricao: pedido.passepartout_descricao
-      };
+      // Tentar carregar produtos_detalhes primeiro (estrutura completa)
+      if (pedido.produtos_detalhes) {
+        try {
+          const produtosCarregados = JSON.parse(pedido.produtos_detalhes);
+          if (produtosCarregados && produtosCarregados.length > 0) {
+            setProdutosPedido(produtosCarregados);
+            console.log('Produtos carregados de produtos_detalhes:', produtosCarregados);
+            return;
+          }
+        } catch (e) {
+          console.error('Erro ao parsear produtos_detalhes:', e);
+        }
+      }
       
-      setProdutosPedido([produtoReconstruido]);
-      
-      // Atualizar formData com o valor_final correto
-      setFormData(prev => ({
-        ...prev,
-        valor_final: pedido.valor_final || totalItens
-      }));
-      
-      console.log('Pedido carregado para edição:', produtoReconstruido);
-      console.log('Valor final:', pedido.valor_final || totalItens);
+      // Fallback: Reconstruir a partir dos itens (para pedidos antigos)
+      if (pedido.itens && pedido.itens.length > 0) {
+        const totalItens = pedido.itens.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0);
+        
+        const produtoReconstruido = {
+          id: Date.now(),
+          tipo_produto: pedido.tipo_produto || 'Quadro',
+          altura: pedido.altura || 0,
+          largura: pedido.largura || 0,
+          quantidade: pedido.quantidade || 1,
+          area: pedido.area || 0,
+          perimetro: pedido.perimetro || 0,
+          itens: pedido.itens || [],
+          total: totalItens,
+          moldura_descricao: pedido.moldura_descricao,
+          vidro_descricao: pedido.vidro_descricao,
+          mdf_descricao: pedido.mdf_descricao,
+          papel_descricao: pedido.papel_descricao,
+          passepartout_descricao: pedido.passepartout_descricao
+        };
+        
+        setProdutosPedido([produtoReconstruido]);
+        console.log('Produto reconstruído (fallback):', produtoReconstruido);
+      }
     }
   }, []);
 
