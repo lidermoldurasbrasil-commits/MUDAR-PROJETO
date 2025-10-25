@@ -9,7 +9,6 @@ const API = `${BACKEND_URL}/api/gestao/financeiro`;
 
 const TIPOS_CONTA = ['Corrente', 'Poupança', 'Caixa', 'Mercado Pago', 'Shopee', 'PagSeguro', 'Stone', 'Picpay'];
 const BANCOS_DISPONIVEIS = ['Itaú', 'Bradesco', 'Banco do Brasil', 'Caixa Econômica', 'Santander', 'Inter', 'Nubank', 'C6 Bank', 'Original', 'Mercado Pago', 'PagSeguro', 'Stone', 'Shopee'];
-const FORMAS_PAGAMENTO = ['Cartão Crédito', 'Cartão Débito', 'PIX', 'PIX - Dinâmico', 'Boleto', 'Transferência', 'Dinheiro', 'Outros'];
 const BANDEIRAS = ['Visa', 'Mastercard', 'Elo', 'American Express', 'Hipercard', 'Diners', 'Discover', 'JCB'];
 
 export default function ContasBancarias() {
