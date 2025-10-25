@@ -291,6 +291,55 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     toast.success('Item removido!');
   };
 
+  // NOVA FUNÇÃO: Recalcular automaticamente ao mudar medidas
+  const handleMedidasChange = async (campo, valor) => {
+    // Atualizar o campo
+    setFormData(prev => ({ ...prev, [campo]: valor }));
+    
+    // Se tem altura E largura E já tem itens calculados, recalcular
+    const novaAltura = campo === 'altura' ? valor : formData.altura;
+    const novaLargura = campo === 'largura' ? valor : formData.largura;
+    
+    if (novaAltura && novaLargura && formData.itens && formData.itens.length > 0) {
+      // Aguardar um pouco para evitar múltiplas chamadas
+      setTimeout(async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await axios.post(`${API}/pedidos/calcular`, {
+            ...formData,
+            altura: novaAltura,
+            largura: novaLargura
+          }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          // Calcular total dos insumos
+          const totalInsumos = response.data.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
+          
+          // Manter descontos e sobre-preços atuais
+          const descontoAtual = formData.desconto_valor || 0;
+          const sobrePrecoAtual = formData.sobre_preco_valor || 0;
+          
+          setFormData(prev => ({
+            ...prev,
+            ...response.data,
+            altura: novaAltura,
+            largura: novaLargura,
+            desconto_percentual: prev.desconto_percentual,
+            desconto_valor: descontoAtual,
+            sobre_preco_percentual: prev.sobre_preco_percentual,
+            sobre_preco_valor: sobrePrecoAtual,
+            valor_final: totalInsumos - descontoAtual + sobrePrecoAtual
+          }));
+          
+          toast.success('Orçamento recalculado!');
+        } catch (error) {
+          console.error('Erro ao recalcular:', error);
+        }
+      }, 500);
+    }
+  };
+
   const handleDescontoPercentualChange = (e) => {
     const percentual = parseFloat(e.target.value) || 0;
     // Calcular total dos insumos
