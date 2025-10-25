@@ -283,6 +283,18 @@ frontend:
           agent: "testing"
           comment: "🎉 MÓDULO CONTAS A RECEBER FRONTEND TESTADO COM SUCESSO TOTAL! Executado fluxo completo conforme solicitação específica do usuário: ✅ FASE 1 - Carregamento: Página carrega corretamente com título 'Contas a Receber', cards de resumo visíveis (Valor Bruto R$500,00, Valor Líquido R$492,50, Contas Pendentes 2, Total Registros 4), botão 'Mostrar Filtros' visível ✅ FASE 2 - Filtros: Seção expande mostrando todos os campos (Status, Cliente, Documento, Forma Pagamento, Conta Bancária, Data Vencimento De/Até), filtro por Status='Pendente' funciona, aplicar/limpar filtros operacional ✅ FASE 3 - Tabela: Todas as colunas presentes e dados exibidos corretamente, contas pendentes com botão 'Baixar', contas recebidas mostram data de recebimento ✅ FASE 4 - Modal Baixa: Modal abre com informações da conta, campos funcionais (data, valor, observações), confirmação realiza baixa com sucesso, tabela atualiza em tempo real, cards de resumo atualizados ✅ FASE 5 - Responsividade: Ocultar filtros funciona, valores formatados em R$, datas em DD/MM/YYYY, status com cores apropriadas ✅ FASE 6 - Cancelamento: Modal fecha sem realizar baixa, conta mantém status 'Pendente'. Sistema 100% funcional e pronto para produção!"
 
+  - task: "Upload de Planilha de Pedidos Marketplace (Frontend)"
+    implemented: true
+    working: "unknown"
+    file: "/app/frontend/src/pages/gestao/MarketplaceProjetoDetalhes.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "unknown"
+          agent: "main"
+          comment: "Implementado modal de upload de planilha na página de detalhes do projeto marketplace. Features: 1) Botão 'Upload Planilha' com ícone ✅ 2) Modal com área de drag-and-drop para arquivo ✅ 3) Validação de tipo de arquivo (.xlsx, .xls, .csv) ✅ 4) Exibição de colunas esperadas na planilha ✅ 5) Upload via FormData para endpoint /api/gestao/marketplaces/pedidos/upload-planilha ✅ 6) Loading state durante upload ✅ 7) Toast de sucesso/erro ✅ 8) Refresh automático da lista de pedidos após upload ✅. Pronto para teste e2e com planilha real."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
