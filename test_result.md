@@ -101,3 +101,49 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Criar lista detalhada e editável de insumos, preços de venda e medidas na aba Orçamento do PedidoForm.js. Corrigir erro 422 no endpoint de cálculo de pedidos."
+
+backend:
+  - task: "Endpoint de cálculo de pedidos (/api/gestao/pedidos/calcular)"
+    implemented: true
+    working: "unknown"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "unknown"
+          agent: "main"
+          comment: "Criado modelo PedidoCalculoRequest separado do PedidoManufatura para permitir cálculos sem campos obrigatórios. Reescrito endpoint completo para usar dicionário resultado ao invés de modificar objeto diretamente. Todos os campos calculados inicializados com valores padrão."
+
+frontend:
+  - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
+    implemented: true
+    working: "unknown"
+    file: "/app/frontend/src/pages/gestao/PedidoForm.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "unknown"
+          agent: "main"
+          comment: "Frontend já possui implementação da aba Orçamento com exibição de itens. Precisa testar se dados calculados estão aparecendo corretamente após fix do backend."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Endpoint de cálculo de pedidos (/api/gestao/pedidos/calcular)"
+    - "Aba Orçamento no PedidoForm com lista de insumos detalhada"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Corrigido erro 422 criando modelo PedidoCalculoRequest separado que não exige campos obrigatórios do PedidoManufatura. Endpoint reescrito para retornar dicionário com todos os campos calculados. Backend reiniciado com sucesso. Pronto para testes."
