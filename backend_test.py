@@ -1771,6 +1771,10 @@ class BusinessManagementSystemTester:
         if not self.test_authentication():
             return False
         
+        # PRIORITY: Test user's specific order creation request
+        print("\n🚨 RUNNING USER REQUESTED ORDER CREATION TEST...")
+        self.test_user_requested_order_creation()
+        
         # PRIORITY: Test minimal order creation as requested by user
         print("\n🚨 RUNNING MINIMAL ORDER CREATION TEST (USER REQUEST)...")
         self.test_minimal_order_creation()
