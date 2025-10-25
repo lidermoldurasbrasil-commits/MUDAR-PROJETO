@@ -40,6 +40,18 @@ export default function MarketplaceProjetoDetalhes() {
   const [showFilters, setShowFilters] = useState(false);
   const [editingPedido, setEditingPedido] = useState(null);
   const [viewMode, setViewMode] = useState('monday'); // 'kanban', 'list', ou 'monday'
+  const [showInlineAdd, setShowInlineAdd] = useState(false);
+  const [novaLinhaInline, setNovaLinhaInline] = useState({
+    numero_pedido: '',
+    quantidade: 1,
+    sku: '',
+    cliente_nome: '',
+    sala_impressao: 'Aguardando Impressão',
+    status: 'Aguardando Impressão',
+    prioridade: 'Normal',
+    prazo_entrega: '',
+    responsavel: ''
+  });
   const [showAddModal, setShowAddModal] = useState(false);
   const [novoPedido, setNovoPedido] = useState({
     numero_pedido: '',
