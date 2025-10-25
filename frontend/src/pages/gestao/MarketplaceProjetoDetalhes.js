@@ -110,6 +110,57 @@ export default function MarketplaceProjetoDetalhes() {
     toast.info('Funcionalidade de upload será implementada na Fase 3');
   };
 
+  const handleAddPedido = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Calcular valor total
+      const valorTotal = novoPedido.quantidade * novoPedido.valor_unitario;
+      
+      // Converter data para ISO
+      const prazoEntrega = novoPedido.prazo_entrega ? 
+        new Date(novoPedido.prazo_entrega).toISOString() : 
+        new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      
+      const pedidoData = {
+        ...novoPedido,
+        projeto_id: projetoId,
+        plataforma: projeto.plataforma,
+        valor_total: valorTotal,
+        prazo_entrega: prazoEntrega,
+        loja_id: lojaAtual
+      };
+      
+      await axios.post(
+        `${API}/pedidos`,
+        pedidoData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success('Pedido criado com sucesso!');
+      setShowAddModal(false);
+      setNovoPedido({
+        numero_pedido: '',
+        sku: '',
+        cliente_nome: '',
+        cliente_contato: '',
+        produto_nome: '',
+        quantidade: 1,
+        valor_unitario: 0,
+        valor_total: 0,
+        status: 'Aguardando Impressão',
+        prioridade: 'Normal',
+        prazo_entrega: '',
+        responsavel: '',
+        observacoes: ''
+      });
+      fetchDados();
+    } catch (error) {
+      console.error('Erro ao criar pedido:', error);
+      toast.error('Erro ao criar pedido');
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     try {
