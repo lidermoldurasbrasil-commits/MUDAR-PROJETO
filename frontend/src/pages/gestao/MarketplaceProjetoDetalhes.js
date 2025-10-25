@@ -52,6 +52,7 @@ export default function MarketplaceProjetoDetalhes() {
   const [uploadProgress, setUploadProgress] = useState(false);
   const [selectedPedidos, setSelectedPedidos] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [ordenacaoData, setOrdenacaoData] = useState('asc'); // 'asc' = próxima primeiro, 'desc' = distante primeiro
   const [novaLinhaInline, setNovaLinhaInline] = useState({
     numero_pedido: '',
     produto_nome: '',
