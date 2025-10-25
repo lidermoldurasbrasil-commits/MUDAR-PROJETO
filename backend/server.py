@@ -2802,18 +2802,92 @@ async def delete_conta_pagar(conta_id: str, current_user: dict = Depends(get_cur
 
 # CONTAS A RECEBER
 @api_router.get("/gestao/financeiro/contas-receber")
-async def get_contas_receber(loja: Optional[str] = None, status: Optional[str] = None, current_user: dict = Depends(get_current_user)):
-    """Lista contas a receber"""
+async def get_contas_receber(
+    loja: Optional[str] = None, 
+    status: Optional[str] = None,
+    cliente: Optional[str] = None,
+    forma_pagamento: Optional[str] = None,
+    conta_bancaria: Optional[str] = None,
+    categoria: Optional[str] = None,
+    documento: Optional[str] = None,
+    recorrencia: Optional[str] = None,
+    vendedor: Optional[str] = None,
+    lote: Optional[str] = None,
+    data_venc_inicio: Optional[str] = None,
+    data_venc_fim: Optional[str] = None,
+    data_pag_inicio: Optional[str] = None,
+    data_pag_fim: Optional[str] = None,
+    data_baixa_inicio: Optional[str] = None,
+    data_baixa_fim: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Lista contas a receber com filtros avançados"""
     query = {}
+    
+    # Filtros básicos
     if loja:
         query['loja_id'] = loja
     if status:
         query['status'] = status
-    contas = await db.contas_receber.find(query).sort("data_prevista", 1).to_list(None)
+    if cliente:
+        query['cliente_origem'] = {'$regex': cliente, '$options': 'i'}
+    if forma_pagamento:
+        query['forma_pagamento_nome'] = {'$regex': forma_pagamento, '$options': 'i'}
+    if conta_bancaria:
+        query['conta_bancaria_id'] = conta_bancaria
+    if categoria:
+        query['categoria_nome'] = {'$regex': categoria, '$options': 'i'}
+    if documento:
+        query['documento'] = {'$regex': documento, '$options': 'i'}
+    if recorrencia:
+        query['recorrencia'] = recorrencia
+    if vendedor:
+        query['vendedor'] = {'$regex': vendedor, '$options': 'i'}
+    if lote:
+        query['lote'] = lote
+    
+    # Filtros de data
+    if data_venc_inicio or data_venc_fim:
+        query['data_vencimento'] = {}
+        if data_venc_inicio:
+            query['data_vencimento']['$gte'] = datetime.fromisoformat(data_venc_inicio)
+        if data_venc_fim:
+            query['data_vencimento']['$lte'] = datetime.fromisoformat(data_venc_fim)
+    
+    if data_pag_inicio or data_pag_fim:
+        query['data_pago_loja'] = {}
+        if data_pag_inicio:
+            query['data_pago_loja']['$gte'] = datetime.fromisoformat(data_pag_inicio)
+        if data_pag_fim:
+            query['data_pago_loja']['$lte'] = datetime.fromisoformat(data_pag_fim)
+    
+    if data_baixa_inicio or data_baixa_fim:
+        query['data_recebimento'] = {}
+        if data_baixa_inicio:
+            query['data_recebimento']['$gte'] = datetime.fromisoformat(data_baixa_inicio)
+        if data_baixa_fim:
+            query['data_recebimento']['$lte'] = datetime.fromisoformat(data_baixa_fim)
+    
+    contas = await db.contas_receber.find(query).sort("data_vencimento", 1).to_list(None)
+    
+    # Calcular totais
+    total_bruto = sum(c.get('valor_bruto', 0) for c in contas)
+    total_liquido = sum(c.get('valor_liquido', 0) for c in contas)
+    total_pendentes = len([c for c in contas if c.get('status') == 'Pendente'])
+    
     for conta in contas:
         if '_id' in conta:
             del conta['_id']
-    return contas
+    
+    return {
+        "contas": contas,
+        "totais": {
+            "valor_bruto": total_bruto,
+            "valor_liquido": total_liquido,
+            "total_pendentes": total_pendentes,
+            "total_registros": len(contas)
+        }
+    }
 
 @api_router.post("/gestao/financeiro/contas-receber")
 async def create_conta_receber(conta: ContaReceber, current_user: dict = Depends(get_current_user)):
