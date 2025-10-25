@@ -511,17 +511,20 @@ export default function MarketplaceProjetoDetalhes() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
                     <input type="checkbox" className="rounded" />
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">ID do Pedido</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">SKU</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Nome Variação</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Quantidade</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Preço Acordado</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Taxa Comissão</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Taxa Serviço</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Valor Líquido</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Opção de Envio</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Data Prevista Envio</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do Pedido</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome do Produto</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">SKU</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Nome Variação</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Preço Acordado</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Taxa Comissão</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Taxa Serviço</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Valor Líquido</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Opção de Envio</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Data Prevista Envio</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Cliente</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Telefone</th>
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
