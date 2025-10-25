@@ -4011,10 +4011,27 @@ async def upload_planilha_pedidos(
             raise HTTPException(status_code=404, detail="Projeto não encontrado")
         
         pedidos_criados = []
+        pedidos_duplicados = []
         
         # Processar cada linha da planilha
         for index, row in df.iterrows():
             try:
+                # Obter ID do pedido
+                numero_pedido = str(row.get('ID do pedido', ''))
+                
+                if not numero_pedido:
+                    continue
+                
+                # Verificar se já existe pedido com esse numero_pedido no mesmo projeto
+                pedido_existente = await db.pedidos_marketplace.find_one({
+                    'projeto_id': projeto_id,
+                    'numero_pedido': numero_pedido
+                })
+                
+                if pedido_existente:
+                    pedidos_duplicados.append(numero_pedido)
+                    continue  # Pular este pedido
+                
                 # Mapear colunas da planilha Shopee para o modelo
                 pedido_data = {
                     'id': str(uuid.uuid4()),
