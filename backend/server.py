@@ -1554,6 +1554,24 @@ class MovimentacaoFinanceira(BaseModel):
     loja_id: str = "fabrica"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class FormaPagamentoBanco(BaseModel):
+    """Configuração de Forma de Pagamento por Banco"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    conta_bancaria_id: str  # Referência à conta bancária
+    forma_pagamento: str  # Ex: "Cartão Crédito", "PIX", "Débito"
+    tipo: str  # D (Débito) ou C (Crédito)
+    tef: bool = False  # TEF habilitado
+    pagamento_sefaz: bool = False
+    bandeira: str = ""  # Ex: "Visa", "Master", "Elo"
+    numero_parcelas: int = 1  # Número de parcelas
+    espaco_parcelas_dias: int = 30  # Dias entre parcelas
+    taxa_banco_percentual: float = 0  # Taxa em %
+    ativa: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # Contador para número de ordem
 async def get_next_numero_ordem():
     """Gera o próximo número de ordem sequencial"""
