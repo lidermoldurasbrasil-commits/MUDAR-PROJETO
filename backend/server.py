@@ -1595,6 +1595,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             prazo = papel_produto.get('prazo_selecionado', '120dias')
             custo_unitario = get_custo_por_prazo(papel_produto, prazo)
             
+            # NOVO: Pegar preço de venda
+            preco_unitario = papel_produto.get('preco_venda', custo_unitario)
+            
             if papel_produto.get('markup_manufatura'):
                 markup_item = (papel_produto['markup_manufatura'] / 100) + 1
                 if markup_item > markup_sugerido:
@@ -1603,13 +1606,17 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             papel = {
                 'id': papel_produto['id'],
                 'descricao': papel_produto['descricao'],
-                'custo_unitario': custo_unitario
+                'custo_unitario': custo_unitario,
+                'preco_unitario': preco_unitario  # NOVO
             }
         
         if papel:
             resultado['papel_descricao'] = papel['descricao']
             custo_papel = resultado['area'] * papel['custo_unitario'] * pedido.quantidade
             custo_total += custo_papel
+            
+            # NOVO: Preço de venda do papel
+            preco_venda_papel = resultado['area'] * papel['preco_unitario'] * pedido.quantidade
             
             itens.append({
                 'insumo_id': papel['id'],
@@ -1618,7 +1625,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
                 'quantidade': resultado['area'],
                 'unidade': 'm²',
                 'custo_unitario': papel['custo_unitario'],
-                'subtotal': custo_papel
+                'preco_unitario': papel['preco_unitario'],  # NOVO
+                'subtotal': custo_papel,
+                'subtotal_venda': preco_venda_papel  # NOVO
             })
     
     # 3.5 Passe-partout
