@@ -40,6 +40,10 @@ export default function ContasBancarias() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
+  const [formasPagamento, setFormasPagamento] = useState({});
+  const [editingFormaId, setEditingFormaId] = useState(null);
+  const [isAddingForma, setIsAddingForma] = useState(false);
   const [filtros, setFiltros] = useState({
     banco: '',
     status: ''
@@ -55,6 +59,18 @@ export default function ContasBancarias() {
     cnpj_titular: '',
     status: 'Ativo',
     loja_id: lojaAtual
+  });
+
+  const [formaData, setFormaData] = useState({
+    forma_pagamento: 'Cartão Crédito',
+    tipo: 'C',
+    tef: false,
+    pagamento_sefaz: false,
+    bandeira: '',
+    numero_parcelas: 1,
+    espaco_parcelas_dias: 30,
+    taxa_banco_percentual: 0,
+    ativa: true
   });
 
   useEffect(() => {
