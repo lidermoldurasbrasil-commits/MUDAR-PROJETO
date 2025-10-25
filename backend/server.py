@@ -2380,13 +2380,15 @@ async def get_resumo_financeiro(loja: Optional[str] = None, current_user: dict =
 
 # CONTAS BANCÁRIAS
 @api_router.get("/gestao/financeiro/contas-bancarias")
-async def get_contas_bancarias(loja: Optional[str] = None, status: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+async def get_contas_bancarias(loja: Optional[str] = None, status: Optional[str] = None, banco: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     """Lista todas as contas bancárias"""
     query = {}
     if loja:
         query['loja_id'] = loja
     if status:
         query['status'] = status
+    if banco:
+        query['banco'] = banco
     
     contas = await db.contas_bancarias.find(query).to_list(None)
     for conta in contas:
