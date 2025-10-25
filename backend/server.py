@@ -1264,7 +1264,7 @@ class PedidoManufatura(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     numero_pedido: int = 0  # Auto-incremental
-    loja_id: str  # fabrica, loja1, loja2, loja3, loja4, loja5
+    loja_id: str = "fabrica"  # fabrica, loja1, loja2, loja3, loja4, loja5 - valor padrão
     
     # Dados básicos
     data_abertura: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
