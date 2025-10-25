@@ -1394,6 +1394,19 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
     # Criar um dicionário para armazenar resultados
     resultado = pedido.model_dump()
     
+    # Inicializar campos calculados com valores padrão
+    resultado['area'] = 0
+    resultado['perimetro'] = 0
+    resultado['barras_necessarias'] = 0
+    resultado['sobra'] = 0
+    resultado['custo_perda'] = 0
+    resultado['moldura_descricao'] = ''
+    resultado['vidro_descricao'] = ''
+    resultado['mdf_descricao'] = ''
+    resultado['papel_descricao'] = ''
+    resultado['passepartout_descricao'] = ''
+    resultado['acessorios_descricoes'] = []
+    
     # 1. Calcular área (m²)
     resultado['area'] = (pedido.altura * pedido.largura) / 10000
     
