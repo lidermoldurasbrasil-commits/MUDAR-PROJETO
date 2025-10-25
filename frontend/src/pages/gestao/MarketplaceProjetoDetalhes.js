@@ -615,8 +615,8 @@ export default function MarketplaceProjetoDetalhes() {
 
       {/* Filtros */}
       {showFilters && (
-        <div className="bg-gray-800 rounded-lg shadow-lg p-4 mb-6 border border-gray-700">
-          <div className="grid grid-cols-3 gap-4">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
               <select
@@ -653,21 +653,69 @@ export default function MarketplaceProjetoDetalhes() {
               />
             </div>
             <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">🔽 Ordenar por Data</label>
+              <select
+                value={ordenacaoData}
+                onChange={(e) => setOrdenacaoData(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg"
+              >
+                <option value="asc">⬆️ Mais Próxima Primeiro</option>
+                <option value="desc">⬇️ Mais Distante Primeiro</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Prazo de Envio</label>
               <select
                 value={filtros.prazoEnvio}
-                onChange={(e) => setFiltros({ ...filtros, prazoEnvio: e.target.value })}
+                onChange={(e) => {
+                  setFiltros({ ...filtros, prazoEnvio: e.target.value });
+                  if (e.target.value !== 'personalizado') {
+                    setFiltros(prev => ({ ...prev, dataInicio: '', dataFim: '' }));
+                  }
+                }}
                 className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg"
               >
                 <option value="">Todos</option>
                 <option value="hoje">📦 Enviar Hoje</option>
                 <option value="amanha">📅 Enviar Amanhã</option>
                 <option value="semana">📆 Enviar Esta Semana</option>
+                <option value="personalizado">🗓️ Data Personalizada</option>
               </select>
             </div>
-            <div className="flex items-end">
+            
+            {/* Campos de Data Personalizada */}
+            {filtros.prazoEnvio === 'personalizado' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Data Início</label>
+                  <input
+                    type="date"
+                    value={filtros.dataInicio}
+                    onChange={(e) => setFiltros({ ...filtros, dataInicio: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Data Fim</label>
+                  <input
+                    type="date"
+                    value={filtros.dataFim}
+                    onChange={(e) => setFiltros({ ...filtros, dataFim: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </>
+            )}
+            
+            <div className={`flex items-end ${filtros.prazoEnvio !== 'personalizado' ? 'md:col-span-2' : ''}`}>
               <button
-                onClick={() => setFiltros({ status: '', atrasado: null, sku: '', prazoEnvio: '' })}
+                onClick={() => {
+                  setFiltros({ status: '', atrasado: null, sku: '', prazoEnvio: '', dataInicio: '', dataFim: '' });
+                  setOrdenacaoData('asc');
+                }}
                 className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
               >
                 Limpar Filtros
