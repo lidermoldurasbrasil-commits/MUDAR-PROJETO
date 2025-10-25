@@ -2449,14 +2449,38 @@ async def get_formas_pagamento(conta_id: str, current_user: dict = Depends(get_c
     return formas
 
 @api_router.post("/gestao/financeiro/contas-bancarias/{conta_id}/formas-pagamento")
-async def create_forma_pagamento(conta_id: str, forma: FormaPagamentoBanco, current_user: dict = Depends(get_current_user)):
+async def create_forma_pagamento(conta_id: str, request: Request, current_user: dict = Depends(get_current_user)):
     """Cria uma forma de pagamento para uma conta"""
-    forma.conta_bancaria_id = conta_id
-    forma_dict = forma.model_dump()
-    await db.formas_pagamento_banco.insert_one(forma_dict)
-    if '_id' in forma_dict:
-        del forma_dict['_id']
-    return forma_dict
+    try:
+        # Capturar body bruto
+        body = await request.json()
+        print(f"\n{'='*60}")
+        print(f"📥 CRIAR FORMA DE PAGAMENTO")
+        print(f"Conta ID: {conta_id}")
+        print(f"Body recebido: {body}")
+        print(f"{'='*60}\n")
+        
+        # Validar com Pydantic
+        forma = FormaPagamentoBanco(**body)
+        forma.conta_bancaria_id = conta_id
+        
+        forma_dict = forma.model_dump()
+        await db.formas_pagamento_banco.insert_one(forma_dict)
+        
+        if '_id' in forma_dict:
+            del forma_dict['_id']
+        
+        print(f"✅ Forma de pagamento criada: {forma_dict.get('id')}\n")
+        return forma_dict
+    
+    except ValidationError as e:
+        print(f"\n❌ ERRO DE VALIDAÇÃO:")
+        print(f"Erros: {e.errors()}")
+        print(f"Body: {body}\n")
+        raise HTTPException(status_code=422, detail=e.errors())
+    except Exception as e:
+        print(f"\n❌ ERRO GERAL: {str(e)}\n")
+        raise
 
 @api_router.put("/gestao/financeiro/formas-pagamento/{forma_id}")
 async def update_forma_pagamento(forma_id: str, forma: FormaPagamentoBanco, current_user: dict = Depends(get_current_user)):
