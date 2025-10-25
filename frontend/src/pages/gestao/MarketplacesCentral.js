@@ -94,6 +94,30 @@ export default function MarketplacesCentral() {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
   };
 
+  const handleEditProjeto = (e, projeto) => {
+    e.stopPropagation(); // Impede navegação ao clicar no lápis
+    setEditandoProjeto({ ...projeto });
+    setShowEditModal(true);
+  };
+
+  const handleSaveProjeto = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `${API}/projetos/${editandoProjeto.id}`,
+        editandoProjeto,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success('Projeto atualizado com sucesso!');
+      setShowEditModal(false);
+      setEditandoProjeto(null);
+      fetchDados();
+    } catch (error) {
+      console.error('Erro ao atualizar projeto:', error);
+      toast.error('Erro ao atualizar projeto');
+    }
+  };
+
   const handleProjetoClick = (projeto) => {
     // Navegar para página de detalhes do projeto
     navigate(`/marketplace/production/projeto/${projeto.id}`);
