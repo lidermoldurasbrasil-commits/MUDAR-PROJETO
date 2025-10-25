@@ -223,7 +223,19 @@ backend:
     status_history:
         - working: true
           agent: "testing"
-          comment: "✅ CRUD DE FORMAS DE PAGAMENTO TESTADO COM SUCESSO TOTAL! Fluxo completo testado conforme solicitação: 1) Login para obter token ✅ 2) Criação conta bancária (nome='Teste Banco', banco='Itaú', tipo='Corrente', saldo_inicial=1000) ✅ 3) Criação forma de pagamento (forma_pagamento='Cartão Crédito', tipo='C', tef=false, pagamento_sefaz=false, bandeira='Visa', numero_parcelas=6, espaco_parcelas_dias=30, taxa_banco_percentual=2.5, ativa=true) ✅ 4) Listagem formas de pagamento da conta (1 método encontrado) ✅ 5) Edição da forma de pagamento (bandeira alterada para 'Mastercard', parcelas para 12) ✅ 6) Deleção da forma de pagamento ✅ VALIDAÇÕES APROVADAS: ✅ Status 200 em todas operações ✅ Forma criada com todos os campos corretos ✅ Bandeira salva e retornada corretamente ✅ Edição funcionando (bandeira e parcelas atualizadas) ✅ Deleção funcionando (método removido da lista). CORREÇÃO APLICADA: Corrigido bug no endpoint PUT que estava gerando novo ID ao atualizar. Agora mantém ID original. Sistema de formas de pagamento 100% funcional!"
+          comment: "✅ CRUD DE FORMAS DE PAGAMENTO TESTADO COM SUCESSO TOTAL! Fluxo completo testado conforme solicitação específica do usuário: 1) Login para obter token ✅ 2) Criar conta bancária (nome='Teste Banco', banco='Itaú', tipo='Corrente', saldo_inicial=1000) ✅ 3) Criar forma de pagamento para essa conta (forma_pagamento='Cartão Crédito', tipo='C', tef=false, pagamento_sefaz=false, bandeira='Visa', numero_parcelas=6, espaco_parcelas_dias=30, taxa_banco_percentual=2.5, ativa=true) ✅ 4) Listar formas de pagamento dessa conta (1 método encontrado) ✅ 5) Editar forma de pagamento (bandeira alterada para 'Mastercard', parcelas para 12) ✅ 6) Deletar forma de pagamento ✅ VALIDAÇÕES 100% APROVADAS: ✅ Status 200 em todas operações ✅ Forma criada com todos os campos corretos ✅ Bandeira salva e retornada corretamente ✅ Edição funcionando (bandeira e parcelas atualizadas corretamente) ✅ Deleção funcionando (método removido da lista). CORREÇÃO CRÍTICA APLICADA: Identificado e corrigido bug no endpoint PUT /api/gestao/financeiro/formas-pagamento/{forma_id} que estava gerando novo UUID ao atualizar, alterando o ID do registro. Agora mantém ID original durante atualizações. Sistema de formas de pagamento 100% funcional e pronto para produção!"
+
+  - task: "Módulo Contas a Receber - Backend e Automação"
+    implemented: true
+    working: "unknown"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "unknown"
+          agent: "main"
+          comment: "Implementado módulo completo de Contas a Receber: 1) Modelo ContaReceber com todos os campos necessários (pedido_id, cliente_origem, valor_bruto, valor_liquido, forma_pagamento, conta_bancaria, taxas, parcelamento, datas, status) ✅ 2) Endpoints CRUD completos (GET com filtros avançados, POST, PUT, DELETE) ✅ 3) Endpoint específico POST /baixa para confirmação de recebimento com atualização de saldo bancário e criação de movimentação financeira ✅ 4) Automação: criação automática de contas a receber (com parcelamento) quando pedido muda status para 'Montagem' ✅ 5) Cálculo de valores por parcela, datas de vencimento baseadas no 'espaco_parcelas_dias' da forma de pagamento ✅. Pronto para teste backend completo."
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
