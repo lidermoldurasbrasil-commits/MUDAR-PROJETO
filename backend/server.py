@@ -1231,6 +1231,34 @@ class HistoricoStatus(BaseModel):
     usuario: str
     observacao: Optional[str] = ""
 
+class PedidoCalculoRequest(BaseModel):
+    """Modelo simplificado apenas para cálculo de orçamento"""
+    model_config = ConfigDict(extra="ignore")
+    
+    # Campos mínimos necessários para cálculo
+    altura: float  # cm
+    largura: float  # cm
+    quantidade: int = 1
+    
+    # Insumos selecionados (todos opcionais)
+    moldura_id: Optional[str] = None
+    usar_vidro: bool = False
+    vidro_id: Optional[str] = None
+    usar_mdf: bool = False
+    mdf_id: Optional[str] = None
+    usar_papel: bool = False
+    papel_id: Optional[str] = None
+    usar_passepartout: bool = False
+    passepartout_id: Optional[str] = None
+    usar_acessorios: bool = False
+    acessorios_ids: Optional[List[str]] = []
+    
+    # Campos comerciais
+    desconto_percentual: float = 0
+    desconto_valor: float = 0
+    sobre_preco_percentual: float = 0
+    sobre_preco_valor: float = 0
+
 class PedidoManufatura(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
