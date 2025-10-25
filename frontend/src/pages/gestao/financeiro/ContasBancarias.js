@@ -343,7 +343,16 @@ export default function ContasBancarias() {
                               <tr className="editing-row">
                                 <td>
                                   <div className="actions">
-                                    <button className="btn-icon success" onClick={() => handleSaveForma(conta.id)}><Check size={16} /></button>
+                                    <button 
+                                      className="btn-icon success" 
+                                      onClick={() => {
+                                        console.log('🔵 BOTÃO SALVAR CLICADO!');
+                                        console.log('Conta ID:', conta.id);
+                                        handleSaveForma(conta.id);
+                                      }}
+                                    >
+                                      <Check size={16} />
+                                    </button>
                                     <button className="btn-icon danger" onClick={handleCancelForma}><X size={16} /></button>
                                   </div>
                                 </td>
