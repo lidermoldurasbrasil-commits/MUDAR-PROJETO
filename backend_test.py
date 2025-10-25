@@ -1832,17 +1832,12 @@ class BusinessManagementSystemTester:
         
         # Step 4: Change pedido status to "Montagem" to trigger automation
         print("\n📋 Step 4: Changing pedido status to 'Montagem' to trigger automation...")
-        status_data = {
-            "novo_status": "Montagem",
-            "observacao": "Teste de automação"
-        }
         
         success_status, status_response = self.run_test(
             "Change Pedido Status to Montagem",
             "PUT",
-            f"gestao/pedidos/{pedido_id}/status",
-            200,
-            data=status_data
+            f"gestao/pedidos/{pedido_id}/status?novo_status=Montagem&observacao=Teste de automação",
+            200
         )
         
         if not success_status:
