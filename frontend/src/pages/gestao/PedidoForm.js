@@ -873,6 +873,37 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
                     </tbody>
                   </table>
                 </div>
+                
+                {/* Botão para adicionar mais produtos */}
+                <div style={{marginTop: '15px', textAlign: 'center'}}>
+                  <button 
+                    type="button" 
+                    className="btn-add-produto"
+                    onClick={() => {
+                      toast.info('Voltando para Especificações para adicionar novo produto...');
+                      setActiveTab('basico');
+                    }}
+                    style={{
+                      padding: '12px 24px',
+                      background: '#5dceaa',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Package size={18} />
+                    Adicionar Outro Produto/Medida ao Pedido
+                  </button>
+                  <p style={{fontSize: '12px', color: '#718096', marginTop: '8px'}}>
+                    Defina nova medida/insumos e clique em "Calcular Orçamento" novamente
+                  </p>
+                </div>
               </>
             )}
 
