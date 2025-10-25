@@ -28,6 +28,10 @@ export default function MarketplaceProjetoDetalhes() {
   const { projetoId } = useParams();
   const navigate = useNavigate();
   
+  // States
+  const [statusOptions, setStatusOptions] = useState([]);
+  const [statusImpressaoOptions, setStatusImpressaoOptions] = useState([]);
+  
   // Tentar pegar context do Outlet (quando usado em /gestao/marketplaces)
   // Se não existir, usar valores padrão (quando usado em /marketplace/production)
   let outletContext;
