@@ -759,36 +759,10 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
                       {formData.itens.map((item, index) => (
                         <tr key={index}>
                           <td className="item-descricao">{item.insumo_descricao}</td>
-                          <td>
-                            <input
-                              type="number"
-                              step="0.01"
-                              className="edit-input"
-                              value={item.quantidade}
-                              onChange={(e) => handleEditarItem(index, 'quantidade', e.target.value)}
-                            />
-                          </td>
+                          <td className="quantidade-value">{item.quantidade?.toFixed(2)}</td>
                           <td>{item.unidade}</td>
-                          <td>
-                            <input
-                              type="number"
-                              step="0.01"
-                              className="edit-input"
-                              value={item.custo_unitario}
-                              onChange={(e) => handleEditarItem(index, 'custo_unitario', e.target.value)}
-                            />
-                          </td>
-                          <td className="subtotal-value">{formatCurrency(item.subtotal)}</td>
-                          <td>
-                            <button
-                              type="button"
-                              className="btn-remove-item"
-                              onClick={() => handleRemoverItem(index)}
-                              title="Remover item"
-                            >
-                              ✕
-                            </button>
-                          </td>
+                          <td className="preco-value">{formatCurrency(item.preco_unitario || 0)}</td>
+                          <td className="subtotal-value">{formatCurrency(item.subtotal_venda || 0)}</td>
                         </tr>
                       ))}
                       <tr className="total-row">
