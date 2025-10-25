@@ -1836,30 +1836,51 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
     return resultado
 
 @api_router.post("/gestao/pedidos")
-async def create_pedido(pedido: PedidoManufatura, current_user: dict = Depends(get_current_user)):
+async def create_pedido(request: Request, current_user: dict = Depends(get_current_user)):
     """Cria um novo pedido de manufatura"""
-    # Gerar número do pedido
-    pedido.numero_pedido = await get_next_numero_pedido()
-    pedido.created_by = current_user.get('username', '')
+    try:
+        # Capturar body bruto para debug
+        body = await request.json()
+        print(f"\n{'='*60}")
+        print(f"📥 RECEBENDO PEDIDO - User: {current_user.get('username', 'Unknown')}")
+        print(f"Body keys: {list(body.keys())}")
+        print(f"{'='*60}\n")
+        
+        # Tentar validar com Pydantic
+        pedido = PedidoManufatura(**body)
+        
+        # Gerar número do pedido
+        pedido.numero_pedido = await get_next_numero_pedido()
+        pedido.created_by = current_user.get('username', '')
+        
+        # Adicionar primeiro histórico
+        pedido.historico_status = [
+            HistoricoStatus(
+                status="Criado",
+                data=datetime.now(timezone.utc),
+                usuario=current_user.get('username', ''),
+                observacao="Pedido criado"
+            )
+        ]
+        
+        pedido_dict = pedido.model_dump()
+        await db.pedidos_manufatura.insert_one(pedido_dict)
+        
+        # Remove _id
+        if '_id' in pedido_dict:
+            del pedido_dict['_id']
+        
+        print(f"✅ PEDIDO CRIADO COM SUCESSO - ID: {pedido_dict.get('id')}\n")
+        return pedido_dict
     
-    # Adicionar primeiro histórico
-    pedido.historico_status = [
-        HistoricoStatus(
-            status="Criado",
-            data=datetime.now(timezone.utc),
-            usuario=current_user.get('username', ''),
-            observacao="Pedido criado"
-        )
-    ]
-    
-    pedido_dict = pedido.model_dump()
-    await db.pedidos_manufatura.insert_one(pedido_dict)
-    
-    # Remove _id
-    if '_id' in pedido_dict:
-        del pedido_dict['_id']
-    
-    return pedido_dict
+    except ValidationError as e:
+        print(f"\n❌ ERRO DE VALIDAÇÃO PYDANTIC:")
+        print(f"Detalhes: {e.errors()}")
+        print(f"Body recebido: {body}\n")
+        raise HTTPException(status_code=422, detail=e.errors())
+    except Exception as e:
+        print(f"\n❌ ERRO GERAL: {str(e)}\n")
+        raise
 
 @api_router.get("/gestao/pedidos/{pedido_id}")
 async def get_pedido(pedido_id: str, current_user: dict = Depends(get_current_user)):
