@@ -1413,7 +1413,9 @@ export default function MarketplaceProjetoDetalhes() {
             </table>
           </div>
         </div>
-      )}
+      ))}
+    </div>
+  )}
 
       {/* Kanban View */}
       {viewMode === 'kanban' && (
