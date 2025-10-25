@@ -2438,6 +2438,40 @@ async def delete_conta_bancaria(conta_id: str, current_user: dict = Depends(get_
     await db.contas_bancarias.delete_one({"id": conta_id})
     return {"message": "Conta excluída com sucesso"}
 
+# FORMAS DE PAGAMENTO POR BANCO
+@api_router.get("/gestao/financeiro/contas-bancarias/{conta_id}/formas-pagamento")
+async def get_formas_pagamento(conta_id: str, current_user: dict = Depends(get_current_user)):
+    """Lista formas de pagamento de uma conta bancária"""
+    formas = await db.formas_pagamento_banco.find({"conta_bancaria_id": conta_id}).to_list(None)
+    for forma in formas:
+        if '_id' in forma:
+            del forma['_id']
+    return formas
+
+@api_router.post("/gestao/financeiro/contas-bancarias/{conta_id}/formas-pagamento")
+async def create_forma_pagamento(conta_id: str, forma: FormaPagamentoBanco, current_user: dict = Depends(get_current_user)):
+    """Cria uma forma de pagamento para uma conta"""
+    forma.conta_bancaria_id = conta_id
+    forma_dict = forma.model_dump()
+    await db.formas_pagamento_banco.insert_one(forma_dict)
+    if '_id' in forma_dict:
+        del forma_dict['_id']
+    return forma_dict
+
+@api_router.put("/gestao/financeiro/formas-pagamento/{forma_id}")
+async def update_forma_pagamento(forma_id: str, forma: FormaPagamentoBanco, current_user: dict = Depends(get_current_user)):
+    """Atualiza uma forma de pagamento"""
+    forma.updated_at = datetime.now(timezone.utc)
+    forma_dict = forma.model_dump()
+    await db.formas_pagamento_banco.update_one({"id": forma_id}, {"$set": forma_dict})
+    return {"message": "Forma de pagamento atualizada com sucesso"}
+
+@api_router.delete("/gestao/financeiro/formas-pagamento/{forma_id}")
+async def delete_forma_pagamento(forma_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta uma forma de pagamento"""
+    await db.formas_pagamento_banco.delete_one({"id": forma_id})
+    return {"message": "Forma de pagamento excluída com sucesso"}
+
 # GRUPOS DE CATEGORIAS
 @api_router.get("/gestao/financeiro/grupos-categorias")
 async def get_grupos_categorias(tipo: Optional[str] = None, current_user: dict = Depends(get_current_user)):
