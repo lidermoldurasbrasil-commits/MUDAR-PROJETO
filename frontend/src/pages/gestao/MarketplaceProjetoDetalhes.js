@@ -40,6 +40,22 @@ export default function MarketplaceProjetoDetalhes() {
   const [showFilters, setShowFilters] = useState(false);
   const [editingPedido, setEditingPedido] = useState(null);
   const [viewMode, setViewMode] = useState('kanban'); // 'kanban' ou 'list'
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [novoPedido, setNovoPedido] = useState({
+    numero_pedido: '',
+    sku: '',
+    cliente_nome: '',
+    cliente_contato: '',
+    produto_nome: '',
+    quantidade: 1,
+    valor_unitario: 0,
+    valor_total: 0,
+    status: 'Aguardando Impressão',
+    prioridade: 'Normal',
+    prazo_entrega: '',
+    responsavel: '',
+    observacoes: ''
+  });
 
   useEffect(() => {
     fetchDados();
