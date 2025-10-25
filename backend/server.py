@@ -4356,6 +4356,93 @@ async def create_mensagem_do_dia(mensagem: MensagemDoDia, current_user: dict = D
     
     return mensagem_dict
 
+# STATUS CUSTOMIZÁVEIS
+class StatusCustomizado(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tipo: str  # "geral" ou "impressao"
+    label: str
+    valor: str
+    cor: str = "#94A3B8"
+    ordem: int = 0
+    ativo: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.get("/gestao/marketplaces/status")
+async def get_status_customizados(tipo: str = None, current_user: dict = Depends(get_current_user)):
+    """Retorna lista de status customizados"""
+    query = {}
+    if tipo:
+        query['tipo'] = tipo
+    
+    status_list = await db.status_customizados.find(query).sort("ordem", 1).to_list(None)
+    
+    # Se não houver status, retornar padrões
+    if not status_list:
+        status_padrao = []
+        if not tipo or tipo == "geral":
+            status_padrao.extend([
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Aguardando Impressão", "valor": "aguardando_impressao", "cor": "#94A3B8", "ordem": 0, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Sala de Impressão", "valor": "sala_impressao", "cor": "#60A5FA", "ordem": 1, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Em Produção", "valor": "em_producao", "cor": "#F59E0B", "ordem": 2, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Expedição", "valor": "expedicao", "cor": "#FBBF24", "ordem": 3, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Enviado", "valor": "enviado", "cor": "#3B82F6", "ordem": 4, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Entregue", "valor": "entregue", "cor": "#10B981", "ordem": 5, "ativo": True}
+            ])
+        if not tipo or tipo == "impressao":
+            status_padrao.extend([
+                {"id": str(uuid.uuid4()), "tipo": "impressao", "label": "Aguardando Impressão", "valor": "aguardando_impressao", "cor": "#94A3B8", "ordem": 0, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "impressao", "label": "Imprimindo", "valor": "imprimindo", "cor": "#F59E0B", "ordem": 1, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "impressao", "label": "Impresso", "valor": "impresso", "cor": "#10B981", "ordem": 2, "ativo": True}
+            ])
+        # Inserir status padrão no banco
+        if status_padrao:
+            await db.status_customizados.insert_many(status_padrao)
+        return status_padrao
+    
+    return status_list
+
+@api_router.post("/gestao/marketplaces/status")
+async def create_status_customizado(status: StatusCustomizado, current_user: dict = Depends(get_current_user)):
+    """Cria novo status customizado (apenas Director/Manager)"""
+    if current_user.get('role') not in ['director', 'manager']:
+        raise HTTPException(status_code=403, detail="Apenas Director ou Manager podem criar status")
+    
+    status_dict = status.model_dump()
+    await db.status_customizados.insert_one(status_dict)
+    
+    if '_id' in status_dict:
+        del status_dict['_id']
+    
+    return status_dict
+
+@api_router.put("/gestao/marketplaces/status/{status_id}")
+async def update_status_customizado(status_id: str, status: StatusCustomizado, current_user: dict = Depends(get_current_user)):
+    """Atualiza status customizado (apenas Director/Manager)"""
+    if current_user.get('role') not in ['director', 'manager']:
+        raise HTTPException(status_code=403, detail="Apenas Director ou Manager podem editar status")
+    
+    status_dict = status.model_dump()
+    status_dict['id'] = status_id
+    
+    await db.status_customizados.update_one(
+        {"id": status_id},
+        {"$set": status_dict}
+    )
+    
+    if '_id' in status_dict:
+        del status_dict['_id']
+    
+    return status_dict
+
+@api_router.delete("/gestao/marketplaces/status/{status_id}")
+async def delete_status_customizado(status_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta status customizado (apenas Director/Manager)"""
+    if current_user.get('role') not in ['director', 'manager']:
+        raise HTTPException(status_code=403, detail="Apenas Director ou Manager podem deletar status")
+    
+    await db.status_customizados.delete_one({"id": status_id})
+    return {"message": "Status deletado com sucesso"}
+
 # DASHBOARD MARKETPLACES
 @api_router.get("/gestao/marketplaces/dashboard")
 async def get_dashboard_marketplaces(current_user: dict = Depends(get_current_user)):
