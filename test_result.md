@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Testar salvamento de pedido com dados mínimos (campos vazios). Usuário quer poder salvar pedido mesmo com campos vazios. Removidas validações obrigatórias e adicionados valores padrão."
+user_problem_statement: "Testar a automação de criação de Ordem de Produção quando pedido muda para status 'Montagem'. Fluxo: Login → Criar cliente → Criar pedido → Mudar status para 'Montagem' → Verificar se Ordem de Produção foi criada automaticamente com campos corretos → Validar que não cria ordem duplicada."
 
 backend:
   - task: "Endpoint de cálculo de pedidos (/api/gestao/pedidos/calcular)"
