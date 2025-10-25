@@ -1470,6 +1470,136 @@ class BusinessManagementSystemTester:
         
         return all_valid
 
+    def test_user_requested_order_creation(self):
+        """Test creating order with updated fields as specifically requested by user"""
+        print("\n🔍 TESTING USER REQUESTED ORDER CREATION...")
+        print("📋 Testing order creation with custo_total, preco_venda, produtos_detalhes fields")
+        
+        # Test the EXACT scenario requested by user
+        print("\n📋 Step 1: Creating order with updated fields as requested...")
+        user_order_data = {
+            "cliente_nome": "Teste",
+            "tipo_produto": "Quadro",
+            "altura": 50,
+            "largura": 70,
+            "quantidade": 1,
+            "itens": [],
+            "custo_total": 100,
+            "preco_venda": 300,
+            "valor_final": 300,
+            "produtos_detalhes": "[]"
+        }
+        
+        success_user, user_response = self.run_test(
+            "Create Order with Updated Fields (User Request)",
+            "POST",
+            "gestao/pedidos",
+            200,  # Should return 200 or 201, NOT 422
+            data=user_order_data
+        )
+        
+        if not success_user:
+            print("❌ CRITICAL: Failed to create order with updated fields")
+            # Check if it's a 422 error (validation error)
+            if hasattr(user_response, 'get') and 'detail' in user_response:
+                print(f"❌ Validation error details: {user_response['detail']}")
+                self.log_test("User Requested Order Creation", False, f"422 validation error: {user_response.get('detail', 'Unknown validation error')}")
+            else:
+                self.log_test("User Requested Order Creation", False, "Failed to create order with updated fields")
+            return False
+        
+        print("✅ Order with updated fields created successfully!")
+        
+        # Step 2: Verify response contains required fields
+        print("\n📋 Step 2: Verifying order response contains ID and correct data...")
+        validation_results = []
+        
+        # Check if order has ID
+        if 'id' in user_response:
+            print(f"✅ Order has ID field: {user_response['id']}")
+            validation_results.append(True)
+            order_id = user_response['id']
+        else:
+            print("❌ Order missing ID field")
+            validation_results.append(False)
+            self.log_test("User Order - ID Field", False, "Missing ID")
+            return False
+        
+        # Check custo_total
+        if user_response.get('custo_total') == 100:
+            print("✅ custo_total correctly set to 100")
+            validation_results.append(True)
+        else:
+            print(f"❌ custo_total incorrect: {user_response.get('custo_total')}")
+            validation_results.append(False)
+        
+        # Check preco_venda
+        if user_response.get('preco_venda') == 300:
+            print("✅ preco_venda correctly set to 300")
+            validation_results.append(True)
+        else:
+            print(f"❌ preco_venda incorrect: {user_response.get('preco_venda')}")
+            validation_results.append(False)
+        
+        # Check produtos_detalhes
+        if 'produtos_detalhes' in user_response:
+            print(f"✅ produtos_detalhes field present: {user_response.get('produtos_detalhes')}")
+            validation_results.append(True)
+        else:
+            print("❌ produtos_detalhes field missing")
+            validation_results.append(False)
+        
+        # Check valor_final
+        if user_response.get('valor_final') == 300:
+            print("✅ valor_final correctly set to 300")
+            validation_results.append(True)
+        else:
+            print(f"❌ valor_final incorrect: {user_response.get('valor_final')}")
+            validation_results.append(False)
+        
+        # Step 3: Verify order was saved in database
+        print("\n📋 Step 3: Verifying order was saved in database...")
+        success_get, get_response = self.run_test(
+            "Get All Orders (Check User Order)",
+            "GET",
+            "gestao/pedidos",
+            200
+        )
+        
+        if success_get and isinstance(get_response, list):
+            # Look for our created order
+            order_found = False
+            for order in get_response:
+                if order.get('id') == order_id:
+                    order_found = True
+                    print(f"✅ Order found in database with ID: {order_id}")
+                    print(f"   Database custo_total: {order.get('custo_total')}")
+                    print(f"   Database preco_venda: {order.get('preco_venda')}")
+                    print(f"   Database produtos_detalhes: {order.get('produtos_detalhes')}")
+                    validation_results.append(True)
+                    break
+            
+            if not order_found:
+                print(f"❌ Order with ID {order_id} not found in database")
+                validation_results.append(False)
+        else:
+            print("❌ Failed to retrieve orders from database")
+            validation_results.append(False)
+        
+        # Overall result
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ USER REQUESTED ORDER CREATION TEST PASSED!")
+            print("✅ Order saved successfully with custo_total, preco_venda, produtos_detalhes fields")
+            self.log_test("User Requested Order Creation - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ USER REQUESTED ORDER CREATION FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("User Requested Order Creation - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
     def test_minimal_order_creation(self):
         """Test creating order with minimal data (empty fields) as requested by user"""
         print("\n🔍 TESTING MINIMAL ORDER CREATION (EMPTY FIELDS)...")
