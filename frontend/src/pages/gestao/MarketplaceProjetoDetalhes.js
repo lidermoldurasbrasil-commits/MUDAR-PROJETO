@@ -544,6 +544,39 @@ export default function MarketplaceProjetoDetalhes() {
     }
   });
 
+  // Função de agrupamento
+  const pedidosAgrupados = () => {
+    if (!agruparPor) {
+      return { 'Todos': pedidosFiltrados };
+    }
+    
+    if (agruparPor === 'sku') {
+      const grupos = {};
+      pedidosFiltrados.forEach(pedido => {
+        const chave = pedido.sku || 'Sem SKU';
+        if (!grupos[chave]) {
+          grupos[chave] = [];
+        }
+        grupos[chave].push(pedido);
+      });
+      return grupos;
+    }
+    
+    if (agruparPor === 'status') {
+      const grupos = {};
+      pedidosFiltrados.forEach(pedido => {
+        const chave = pedido.status || 'Sem Status';
+        if (!grupos[chave]) {
+          grupos[chave] = [];
+        }
+        grupos[chave].push(pedido);
+      });
+      return grupos;
+    }
+    
+    return { 'Todos': pedidosFiltrados };
+  };
+
   // Agrupar pedidos por status para o Kanban
   const pedidosPorStatus = STATUS_OPTIONS.reduce((acc, status) => {
     acc[status.value] = pedidosFiltrados.filter(p => p.status === status.value);
