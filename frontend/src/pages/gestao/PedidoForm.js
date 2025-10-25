@@ -531,15 +531,36 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
               </div>
               <div className="input-group">
                 <label>Altura (cm) *</label>
-                <input type="number" step="0.01" name="altura" value={formData.altura} onChange={handleChange} required />
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  name="altura" 
+                  value={formData.altura} 
+                  onChange={(e) => handleMedidasChange('altura', e.target.value)} 
+                  required 
+                />
               </div>
               <div className="input-group">
                 <label>Largura (cm) *</label>
-                <input type="number" step="0.01" name="largura" value={formData.largura} onChange={handleChange} required />
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  name="largura" 
+                  value={formData.largura} 
+                  onChange={(e) => handleMedidasChange('largura', e.target.value)} 
+                  required 
+                />
               </div>
               <div className="input-group">
                 <label>Quantidade *</label>
-                <input type="number" name="quantidade" value={formData.quantidade} onChange={handleChange} min="1" required />
+                <input 
+                  type="number" 
+                  name="quantidade" 
+                  value={formData.quantidade} 
+                  onChange={(e) => handleMedidasChange('quantidade', e.target.value)} 
+                  min="1" 
+                  required 
+                />
               </div>
             </div>
 
