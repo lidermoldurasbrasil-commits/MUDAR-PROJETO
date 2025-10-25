@@ -301,7 +301,7 @@ export default function Pedidos() {
             <tbody>
               {filteredPedidos.length === 0 ? (
                 <tr>
-                  <td colSpan="13" className="no-data">
+                  <td colSpan="14" className="no-data">
                     Nenhum pedido encontrado
                   </td>
                 </tr>
@@ -331,6 +331,9 @@ export default function Pedidos() {
                           <option key={status} value={status}>{status}</option>
                         ))}
                       </select>
+                    </td>
+                    <td style={{fontWeight: '700', color: '#2563eb', fontSize: '15px'}}>
+                      {formatCurrency(pedido.valor_final || pedido.preco_venda)}
                     </td>
                     <td>{formatCurrency(pedido.custo_total)}</td>
                     <td style={{fontWeight: '600', color: pedido.valor_entrada > 0 ? '#059669' : '#9ca3af'}}>
