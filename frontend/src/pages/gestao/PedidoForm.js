@@ -55,6 +55,7 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     
     descricao_orcamento: pedido?.descricao_orcamento || '',
     forma_pagamento: pedido?.forma_pagamento || '',
+    valor_entrada: pedido?.valor_entrada || 0,  // NOVO: Valor de entrada
     desconto_percentual: pedido?.desconto_percentual || 0,
     desconto_valor: pedido?.desconto_valor || 0,
     sobre_preco_percentual: pedido?.sobre_preco_percentual || 0,
@@ -82,6 +83,9 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     
     loja_id: lojaAtual || 'fabrica'
   });
+
+  // NOVO: Array para armazenar múltiplos produtos no pedido
+  const [produtosPedido, setProdutosPedido] = useState(pedido?.produtos_pedido || []);
 
   const [novoCliente, setNovoCliente] = useState({
     nome: '',
