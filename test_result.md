@@ -125,6 +125,9 @@ backend:
         - working: "unknown"
           agent: "main"
           comment: "CORRIGIDO: Alterado para usar preco_manufatura ao invés de preco_venda. O cálculo agora usa o campo preco_manufatura de cada produto cadastrado como base para o preço unitário. Aplicado para todos os insumos."
+        - working: "unknown"
+          agent: "main"
+          comment: "CORRIGIDO CÁLCULO DA MOLDURA: Alterado de cálculo por barra (270cm) para METRO LINEAR. Custo e preço_manufatura agora são considerados por metro linear. Quantidade exibida em metros lineares (ml), não cm. Conversão: perímetro_cm / 100 = perímetro_metros. Cálculo: metros_lineares × preço_por_metro."
         - working: true
           agent: "testing"
           comment: "✅ NOVAS FUNCIONALIDADES DE PREÇO TESTADAS E APROVADAS! Corrigido modelo Produto para incluir campo preco_venda. Testados 3 cenários específicos: 1) APENAS moldura (60x80cm) - retorna 1 item com preco_unitario≠custo_unitario e subtotal_venda>subtotal. 2) Moldura+vidro (50x70cm) - retorna 2 itens, ambos com preços de venda corretos. 3) APENAS vidro (40x60cm) - funciona sem moldura, preços corretos. Todos os itens possuem campos obrigatórios: custo_unitario, preco_unitario, subtotal, subtotal_venda. Preços de venda baseados no cadastro de produtos (campo preco_venda). Cálculo com insumos individuais funcionando perfeitamente. 57 testes executados, 100% de sucesso."
