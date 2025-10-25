@@ -1291,9 +1291,18 @@ class PedidoManufatura(BaseModel):
     preco_venda: float = 0
     margem_percentual: float = 0
     
-    # Controle de produção (movido para seção separada)
-    status: str = "Criado"  # Criado, Em Análise, Corte, Montagem, Acabamento, Pronto, Entregue, Cancelado
-    vendedor: Optional[str] = ""  # Mudado de responsavel para vendedor
+    # Orçamento (campos comerciais)
+    forma_pagamento: Optional[str] = ""
+    desconto_percentual: float = 0
+    desconto_valor: float = 0
+    sobre_preco_percentual: float = 0
+    sobre_preco_valor: float = 0
+    valor_final: float = 0
+    descricao_orcamento: Optional[str] = ""
+    
+    # Controle de produção
+    status: str = "Criado"
+    vendedor: Optional[str] = ""
     prazo_entrega: Optional[datetime] = None
     observacoes: Optional[str] = ""
     observacoes_loja: Optional[str] = ""
