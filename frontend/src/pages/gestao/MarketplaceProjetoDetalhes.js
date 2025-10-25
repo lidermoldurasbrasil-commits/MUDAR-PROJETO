@@ -761,7 +761,7 @@ export default function MarketplaceProjetoDetalhes() {
                 className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg"
               >
                 <option value="">Todos</option>
-                {STATUS_OPTIONS.map(s => (
+                {statusOptions.map(s => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
               </select>
