@@ -122,7 +122,59 @@ export default function MarketplaceProjetoDetalhes() {
   };
 
   const handleUploadPlanilha = () => {
-    toast.info('Funcionalidade de upload será implementada na Fase 3');
+    setShowUploadModal(true);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validar tipo de arquivo
+      const allowedTypes = ['.xlsx', '.xls', '.csv'];
+      const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+      
+      if (!allowedTypes.includes(fileExt)) {
+        toast.error('Formato de arquivo inválido. Use Excel (.xlsx, .xls) ou CSV (.csv)');
+        return;
+      }
+      
+      setUploadFile(file);
+    }
+  };
+
+  const handleConfirmarUpload = async () => {
+    if (!uploadFile) {
+      toast.error('Selecione um arquivo primeiro');
+      return;
+    }
+    
+    try {
+      setUploadProgress(true);
+      const token = localStorage.getItem('token');
+      
+      const formData = new FormData();
+      formData.append('file', uploadFile);
+      
+      const response = await axios.post(
+        `${API}/pedidos/upload-planilha?projeto_id=${projetoId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      
+      toast.success(response.data.message);
+      setShowUploadModal(false);
+      setUploadFile(null);
+      fetchDados();
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error);
+      toast.error(error.response?.data?.detail || 'Erro ao processar planilha');
+    } finally {
+      setUploadProgress(false);
+    }
   };
 
   const handleAddPedido = async () => {
