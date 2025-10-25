@@ -297,11 +297,14 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     const totalInsumos = formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
     const valorDesconto = (totalInsumos * percentual) / 100;
     
+    // Usar os valores atuais de sobre-preço
+    const sobrePrecoValor = formData.sobre_preco_valor || 0;
+    
     setFormData(prev => ({
       ...prev,
       desconto_percentual: percentual,
       desconto_valor: valorDesconto,
-      valor_final: totalInsumos - valorDesconto + prev.sobre_preco_valor
+      valor_final: totalInsumos - valorDesconto + sobrePrecoValor
     }));
   };
 
@@ -311,11 +314,14 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     const totalInsumos = formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
     const percentual = totalInsumos > 0 ? (valor / totalInsumos) * 100 : 0;
     
+    // Usar os valores atuais de sobre-preço
+    const sobrePrecoValor = formData.sobre_preco_valor || 0;
+    
     setFormData(prev => ({
       ...prev,
       desconto_valor: valor,
       desconto_percentual: percentual,
-      valor_final: totalInsumos - valor + prev.sobre_preco_valor
+      valor_final: totalInsumos - valor + sobrePrecoValor
     }));
   };
 
@@ -325,11 +331,14 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     const totalInsumos = formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
     const valorSobre = (totalInsumos * percentual) / 100;
     
+    // Usar os valores atuais de desconto
+    const descontoValor = formData.desconto_valor || 0;
+    
     setFormData(prev => ({
       ...prev,
       sobre_preco_percentual: percentual,
       sobre_preco_valor: valorSobre,
-      valor_final: totalInsumos - prev.desconto_valor + valorSobre
+      valor_final: totalInsumos - descontoValor + valorSobre
     }));
   };
 
@@ -339,11 +348,14 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     const totalInsumos = formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
     const percentual = totalInsumos > 0 ? (valor / totalInsumos) * 100 : 0;
     
+    // Usar os valores atuais de desconto
+    const descontoValor = formData.desconto_valor || 0;
+    
     setFormData(prev => ({
       ...prev,
       sobre_preco_valor: valor,
       sobre_preco_percentual: percentual,
-      valor_final: totalInsumos - prev.desconto_valor + valor
+      valor_final: totalInsumos - descontoValor + valor
     }));
   };
 
