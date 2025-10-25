@@ -98,7 +98,36 @@ export default function MarketplaceProjetoDetalhes() {
 
   useEffect(() => {
     fetchDados();
+    fetchStatusCustomizados();
   }, [projetoId, filtros]);
+
+  const fetchStatusCustomizados = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const [geralRes, impressaoRes] = await Promise.all([
+        axios.get(`${API}/status?tipo=geral`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API}/status?tipo=impressao`, { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      
+      // Converter para formato esperado
+      const geralFormatado = geralRes.data.map(s => ({
+        value: s.label,
+        label: s.label,
+        color: s.cor
+      }));
+      
+      const impressaoFormatado = impressaoRes.data.map(s => ({
+        value: s.label,
+        label: s.label,
+        color: s.cor
+      }));
+      
+      setStatusOptions(geralFormatado);
+      setStatusImpressaoOptions(impressaoFormatado);
+    } catch (error) {
+      console.error('Erro ao buscar status customizados:', error);
+    }
+  };
 
   const fetchDados = async () => {
     try {
