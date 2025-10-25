@@ -725,6 +725,17 @@ export default function MarketplaceProjetoDetalhes() {
                       </select>
                     </td>
                     
+                    {/* Nome do Produto */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={novaLinhaInline.produto_nome}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, produto_nome: e.target.value})}
+                        placeholder="Nome do produto"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    
                     {/* SKU */}
                     <td className="px-4 py-3">
                       <input
@@ -796,13 +807,35 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
-                    {/* Data Prevista Envio com Botões */}
+                    {/* Data Prevista Envio */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="date"
+                        value={novaLinhaInline.data_prevista_envio}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, data_prevista_envio: e.target.value})}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    
+                    {/* Cliente */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={novaLinhaInline.cliente_nome}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, cliente_nome: e.target.value})}
+                        placeholder="Nome do cliente"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    
+                    {/* Telefone com Botões */}
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <input
-                          type="date"
-                          value={novaLinhaInline.data_prevista_envio}
-                          onChange={(e) => setNovaLinhaInline({...novaLinhaInline, data_prevista_envio: e.target.value})}
+                          type="text"
+                          value={novaLinhaInline.cliente_contato}
+                          onChange={(e) => setNovaLinhaInline({...novaLinhaInline, cliente_contato: e.target.value})}
+                          placeholder="Telefone"
                           className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
                         />
                         <button
