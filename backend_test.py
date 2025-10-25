@@ -1277,6 +1277,199 @@ class BusinessManagementSystemTester:
         
         return all_valid
 
+    def test_manufacturing_order_creation(self):
+        """Test manufacturing order creation as requested by user"""
+        print("\n🏭 TESTING MANUFACTURING ORDER CREATION...")
+        
+        # Step 1: Create a client first (required for the order)
+        print("\n📋 Step 1: Creating client...")
+        cliente_data = {
+            "loja_id": "fabrica",
+            "nome": "Cliente Teste",
+            "cpf": "12345678900",
+            "telefone": "(11) 98765-4321",
+            "celular": "(11) 91234-5678",
+            "endereco": "Rua Teste, 123",
+            "cidade": "São Paulo"
+        }
+        
+        success_cliente, cliente_response = self.run_test(
+            "Create Test Client",
+            "POST",
+            "gestao/clientes",
+            200,
+            data=cliente_data
+        )
+        
+        if not success_cliente or 'id' not in cliente_response:
+            print("❌ CRITICAL: Failed to create client - cannot proceed with order creation")
+            self.log_test("Manufacturing Order Creation", False, "Failed to create client")
+            return False
+        
+        cliente_id = cliente_response['id']
+        print(f"✅ Client created successfully with ID: {cliente_id}")
+        
+        # Step 2: Create manufacturing order
+        print("\n📋 Step 2: Creating manufacturing order...")
+        pedido_data = {
+            "loja_id": "fabrica",
+            "cliente_id": cliente_id,
+            "cliente_nome": "Cliente Teste",
+            "tipo_produto": "Quadro",
+            "altura": 50,
+            "largura": 70,
+            "quantidade": 1,
+            "itens": [
+                {
+                    "insumo_id": "test-id",
+                    "insumo_descricao": "Moldura Teste",
+                    "tipo_insumo": "Moldura",
+                    "quantidade": 2.4,
+                    "unidade": "ml",
+                    "custo_unitario": 50.0,
+                    "preco_unitario": 150.0,
+                    "subtotal": 120.0,
+                    "subtotal_venda": 360.0
+                }
+            ],
+            "custo_total": 120.0,
+            "preco_venda": 360.0,
+            "valor_final": 360.0,
+            "forma_pagamento": "Dinheiro",
+            "valor_entrada": 100.0
+        }
+        
+        success_pedido, pedido_response = self.run_test(
+            "Create Manufacturing Order",
+            "POST",
+            "gestao/pedidos",
+            200,
+            data=pedido_data
+        )
+        
+        if not success_pedido:
+            print("❌ CRITICAL: Failed to create manufacturing order")
+            self.log_test("Manufacturing Order Creation", False, "Failed to create order")
+            return False
+        
+        # Step 3: Verify response contains required fields
+        print("\n📋 Step 3: Verifying order response...")
+        validation_results = []
+        
+        # Check if order has ID
+        if 'id' in pedido_response:
+            print("✅ Order has ID field")
+            validation_results.append(True)
+            order_id = pedido_response['id']
+        else:
+            print("❌ Order missing ID field")
+            validation_results.append(False)
+            self.log_test("Order Response - ID Field", False, "Missing ID")
+            return False
+        
+        # Check if order has numero_pedido
+        if 'numero_pedido' in pedido_response and pedido_response['numero_pedido'] > 0:
+            print(f"✅ Order has numero_pedido: {pedido_response['numero_pedido']}")
+            validation_results.append(True)
+        else:
+            print("❌ Order missing or invalid numero_pedido")
+            validation_results.append(False)
+            self.log_test("Order Response - Numero Pedido", False, "Missing or invalid numero_pedido")
+        
+        # Check cliente_nome
+        if pedido_response.get('cliente_nome') == "Cliente Teste":
+            print("✅ Order has correct cliente_nome")
+            validation_results.append(True)
+        else:
+            print(f"❌ Order has incorrect cliente_nome: {pedido_response.get('cliente_nome')}")
+            validation_results.append(False)
+            self.log_test("Order Response - Cliente Nome", False, "Incorrect cliente_nome")
+        
+        # Check itens
+        if 'itens' in pedido_response and len(pedido_response['itens']) > 0:
+            print("✅ Order has itens")
+            validation_results.append(True)
+        else:
+            print("❌ Order missing itens")
+            validation_results.append(False)
+            self.log_test("Order Response - Itens", False, "Missing itens")
+        
+        # Check valor_final
+        if pedido_response.get('valor_final') == 360.0:
+            print("✅ Order has correct valor_final")
+            validation_results.append(True)
+        else:
+            print(f"❌ Order has incorrect valor_final: {pedido_response.get('valor_final')}")
+            validation_results.append(False)
+            self.log_test("Order Response - Valor Final", False, "Incorrect valor_final")
+        
+        # Check valor_entrada
+        if pedido_response.get('valor_entrada') == 100.0:
+            print("✅ Order has correct valor_entrada")
+            validation_results.append(True)
+        else:
+            print(f"❌ Order has incorrect valor_entrada: {pedido_response.get('valor_entrada')}")
+            validation_results.append(False)
+            self.log_test("Order Response - Valor Entrada", False, "Incorrect valor_entrada")
+        
+        # Step 4: Verify order was saved in database
+        print("\n📋 Step 4: Verifying order was saved in database...")
+        success_get, get_response = self.run_test(
+            "Get All Orders",
+            "GET",
+            "gestao/pedidos",
+            200
+        )
+        
+        if success_get and isinstance(get_response, list):
+            # Look for our created order
+            order_found = False
+            for order in get_response:
+                if order.get('id') == order_id:
+                    order_found = True
+                    print(f"✅ Order found in database with ID: {order_id}")
+                    validation_results.append(True)
+                    break
+            
+            if not order_found:
+                print(f"❌ Order with ID {order_id} not found in database")
+                validation_results.append(False)
+                self.log_test("Order Database - Persistence", False, "Order not found in database")
+        else:
+            print("❌ Failed to retrieve orders from database")
+            validation_results.append(False)
+            self.log_test("Order Database - Retrieval", False, "Failed to get orders")
+        
+        # Step 5: Test specific order retrieval
+        print("\n📋 Step 5: Testing specific order retrieval...")
+        success_specific, specific_response = self.run_test(
+            "Get Specific Order",
+            "GET",
+            f"gestao/pedidos/{order_id}",
+            200
+        )
+        
+        if success_specific:
+            print("✅ Specific order retrieval successful")
+            validation_results.append(True)
+        else:
+            print("❌ Failed to retrieve specific order")
+            validation_results.append(False)
+            self.log_test("Order Specific Retrieval", False, "Failed to get specific order")
+        
+        # Overall result
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ ALL MANUFACTURING ORDER CREATION TESTS PASSED!")
+            self.log_test("Manufacturing Order Creation - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ MANUFACTURING ORDER CREATION FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("Manufacturing Order Creation - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
@@ -1285,6 +1478,10 @@ class BusinessManagementSystemTester:
         # Authentication is required for all other tests
         if not self.test_authentication():
             return False
+        
+        # PRIORITY: Test manufacturing order creation as requested
+        print("\n🚨 RUNNING MANUFACTURING ORDER CREATION TEST...")
+        self.test_manufacturing_order_creation()
         
         # PRIORITY: Run the specific linear meter frame calculation test
         print("\n🚨 RUNNING SPECIFIC LINEAR METER FRAME TEST...")
