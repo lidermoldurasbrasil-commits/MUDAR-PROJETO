@@ -91,6 +91,7 @@ function App() {
               <Route index element={<Navigate to="/gestao/produtos" replace />} />
               <Route path="produtos" element={<Produtos />} />
               <Route path="pedidos" element={<Pedidos />} />
+              <Route path="producao" element={<Producao />} />
               <Route path="estoque" element={<Estoque />} />
               <Route path="financeiro" element={<Financeiro />} />
               <Route path="cadastros" element={<Clientes />} />
