@@ -693,7 +693,7 @@ export default function MarketplaceProjetoDetalhes() {
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
                   >
                     <option value="" disabled>Mudar Status ({selectedPedidos.length})</option>
-                    {STATUS_OPTIONS.map(s => (
+                    {statusOptions.map(s => (
                       <option key={s.value} value={s.value}>{s.label}</option>
                     ))}
                   </select>
@@ -1000,7 +1000,7 @@ export default function MarketplaceProjetoDetalhes() {
                           color: 'white'
                         }}
                       >
-                        {STATUS_OPTIONS.map(s => (
+                        {statusOptions.map(s => (
                           <option key={s.value} value={s.value}>{s.label}</option>
                         ))}
                       </select>
@@ -1156,7 +1156,7 @@ export default function MarketplaceProjetoDetalhes() {
                           backgroundColor: STATUS_OPTIONS.find(s => s.value === novaLinhaInline.status)?.color || '#94A3B8'
                         }}
                       >
-                        {STATUS_OPTIONS.map(s => (
+                        {statusOptions.map(s => (
                           <option key={s.value} value={s.value}>{s.label}</option>
                         ))}
                       </select>
@@ -1411,7 +1411,7 @@ export default function MarketplaceProjetoDetalhes() {
                           color: 'white'
                         }}
                       >
-                        {STATUS_OPTIONS.map(s => (
+                        {statusOptions.map(s => (
                           <option key={s.value} value={s.value}>{s.label}</option>
                         ))}
                       </select>
@@ -1510,7 +1510,7 @@ export default function MarketplaceProjetoDetalhes() {
                       className="w-full mt-2 px-2 py-1 text-xs border border-gray-600 bg-gray-800 text-white rounded"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {STATUS_OPTIONS.map(s => (
+                      {statusOptions.map(s => (
                         <option key={s.value} value={s.value}>{s.label}</option>
                       ))}
                     </select>
@@ -1575,7 +1575,7 @@ export default function MarketplaceProjetoDetalhes() {
                             color: 'white'
                           }}
                         >
-                          {STATUS_OPTIONS.map(s => (
+                          {statusOptions.map(s => (
                             <option key={s.value} value={s.value}>{s.label}</option>
                           ))}
                         </select>
@@ -1729,7 +1729,7 @@ export default function MarketplaceProjetoDetalhes() {
                     onChange={(e) => setNovoPedido({...novoPedido, status: e.target.value})}
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
-                    {STATUS_OPTIONS.map(s => (
+                    {statusOptions.map(s => (
                       <option key={s.value} value={s.value}>{s.label}</option>
                     ))}
                   </select>
