@@ -527,7 +527,9 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           itens: todosItens,
           custo_total: totalGeral,
           preco_venda: totalGeral,
-          valor_final: totalGeral - (formData.desconto_valor || 0) + (formData.sobre_preco_valor || 0)
+          valor_final: totalGeral - (formData.desconto_valor || 0) + (formData.sobre_preco_valor || 0),
+          // NOVO: Salvar estrutura de múltiplos produtos como JSON
+          produtos_detalhes: JSON.stringify(produtosPedido)
         };
         
         console.log('Enviando dados (com produtos):', dadosEnvio);
@@ -556,7 +558,8 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           itens: [],
           custo_total: 0,
           preco_venda: 0,
-          valor_final: 0
+          valor_final: 0,
+          produtos_detalhes: "[]"
         };
         
         console.log('Enviando dados (sem produtos):', dadosEnvio);
