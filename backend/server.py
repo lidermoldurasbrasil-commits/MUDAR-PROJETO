@@ -2463,6 +2463,9 @@ async def update_forma_pagamento(forma_id: str, forma: FormaPagamentoBanco, curr
     """Atualiza uma forma de pagamento"""
     forma.updated_at = datetime.now(timezone.utc)
     forma_dict = forma.model_dump()
+    # Remove the ID field to prevent changing the existing ID
+    if 'id' in forma_dict:
+        del forma_dict['id']
     await db.formas_pagamento_banco.update_one({"id": forma_id}, {"$set": forma_dict})
     return {"message": "Forma de pagamento atualizada com sucesso"}
 
