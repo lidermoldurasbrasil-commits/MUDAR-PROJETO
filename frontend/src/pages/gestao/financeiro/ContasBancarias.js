@@ -443,8 +443,8 @@ export default function ContasBancarias() {
         .actions { display: flex; gap: 6px; }
         .btn-icon { padding: 6px; border: none; background: #f7fafc; border-radius: 6px; cursor: pointer; display: flex; align-items: center; color: #4a5568; transition: all 0.2s; }
         .btn-icon:hover { background: #edf2f7; transform: scale(1.1); }
-        .btn-icon.success { background: #10b981; color: white; }
-        .btn-icon.success:hover { background: #059669; }
+        .btn-icon.success { background: #10b981; color: white; min-width: 32px; min-height: 32px; }
+        .btn-icon.success:hover { background: #059669; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4); }
         .btn-icon.danger { color: #ef4444; }
         .btn-icon.danger:hover { background: #fee2e2; }
         .btn-expand { padding: 4px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; color: #5dceaa; transition: all 0.2s; }
