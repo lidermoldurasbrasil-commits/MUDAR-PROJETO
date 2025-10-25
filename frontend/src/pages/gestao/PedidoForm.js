@@ -1526,6 +1526,94 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           border-bottom: 1px solid #e2e8f0;
         }
 
+        .orcamento-table {
+          width: 100%;
+          border-collapse: collapse;
+          background: white;
+        }
+
+        .orcamento-table thead {
+          background: #5dceaa;
+        }
+
+        .orcamento-table th {
+          padding: 14px 12px;
+          text-align: left;
+          font-size: 12px;
+          font-weight: 700;
+          color: white;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .orcamento-table tbody tr {
+          border-bottom: 1px solid #e2e8f0;
+          transition: background 0.2s;
+        }
+
+        .orcamento-table tbody tr:hover:not(.total-row) {
+          background: #f7fafc;
+        }
+
+        .orcamento-table td {
+          padding: 12px;
+          font-size: 14px;
+          color: #2d3748;
+        }
+
+        .item-descricao {
+          font-weight: 500;
+          color: #2d3748;
+        }
+
+        .edit-input {
+          width: 100%;
+          max-width: 120px;
+          padding: 6px 10px;
+          border: 1px solid #cbd5e0;
+          border-radius: 4px;
+          font-size: 14px;
+          transition: all 0.2s;
+        }
+
+        .edit-input:focus {
+          outline: none;
+          border-color: #5dceaa;
+          box-shadow: 0 0 0 3px rgba(93, 206, 170, 0.1);
+        }
+
+        .subtotal-value {
+          font-weight: 600;
+          color: #2d7a5e;
+        }
+
+        .btn-remove-item {
+          background: #fee2e2;
+          color: #dc2626;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 16px;
+          font-weight: 700;
+          transition: all 0.2s;
+        }
+
+        .btn-remove-item:hover {
+          background: #fecaca;
+          transform: scale(1.1);
+        }
+
+        .total-row {
+          background: #f7fafc;
+          font-weight: 600;
+        }
+
+        .total-row td {
+          border-top: 2px solid #e2e8f0;
+          padding: 14px 12px;
+        }
+
         .summary-grid {
           background: #f7fafc;
           padding: 20px;
