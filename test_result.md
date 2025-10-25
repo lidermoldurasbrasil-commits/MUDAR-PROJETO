@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Testar a automação de criação de Ordem de Produção quando pedido muda para status 'Montagem'. Fluxo: Login → Criar cliente → Criar pedido → Mudar status para 'Montagem' → Verificar se Ordem de Produção foi criada automaticamente com campos corretos → Validar que não cria ordem duplicada."
+user_problem_statement: "Testar o módulo financeiro - Contas Bancárias. Fluxo: Login → Criar conta bancária → Listar contas → Criar mais 2 contas → Atualizar conta → Filtrar por banco → Deletar conta. Validar CRUD completo e filtros funcionando."
 
 backend:
   - task: "Endpoint de cálculo de pedidos (/api/gestao/pedidos/calcular)"
