@@ -33,15 +33,18 @@ export default function ContasBancarias() {
     forma_pagamento: 'Cartão Crédito', tipo: 'C', tef: false, pagamento_sefaz: false, bandeira: '', numero_parcelas: 1, espaco_parcelas_dias: 30, taxa_banco_percentual: 0, ativa: true
   });
 
-  useEffect(() => { fetchContas(); }, [lojaAtual, filtros]);
-
   const fetchContas = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       let url = `${API}/contas-bancarias?loja=${lojaAtual}`;
-      if (filtros.banco) url += `&banco=${filtros.banco}`;
-      if (filtros.status) url += `&status=${filtros.status}`;
+      
+      // Se "Selecionar Todos" estiver desmarcado, aplicar filtros
+      if (!selecionarTodos) {
+        if (filtros.banco) url += `&banco=${filtros.banco}`;
+        if (filtros.status) url += `&status=${filtros.status}`;
+      }
+      
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       setContas(response.data);
     } catch (error) {
@@ -51,6 +54,8 @@ export default function ContasBancarias() {
       setLoading(false);
     }
   };
+
+  useEffect(() => { fetchContas(); }, [lojaAtual, filtros, selecionarTodos]);
 
   const handleAddNew = () => {
     setIsAdding(true);
