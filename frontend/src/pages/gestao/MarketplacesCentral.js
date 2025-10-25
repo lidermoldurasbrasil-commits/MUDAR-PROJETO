@@ -296,6 +296,13 @@ export default function MarketplacesCentral() {
                       <p className="text-xs text-gray-400">{projeto.descricao}</p>
                     </div>
                   </div>
+                  <button
+                    onClick={(e) => handleEditProjeto(e, projeto)}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                    title="Editar projeto"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
                 </div>
 
                 {/* Badge Recomendado (se houver) */}
