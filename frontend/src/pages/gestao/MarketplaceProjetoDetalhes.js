@@ -602,9 +602,32 @@ export default function MarketplaceProjetoDetalhes() {
                 <option value="true">Atrasados</option>
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">SKU</label>
+              <input
+                type="text"
+                value={filtros.sku}
+                onChange={(e) => setFiltros({ ...filtros, sku: e.target.value })}
+                placeholder="Buscar por SKU..."
+                className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Prazo de Envio</label>
+              <select
+                value={filtros.prazoEnvio}
+                onChange={(e) => setFiltros({ ...filtros, prazoEnvio: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg"
+              >
+                <option value="">Todos</option>
+                <option value="hoje">📦 Enviar Hoje</option>
+                <option value="amanha">📅 Enviar Amanhã</option>
+                <option value="semana">📆 Enviar Esta Semana</option>
+              </select>
+            </div>
             <div className="flex items-end">
               <button
-                onClick={() => setFiltros({ status: '', atrasado: null })}
+                onClick={() => setFiltros({ status: '', atrasado: null, sku: '', prazoEnvio: '' })}
                 className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
               >
                 Limpar Filtros
