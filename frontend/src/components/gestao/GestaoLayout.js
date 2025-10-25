@@ -88,18 +88,19 @@ export default function GestaoLayout({ user, onLogout }) {
       <style jsx>{`
         .gestao-layout {
           min-height: 100vh;
-          background: #f5f5f5;
+          background: #111827;
           display: flex;
           flex-direction: column;
         }
 
         .gestao-header {
-          background: linear-gradient(135deg, #5dceaa 0%, #4db89a 100%);
+          background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 12px 30px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          border-bottom: 1px solid #374151;
         }
 
         .header-left .logo h1 {
@@ -122,17 +123,17 @@ export default function GestaoLayout({ user, onLogout }) {
         }
 
         .loja-selector label {
-          color: white;
+          color: #D1D5DB;
           font-size: 14px;
           font-weight: 500;
         }
 
         .loja-selector select {
           padding: 8px 15px;
-          border: 2px solid white;
+          border: 1px solid #4B5563;
           border-radius: 8px;
-          background: white;
-          color: #2d3748;
+          background: #374151;
+          color: white;
           font-size: 14px;
           font-weight: 500;
           cursor: pointer;
@@ -141,7 +142,8 @@ export default function GestaoLayout({ user, onLogout }) {
         }
 
         .loja-selector select:hover {
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          background: #4B5563;
+          border-color: #6B7280;
         }
 
         .user-info {
@@ -154,6 +156,7 @@ export default function GestaoLayout({ user, onLogout }) {
         .user-info .company {
           font-size: 12px;
           opacity: 0.9;
+          color: #9CA3AF;
         }
 
         .user-info .user-name {
@@ -164,14 +167,15 @@ export default function GestaoLayout({ user, onLogout }) {
         .user-info .user-role {
           font-size: 12px;
           opacity: 0.85;
+          color: #D1D5DB;
         }
 
         .btn-logout {
-          background: rgba(255, 255, 255, 0.2);
-          border: none;
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid rgba(239, 68, 68, 0.3);
           border-radius: 8px;
           padding: 8px 12px;
-          color: white;
+          color: #FCA5A5;
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -179,14 +183,16 @@ export default function GestaoLayout({ user, onLogout }) {
         }
 
         .btn-logout:hover {
-          background: rgba(255, 255, 255, 0.3);
+          background: rgba(239, 68, 68, 0.2);
+          border-color: rgba(239, 68, 68, 0.5);
         }
 
         .gestao-menu {
-          background: #4db89a;
+          background: #1F2937;
           display: flex;
           padding: 0 20px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          border-bottom: 1px solid #374151;
         }
 
         .menu-item {
@@ -197,7 +203,7 @@ export default function GestaoLayout({ user, onLogout }) {
           align-items: center;
           gap: 6px;
           padding: 15px 25px;
-          color: white;
+          color: #9CA3AF;
           cursor: pointer;
           transition: all 0.2s;
           border-bottom: 3px solid transparent;
@@ -205,12 +211,14 @@ export default function GestaoLayout({ user, onLogout }) {
         }
 
         .menu-item:hover {
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(59, 130, 246, 0.1);
+          color: #60A5FA;
         }
 
         .menu-item.active {
-          background: rgba(255, 255, 255, 0.15);
-          border-bottom-color: white;
+          background: rgba(59, 130, 246, 0.15);
+          border-bottom-color: #3B82F6;
+          color: white;
         }
 
         .menu-item span {
@@ -220,7 +228,8 @@ export default function GestaoLayout({ user, onLogout }) {
 
         .gestao-content {
           flex: 1;
-          padding: 25px 30px;
+          padding: 0;
+          background: #111827;
         }
       `}</style>
     </div>
