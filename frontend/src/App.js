@@ -101,6 +101,7 @@ function App() {
               <Route path="financeiro/contas-bancarias" element={<ContasBancarias />} />
               <Route path="financeiro/contas-receber" element={<ContasAReceber />} />
               <Route path="marketplaces" element={<MarketplacesCentral />} />
+              <Route path="marketplaces/projeto/:projetoId" element={<MarketplaceProjetoDetalhes />} />
               <Route path="cadastros" element={<Clientes />} />
               <Route path="relatorios" element={<Relatorios />} />
             </Route>
