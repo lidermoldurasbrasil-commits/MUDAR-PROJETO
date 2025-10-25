@@ -1427,14 +1427,10 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
         if moldura_produto:
             # Usar prazo selecionado no produto
             prazo = moldura_produto.get('prazo_selecionado', '120dias')
-            custo_unitario_barra = get_custo_por_prazo(moldura_produto, prazo)
+            custo_metro_linear = get_custo_por_prazo(moldura_produto, prazo)  # Custo por metro linear
             
-            # Converter custo de barra para custo por cm
-            custo_por_cm = custo_unitario_barra / 270 if custo_unitario_barra > 0 else 0
-            
-            # NOVO: Pegar preço de manufatura do produto
-            preco_manufatura_barra = moldura_produto.get('preco_manufatura', custo_unitario_barra)
-            preco_manufatura_por_cm = preco_manufatura_barra / 270 if preco_manufatura_barra > 0 else 0
+            # Preço de manufatura (preço de venda por metro linear)
+            preco_metro_linear = moldura_produto.get('preco_manufatura', custo_metro_linear)
             
             # Pegar markup do produto (usar markup_manufatura)
             if moldura_produto.get('markup_manufatura'):
@@ -1443,9 +1439,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             moldura = {
                 'id': moldura_produto['id'],
                 'descricao': moldura_produto['descricao'],
-                'custo_unitario': custo_por_cm,
-                'preco_unitario': preco_manufatura_por_cm,  # Preço de manufatura por cm
-                'barra_padrao': 270,
+                'custo_por_metro': custo_metro_linear,
+                'preco_por_metro': preco_metro_linear,
+                'barra_padrao': 270,  # Comprimento padrão da barra em cm
                 'largura_moldura': moldura_produto.get('largura', 0)  # Largura da frente da moldura
             }
         elif moldura:
@@ -1474,28 +1470,34 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             
             # Total de perda a cobrar
             perda_total_cm = perda_corte_cm + perda_sobra_cm
-            resultado['custo_perda'] = perda_total_cm * moldura['custo_unitario']
             
-            # Perímetro cobrado = perímetro + perdas
-            perimetro_cobrado = resultado['perimetro'] + perda_total_cm
+            # Perímetro cobrado em cm (perímetro + perdas)
+            perimetro_cobrado_cm = resultado['perimetro'] + perda_total_cm
             
-            # Custo da moldura
-            custo_moldura = perimetro_cobrado * moldura['custo_unitario'] * pedido.quantidade
+            # Converter para metros lineares para cálculo
+            perimetro_cobrado_metros = perimetro_cobrado_cm / 100
+            
+            # Custo da moldura (em metros lineares)
+            custo_moldura = perimetro_cobrado_metros * moldura['custo_por_metro'] * pedido.quantidade
             custo_total += custo_moldura
             
-            # NOVO: Preço de venda da moldura
-            preco_venda_moldura = perimetro_cobrado * moldura['preco_unitario'] * pedido.quantidade
+            # Preço de venda da moldura (em metros lineares)
+            preco_venda_moldura = perimetro_cobrado_metros * moldura['preco_por_metro'] * pedido.quantidade
+            
+            # Custo de perda
+            perda_total_metros = perda_total_cm / 100
+            resultado['custo_perda'] = perda_total_metros * moldura['custo_por_metro']
             
             itens.append({
                 'insumo_id': moldura['id'],
                 'insumo_descricao': f"{moldura['descricao']} (Perda corte: {perda_corte_cm:.0f}cm, Sobra: {perda_sobra_cm:.0f}cm)",
                 'tipo_insumo': 'Moldura',
-                'quantidade': perimetro_cobrado,
-                'unidade': 'cm',
-                'custo_unitario': moldura['custo_unitario'],
-                'preco_unitario': moldura['preco_unitario'],  # NOVO
+                'quantidade': perimetro_cobrado_metros,
+                'unidade': 'ml',  # metro linear
+                'custo_unitario': moldura['custo_por_metro'],
+                'preco_unitario': moldura['preco_por_metro'],
                 'subtotal': custo_moldura,
-                'subtotal_venda': preco_venda_moldura  # NOVO
+                'subtotal_venda': preco_venda_moldura
             })
     
     # 3.2 Vidro
