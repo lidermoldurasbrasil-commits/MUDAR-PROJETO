@@ -359,10 +359,13 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       
+      // Calcular total dos insumos
+      const totalInsumos = response.data.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
+      
       setFormData(prev => ({
         ...prev,
         ...response.data,
-        valor_final: response.data.preco_venda
+        valor_final: totalInsumos  // Inicialmente sem desconto/sobre-preço
       }));
       
       toast.success('Cálculo realizado!');
