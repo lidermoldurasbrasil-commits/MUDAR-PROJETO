@@ -10,7 +10,18 @@ const API = `${BACKEND_URL}/api/gestao/marketplaces`;
 
 export default function MarketplacesCentral() {
   const navigate = useNavigate();
-  const { lojaAtual, user } = useOutletContext();
+  
+  // Tentar pegar context do Outlet (quando usado em /gestao/marketplaces)
+  // Se não existir, usar valores padrão (quando usado em /marketplace/production)
+  let outletContext;
+  try {
+    outletContext = useOutletContext();
+  } catch (e) {
+    outletContext = { lojaAtual: 'fabrica', user: null };
+  }
+  
+  const { lojaAtual = 'fabrica', user = null } = outletContext || {};
+  
   const [projetos, setProjetos] = useState([]);
   const [dashboard, setDashboard] = useState(null);
   const [mensagemDia, setMensagemDia] = useState(null);
