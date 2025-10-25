@@ -4142,6 +4142,30 @@ async def update_pedido_marketplace(pedido_id: str, pedido: PedidoMarketplace, c
         pedido_dict['data_expedicao'] = datetime.now(timezone.utc).isoformat()
     elif pedido.status == "Enviado" and not pedido_dict.get('data_envio'):
         pedido_dict['data_envio'] = datetime.now(timezone.utc).isoformat()
+        
+        # Criar lançamento de venda no sistema principal
+        pedido_completo = await db.pedidos_marketplace.find_one({"id": pedido_id})
+        if pedido_completo and pedido_completo.get('preco_acordado'):
+            venda_data = {
+                "id": str(uuid.uuid4()),
+                "origem": "marketplace",
+                "origem_id": pedido_id,
+                "projeto_marketplace": pedido_completo.get('projeto_id'),
+                "plataforma": pedido_completo.get('plataforma'),
+                "numero_pedido": pedido_completo.get('numero_pedido'),
+                "sku": pedido_completo.get('sku'),
+                "produto_nome": pedido_completo.get('produto_nome'),
+                "quantidade": pedido_completo.get('quantidade', 1),
+                "valor_bruto": pedido_completo.get('preco_acordado', 0) * pedido_completo.get('quantidade', 1),
+                "taxa_comissao": pedido_completo.get('valor_taxa_comissao', 0),
+                "taxa_servico": pedido_completo.get('valor_taxa_servico', 0),
+                "valor_liquido": pedido_completo.get('valor_liquido', 0),
+                "data_venda": datetime.now(timezone.utc).isoformat(),
+                "data_envio": datetime.now(timezone.utc).isoformat(),
+                "status": "enviado",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.vendas_marketplace.insert_one(venda_data)
     elif pedido.status == "Entregue" and not pedido_dict.get('data_entrega'):
         pedido_dict['data_entrega'] = datetime.now(timezone.utc).isoformat()
     
