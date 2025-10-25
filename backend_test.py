@@ -3154,6 +3154,253 @@ class BusinessManagementSystemTester:
         
         return True
 
+    def test_marketplace_spreadsheet_upload(self):
+        """Test marketplace spreadsheet upload functionality as requested"""
+        print("\n🛍️ TESTING MARKETPLACE SPREADSHEET UPLOAD...")
+        print("📋 Testing complete flow: Login → Create Project → Download Spreadsheet → Upload → Validate")
+        
+        # Step 1: Create a marketplace project first
+        print("\n📋 Step 1: Creating test marketplace project...")
+        projeto_data = {
+            "nome": "Projeto Teste Shopee",
+            "descricao": "Projeto de teste para upload",
+            "plataforma": "shopee",
+            "cor_primaria": "#FF6600",
+            "icone": "🛍️"
+        }
+        
+        success_projeto, projeto_response = self.run_test(
+            "Create Test Marketplace Project",
+            "POST",
+            "gestao/marketplaces/projetos",
+            200,
+            data=projeto_data
+        )
+        
+        if not success_projeto or 'id' not in projeto_response:
+            print("❌ CRITICAL: Failed to create marketplace project - cannot proceed with upload test")
+            self.log_test("Marketplace Upload Test", False, "Failed to create project")
+            return False
+        
+        projeto_id = projeto_response['id']
+        print(f"✅ Marketplace project created successfully with ID: {projeto_id}")
+        
+        # Step 2: Download the provided spreadsheet
+        print("\n📋 Step 2: Downloading test spreadsheet...")
+        spreadsheet_url = "https://customer-assets.emergentagent.com/job_manufatura-sys/artifacts/ynjjjxn2_Order.toship.20250925_20251025.xlsx"
+        
+        try:
+            response = requests.get(spreadsheet_url)
+            response.raise_for_status()
+            
+            # Save to temporary file
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as temp_file:
+                temp_file.write(response.content)
+                temp_file_path = temp_file.name
+            
+            print(f"✅ Spreadsheet downloaded successfully to: {temp_file_path}")
+            print(f"   File size: {len(response.content)} bytes")
+            
+        except Exception as e:
+            print(f"❌ CRITICAL: Failed to download spreadsheet: {str(e)}")
+            self.log_test("Marketplace Upload - Download Spreadsheet", False, f"Download failed: {str(e)}")
+            return False
+        
+        # Step 3: Upload the spreadsheet
+        print("\n📋 Step 3: Uploading spreadsheet to marketplace project...")
+        
+        try:
+            upload_url = f"{self.api_url}/gestao/marketplaces/pedidos/upload-planilha"
+            
+            # Prepare multipart form data
+            with open(temp_file_path, 'rb') as file:
+                files = {'file': ('Order.toship.xlsx', file, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+                params = {'projeto_id': projeto_id}
+                headers = {'Authorization': f'Bearer {self.token}'}
+                
+                upload_response = requests.post(upload_url, files=files, params=params, headers=headers)
+            
+            # Clean up temp file
+            os.unlink(temp_file_path)
+            
+            if upload_response.status_code == 200:
+                print("✅ Spreadsheet uploaded successfully!")
+                upload_data = upload_response.json()
+                self.log_test("Marketplace Upload - File Upload", True)
+            else:
+                print(f"❌ Upload failed with status {upload_response.status_code}")
+                print(f"   Response: {upload_response.text}")
+                self.log_test("Marketplace Upload - File Upload", False, f"Status {upload_response.status_code}: {upload_response.text}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ CRITICAL: Upload request failed: {str(e)}")
+            self.log_test("Marketplace Upload - Upload Request", False, f"Upload failed: {str(e)}")
+            # Clean up temp file if it exists
+            if 'temp_file_path' in locals() and os.path.exists(temp_file_path):
+                os.unlink(temp_file_path)
+            return False
+        
+        # Step 4: Validate upload response
+        print("\n📋 Step 4: Validating upload response...")
+        validation_results = []
+        
+        # Check required response fields
+        required_fields = ['message', 'total_importados', 'total_linhas']
+        for field in required_fields:
+            if field in upload_data:
+                print(f"✅ Response contains '{field}': {upload_data[field]}")
+                validation_results.append(True)
+            else:
+                print(f"❌ Response missing '{field}'")
+                validation_results.append(False)
+                self.log_test(f"Upload Response - {field}", False, f"Missing {field}")
+        
+        # Check if orders were imported
+        total_importados = upload_data.get('total_importados', 0)
+        if total_importados > 0:
+            print(f"✅ Orders imported successfully: {total_importados}")
+            validation_results.append(True)
+            self.log_test("Upload Response - Orders Imported", True)
+        else:
+            print(f"❌ No orders imported: {total_importados}")
+            validation_results.append(False)
+            self.log_test("Upload Response - Orders Imported", False, "No orders imported")
+        
+        # Check success message
+        message = upload_data.get('message', '')
+        if 'sucesso' in message.lower() or 'success' in message.lower():
+            print(f"✅ Success message received: {message}")
+            validation_results.append(True)
+            self.log_test("Upload Response - Success Message", True)
+        else:
+            print(f"⚠️ Unexpected message: {message}")
+            # Don't fail for this, just log
+            self.log_test("Upload Response - Success Message", True, f"Message: {message}")
+        
+        # Step 5: Verify orders in database
+        print("\n📋 Step 5: Verifying imported orders in database...")
+        
+        success_get, pedidos_response = self.run_test(
+            "Get Marketplace Orders",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={projeto_id}",
+            200
+        )
+        
+        if success_get and isinstance(pedidos_response, list):
+            imported_orders_count = len(pedidos_response)
+            print(f"✅ Found {imported_orders_count} orders in database")
+            
+            if imported_orders_count == total_importados:
+                print("✅ Database count matches upload response")
+                validation_results.append(True)
+                self.log_test("Database Verification - Order Count", True)
+            else:
+                print(f"❌ Database count ({imported_orders_count}) doesn't match upload response ({total_importados})")
+                validation_results.append(False)
+                self.log_test("Database Verification - Order Count", False, f"Count mismatch: DB={imported_orders_count}, Upload={total_importados}")
+            
+            # Step 6: Validate field mapping for sample order
+            if imported_orders_count > 0:
+                print("\n📋 Step 6: Validating field mapping for sample order...")
+                sample_order = pedidos_response[0]
+                
+                # Check critical fields are populated
+                critical_fields = [
+                    'numero_pedido', 'sku', 'nome_variacao', 'quantidade', 
+                    'preco_acordado', 'valor_taxa_comissao', 'valor_taxa_servico',
+                    'opcao_envio', 'data_prevista_envio'
+                ]
+                
+                field_validation_results = []
+                for field in critical_fields:
+                    if field in sample_order and sample_order[field] not in [None, '', 0]:
+                        print(f"✅ Field '{field}' populated: {sample_order[field]}")
+                        field_validation_results.append(True)
+                    else:
+                        print(f"❌ Field '{field}' missing or empty: {sample_order.get(field)}")
+                        field_validation_results.append(False)
+                        self.log_test(f"Field Mapping - {field}", False, f"Field missing or empty")
+                
+                # Check calculated fields
+                if 'valor_liquido' in sample_order:
+                    valor_liquido = sample_order['valor_liquido']
+                    preco_acordado = sample_order.get('preco_acordado', 0)
+                    taxa_comissao = sample_order.get('valor_taxa_comissao', 0)
+                    taxa_servico = sample_order.get('valor_taxa_servico', 0)
+                    expected_liquido = preco_acordado - taxa_comissao - taxa_servico
+                    
+                    if abs(valor_liquido - expected_liquido) < 0.01:  # Allow small floating point differences
+                        print(f"✅ valor_liquido calculated correctly: {valor_liquido}")
+                        field_validation_results.append(True)
+                        self.log_test("Field Mapping - valor_liquido calculation", True)
+                    else:
+                        print(f"❌ valor_liquido calculation error: {valor_liquido} (expected {expected_liquido})")
+                        field_validation_results.append(False)
+                        self.log_test("Field Mapping - valor_liquido calculation", False, f"Calculation error: {valor_liquido} vs {expected_liquido}")
+                
+                # Check percentage calculations
+                if sample_order.get('preco_acordado', 0) > 0:
+                    preco = sample_order['preco_acordado']
+                    taxa_comissao_valor = sample_order.get('valor_taxa_comissao', 0)
+                    taxa_servico_valor = sample_order.get('valor_taxa_servico', 0)
+                    
+                    expected_taxa_comissao_pct = (taxa_comissao_valor / preco) * 100 if preco > 0 else 0
+                    expected_taxa_servico_pct = (taxa_servico_valor / preco) * 100 if preco > 0 else 0
+                    
+                    actual_taxa_comissao_pct = sample_order.get('taxa_comissao', 0)
+                    actual_taxa_servico_pct = sample_order.get('taxa_servico', 0)
+                    
+                    if abs(actual_taxa_comissao_pct - expected_taxa_comissao_pct) < 0.1:
+                        print(f"✅ taxa_comissao percentage calculated correctly: {actual_taxa_comissao_pct}%")
+                        field_validation_results.append(True)
+                    else:
+                        print(f"❌ taxa_comissao percentage error: {actual_taxa_comissao_pct}% (expected {expected_taxa_comissao_pct}%)")
+                        field_validation_results.append(False)
+                    
+                    if abs(actual_taxa_servico_pct - expected_taxa_servico_pct) < 0.1:
+                        print(f"✅ taxa_servico percentage calculated correctly: {actual_taxa_servico_pct}%")
+                        field_validation_results.append(True)
+                    else:
+                        print(f"❌ taxa_servico percentage error: {actual_taxa_servico_pct}% (expected {expected_taxa_servico_pct}%)")
+                        field_validation_results.append(False)
+                
+                # Print sample order details
+                print(f"\n📊 Sample Order Details:")
+                print(f"   ID do pedido: {sample_order.get('numero_pedido')}")
+                print(f"   SKU: {sample_order.get('sku')}")
+                print(f"   Nome variação: {sample_order.get('nome_variacao')}")
+                print(f"   Quantidade: {sample_order.get('quantidade')}")
+                print(f"   Preço acordado: R$ {sample_order.get('preco_acordado', 0):.2f}")
+                print(f"   Taxa comissão: {sample_order.get('taxa_comissao', 0):.2f}% (R$ {sample_order.get('valor_taxa_comissao', 0):.2f})")
+                print(f"   Taxa serviço: {sample_order.get('taxa_servico', 0):.2f}% (R$ {sample_order.get('valor_taxa_servico', 0):.2f})")
+                print(f"   Valor líquido: R$ {sample_order.get('valor_liquido', 0):.2f}")
+                print(f"   Opção envio: {sample_order.get('opcao_envio')}")
+                print(f"   Data prevista envio: {sample_order.get('data_prevista_envio')}")
+                
+                validation_results.extend(field_validation_results)
+            
+        else:
+            print("❌ Failed to retrieve orders from database")
+            validation_results.append(False)
+            self.log_test("Database Verification - Retrieval", False, "Failed to get orders")
+        
+        # Overall result
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ ALL MARKETPLACE SPREADSHEET UPLOAD TESTS PASSED!")
+            print(f"✅ Successfully imported {total_importados} orders from Shopee spreadsheet")
+            print("✅ Field mapping, calculations, and database persistence all working correctly")
+            self.log_test("Marketplace Spreadsheet Upload - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ MARKETPLACE UPLOAD TESTS FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("Marketplace Spreadsheet Upload - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
