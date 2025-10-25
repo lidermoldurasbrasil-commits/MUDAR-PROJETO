@@ -198,7 +198,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Aba Orçamento no PedidoForm com lista de insumos detalhada"
+    - "Salvamento de pedido com dados mínimos (campos vazios)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
