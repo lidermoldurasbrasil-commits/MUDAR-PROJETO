@@ -529,7 +529,8 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
       if (produtosPedido && produtosPedido.length > 0) {
         const primeiroProduto = produtosPedido[0];
         const todosItens = produtosPedido.flatMap(p => p.itens || []);
-        const totalGeral = produtosPedido.reduce((sum, p) => sum + (p.total || 0), 0);
+        const totalGeralVenda = produtosPedido.reduce((sum, p) => sum + (p.total || 0), 0);
+        const totalGeralCusto = produtosPedido.reduce((sum, p) => sum + (p.custo || 0), 0);
         
         const dadosEnvio = {
           ...formData,
@@ -539,9 +540,9 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           tipo_produto: primeiroProduto.tipo_produto || formData.tipo_produto || 'Quadro',
           cliente_nome: formData.cliente_nome || 'Cliente não informado',
           itens: todosItens,
-          custo_total: totalGeral,
-          preco_venda: totalGeral,
-          valor_final: totalGeral - (formData.desconto_valor || 0) + (formData.sobre_preco_valor || 0),
+          custo_total: totalGeralCusto,  // CORRIGIDO: Usar soma dos custos
+          preco_venda: totalGeralVenda,  // Usar soma dos preços de venda
+          valor_final: totalGeralVenda - (formData.desconto_valor || 0) + (formData.sobre_preco_valor || 0),
           // NOVO: Salvar estrutura de múltiplos produtos como JSON
           produtos_detalhes: JSON.stringify(produtosPedido)
         };
