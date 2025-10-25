@@ -202,22 +202,46 @@ export default function ContasBancarias() {
 
       <div className="filtros-section">
         <div className="filtro-group">
+          <label>
+            <input 
+              type="checkbox" 
+              checked={selecionarTodos} 
+              onChange={(e) => {
+                setSelecionarTodos(e.target.checked);
+                if (e.target.checked) {
+                  setFiltros({ banco: '', status: '' });
+                }
+              }}
+              style={{ marginRight: '8px', cursor: 'pointer' }}
+            />
+            Selecionar Todos os Bancos
+          </label>
+        </div>
+        <div className="filtro-group">
           <label>Banco</label>
-          <select value={filtros.banco} onChange={(e) => setFiltros(prev => ({ ...prev, banco: e.target.value }))}>
+          <select 
+            value={filtros.banco} 
+            onChange={(e) => setFiltros(prev => ({ ...prev, banco: e.target.value }))}
+            disabled={selecionarTodos}
+          >
             <option value="">Todos os bancos</option>
             {BANCOS_DISPONIVEIS.map(banco => <option key={banco} value={banco}>{banco}</option>)}
           </select>
         </div>
         <div className="filtro-group">
           <label>Status</label>
-          <select value={filtros.status} onChange={(e) => setFiltros(prev => ({ ...prev, status: e.target.value }))}>
+          <select 
+            value={filtros.status} 
+            onChange={(e) => setFiltros(prev => ({ ...prev, status: e.target.value }))}
+            disabled={selecionarTodos}
+          >
             <option value="">Todos</option>
             <option value="Ativo">Ativo</option>
             <option value="Inativo">Inativo</option>
           </select>
         </div>
         <button className="btn-filtrar" onClick={fetchContas}><Filter size={18} />Filtrar</button>
-        <button className="btn-limpar" onClick={() => setFiltros({ banco: '', status: '' })}><FilterX size={18} />Limpar</button>
+        <button className="btn-limpar" onClick={() => { setFiltros({ banco: '', status: '' }); setSelecionarTodos(false); }}><FilterX size={18} />Limpar</button>
       </div>
 
       <div className="table-container">
