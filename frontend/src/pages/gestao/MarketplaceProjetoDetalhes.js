@@ -987,6 +987,110 @@ export default function MarketplaceProjetoDetalhes() {
         </div>
       )}
 
+      {/* Produção View - Visão Simplificada sem Preços */}
+      {viewMode === 'producao' && (
+        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-gray-900 border-b border-gray-700">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
+                    <input 
+                      type="checkbox" 
+                      className="rounded cursor-pointer" 
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do Pedido</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[140px]">Status Impressão</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">SKU</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome Variação</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-800 divide-y divide-gray-700">
+                {pedidos.map((pedido) => (
+                  <tr key={pedido.id} className="hover:bg-gray-700/30 group">
+                    <td className="px-4 py-3">
+                      <input 
+                        type="checkbox" 
+                        className="rounded cursor-pointer" 
+                        checked={selectedPedidos.includes(pedido.id)}
+                        onChange={() => handleSelectPedido(pedido.id)}
+                      />
+                    </td>
+                    
+                    {/* ID do Pedido */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <button className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white transition-opacity">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                        <span className="text-white font-medium">{pedido.numero_pedido}</span>
+                      </div>
+                    </td>
+                    
+                    {/* Status Geral - Dropdown */}
+                    <td className="px-4 py-3">
+                      <select
+                        value={pedido.status}
+                        onChange={(e) => {
+                          handleStatusChange(pedido.id, e.target.value);
+                          handleUpdatePedido(pedido.id, 'status', e.target.value);
+                        }}
+                        className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        style={{
+                          backgroundColor: STATUS_OPTIONS.find(s => s.value === pedido.status)?.color || '#94A3B8',
+                          color: 'white'
+                        }}
+                      >
+                        {STATUS_OPTIONS.map(s => (
+                          <option key={s.value} value={s.value}>{s.label}</option>
+                        ))}
+                      </select>
+                    </td>
+                    
+                    {/* Status Impressão - Dropdown */}
+                    <td className="px-4 py-3">
+                      <select
+                        value={pedido.status_impressao || 'Aguardando Impressão'}
+                        onChange={(e) => handleUpdatePedido(pedido.id, 'status_impressao', e.target.value)}
+                        className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        style={{
+                          backgroundColor: STATUS_IMPRESSAO_OPTIONS.find(s => s.value === (pedido.status_impressao || 'Aguardando Impressão'))?.color || '#94A3B8',
+                          color: 'white'
+                        }}
+                      >
+                        {STATUS_IMPRESSAO_OPTIONS.map(s => (
+                          <option key={s.value} value={s.value}>{s.label}</option>
+                        ))}
+                      </select>
+                    </td>
+                    
+                    {/* SKU */}
+                    <td className="px-4 py-3">
+                      <span className="text-gray-300 text-sm">{pedido.sku || '-'}</span>
+                    </td>
+                    
+                    {/* Nome Variação */}
+                    <td className="px-4 py-3">
+                      <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
+                    </td>
+                    
+                    {/* Quantidade */}
+                    <td className="px-4 py-3">
+                      <span className="text-white font-medium text-center">{pedido.quantidade}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* Kanban View */}
       {viewMode === 'kanban' && (
         <div className="grid grid-cols-6 gap-4">
