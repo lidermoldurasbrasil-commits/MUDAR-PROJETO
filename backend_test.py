@@ -2649,9 +2649,32 @@ def main_financial_test():
     
     return 0 if all_passed else 1
 
+def main_payment_methods_test():
+    """Run only the payment methods CRUD test as requested"""
+    tester = BusinessManagementSystemTester()
+    
+    print("🚀 Starting Payment Methods CRUD Test...")
+    print(f"🌐 Testing against: {tester.base_url}")
+    
+    # Authentication is required
+    if not tester.test_authentication():
+        print("❌ Authentication failed - stopping tests")
+        return 1
+    
+    # Run only the payment methods CRUD test
+    success = tester.test_payment_methods_crud()
+    
+    # Print final results
+    all_passed = tester.print_summary()
+    
+    return 0 if all_passed else 1
+
 if __name__ == "__main__":
-    # Check if we want to run financial test specifically
-    if len(sys.argv) > 1 and sys.argv[1] == "financial":
-        sys.exit(main_financial_test())
+    # Check if we want to run specific tests
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "financial":
+            sys.exit(main_financial_test())
+        elif sys.argv[1] == "payment_methods":
+            sys.exit(main_payment_methods_test())
     else:
         sys.exit(main())
