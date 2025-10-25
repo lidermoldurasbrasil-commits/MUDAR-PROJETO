@@ -150,6 +150,18 @@ backend:
           agent: "testing"
           comment: "✅ ENDPOINT DE CRIAÇÃO DE PEDIDOS FUNCIONANDO PERFEITAMENTE! Testado conforme solicitação do usuário: 1) Login realizado com sucesso para obter token. 2) Cliente criado com dados: nome='Cliente Teste', cpf='12345678900', telefone='(11) 98765-4321', endereço='Rua Teste, 123', cidade='São Paulo'. 3) Pedido de manufatura criado com sucesso: tipo_produto='Quadro', altura=50cm, largura=70cm, quantidade=1, itens com moldura (2.4ml, R$50.00/ml custo, R$150.00/ml preço), custo_total=R$120.00, preco_venda=R$360.00, valor_final=R$360.00, forma_pagamento='Dinheiro', valor_entrada=R$100.00. 4) Response retorna status 200 com ID do pedido, numero_pedido=1, todos os campos corretos. 5) Pedido salvo no banco confirmado via GET /api/gestao/pedidos. 6) Busca específica por ID funcionando. Todas as validações aprovadas: ID gerado, numero_pedido sequencial, cliente_nome correto, itens presentes, valor_final e valor_entrada corretos, persistência no banco confirmada."
 
+  - task: "Salvamento de pedido com dados mínimos (campos vazios)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTE DE SALVAMENTO COM DADOS MÍNIMOS APROVADO! Testado conforme solicitação específica do usuário: POST /api/gestao/pedidos aceita pedido com campos vazios sem erro 422. Dados testados: cliente_nome='', tipo_produto='', altura=0, largura=0, quantidade=1, itens=[], custo_total=0, preco_venda=0, valor_final=0. RESULTADO: ✅ Status 200 retornado ✅ Pedido criado com ID único ✅ Pedido salvo no banco de dados ✅ Campos vazios aceitos sem validação obrigatória ✅ Valores padrão aplicados quando necessário. Sistema permite salvamento de pedidos mesmo com campos vazios, conforme solicitado pelo usuário. Validações obrigatórias removidas com sucesso."
+
   - task: "Endpoint de clientes (/api/gestao/clientes)"
     implemented: true
     working: true
