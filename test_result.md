@@ -189,6 +189,18 @@ backend:
           agent: "testing"
           comment: "✅ ENDPOINT DE CLIENTES FUNCIONANDO! Testado durante criação de pedido: POST /api/gestao/clientes retorna status 200, cria cliente com ID único, todos os campos salvos corretamente (nome, cpf, telefone, celular, endereco, cidade). Cliente necessário para criação de pedidos de manufatura."
 
+  - task: "Automação de criação de Ordem de Produção quando pedido muda para status 'Montagem'"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ AUTOMAÇÃO DE ORDEM DE PRODUÇÃO TESTADA COM SUCESSO! Fluxo completo testado: 1) Login realizado ✅ 2) Cliente criado (Cliente Teste Automação) ✅ 3) Pedido criado com dados mínimos (tipo_produto='Quadro', altura=50cm, largura=70cm, quantidade=1) ✅ 4) Status alterado para 'Montagem' via PUT /api/gestao/pedidos/{id}/status ✅ 5) Ordem de Produção criada automaticamente ✅ VALIDAÇÕES APROVADAS: ✅ numero_ordem gerado (1) ✅ cliente_nome correto ✅ loja_origem='fabrica' ✅ status_producao='Em Fila' ✅ timeline com entrada de criação ✅ checklist inicializado ✅ NÃO cria ordem duplicada em múltiplas tentativas ✅ Pedido continua com status 'Montagem'. Logs mostram 'Ordem de Produção #1 criada com sucesso!' e 'Ordem de Produção já existe para este pedido' na segunda tentativa. Automação funcionando perfeitamente!"
+
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
     implemented: true
