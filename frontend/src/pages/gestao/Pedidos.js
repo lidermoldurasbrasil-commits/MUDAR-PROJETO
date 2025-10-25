@@ -655,6 +655,10 @@ export default function Pedidos() {
         .btn-delete:hover {
           background: #fee2e2;
         }
+        
+        .btn-view:hover {
+          background: #2563eb !important;
+        }
 
         .loading {
           padding: 60px;
@@ -666,6 +670,57 @@ export default function Pedidos() {
           text-align: center;
           padding: 60px;
           color: #a0aec0;
+        }
+        
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        }
+
+        .modal-content {
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+          width: 90%;
+          max-width: 900px;
+        }
+
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px 25px;
+          border-bottom: 2px solid #e5e7eb;
+        }
+
+        .modal-header h2 {
+          margin: 0;
+          font-size: 20px;
+          color: #1f2937;
+        }
+
+        .btn-close {
+          background: none;
+          border: none;
+          font-size: 32px;
+          cursor: pointer;
+          color: #9ca3af;
+          line-height: 1;
+          padding: 0;
+          width: 32px;
+          height: 32px;
+        }
+
+        .btn-close:hover {
+          color: #374151;
         }
       `}</style>
     </div>
