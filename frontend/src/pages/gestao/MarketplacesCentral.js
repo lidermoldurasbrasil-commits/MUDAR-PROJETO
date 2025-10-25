@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Plus, TrendingUp, Package, Send, CheckCircle, AlertTriangle, DollarSign, Activity, Edit2 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api/gestao/marketplaces`;
