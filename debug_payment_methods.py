@@ -14,8 +14,9 @@ def test_payment_methods_debug():
     print("🔐 Authenticating...")
     
     # Register
+    import time
     register_data = {
-        "username": f"testuser_debug",
+        "username": f"testuser_debug_{int(time.time())}",
         "password": "TestPass123!",
         "role": "manager"
     }
