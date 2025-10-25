@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import PedidoForm from './PedidoForm';
