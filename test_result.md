@@ -158,3 +158,5 @@ agent_communication:
       message: "Corrigido erro 422 criando modelo PedidoCalculoRequest separado que não exige campos obrigatórios do PedidoManufatura. Endpoint reescrito para retornar dicionário com todos os campos calculados. Backend reiniciado com sucesso. Pronto para testes."
     - agent: "testing"
       message: "🎉 TESTE CONCLUÍDO COM SUCESSO! Endpoint POST /api/gestao/pedidos/calcular está funcionando perfeitamente. Não há mais erro 422. Todos os cálculos estão corretos e response contém todos os campos obrigatórios. Sistema de gestão de pedidos de manufatura operacional. Testado com 48 casos de teste, 100% de sucesso."
+    - agent: "main"
+      message: "Implementadas melhorias solicitadas pelo usuário: 1) Campos de composição (insumos, quantidade, preço) agora são somente leitura (não editáveis). 2) Endpoint atualizado para retornar preço de venda dos produtos cadastrados (preco_unitario e subtotal_venda) ao invés de apenas custo. 3) Cálculo funciona com insumos individuais - não precisa selecionar todos. Frontend e backend atualizados. Pronto para testes."
