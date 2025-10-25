@@ -572,141 +572,134 @@ export default function MarketplaceProjetoDetalhes() {
                   </tr>
                 ))}
                 
-                {/* Linha de Adicionar Inline */}
+                {/* Linha de Adicionar Inline - HORIZONTAL */}
                 {showInlineAdd ? (
-                  <tr className="bg-gray-900/50 border-t-2 border-blue-500">
+                  <tr className="bg-gray-900/80 border-t-2 border-blue-500">
                     <td className="px-4 py-3">
                       <input type="checkbox" className="rounded" disabled />
                     </td>
-                    <td className="px-4 py-3" colSpan="8">
-                      <div className="space-y-3 py-2">
-                        {/* Nome/Elemento */}
-                        <div>
-                          <label className="block text-xs text-gray-400 mb-1">Elemento/Número do Pedido *</label>
-                          <input
-                            type="text"
-                            value={novaLinhaInline.numero_pedido}
-                            onChange={(e) => setNovaLinhaInline({...novaLinhaInline, numero_pedido: e.target.value})}
-                            placeholder="Ex: SHOPEE-001"
-                            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            autoFocus
-                          />
-                        </div>
-
-                        {/* Grid com 3 colunas */}
-                        <div className="grid grid-cols-3 gap-3">
-                          {/* Quantidade */}
-                          <div>
-                            <label className="block text-xs text-gray-400 mb-1">Quantidade</label>
-                            <input
-                              type="number"
-                              min="1"
-                              value={novaLinhaInline.quantidade}
-                              onChange={(e) => setNovaLinhaInline({...novaLinhaInline, quantidade: parseInt(e.target.value) || 1})}
-                              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-
-                          {/* SKU */}
-                          <div>
-                            <label className="block text-xs text-gray-400 mb-1">SKU</label>
-                            <input
-                              type="text"
-                              value={novaLinhaInline.sku}
-                              onChange={(e) => setNovaLinhaInline({...novaLinhaInline, sku: e.target.value})}
-                              placeholder="Código do produto"
-                              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-
-                          {/* Cliente */}
-                          <div>
-                            <label className="block text-xs text-gray-400 mb-1">Cliente</label>
-                            <input
-                              type="text"
-                              value={novaLinhaInline.cliente_nome}
-                              onChange={(e) => setNovaLinhaInline({...novaLinhaInline, cliente_nome: e.target.value})}
-                              placeholder="Nome do cliente"
-                              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Sala de Impressão - Checklist */}
-                        <div>
-                          <label className="block text-xs text-gray-400 mb-2">Sala de Impressão</label>
-                          <div className="flex gap-4">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                type="radio"
-                                name="sala_impressao"
-                                checked={novaLinhaInline.sala_impressao === 'Aguardando Impressão'}
-                                onChange={() => setNovaLinhaInline({...novaLinhaInline, sala_impressao: 'Aguardando Impressão', status: 'Aguardando Impressão'})}
-                                className="w-4 h-4 text-blue-600"
-                              />
-                              <span className="text-sm text-gray-300">Aguardando Impressão</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                type="radio"
-                                name="sala_impressao"
-                                checked={novaLinhaInline.sala_impressao === 'Imprimindo'}
-                                onChange={() => setNovaLinhaInline({...novaLinhaInline, sala_impressao: 'Imprimindo', status: 'Sala de Impressão'})}
-                                className="w-4 h-4 text-blue-600"
-                              />
-                              <span className="text-sm text-gray-300">Imprimindo</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                type="radio"
-                                name="sala_impressao"
-                                checked={novaLinhaInline.sala_impressao === 'Impresso'}
-                                onChange={() => setNovaLinhaInline({...novaLinhaInline, sala_impressao: 'Impresso', status: 'Sala de Impressão'})}
-                                className="w-4 h-4 text-blue-600"
-                              />
-                              <span className="text-sm text-gray-300">Impresso</span>
-                            </label>
-                          </div>
-                        </div>
-
-                        {/* Grid com Prazo e Responsável */}
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs text-gray-400 mb-1">Prazo de Entrega</label>
-                            <input
-                              type="date"
-                              value={novaLinhaInline.prazo_entrega}
-                              onChange={(e) => setNovaLinhaInline({...novaLinhaInline, prazo_entrega: e.target.value})}
-                              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs text-gray-400 mb-1">Responsável</label>
-                            <input
-                              type="text"
-                              value={novaLinhaInline.responsavel}
-                              onChange={(e) => setNovaLinhaInline({...novaLinhaInline, responsavel: e.target.value})}
-                              placeholder="Nome do responsável"
-                              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Botões de Ação */}
-                        <div className="flex gap-2 pt-2">
-                          <button
-                            onClick={handleAddInline}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
-                          >
-                            Adicionar
-                          </button>
-                          <button
-                            onClick={() => setShowInlineAdd(false)}
-                            className="px-4 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 text-sm"
-                          >
-                            Cancelar
-                          </button>
-                        </div>
+                    
+                    {/* Elemento - Primeiro campo */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={novaLinhaInline.numero_pedido}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, numero_pedido: e.target.value})}
+                        placeholder="Digite o elemento..."
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        autoFocus
+                      />
+                    </td>
+                    
+                    {/* Status */}
+                    <td className="px-4 py-3">
+                      <select
+                        value={novaLinhaInline.status}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, status: e.target.value})}
+                        className="w-full px-3 py-2 rounded font-medium text-white focus:ring-2 focus:ring-blue-500"
+                        style={{
+                          backgroundColor: STATUS_OPTIONS.find(s => s.value === novaLinhaInline.status)?.color || '#94A3B8'
+                        }}
+                      >
+                        {STATUS_OPTIONS.map(s => (
+                          <option key={s.value} value={s.value}>{s.label}</option>
+                        ))}
+                      </select>
+                    </td>
+                    
+                    {/* Quantidade */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        min="1"
+                        value={novaLinhaInline.quantidade}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, quantidade: parseInt(e.target.value) || 1})}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white text-center rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    
+                    {/* SKU */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={novaLinhaInline.sku}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, sku: e.target.value})}
+                        placeholder="SKU"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    
+                    {/* Cliente */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={novaLinhaInline.cliente_nome}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, cliente_nome: e.target.value})}
+                        placeholder="Nome do cliente"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    
+                    {/* Sala de Impressão */}
+                    <td className="px-4 py-3">
+                      <select
+                        value={novaLinhaInline.sala_impressao}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, sala_impressao: e.target.value})}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="Aguardando Impressão">Aguardando</option>
+                        <option value="Imprimindo">Imprimindo</option>
+                        <option value="Impresso">Impresso</option>
+                      </select>
+                    </td>
+                    
+                    {/* Prazo */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="date"
+                        value={novaLinhaInline.prazo_entrega}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, prazo_entrega: e.target.value})}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    
+                    {/* Responsável com Botões */}
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={novaLinhaInline.responsavel}
+                          onChange={(e) => setNovaLinhaInline({...novaLinhaInline, responsavel: e.target.value})}
+                          placeholder="Responsável"
+                          className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                          onClick={handleAddInline}
+                          className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          title="Salvar"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowInlineAdd(false);
+                            setNovaLinhaInline({
+                              numero_pedido: '',
+                              quantidade: 1,
+                              sku: '',
+                              cliente_nome: '',
+                              sala_impressao: 'Aguardando Impressão',
+                              status: 'Aguardando Impressão',
+                              prioridade: 'Normal',
+                              prazo_entrega: '',
+                              responsavel: ''
+                            });
+                          }}
+                          className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                          title="Cancelar"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
