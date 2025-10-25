@@ -237,7 +237,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Automação de criação de Ordem de Produção quando pedido muda para status 'Montagem'"
+    - "Módulo Financeiro - Contas Bancárias (/api/gestao/financeiro/contas-bancarias)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
