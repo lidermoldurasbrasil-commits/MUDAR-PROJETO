@@ -46,12 +46,15 @@ export default function MarketplaceProjetoDetalhes() {
   const [uploadProgress, setUploadProgress] = useState(false);
   const [novaLinhaInline, setNovaLinhaInline] = useState({
     numero_pedido: '',
+    produto_nome: '',
     quantidade: 1,
     sku: '',
     nome_variacao: '',
     preco_acordado: 0,
     opcao_envio: '',
     data_prevista_envio: '',
+    cliente_nome: '',
+    cliente_contato: '',
     status: 'Aguardando Impressão',
     prioridade: 'Normal'
   });
