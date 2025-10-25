@@ -3729,6 +3729,412 @@ async def get_evolucao_diaria(dias: int = 30, loja: Optional[str] = None, curren
         'valores': list(evolucao.values())
     }
 
+# ========================================
+# ENDPOINTS MARKETPLACES
+# ========================================
+
+# PROJETOS MARKETPLACE
+@api_router.get("/gestao/marketplaces/projetos")
+async def get_projetos_marketplace(current_user: dict = Depends(get_current_user)):
+    """Lista todos os projetos de marketplace"""
+    projetos = await db.projetos_marketplace.find().to_list(None)
+    
+    # Se não houver projetos, inicializar os 3 principais
+    if not projetos:
+        projetos_iniciais = [
+            {
+                "id": str(uuid.uuid4()),
+                "nome": "Shopee Brasil",
+                "plataforma": "shopee",
+                "descricao": "Controle de produção e pedidos integrados à Shopee",
+                "icone": "🛍️",
+                "cor_primaria": "#FF6B00",
+                "status_ativo": True,
+                "pedidos_em_producao": 0,
+                "pedidos_enviados": 0,
+                "pedidos_entregues": 0,
+                "pedidos_atrasados": 0,
+                "progresso_percentual": 0,
+                "performance_icone": "🚀",
+                "valor_total_vendido": 0,
+                "loja_id": "fabrica",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "created_by": current_user.get('username', '')
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "nome": "Mercado Livre",
+                "plataforma": "mercadolivre",
+                "descricao": "Controle de produção e pedidos integrados ao Mercado Livre",
+                "icone": "💛",
+                "cor_primaria": "#FFE600",
+                "status_ativo": True,
+                "pedidos_em_producao": 0,
+                "pedidos_enviados": 0,
+                "pedidos_entregues": 0,
+                "pedidos_atrasados": 0,
+                "progresso_percentual": 0,
+                "performance_icone": "🚀",
+                "valor_total_vendido": 0,
+                "loja_id": "fabrica",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "created_by": current_user.get('username', '')
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "nome": "TikTok Shop",
+                "plataforma": "tiktok",
+                "descricao": "Controle de produção e pedidos integrados ao TikTok Shop",
+                "icone": "🎵",
+                "cor_primaria": "#000000",
+                "status_ativo": True,
+                "pedidos_em_producao": 0,
+                "pedidos_enviados": 0,
+                "pedidos_entregues": 0,
+                "pedidos_atrasados": 0,
+                "progresso_percentual": 0,
+                "performance_icone": "🚀",
+                "valor_total_vendido": 0,
+                "loja_id": "fabrica",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "created_by": current_user.get('username', '')
+            }
+        ]
+        
+        await db.projetos_marketplace.insert_many(projetos_iniciais)
+        projetos = projetos_iniciais
+    
+    # Atualizar métricas de cada projeto
+    for projeto in projetos:
+        projeto_id = projeto.get('id')
+        
+        # Contar pedidos por status
+        em_producao = await db.pedidos_marketplace.count_documents({
+            "projeto_id": projeto_id,
+            "status": {"$in": ["Sala de Impressão", "Em Produção"]}
+        })
+        
+        enviados = await db.pedidos_marketplace.count_documents({
+            "projeto_id": projeto_id,
+            "status": "Enviado"
+        })
+        
+        entregues = await db.pedidos_marketplace.count_documents({
+            "projeto_id": projeto_id,
+            "status": "Entregue"
+        })
+        
+        atrasados = await db.pedidos_marketplace.count_documents({
+            "projeto_id": projeto_id,
+            "atrasado": True
+        })
+        
+        # Atualizar projeto
+        projeto['pedidos_em_producao'] = em_producao
+        projeto['pedidos_enviados'] = enviados
+        projeto['pedidos_entregues'] = entregues
+        projeto['pedidos_atrasados'] = atrasados
+        
+        # Calcular progresso percentual
+        total_pedidos = em_producao + enviados + entregues
+        if total_pedidos > 0:
+            projeto['progresso_percentual'] = round((entregues / total_pedidos) * 100, 1)
+        
+        # Determinar ícone de performance
+        if atrasados > 5:
+            projeto['performance_icone'] = "🧊"
+        elif entregues > 50:
+            projeto['performance_icone'] = "🚀"
+        elif em_producao > 20:
+            projeto['performance_icone'] = "🔥"
+        
+        if '_id' in projeto:
+            del projeto['_id']
+    
+    return projetos
+
+@api_router.post("/gestao/marketplaces/projetos")
+async def create_projeto_marketplace(projeto: ProjetoMarketplace, current_user: dict = Depends(get_current_user)):
+    """Cria um novo projeto de marketplace"""
+    projeto.created_by = current_user.get('username', '')
+    projeto_dict = projeto.model_dump()
+    await db.projetos_marketplace.insert_one(projeto_dict)
+    if '_id' in projeto_dict:
+        del projeto_dict['_id']
+    return projeto_dict
+
+@api_router.put("/gestao/marketplaces/projetos/{projeto_id}")
+async def update_projeto_marketplace(projeto_id: str, projeto: ProjetoMarketplace, current_user: dict = Depends(get_current_user)):
+    """Atualiza um projeto de marketplace"""
+    projeto_dict = projeto.model_dump()
+    projeto_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+    await db.projetos_marketplace.update_one({"id": projeto_id}, {"$set": projeto_dict})
+    return {"message": "Projeto atualizado com sucesso"}
+
+@api_router.delete("/gestao/marketplaces/projetos/{projeto_id}")
+async def delete_projeto_marketplace(projeto_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta um projeto de marketplace"""
+    await db.projetos_marketplace.delete_one({"id": projeto_id})
+    return {"message": "Projeto excluído com sucesso"}
+
+# PEDIDOS MARKETPLACE
+@api_router.get("/gestao/marketplaces/pedidos")
+async def get_pedidos_marketplace(
+    projeto_id: Optional[str] = None,
+    status: Optional[str] = None,
+    atrasado: Optional[bool] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Lista pedidos de marketplace com filtros"""
+    query = {}
+    if projeto_id:
+        query['projeto_id'] = projeto_id
+    if status:
+        query['status'] = status
+    if atrasado is not None:
+        query['atrasado'] = atrasado
+    
+    pedidos = await db.pedidos_marketplace.find(query).sort("data_pedido", -1).to_list(None)
+    
+    for pedido in pedidos:
+        if '_id' in pedido:
+            del pedido['_id']
+        
+        # Verificar atraso
+        if pedido.get('status') not in ['Entregue', 'Cancelado']:
+            prazo = pedido.get('prazo_entrega')
+            if isinstance(prazo, str):
+                prazo = datetime.fromisoformat(prazo.replace('Z', '+00:00'))
+            if prazo < datetime.now(timezone.utc):
+                dias_atraso = (datetime.now(timezone.utc) - prazo).days
+                pedido['atrasado'] = True
+                pedido['dias_atraso'] = dias_atraso
+    
+    return pedidos
+
+@api_router.post("/gestao/marketplaces/pedidos")
+async def create_pedido_marketplace(pedido: PedidoMarketplace, current_user: dict = Depends(get_current_user)):
+    """Cria um novo pedido de marketplace"""
+    pedido.created_by = current_user.get('username', '')
+    pedido_dict = pedido.model_dump()
+    await db.pedidos_marketplace.insert_one(pedido_dict)
+    if '_id' in pedido_dict:
+        del pedido_dict['_id']
+    return pedido_dict
+
+@api_router.post("/gestao/marketplaces/pedidos/bulk")
+async def create_pedidos_bulk(pedidos: list[PedidoMarketplace], current_user: dict = Depends(get_current_user)):
+    """Cria múltiplos pedidos de uma vez (upload de planilha)"""
+    pedidos_dict = []
+    for pedido in pedidos:
+        pedido.created_by = current_user.get('username', '')
+        pedido_dict = pedido.model_dump()
+        pedidos_dict.append(pedido_dict)
+    
+    if pedidos_dict:
+        await db.pedidos_marketplace.insert_many(pedidos_dict)
+    
+    return {"message": f"{len(pedidos_dict)} pedidos criados com sucesso"}
+
+@api_router.put("/gestao/marketplaces/pedidos/{pedido_id}")
+async def update_pedido_marketplace(pedido_id: str, pedido: PedidoMarketplace, current_user: dict = Depends(get_current_user)):
+    """Atualiza um pedido de marketplace"""
+    pedido_dict = pedido.model_dump()
+    pedido_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    # Atualizar datas conforme status
+    if pedido.status == "Sala de Impressão" and not pedido_dict.get('data_impressao'):
+        pedido_dict['data_impressao'] = datetime.now(timezone.utc).isoformat()
+    elif pedido.status == "Em Produção" and not pedido_dict.get('data_producao'):
+        pedido_dict['data_producao'] = datetime.now(timezone.utc).isoformat()
+    elif pedido.status == "Expedição" and not pedido_dict.get('data_expedicao'):
+        pedido_dict['data_expedicao'] = datetime.now(timezone.utc).isoformat()
+    elif pedido.status == "Enviado" and not pedido_dict.get('data_envio'):
+        pedido_dict['data_envio'] = datetime.now(timezone.utc).isoformat()
+    elif pedido.status == "Entregue" and not pedido_dict.get('data_entrega'):
+        pedido_dict['data_entrega'] = datetime.now(timezone.utc).isoformat()
+    
+    await db.pedidos_marketplace.update_one({"id": pedido_id}, {"$set": pedido_dict})
+    return {"message": "Pedido atualizado com sucesso"}
+
+@api_router.delete("/gestao/marketplaces/pedidos/{pedido_id}")
+async def delete_pedido_marketplace(pedido_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta um pedido de marketplace"""
+    await db.pedidos_marketplace.delete_one({"id": pedido_id})
+    return {"message": "Pedido excluído com sucesso"}
+
+# MENSAGEM DO DIA
+@api_router.get("/gestao/marketplaces/mensagem-do-dia")
+async def get_mensagem_do_dia(current_user: dict = Depends(get_current_user)):
+    """Retorna a mensagem do dia atual"""
+    hoje = datetime.now(timezone.utc).date()
+    mensagem = await db.mensagens_do_dia.find_one({
+        "data": {
+            "$gte": datetime.combine(hoje, datetime.min.time(), tzinfo=timezone.utc),
+            "$lt": datetime.combine(hoje + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc)
+        }
+    })
+    
+    if not mensagem:
+        # Criar mensagem padrão se não existir
+        mensagem = {
+            "id": str(uuid.uuid4()),
+            "data": datetime.now(timezone.utc).isoformat(),
+            "mensagem": "🚀 Lembre-se: a constância vence o talento. Vamos entregar tudo hoje!",
+            "created_by": "sistema",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.mensagens_do_dia.insert_one(mensagem)
+    
+    if '_id' in mensagem:
+        del mensagem['_id']
+    
+    return mensagem
+
+@api_router.post("/gestao/marketplaces/mensagem-do-dia")
+async def create_mensagem_do_dia(mensagem: MensagemDoDia, current_user: dict = Depends(get_current_user)):
+    """Cria/atualiza a mensagem do dia (apenas Director/Manager)"""
+    # Verificar permissão
+    if current_user.get('role') not in ['director', 'manager']:
+        raise HTTPException(status_code=403, detail="Apenas Director ou Manager podem editar a mensagem do dia")
+    
+    mensagem.created_by = current_user.get('username', '')
+    hoje = datetime.now(timezone.utc).date()
+    
+    # Verificar se já existe mensagem para hoje
+    mensagem_existente = await db.mensagens_do_dia.find_one({
+        "data": {
+            "$gte": datetime.combine(hoje, datetime.min.time(), tzinfo=timezone.utc),
+            "$lt": datetime.combine(hoje + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc)
+        }
+    })
+    
+    mensagem_dict = mensagem.model_dump()
+    
+    if mensagem_existente:
+        # Atualizar mensagem existente
+        await db.mensagens_do_dia.update_one(
+            {"id": mensagem_existente['id']},
+            {"$set": {"mensagem": mensagem_dict['mensagem'], "created_by": mensagem_dict['created_by']}}
+        )
+        mensagem_dict['id'] = mensagem_existente['id']
+    else:
+        # Criar nova mensagem
+        await db.mensagens_do_dia.insert_one(mensagem_dict)
+    
+    if '_id' in mensagem_dict:
+        del mensagem_dict['_id']
+    
+    return mensagem_dict
+
+# DASHBOARD MARKETPLACES
+@api_router.get("/gestao/marketplaces/dashboard")
+async def get_dashboard_marketplaces(current_user: dict = Depends(get_current_user)):
+    """Dashboard com indicadores gerais dos marketplaces"""
+    
+    # Estatísticas gerais
+    total_pedidos_producao = await db.pedidos_marketplace.count_documents({
+        "status": {"$in": ["Sala de Impressão", "Em Produção", "Expedição"]}
+    })
+    
+    total_pedidos_enviados = await db.pedidos_marketplace.count_documents({
+        "status": "Enviado"
+    })
+    
+    total_pedidos_entregues = await db.pedidos_marketplace.count_documents({
+        "status": "Entregue"
+    })
+    
+    total_pedidos_atrasados = await db.pedidos_marketplace.count_documents({
+        "atrasado": True
+    })
+    
+    # Valor total produzido hoje
+    hoje = datetime.now(timezone.utc).date()
+    pedidos_hoje = await db.pedidos_marketplace.find({
+        "data_producao": {
+            "$gte": datetime.combine(hoje, datetime.min.time(), tzinfo=timezone.utc),
+            "$lt": datetime.combine(hoje + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc)
+        }
+    }).to_list(None)
+    
+    valor_produzido_hoje = sum(p.get('valor_total', 0) for p in pedidos_hoje)
+    
+    # Calcular performance geral (% de pedidos entregues no prazo)
+    total_finalizados = await db.pedidos_marketplace.count_documents({
+        "status": {"$in": ["Entregue", "Enviado"]}
+    })
+    
+    no_prazo = await db.pedidos_marketplace.count_documents({
+        "status": {"$in": ["Entregue", "Enviado"]},
+        "atrasado": False
+    })
+    
+    performance_geral = round((no_prazo / total_finalizados * 100), 1) if total_finalizados > 0 else 0
+    
+    # Gráfico: Volume de produção últimos 7 dias
+    volume_producao = []
+    for i in range(6, -1, -1):
+        dia = datetime.now(timezone.utc).date() - timedelta(days=i)
+        count = await db.pedidos_marketplace.count_documents({
+            "data_producao": {
+                "$gte": datetime.combine(dia, datetime.min.time(), tzinfo=timezone.utc),
+                "$lt": datetime.combine(dia + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc)
+            }
+        })
+        volume_producao.append({
+            "data": dia.strftime('%d/%m'),
+            "quantidade": count
+        })
+    
+    # Gráfico: Status atual dos pedidos (pizza)
+    status_counts = {}
+    status_list = ["Aguardando Impressão", "Sala de Impressão", "Em Produção", "Expedição", "Enviado", "Entregue"]
+    for status in status_list:
+        count = await db.pedidos_marketplace.count_documents({"status": status})
+        if count > 0:
+            status_counts[status] = count
+    
+    # Gráfico: Desempenho por plataforma
+    desempenho_plataformas = []
+    plataformas = ["shopee", "mercadolivre", "tiktok"]
+    for plataforma in plataformas:
+        vendas = await db.pedidos_marketplace.count_documents({"plataforma": plataforma})
+        producao = await db.pedidos_marketplace.count_documents({
+            "plataforma": plataforma,
+            "status": {"$in": ["Em Produção", "Sala de Impressão"]}
+        })
+        entregas = await db.pedidos_marketplace.count_documents({
+            "plataforma": plataforma,
+            "status": "Entregue"
+        })
+        
+        desempenho_plataformas.append({
+            "plataforma": plataforma.capitalize(),
+            "vendas": vendas,
+            "producao": producao,
+            "entregas": entregas
+        })
+    
+    return {
+        "indicadores": {
+            "pedidos_em_producao": total_pedidos_producao,
+            "pedidos_enviados": total_pedidos_enviados,
+            "pedidos_entregues": total_pedidos_entregues,
+            "pedidos_atrasados": total_pedidos_atrasados,
+            "valor_produzido_hoje": valor_produzido_hoje,
+            "performance_geral": performance_geral
+        },
+        "graficos": {
+            "volume_producao": volume_producao,
+            "status_atual": status_counts,
+            "desempenho_plataformas": desempenho_plataformas
+        }
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
