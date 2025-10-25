@@ -4153,6 +4153,18 @@ async def delete_pedido_marketplace(pedido_id: str, current_user: dict = Depends
     await db.pedidos_marketplace.delete_one({"id": pedido_id})
     return {"message": "Pedido excluído com sucesso"}
 
+@api_router.post("/gestao/marketplaces/pedidos/delete-many")
+async def delete_many_pedidos_marketplace(
+    pedido_ids: list[str],
+    current_user: dict = Depends(get_current_user)
+):
+    """Deleta múltiplos pedidos de marketplace"""
+    result = await db.pedidos_marketplace.delete_many({"id": {"$in": pedido_ids}})
+    return {
+        "message": f"{result.deleted_count} pedidos excluídos com sucesso",
+        "deleted_count": result.deleted_count
+    }
+
 # MENSAGEM DO DIA
 @api_router.get("/gestao/marketplaces/mensagem-do-dia")
 async def get_mensagem_do_dia(current_user: dict = Depends(get_current_user)):
