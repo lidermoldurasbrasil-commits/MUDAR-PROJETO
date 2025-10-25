@@ -330,6 +330,55 @@ export default function MarketplaceProjetoDetalhes() {
     }
   };
 
+  // Funções de Checkbox
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedPedidos([]);
+    } else {
+      setSelectedPedidos(pedidos.map(p => p.id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const handleSelectPedido = (pedidoId) => {
+    if (selectedPedidos.includes(pedidoId)) {
+      setSelectedPedidos(selectedPedidos.filter(id => id !== pedidoId));
+      setSelectAll(false);
+    } else {
+      const newSelected = [...selectedPedidos, pedidoId];
+      setSelectedPedidos(newSelected);
+      setSelectAll(newSelected.length === pedidos.length);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedPedidos.length === 0) {
+      toast.error('Selecione pelo menos um pedido para deletar');
+      return;
+    }
+
+    if (!window.confirm(`Tem certeza que deseja excluir ${selectedPedidos.length} pedido(s)?`)) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${API}/pedidos/delete-many`,
+        selectedPedidos,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success(`${selectedPedidos.length} pedido(s) excluído(s) com sucesso!`);
+      setSelectedPedidos([]);
+      setSelectAll(false);
+      fetchDados();
+    } catch (error) {
+      console.error('Erro ao deletar pedidos:', error);
+      toast.error('Erro ao deletar pedidos');
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     try {
