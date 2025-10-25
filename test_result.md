@@ -150,3 +150,5 @@ test_plan:
 agent_communication:
     - agent: "main"
       message: "Corrigido erro 422 criando modelo PedidoCalculoRequest separado que não exige campos obrigatórios do PedidoManufatura. Endpoint reescrito para retornar dicionário com todos os campos calculados. Backend reiniciado com sucesso. Pronto para testes."
+    - agent: "testing"
+      message: "🎉 TESTE CONCLUÍDO COM SUCESSO! Endpoint POST /api/gestao/pedidos/calcular está funcionando perfeitamente. Não há mais erro 422. Todos os cálculos estão corretos e response contém todos os campos obrigatórios. Sistema de gestão de pedidos de manufatura operacional. Testado com 48 casos de teste, 100% de sucesso."
