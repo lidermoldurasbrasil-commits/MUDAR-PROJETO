@@ -739,7 +739,75 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
               />
             </div>
 
-            <div className="valor-display">
+            {/* NOVA SEÇÃO: Composição do Orçamento */}
+            {formData.itens && formData.itens.length > 0 && (
+              <>
+                <div className="section-title" style={{marginTop: '30px'}}>Composição do Orçamento</div>
+                <div className="table-responsive">
+                  <table className="orcamento-table">
+                    <thead>
+                      <tr>
+                        <th>Insumo</th>
+                        <th>Quantidade</th>
+                        <th>Unidade</th>
+                        <th>Preço Unit.</th>
+                        <th>Subtotal</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {formData.itens.map((item, index) => (
+                        <tr key={index}>
+                          <td className="item-descricao">{item.insumo_descricao}</td>
+                          <td>
+                            <input
+                              type="number"
+                              step="0.01"
+                              className="edit-input"
+                              value={item.quantidade}
+                              onChange={(e) => handleEditarItem(index, 'quantidade', e.target.value)}
+                            />
+                          </td>
+                          <td>{item.unidade}</td>
+                          <td>
+                            <input
+                              type="number"
+                              step="0.01"
+                              className="edit-input"
+                              value={item.custo_unitario}
+                              onChange={(e) => handleEditarItem(index, 'custo_unitario', e.target.value)}
+                            />
+                          </td>
+                          <td className="subtotal-value">{formatCurrency(item.subtotal)}</td>
+                          <td>
+                            <button
+                              type="button"
+                              className="btn-remove-item"
+                              onClick={() => handleRemoverItem(index)}
+                              title="Remover item"
+                            >
+                              ✕
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      <tr className="total-row">
+                        <td colSpan="4"><strong>SUBTOTAL</strong></td>
+                        <td className="subtotal-value"><strong>{formatCurrency(formData.custo_total)}</strong></td>
+                        <td></td>
+                      </tr>
+                      <tr className="total-row">
+                        <td colSpan="4"><strong>PREÇO DE VENDA (Markup {formData.markup.toFixed(1)}x)</strong></td>
+                        <td className="subtotal-value"><strong>{formatCurrency(formData.preco_venda)}</strong></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+
+            <div className="valor-display" style={{marginTop: '20px'}}>
               <div className="valor-label">Preço de Venda Base</div>
               <div className="valor-amount">{formatCurrency(formData.preco_venda)}</div>
             </div>
