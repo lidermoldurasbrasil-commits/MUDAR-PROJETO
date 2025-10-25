@@ -1193,20 +1193,20 @@ class BusinessManagementSystemTester:
             validation_results.append(False)
             self.log_test("Linear Meter - Unit Validation", False, f"Unit is '{unit}', not 'ml'")
         
-        # 2. Check quantity is in meters (around 2.64), NOT cm (240)
+        # 2. Check quantity is in meters (should be 2.94), NOT cm (240)
         quantidade = frame_item.get('quantidade', 0)
-        if 2.4 <= quantidade <= 2.8:  # Allow some tolerance for losses
-            print(f"✅ Quantity is {quantidade:.2f} meters - CORRECT (within expected range)")
+        if abs(quantidade - expected_charged_meters) < 0.1:  # Allow small tolerance
+            print(f"✅ Quantity is {quantidade:.2f} meters - CORRECT (matches expected {expected_charged_meters:.2f})")
             validation_results.append(True)
             self.log_test("Linear Meter - Quantity in Meters", True)
-        elif 240 <= quantidade <= 280:  # If it's in cm (wrong)
+        elif 240 <= quantidade <= 300:  # If it's in cm (wrong)
             print(f"❌ Quantity is {quantidade} - appears to be in CM, should be in METERS")
             validation_results.append(False)
             self.log_test("Linear Meter - Quantity in Meters", False, f"Quantity {quantidade} appears to be in cm")
         else:
-            print(f"⚠️ Quantity is {quantidade} - unexpected value")
+            print(f"❌ Quantity is {quantidade:.2f} - expected {expected_charged_meters:.2f} meters")
             validation_results.append(False)
-            self.log_test("Linear Meter - Quantity in Meters", False, f"Unexpected quantity: {quantidade}")
+            self.log_test("Linear Meter - Quantity in Meters", False, f"Quantity {quantidade}, expected {expected_charged_meters}")
         
         # 3. Check custo_unitario is R$ 50.00 (cost per linear meter)
         custo_unitario = frame_item.get('custo_unitario', 0)
