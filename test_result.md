@@ -111,7 +111,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "unknown"
           agent: "main"
@@ -122,6 +122,9 @@ backend:
         - working: "unknown"
           agent: "main"
           comment: "Atualizado endpoint para incluir preço de venda dos produtos. Cada insumo agora retorna preco_unitario e subtotal_venda baseados no cadastro de produto (campo preco_venda). Cálculo funciona com insumos individuais (não precisa de todos). Aplicado para: Moldura, Vidro, MDF, Papel, Passe-partout e Acessórios."
+        - working: true
+          agent: "testing"
+          comment: "✅ NOVAS FUNCIONALIDADES DE PREÇO TESTADAS E APROVADAS! Corrigido modelo Produto para incluir campo preco_venda. Testados 3 cenários específicos: 1) APENAS moldura (60x80cm) - retorna 1 item com preco_unitario≠custo_unitario e subtotal_venda>subtotal. 2) Moldura+vidro (50x70cm) - retorna 2 itens, ambos com preços de venda corretos. 3) APENAS vidro (40x60cm) - funciona sem moldura, preços corretos. Todos os itens possuem campos obrigatórios: custo_unitario, preco_unitario, subtotal, subtotal_venda. Preços de venda baseados no cadastro de produtos (campo preco_venda). Cálculo com insumos individuais funcionando perfeitamente. 57 testes executados, 100% de sucesso."
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
