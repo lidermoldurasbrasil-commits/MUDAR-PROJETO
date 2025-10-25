@@ -1692,6 +1692,30 @@ async def calcular_pedido(pedido: PedidoManufatura, current_user: dict = Depends
     pedido.preco_venda = custo_total * markup_sugerido
     pedido.margem_percentual = ((pedido.preco_venda - custo_total) / pedido.preco_venda * 100) if pedido.preco_venda > 0 else 0
     
+    # 5. Calcular valor final com desconto/sobre-preço
+    valor_base = pedido.preco_venda
+    
+    # Aplicar desconto (% ou valor)
+    desconto_total = 0
+    if pedido.desconto_percentual > 0:
+        desconto_total = valor_base * (pedido.desconto_percentual / 100)
+        pedido.desconto_valor = desconto_total
+    elif pedido.desconto_valor > 0:
+        desconto_total = pedido.desconto_valor
+        pedido.desconto_percentual = (desconto_total / valor_base * 100) if valor_base > 0 else 0
+    
+    # Aplicar sobre-preço (% ou valor)
+    sobre_preco_total = 0
+    if pedido.sobre_preco_percentual > 0:
+        sobre_preco_total = valor_base * (pedido.sobre_preco_percentual / 100)
+        pedido.sobre_preco_valor = sobre_preco_total
+    elif pedido.sobre_preco_valor > 0:
+        sobre_preco_total = pedido.sobre_preco_valor
+        pedido.sobre_preco_percentual = (sobre_preco_total / valor_base * 100) if valor_base > 0 else 0
+    
+    # Valor final
+    pedido.valor_final = valor_base - desconto_total + sobre_preco_total
+    
     return pedido
 
 @api_router.post("/gestao/pedidos")
