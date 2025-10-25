@@ -201,6 +201,18 @@ backend:
           agent: "testing"
           comment: "✅ AUTOMAÇÃO DE ORDEM DE PRODUÇÃO TESTADA COM SUCESSO! Fluxo completo testado: 1) Login realizado ✅ 2) Cliente criado (Cliente Teste Automação) ✅ 3) Pedido criado com dados mínimos (tipo_produto='Quadro', altura=50cm, largura=70cm, quantidade=1) ✅ 4) Status alterado para 'Montagem' via PUT /api/gestao/pedidos/{id}/status ✅ 5) Ordem de Produção criada automaticamente ✅ VALIDAÇÕES APROVADAS: ✅ numero_ordem gerado (1) ✅ cliente_nome correto ✅ loja_origem='fabrica' ✅ status_producao='Em Fila' ✅ timeline com entrada de criação ✅ checklist inicializado ✅ NÃO cria ordem duplicada em múltiplas tentativas ✅ Pedido continua com status 'Montagem'. Logs mostram 'Ordem de Produção #1 criada com sucesso!' e 'Ordem de Produção já existe para este pedido' na segunda tentativa. Automação funcionando perfeitamente!"
 
+  - task: "Módulo Financeiro - Contas Bancárias (/api/gestao/financeiro/contas-bancarias)"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "✅ MÓDULO FINANCEIRO TESTADO - MAIORIA FUNCIONANDO! Testado fluxo completo conforme solicitado: 1) Login realizado ✅ 2) Criação conta Itaú (saldo_inicial=15000, saldo_atual=15000) ✅ 3) Listagem contas por loja=fabrica ✅ 4) Criação conta Bradesco (Poupança, saldo=20000) ✅ 5) Criação conta Mercado Pago (saldo=5000) ✅ 6) Atualização conta Itaú (agência e conta alteradas) ✅ 7) Deleção conta Mercado Pago ✅ 8) Validação final (2 contas restantes) ✅. PROBLEMA IDENTIFICADO: ❌ Filtro por banco não funciona - GET /api/gestao/financeiro/contas-bancarias?banco=Itaú retorna TODAS as contas ao invés de filtrar apenas Itaú. Endpoint só suporta filtros 'loja' e 'status', mas NÃO 'banco'. CRUD básico 100% funcional, apenas filtro por banco precisa ser implementado."
+
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
     implemented: true
