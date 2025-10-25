@@ -595,7 +595,12 @@ export default function MarketplaceProjetoDetalhes() {
                 {pedidos.map((pedido) => (
                   <tr key={pedido.id} className="hover:bg-gray-700/30 group">
                     <td className="px-4 py-3">
-                      <input type="checkbox" className="rounded" />
+                      <input 
+                        type="checkbox" 
+                        className="rounded cursor-pointer" 
+                        checked={selectedPedidos.includes(pedido.id)}
+                        onChange={() => handleSelectPedido(pedido.id)}
+                      />
                     </td>
                     
                     {/* ID do Pedido - Editável */}
