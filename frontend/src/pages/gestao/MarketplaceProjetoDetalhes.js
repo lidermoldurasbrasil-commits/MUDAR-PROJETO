@@ -1281,42 +1281,54 @@ export default function MarketplaceProjetoDetalhes() {
 
       {/* Produção View - Visão Simplificada sem Preços */}
       {viewMode === 'producao' && (
-        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-gray-900 border-b border-gray-700">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
-                    <input 
-                      type="checkbox" 
-                      className="rounded cursor-pointer" 
-                      checked={selectAll}
-                      onChange={handleSelectAll}
-                    />
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do Pedido</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[140px]">Status Impressão</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">SKU</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome Variação</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[130px]">
-                    <button 
-                      onClick={() => setOrdenacaoData(ordenacaoData === 'asc' ? 'desc' : 'asc')}
-                      className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
-                    >
-                      Data Prevista Envio
-                      {ordenacaoData === 'asc' ? (
-                        <ChevronUp className="w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" />
-                      )}
-                    </button>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-gray-800 divide-y divide-gray-700">
-                {pedidosFiltrados.map((pedido) => (
+        <div className="space-y-6">
+          {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
+            <div key={grupo} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+              {agruparPor && (
+                <div className="bg-gray-900 px-6 py-3 border-b border-gray-700">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    {agruparPor === 'sku' && '🏷️'}
+                    {agruparPor === 'status' && '🔵'}
+                    {grupo} 
+                    <span className="text-sm text-gray-400">({pedidosDoGrupo.length} pedidos)</span>
+                  </h3>
+                </div>
+              )}
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gray-900 border-b border-gray-700">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
+                        <input 
+                          type="checkbox" 
+                          className="rounded cursor-pointer" 
+                          checked={selectAll}
+                          onChange={handleSelectAll}
+                        />
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do Pedido</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[140px]">Status Impressão</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">SKU</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome Variação</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[130px]">
+                        <button 
+                          onClick={() => setOrdenacaoData(ordenacaoData === 'asc' ? 'desc' : 'asc')}
+                          className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+                        >
+                          Data Prevista Envio
+                          {ordenacaoData === 'asc' ? (
+                            <ChevronUp className="w-4 h-4" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4" />
+                          )}
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-gray-800 divide-y divide-gray-700">
+                    {pedidosDoGrupo.map((pedido) => (
                   <tr key={pedido.id} className="hover:bg-gray-700/30 group">
                     <td className="px-4 py-3">
                       <input 
