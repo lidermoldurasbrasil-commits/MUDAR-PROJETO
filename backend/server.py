@@ -1318,6 +1318,9 @@ class PedidoManufatura(BaseModel):
     # Composição detalhada
     itens: List[ItemOrcamento] = []
     
+    # NOVO: Estrutura de múltiplos produtos no pedido
+    produtos_detalhes: Optional[str] = ""  # JSON string com array de produtos
+    
     # Custos e valores
     custo_total: float = 0
     markup: float = 3.0
