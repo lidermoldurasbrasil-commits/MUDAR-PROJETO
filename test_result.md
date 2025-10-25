@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Criar lista detalhada e editável de insumos, preços de venda e medidas na aba Orçamento do PedidoForm.js. Corrigir erro 422 no endpoint de cálculo de pedidos."
+user_problem_statement: "Testar salvamento de pedido com dados mínimos (campos vazios). Usuário quer poder salvar pedido mesmo com campos vazios. Removidas validações obrigatórias e adicionados valores padrão."
 
 backend:
   - task: "Endpoint de cálculo de pedidos (/api/gestao/pedidos/calcular)"
