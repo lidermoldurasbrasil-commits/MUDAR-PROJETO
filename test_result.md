@@ -213,7 +213,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Salvamento de pedido com dados mínimos (campos vazios)"
+    - "Teste de salvamento de pedido com campos atualizados"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
