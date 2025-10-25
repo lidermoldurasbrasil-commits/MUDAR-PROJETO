@@ -1759,17 +1759,21 @@ async def delete_pedido(pedido_id: str, current_user: dict = Depends(get_current
     return {"message": "Pedido excluído com sucesso"}
 
 @api_router.post("/gestao/pedidos/upload-imagem")
-async def upload_imagem_pedido(file: bytes = File(...), current_user: dict = Depends(get_current_user)):
+async def upload_imagem_pedido(file: UploadFile, current_user: dict = Depends(get_current_user)):
     """Upload de imagem do objeto do cliente"""
     import base64
     from datetime import datetime
     
-    # Converter para base64 para armazenar
-    image_base64 = base64.b64encode(file).decode('utf-8')
+    # Ler arquivo
+    contents = await file.read()
     
-    # Retornar URL data (pode ser melhorado para salvar em disco/cloud)
+    # Converter para base64
+    image_base64 = base64.b64encode(contents).decode('utf-8')
+    
+    # Retornar URL data
     return {
         "url": f"data:image/jpeg;base64,{image_base64}",
+        "filename": file.filename,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
