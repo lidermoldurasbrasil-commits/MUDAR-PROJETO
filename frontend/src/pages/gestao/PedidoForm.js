@@ -10,7 +10,9 @@ const TIPOS_PRODUTO = ['Quadro', 'Espelho', 'Moldura avulsa', 'Fine-Art'];
 const FORMAS_PAGAMENTO = ['À Vista', 'Pix', 'Cartão Crédito', 'Cartão Débito', 'Boleto', '30 dias', '60 dias', '90 dias'];
 
 export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
-  const [activeTab, setActiveTab] = useState('basico');
+  const [activeTab, setActiveTab] = useState(
+    pedido && pedido.itens && pedido.itens.length > 0 ? 'orcamento' : 'basico'
+  );
   const [loading, setLoading] = useState(false);
   const [canViewCosts, setCanViewCosts] = useState(false);
   
