@@ -1173,6 +1173,8 @@ class BusinessManagementSystemTester:
         print(f"📊 Expected Calculation:")
         print(f"   Perimeter: {expected_perimeter_cm} cm")
         print(f"   Cut loss: {expected_cut_loss_cm} cm")
+        print(f"   Bars needed: {expected_bars_needed}")
+        print(f"   Leftover: {expected_leftover_cm} cm (< 100cm, so charged)")
         print(f"   Charged perimeter: {expected_charged_perimeter_cm} cm = {expected_charged_meters:.2f} meters")
         print(f"   Expected subtotal cost: R$ {expected_subtotal_cost:.2f}")
         print(f"   Expected subtotal venda: R$ {expected_subtotal_venda:.2f}")
