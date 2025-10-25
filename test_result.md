@@ -225,7 +225,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Teste de salvamento de pedido com campos atualizados"
+    - "Automação de criação de Ordem de Produção quando pedido muda para status 'Montagem'"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
