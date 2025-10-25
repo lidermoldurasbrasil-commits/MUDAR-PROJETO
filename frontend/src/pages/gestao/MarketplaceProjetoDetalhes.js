@@ -710,7 +710,19 @@ export default function MarketplaceProjetoDetalhes() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Taxa Serviço</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Valor Líquido</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Opção de Envio</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Data Prevista Envio</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">
+                    <button 
+                      onClick={() => setOrdenacaoData(ordenacaoData === 'asc' ? 'desc' : 'asc')}
+                      className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+                    >
+                      Data Prevista Envio
+                      {ordenacaoData === 'asc' ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+                  </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Cliente</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Telefone</th>
                 </tr>
