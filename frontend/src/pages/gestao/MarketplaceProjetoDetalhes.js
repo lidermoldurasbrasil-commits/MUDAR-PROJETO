@@ -711,7 +711,7 @@ export default function MarketplaceProjetoDetalhes() {
                     className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer"
                   >
                     <option value="" disabled>Mudar Impressão ({selectedPedidos.length})</option>
-                    {STATUS_IMPRESSAO_OPTIONS.map(s => (
+                    {statusImpressaoOptions.map(s => (
                       <option key={s.value} value={s.value}>{s.label}</option>
                     ))}
                   </select>
@@ -1428,7 +1428,7 @@ export default function MarketplaceProjetoDetalhes() {
                           color: 'white'
                         }}
                       >
-                        {STATUS_IMPRESSAO_OPTIONS.map(s => (
+                        {statusImpressaoOptions.map(s => (
                           <option key={s.value} value={s.value}>{s.label}</option>
                         ))}
                       </select>
