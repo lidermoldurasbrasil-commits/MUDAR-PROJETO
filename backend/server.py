@@ -1938,6 +1938,150 @@ async def delete_pedido(pedido_id: str, current_user: dict = Depends(get_current
     await db.pedidos_manufatura.delete_one({"id": pedido_id})
     return {"message": "Pedido excluído com sucesso"}
 
+# ============= ENDPOINTS: ORDEM DE PRODUÇÃO (FÁBRICA) =============
+
+@api_router.get("/gestao/producao")
+async def get_ordens_producao(loja: Optional[str] = None, status: Optional[str] = None, responsavel: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Lista todas as ordens de produção com filtros opcionais"""
+    filtro = {}
+    
+    if loja:
+        filtro['loja_origem'] = loja
+    if status:
+        filtro['status_interno'] = status
+    if responsavel:
+        filtro['responsavel_atual'] = responsavel
+    
+    ordens = await db.ordens_producao.find(filtro).sort("created_at", -1).to_list(length=1000)
+    
+    # Remover _id
+    for ordem in ordens:
+        ordem.pop('_id', None)
+    
+    return ordens
+
+@api_router.post("/gestao/producao")
+async def create_ordem_producao(ordem: OrdemProducao, current_user: dict = Depends(get_current_user)):
+    """Cria uma nova ordem de produção"""
+    ordem.numero_ordem = await get_next_numero_ordem()
+    ordem.created_by = current_user.get('username', '')
+    
+    # Adicionar entrada inicial na timeline
+    entrada_inicial = TimelineEntry(
+        usuario=current_user.get('username', ''),
+        mudanca=f"Ordem de Produção #{ordem.numero_ordem} criada",
+        comentario=f"Status inicial: {ordem.status_interno}"
+    )
+    ordem.timeline.append(entrada_inicial)
+    
+    ordem_dict = ordem.model_dump()
+    await db.ordens_producao.insert_one(ordem_dict)
+    
+    ordem_dict.pop('_id', None)
+    return ordem_dict
+
+@api_router.get("/gestao/producao/{ordem_id}")
+async def get_ordem_producao(ordem_id: str, current_user: dict = Depends(get_current_user)):
+    """Busca uma ordem de produção por ID"""
+    ordem = await db.ordens_producao.find_one({"id": ordem_id})
+    if not ordem:
+        raise HTTPException(status_code=404, detail="Ordem não encontrada")
+    
+    ordem.pop('_id', None)
+    return ordem
+
+@api_router.put("/gestao/producao/{ordem_id}")
+async def update_ordem_producao(ordem_id: str, ordem: OrdemProducao, current_user: dict = Depends(get_current_user)):
+    """Atualiza uma ordem de produção"""
+    ordem_existente = await db.ordens_producao.find_one({"id": ordem_id})
+    if not ordem_existente:
+        raise HTTPException(status_code=404, detail="Ordem não encontrada")
+    
+    ordem.updated_at = datetime.now(timezone.utc)
+    
+    # Verificar mudanças e adicionar na timeline
+    if ordem_existente.get('status_interno') != ordem.status_interno:
+        entrada_timeline = TimelineEntry(
+            usuario=current_user.get('username', ''),
+            mudanca=f"Status alterado: {ordem_existente.get('status_interno')} → {ordem.status_interno}",
+            comentario=""
+        )
+        ordem.timeline.append(entrada_timeline)
+    
+    if ordem_existente.get('responsavel_atual') != ordem.responsavel_atual:
+        entrada_timeline = TimelineEntry(
+            usuario=current_user.get('username', ''),
+            mudanca=f"Responsável alterado: {ordem_existente.get('responsavel_atual')} → {ordem.responsavel_atual}",
+            comentario=""
+        )
+        ordem.timeline.append(entrada_timeline)
+    
+    ordem_dict = ordem.model_dump()
+    await db.ordens_producao.replace_one({"id": ordem_id}, ordem_dict)
+    
+    ordem_dict.pop('_id', None)
+    return ordem_dict
+
+@api_router.delete("/gestao/producao/{ordem_id}")
+async def delete_ordem_producao(ordem_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta uma ordem de produção"""
+    await db.ordens_producao.delete_one({"id": ordem_id})
+    return {"message": "Ordem de produção excluída com sucesso"}
+
+@api_router.post("/gestao/producao/{ordem_id}/timeline")
+async def add_timeline_entry(ordem_id: str, mudanca: str, comentario: Optional[str] = "", current_user: dict = Depends(get_current_user)):
+    """Adiciona uma entrada manual na timeline"""
+    ordem = await db.ordens_producao.find_one({"id": ordem_id})
+    if not ordem:
+        raise HTTPException(status_code=404, detail="Ordem não encontrada")
+    
+    entrada = {
+        'data_hora': datetime.now(timezone.utc).isoformat(),
+        'usuario': current_user.get('username', ''),
+        'mudanca': mudanca,
+        'comentario': comentario
+    }
+    
+    await db.ordens_producao.update_one(
+        {"id": ordem_id},
+        {"$push": {"timeline": entrada}}
+    )
+    
+    return {"message": "Entrada adicionada à timeline"}
+
+@api_router.get("/gestao/producao/dashboard/stats")
+async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
+    """Retorna estatísticas para o dashboard"""
+    # Total por status
+    stats_status = {}
+    for status in ["Aguardando Arte", "Armazenado Fábrica", "Produção", "Acabamento", "Pronto", "Entregue", "Reparo"]:
+        count = await db.ordens_producao.count_documents({"status_interno": status})
+        stats_status[status] = count
+    
+    # Total por loja
+    stats_lojas = {}
+    for loja in ["fabrica", "loja1", "loja2", "loja3", "loja4", "loja5"]:
+        count = await db.ordens_producao.count_documents({"loja_origem": loja})
+        stats_lojas[loja] = count
+    
+    # Atrasados (data_entrega_prometida < hoje e status != Entregue)
+    hoje = datetime.now(timezone.utc)
+    atrasados = await db.ordens_producao.count_documents({
+        "data_entrega_prometida": {"$lt": hoje},
+        "status_interno": {"$ne": "Entregue"}
+    })
+    
+    # Em reparo
+    em_reparo = await db.ordens_producao.count_documents({"status_interno": "Reparo"})
+    
+    return {
+        "por_status": stats_status,
+        "por_loja": stats_lojas,
+        "atrasados": atrasados,
+        "em_reparo": em_reparo,
+        "total": sum(stats_status.values())
+    }
+
 @api_router.post("/gestao/pedidos/upload-imagem")
 async def upload_imagem_pedido(file: UploadFile, current_user: dict = Depends(get_current_user)):
     """Upload de imagem do objeto do cliente"""
