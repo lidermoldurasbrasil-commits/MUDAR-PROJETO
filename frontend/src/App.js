@@ -97,6 +97,7 @@ function App() {
               <Route path="estoque" element={<Estoque />} />
               <Route path="financeiro" element={<Financeiro />} />
               <Route path="financeiro/contas-bancarias" element={<ContasBancarias />} />
+              <Route path="financeiro/contas-receber" element={<ContasAReceber />} />
               <Route path="cadastros" element={<Clientes />} />
               <Route path="relatorios" element={<Relatorios />} />
             </Route>
