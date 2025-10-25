@@ -469,8 +469,15 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.cliente_nome || !formData.altura || !formData.largura) {
-      toast.error('Preencha os campos obrigatórios');
+    // Validar se tem cliente
+    if (!formData.cliente_nome) {
+      toast.error('Selecione um cliente');
+      return;
+    }
+    
+    // Validar se tem ao menos um produto calculado
+    if (!produtosPedido || produtosPedido.length === 0) {
+      toast.error('Adicione ao menos um produto ao orçamento');
       return;
     }
 
@@ -479,13 +486,24 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     try {
       const token = localStorage.getItem('token');
       
+      // Preparar dados para envio
+      const dadosEnvio = {
+        ...formData,
+        produtos_pedido: produtosPedido,  // Array de produtos
+        // Calcular total geral de todos os produtos
+        custo_total: produtosPedido.reduce((sum, p) => sum + (p.total || 0), 0),
+        preco_venda: produtosPedido.reduce((sum, p) => sum + (p.total || 0), 0),
+        // Itens será o consolidado de todos os produtos
+        itens: produtosPedido.flatMap(p => p.itens || [])
+      };
+      
       if (pedido?.id) {
-        await axios.put(`${API}/pedidos/${pedido.id}`, formData, {
+        await axios.put(`${API}/pedidos/${pedido.id}`, dadosEnvio, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Pedido atualizado!');
       } else {
-        await axios.post(`${API}/pedidos`, formData, {
+        await axios.post(`${API}/pedidos`, dadosEnvio, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Pedido criado!');
@@ -493,7 +511,8 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
       
       onSave();
     } catch (error) {
-      toast.error('Erro ao salvar pedido');
+      console.error('Erro ao salvar:', error);
+      toast.error('Erro ao salvar pedido: ' + (error.response?.data?.detail || error.message));
     } finally {
       setLoading(false);
     }
