@@ -1559,7 +1559,7 @@ class FormaPagamentoBanco(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    conta_bancaria_id: str  # Referência à conta bancária
+    conta_bancaria_id: Optional[str] = None  # Referência à conta bancária (preenchido pelo endpoint)
     forma_pagamento: str  # Ex: "Cartão Crédito", "PIX", "Débito"
     tipo: str  # D (Débito) ou C (Crédito)
     tef: bool = False  # TEF habilitado
