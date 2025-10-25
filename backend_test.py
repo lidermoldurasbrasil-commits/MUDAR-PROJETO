@@ -1232,26 +1232,26 @@ class BusinessManagementSystemTester:
         
         # 5. Check subtotal (cost) is approximately correct
         subtotal = frame_item.get('subtotal', 0)
-        tolerance = 10.0  # Allow R$ 10 tolerance for losses calculation
+        tolerance = 1.0  # Allow R$ 1 tolerance for rounding
         if abs(subtotal - expected_subtotal_cost) <= tolerance:
-            print(f"✅ Subtotal cost is R$ {subtotal:.2f} (within tolerance) - CORRECT")
+            print(f"✅ Subtotal cost is R$ {subtotal:.2f} - CORRECT (expected R$ {expected_subtotal_cost:.2f})")
             validation_results.append(True)
             self.log_test("Linear Meter - Subtotal Cost", True)
         else:
-            print(f"❌ Subtotal cost is R$ {subtotal:.2f}, expected ~R$ {expected_subtotal_cost:.2f}")
+            print(f"❌ Subtotal cost is R$ {subtotal:.2f}, expected R$ {expected_subtotal_cost:.2f}")
             validation_results.append(False)
-            self.log_test("Linear Meter - Subtotal Cost", False, f"Subtotal {subtotal}, expected ~{expected_subtotal_cost}")
+            self.log_test("Linear Meter - Subtotal Cost", False, f"Subtotal {subtotal}, expected {expected_subtotal_cost}")
         
         # 6. Check subtotal_venda (selling price) is approximately correct
         subtotal_venda = frame_item.get('subtotal_venda', 0)
-        if abs(subtotal_venda - expected_subtotal_venda) <= tolerance * 3:  # Larger tolerance for selling price
-            print(f"✅ Subtotal venda is R$ {subtotal_venda:.2f} (within tolerance) - CORRECT")
+        if abs(subtotal_venda - expected_subtotal_venda) <= tolerance * 3:  # Allow R$ 3 tolerance for selling price
+            print(f"✅ Subtotal venda is R$ {subtotal_venda:.2f} - CORRECT (expected R$ {expected_subtotal_venda:.2f})")
             validation_results.append(True)
             self.log_test("Linear Meter - Subtotal Venda", True)
         else:
-            print(f"❌ Subtotal venda is R$ {subtotal_venda:.2f}, expected ~R$ {expected_subtotal_venda:.2f}")
+            print(f"❌ Subtotal venda is R$ {subtotal_venda:.2f}, expected R$ {expected_subtotal_venda:.2f}")
             validation_results.append(False)
-            self.log_test("Linear Meter - Subtotal Venda", False, f"Subtotal venda {subtotal_venda}, expected ~{expected_subtotal_venda}")
+            self.log_test("Linear Meter - Subtotal Venda", False, f"Subtotal venda {subtotal_venda}, expected {expected_subtotal_venda}")
         
         # Print actual item details
         print(f"\n📋 Actual Frame Item Details:")
