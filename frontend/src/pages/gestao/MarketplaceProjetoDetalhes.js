@@ -418,9 +418,63 @@ export default function MarketplaceProjetoDetalhes() {
     return colors[prioridade] || 'bg-gray-100 text-gray-800';
   };
 
+  // Função de filtragem de pedidos
+  const pedidosFiltrados = pedidos.filter(pedido => {
+    // Filtro de Status
+    if (filtros.status && pedido.status !== filtros.status) {
+      return false;
+    }
+    
+    // Filtro de Atrasado
+    if (filtros.atrasado !== null) {
+      const isAtrasado = pedido.atrasado === true;
+      if (filtros.atrasado !== isAtrasado) {
+        return false;
+      }
+    }
+    
+    // Filtro de SKU
+    if (filtros.sku && pedido.sku) {
+      if (!pedido.sku.toLowerCase().includes(filtros.sku.toLowerCase())) {
+        return false;
+      }
+    }
+    
+    // Filtro de Prazo de Envio
+    if (filtros.prazoEnvio && pedido.data_prevista_envio) {
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      
+      const amanha = new Date(hoje);
+      amanha.setDate(amanha.getDate() + 1);
+      
+      const fimSemana = new Date(hoje);
+      fimSemana.setDate(fimSemana.getDate() + 7);
+      
+      const dataPrevista = new Date(pedido.data_prevista_envio);
+      dataPrevista.setHours(0, 0, 0, 0);
+      
+      if (filtros.prazoEnvio === 'hoje') {
+        if (dataPrevista.getTime() !== hoje.getTime()) {
+          return false;
+        }
+      } else if (filtros.prazoEnvio === 'amanha') {
+        if (dataPrevista.getTime() !== amanha.getTime()) {
+          return false;
+        }
+      } else if (filtros.prazoEnvio === 'semana') {
+        if (dataPrevista < hoje || dataPrevista > fimSemana) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
+  });
+
   // Agrupar pedidos por status para o Kanban
   const pedidosPorStatus = STATUS_OPTIONS.reduce((acc, status) => {
-    acc[status.value] = pedidos.filter(p => p.status === status.value);
+    acc[status.value] = pedidosFiltrados.filter(p => p.status === status.value);
     return acc;
   }, {});
 
