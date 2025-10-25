@@ -161,6 +161,21 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ TESTE DE SALVAMENTO COM DADOS MÍNIMOS APROVADO! Testado conforme solicitação específica do usuário: POST /api/gestao/pedidos aceita pedido com campos vazios sem erro 422. Dados testados: cliente_nome='', tipo_produto='', altura=0, largura=0, quantidade=1, itens=[], custo_total=0, preco_venda=0, valor_final=0. RESULTADO: ✅ Status 200 retornado ✅ Pedido criado com ID único ✅ Pedido salvo no banco de dados ✅ Campos vazios aceitos sem validação obrigatória ✅ Valores padrão aplicados quando necessário. Sistema permite salvamento de pedidos mesmo com campos vazios, conforme solicitado pelo usuário. Validações obrigatórias removidas com sucesso."
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTE ESPECÍFICO DOS CAMPOS ATUALIZADOS APROVADO! Testado salvamento de pedido com campos custo_total, preco_venda e produtos_detalhes conforme solicitação do usuário. Dados testados: cliente_nome='Teste', tipo_produto='Quadro', altura=50, largura=70, quantidade=1, itens=[], custo_total=100, preco_venda=300, valor_final=300, produtos_detalhes='[]'. RESULTADO: ✅ Status 200 retornado ✅ Pedido criado com ID único ✅ Todos os campos salvos corretamente ✅ Response retorna ID do pedido ✅ Pedido persistido no banco de dados. Não há erro 422. Endpoint de criação de pedidos funcionando perfeitamente com os campos atualizados."
+
+  - task: "Teste de salvamento de pedido com campos atualizados"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTE ESPECÍFICO SOLICITADO PELO USUÁRIO APROVADO! Testado salvamento de pedido com os campos atualizados custo_total, preco_venda e produtos_detalhes. Fluxo testado: 1) Login para obter token ✅ 2) Criação de pedido mínimo com dados: cliente_nome='Teste', tipo_produto='Quadro', altura=50, largura=70, quantidade=1, itens=[], custo_total=100, preco_venda=300, valor_final=300, produtos_detalhes='[]' ✅ 3) Verificação de status 200 ✅ 4) Response retorna ID do pedido ✅ 5) Pedido salvo no banco confirmado ✅. Não há erro 422 ou problemas de validação. Endpoint POST /api/gestao/pedidos funcionando perfeitamente com os novos campos."
 
   - task: "Endpoint de clientes (/api/gestao/clientes)"
     implemented: true
