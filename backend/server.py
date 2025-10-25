@@ -3970,7 +3970,7 @@ async def upload_planilha_pedidos(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user)
 ):
-    """Upload de planilha Excel/CSV com pedidos do marketplace"""
+    """Upload de planilha Excel/CSV com pedidos do marketplace (formato Shopee)"""
     try:
         import pandas as pd
         import io
@@ -3990,59 +3990,77 @@ async def upload_planilha_pedidos(
         
         pedidos_criados = []
         
-        # Processar cada linha
+        # Processar cada linha da planilha
         for index, row in df.iterrows():
             try:
-                # Mapear colunas da planilha para o modelo
+                # Mapear colunas da planilha Shopee para o modelo
                 pedido_data = {
                     'id': str(uuid.uuid4()),
                     'projeto_id': projeto_id,
                     'plataforma': projeto['plataforma'],
-                    'numero_pedido': str(row.get('ID do Pedido', row.get('Número do Pedido', ''))),
-                    'numero_referencia_sku': str(row.get('Número de Referência SKU', '')),
-                    'sku': str(row.get('SKU', '')),
-                    'nome_variacao': str(row.get('Nome Variação', row.get('Nome da Variação', ''))),
-                    'produto_nome': str(row.get('Nome do Produto', row.get('Produto', ''))),
+                    
+                    # Dados do pedido
+                    'numero_pedido': str(row.get('ID do pedido', '')),
+                    'numero_referencia_sku': str(row.get('Número de referência SKU', row.get('Nº de referência do SKU principal', ''))),
+                    'sku': str(row.get('Número de referência SKU', '')),
+                    'nome_variacao': str(row.get('Nome da variação', '')),
+                    'produto_nome': str(row.get('Nome do Produto', '')),
+                    
+                    # Cliente
+                    'cliente_nome': str(row.get('Nome do destinatário', row.get('Nome de usuário (comprador)', ''))),
+                    'cliente_contato': str(row.get('Telefone', '')),
+                    
+                    # Valores
                     'quantidade': int(row.get('Quantidade', 1)),
-                    'preco_acordado': float(row.get('Preço Acordado', 0)),
-                    'valor_unitario': float(row.get('Valor Unitário', row.get('Preço Acordado', 0))),
-                    'taxa_comissao': float(row.get('Taxa de Comissão', 0)),
-                    'taxa_servico': float(row.get('Taxa de Serviço', 0)),
-                    'opcao_envio': str(row.get('Opção de Envio', '')),
-                    'cliente_nome': str(row.get('Nome do Cliente', row.get('Cliente', ''))),
+                    'preco_acordado': float(row.get('Preço acordado', 0)),
+                    'valor_unitario': float(row.get('Preço original', row.get('Preço acordado', 0))),
+                    'valor_total': float(row.get('Total global', row.get('Cartão de Crédito', 0))),
+                    
+                    # Taxas - Extraindo os valores corretos da planilha
+                    'taxa_comissao': 0,  # Será calculado como percentual
+                    'taxa_servico': 0,   # Será calculado como percentual
+                    'valor_taxa_comissao': float(row.get('Taxa de comissão', 0)),
+                    'valor_taxa_servico': float(row.get('Taxa de serviço', 0)),
+                    
+                    # Envio
+                    'opcao_envio': str(row.get('Opção de envio', '')),
                     'status': 'Aguardando Impressão',
+                    
+                    # Metadata
                     'loja_id': projeto.get('loja_id', 'fabrica'),
                     'created_by': current_user.get('username', ''),
                     'created_at': datetime.now(timezone.utc).isoformat(),
-                    'updated_at': datetime.now(timezone.utc).isoformat()
+                    'updated_at': datetime.now(timezone.utc).isoformat(),
+                    'prazo_entrega': (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
                 }
                 
-                # Calcular data prevista de envio
-                if 'Data Prevista de Envio' in row and pd.notna(row['Data Prevista de Envio']):
-                    pedido_data['data_prevista_envio'] = pd.to_datetime(row['Data Prevista de Envio']).isoformat()
+                # Processar data prevista de envio
+                if 'Data prevista de envio' in row and pd.notna(row['Data prevista de envio']):
+                    try:
+                        pedido_data['data_prevista_envio'] = pd.to_datetime(row['Data prevista de envio']).isoformat()
+                        pedido_data['prazo_entrega'] = pd.to_datetime(row['Data prevista de envio']).isoformat()
+                    except:
+                        pass
                 
-                # Calcular taxas
+                # Calcular taxas como percentual se houver valor
                 if pedido_data['preco_acordado'] > 0:
-                    if pedido_data['taxa_comissao'] > 0:
-                        pedido_data['valor_taxa_comissao'] = pedido_data['preco_acordado'] * (pedido_data['taxa_comissao'] / 100)
-                    else:
-                        pedido_data['valor_taxa_comissao'] = 0
+                    if pedido_data['valor_taxa_comissao'] > 0:
+                        pedido_data['taxa_comissao'] = (pedido_data['valor_taxa_comissao'] / pedido_data['preco_acordado']) * 100
                     
-                    if pedido_data['taxa_servico'] > 0:
-                        pedido_data['valor_taxa_servico'] = pedido_data['preco_acordado'] * (pedido_data['taxa_servico'] / 100)
-                    else:
-                        pedido_data['valor_taxa_servico'] = 0
+                    if pedido_data['valor_taxa_servico'] > 0:
+                        pedido_data['taxa_servico'] = (pedido_data['valor_taxa_servico'] / pedido_data['preco_acordado']) * 100
                     
+                    # Calcular valor líquido
                     pedido_data['valor_liquido'] = pedido_data['preco_acordado'] - pedido_data['valor_taxa_comissao'] - pedido_data['valor_taxa_servico']
-                    pedido_data['valor_total'] = pedido_data['preco_acordado'] * pedido_data['quantidade']
-                
-                # Adicionar prazo de entrega padrão
-                pedido_data['prazo_entrega'] = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+                else:
+                    pedido_data['valor_liquido'] = 0
                 
                 pedidos_criados.append(pedido_data)
                 
             except Exception as e:
                 print(f"Erro ao processar linha {index}: {e}")
+                import traceback
+                print(traceback.format_exc())
                 continue
         
         # Inserir no banco
@@ -4050,8 +4068,9 @@ async def upload_planilha_pedidos(
             await db.pedidos_marketplace.insert_many(pedidos_criados)
         
         return {
-            "message": f"{len(pedidos_criados)} pedidos importados com sucesso",
-            "total": len(pedidos_criados),
+            "message": f"{len(pedidos_criados)} pedidos importados com sucesso da planilha Shopee",
+            "total_importados": len(pedidos_criados),
+            "total_linhas": len(df),
             "erros": len(df) - len(pedidos_criados)
         }
         
