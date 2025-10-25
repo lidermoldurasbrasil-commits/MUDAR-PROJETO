@@ -1551,6 +1551,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             prazo = mdf_produto.get('prazo_selecionado', '120dias')
             custo_unitario = get_custo_por_prazo(mdf_produto, prazo)
             
+            # NOVO: Pegar preço de venda
+            preco_unitario = mdf_produto.get('preco_venda', custo_unitario)
+            
             if mdf_produto.get('markup_manufatura'):
                 markup_item = (mdf_produto['markup_manufatura'] / 100) + 1
                 if markup_item > markup_sugerido:
@@ -1559,13 +1562,17 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             mdf = {
                 'id': mdf_produto['id'],
                 'descricao': mdf_produto['descricao'],
-                'custo_unitario': custo_unitario
+                'custo_unitario': custo_unitario,
+                'preco_unitario': preco_unitario  # NOVO
             }
         
         if mdf:
             resultado['mdf_descricao'] = mdf['descricao']
             custo_mdf = resultado['area'] * mdf['custo_unitario'] * pedido.quantidade
             custo_total += custo_mdf
+            
+            # NOVO: Preço de venda do MDF
+            preco_venda_mdf = resultado['area'] * mdf['preco_unitario'] * pedido.quantidade
             
             itens.append({
                 'insumo_id': mdf['id'],
@@ -1574,7 +1581,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
                 'quantidade': resultado['area'],
                 'unidade': 'm²',
                 'custo_unitario': mdf['custo_unitario'],
-                'subtotal': custo_mdf
+                'preco_unitario': mdf['preco_unitario'],  # NOVO
+                'subtotal': custo_mdf,
+                'subtotal_venda': preco_venda_mdf  # NOVO
             })
     
     # 3.4 Papel/Adesivo
