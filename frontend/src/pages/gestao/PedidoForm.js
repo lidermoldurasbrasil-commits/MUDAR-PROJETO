@@ -123,7 +123,8 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
       
       // Fallback: Reconstruir a partir dos itens (para pedidos antigos)
       if (pedido.itens && pedido.itens.length > 0) {
-        const totalItens = pedido.itens.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0);
+        const totalVenda = pedido.itens.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0);
+        const totalCusto = pedido.itens.reduce((sum, item) => sum + (item.subtotal || 0), 0);
         
         const produtoReconstruido = {
           id: Date.now(),
@@ -134,7 +135,8 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           area: pedido.area || 0,
           perimetro: pedido.perimetro || 0,
           itens: pedido.itens || [],
-          total: totalItens,
+          total: totalVenda,
+          custo: totalCusto,  // NOVO: Adicionar custo
           moldura_descricao: pedido.moldura_descricao,
           vidro_descricao: pedido.vidro_descricao,
           mdf_descricao: pedido.mdf_descricao,
