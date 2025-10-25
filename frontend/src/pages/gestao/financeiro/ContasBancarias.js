@@ -412,9 +412,10 @@ export default function ContasBancarias() {
         .page-header p { color: #718096; margin: 0; }
         .filtros-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; align-items: flex-end; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
         .filtro-group { display: flex; flex-direction: column; gap: 6px; }
-        .filtro-group label { font-size: 14px; font-weight: 500; color: #4a5568; }
+        .filtro-group label { font-size: 14px; font-weight: 500; color: #4a5568; display: flex; align-items: center; }
         .filtro-group select { padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 6px; font-size: 14px; min-width: 180px; outline: none; }
         .filtro-group select:focus { border-color: #5dceaa; }
+        .filtro-group select:disabled { background: #f7fafc; cursor: not-allowed; opacity: 0.6; }
         .btn-filtrar, .btn-limpar { padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
         .btn-filtrar { background: #5dceaa; color: white; }
         .btn-filtrar:hover { background: #4db89a; }
