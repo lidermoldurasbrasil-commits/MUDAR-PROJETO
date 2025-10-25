@@ -41,6 +41,9 @@ export default function MarketplaceProjetoDetalhes() {
   const [editingPedido, setEditingPedido] = useState(null);
   const [viewMode, setViewMode] = useState('monday'); // 'kanban', 'list', ou 'monday'
   const [showInlineAdd, setShowInlineAdd] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(false);
   const [novaLinhaInline, setNovaLinhaInline] = useState({
     numero_pedido: '',
     quantidade: 1,
