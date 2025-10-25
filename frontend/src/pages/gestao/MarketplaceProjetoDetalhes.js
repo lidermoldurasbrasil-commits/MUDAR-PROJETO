@@ -568,7 +568,12 @@ export default function MarketplaceProjetoDetalhes() {
               <thead className="bg-gray-900 border-b border-gray-700">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
-                    <input type="checkbox" className="rounded" />
+                    <input 
+                      type="checkbox" 
+                      className="rounded cursor-pointer" 
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                    />
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do Pedido</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status</th>
