@@ -82,8 +82,8 @@ export default function MarketplacesCentral() {
   };
 
   const handleProjetoClick = (projeto) => {
-    // Navegar para página de detalhes do projeto (implementar na Fase 2)
-    navigate(`/gestao/marketplaces/projeto/${projeto.id}`);
+    // Navegar para página de detalhes do projeto
+    navigate(`/marketplace/production/projeto/${projeto.id}`);
   };
 
   if (loading) {
