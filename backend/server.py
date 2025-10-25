@@ -808,6 +808,7 @@ class Produto(BaseModel):
     custo_base: Optional[float] = 0
     preco_manufatura: Optional[float] = 0
     preco_varejo: Optional[float] = 0
+    preco_venda: Optional[float] = 0  # NOVO: Preço de venda para cálculos
     markup_manufatura: Optional[float] = 0
     markup_varejo: Optional[float] = 0
     
