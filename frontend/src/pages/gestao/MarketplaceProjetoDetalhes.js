@@ -655,13 +655,13 @@ export default function MarketplaceProjetoDetalhes() {
                       <input type="checkbox" className="rounded" disabled />
                     </td>
                     
-                    {/* Elemento - Primeiro campo */}
+                    {/* ID do Pedido */}
                     <td className="px-4 py-3">
                       <input
                         type="text"
                         value={novaLinhaInline.numero_pedido}
                         onChange={(e) => setNovaLinhaInline({...novaLinhaInline, numero_pedido: e.target.value})}
-                        placeholder="Digite o elemento..."
+                        placeholder="ID do pedido..."
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         autoFocus
                       />
@@ -683,17 +683,6 @@ export default function MarketplaceProjetoDetalhes() {
                       </select>
                     </td>
                     
-                    {/* Quantidade */}
-                    <td className="px-4 py-3">
-                      <input
-                        type="number"
-                        min="1"
-                        value={novaLinhaInline.quantidade}
-                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, quantidade: parseInt(e.target.value) || 1})}
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white text-center rounded focus:ring-2 focus:ring-blue-500"
-                      />
-                    </td>
-                    
                     {/* SKU */}
                     <td className="px-4 py-3">
                       <input
@@ -705,48 +694,73 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
-                    {/* Cliente */}
+                    {/* Nome Variação */}
                     <td className="px-4 py-3">
                       <input
                         type="text"
-                        value={novaLinhaInline.cliente_nome}
-                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, cliente_nome: e.target.value})}
-                        placeholder="Nome do cliente"
+                        value={novaLinhaInline.nome_variacao}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, nome_variacao: e.target.value})}
+                        placeholder="Nome variação"
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
                       />
                     </td>
                     
-                    {/* Sala de Impressão */}
-                    <td className="px-4 py-3">
-                      <select
-                        value={novaLinhaInline.sala_impressao}
-                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, sala_impressao: e.target.value})}
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="Aguardando Impressão">Aguardando</option>
-                        <option value="Imprimindo">Imprimindo</option>
-                        <option value="Impresso">Impresso</option>
-                      </select>
-                    </td>
-                    
-                    {/* Prazo */}
+                    {/* Quantidade */}
                     <td className="px-4 py-3">
                       <input
-                        type="date"
-                        value={novaLinhaInline.prazo_entrega}
-                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, prazo_entrega: e.target.value})}
+                        type="number"
+                        min="1"
+                        value={novaLinhaInline.quantidade}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, quantidade: parseInt(e.target.value) || 1})}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white text-center rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    
+                    {/* Preço Acordado */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={novaLinhaInline.preco_acordado}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, preco_acordado: parseFloat(e.target.value) || 0})}
+                        placeholder="0.00"
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
                       />
                     </td>
                     
-                    {/* Responsável com Botões */}
+                    {/* Taxa Comissão - Somente exibição */}
+                    <td className="px-4 py-3">
+                      <span className="text-orange-400 text-sm">R$ 0.00</span>
+                    </td>
+                    
+                    {/* Taxa Serviço - Somente exibição */}
+                    <td className="px-4 py-3">
+                      <span className="text-orange-400 text-sm">R$ 0.00</span>
+                    </td>
+                    
+                    {/* Valor Líquido - Somente exibição */}
+                    <td className="px-4 py-3">
+                      <span className="text-green-400 text-sm">R$ 0.00</span>
+                    </td>
+                    
+                    {/* Opção de Envio */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={novaLinhaInline.opcao_envio}
+                        onChange={(e) => setNovaLinhaInline({...novaLinhaInline, opcao_envio: e.target.value})}
+                        placeholder="Ex: Normal"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    
+                    {/* Data Prevista Envio com Botões */}
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <input
-                          type="text"
-                          value={novaLinhaInline.responsavel}
-                          onChange={(e) => setNovaLinhaInline({...novaLinhaInline, responsavel: e.target.value})}
-                          placeholder="Responsável"
+                          type="date"
+                          value={novaLinhaInline.data_prevista_envio}
+                          onChange={(e) => setNovaLinhaInline({...novaLinhaInline, data_prevista_envio: e.target.value})}
                           className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded focus:ring-2 focus:ring-blue-500"
                         />
                         <button
