@@ -150,7 +150,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Endpoint de cálculo de pedidos (/api/gestao/pedidos/calcular)"
     - "Aba Orçamento no PedidoForm com lista de insumos detalhada"
   stuck_tasks: []
   test_all: false
