@@ -1061,6 +1061,27 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
               <div className="valor-final-label">VALOR FINAL</div>
               <div className="valor-final-amount">{formatCurrency(formData.valor_final)}</div>
             </div>
+            
+            {/* NOVO: Resumo de Pagamento */}
+            {formData.valor_entrada > 0 && (
+              <div style={{marginTop: '20px', padding: '15px', background: '#f0fdf4', borderRadius: '8px', border: '2px solid #86efac'}}>
+                <div style={{fontSize: '14px', fontWeight: '600', color: '#166534', marginBottom: '10px'}}>
+                  📊 RESUMO DE PAGAMENTO
+                </div>
+                <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #d1fae5'}}>
+                  <span style={{color: '#064e3b', fontWeight: '500'}}>Valor Pago (Entrada):</span>
+                  <span style={{color: '#059669', fontWeight: '700', fontSize: '16px'}}>
+                    {formatCurrency(formData.valor_entrada)}
+                  </span>
+                </div>
+                <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', marginTop: '8px'}}>
+                  <span style={{color: '#064e3b', fontWeight: '500'}}>Saldo Restante:</span>
+                  <span style={{color: '#dc2626', fontWeight: '700', fontSize: '18px'}}>
+                    {formatCurrency(formData.valor_final - formData.valor_entrada)}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
