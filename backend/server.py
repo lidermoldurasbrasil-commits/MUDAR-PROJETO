@@ -4106,11 +4106,18 @@ async def upload_planilha_pedidos(
         if pedidos_criados:
             await db.pedidos_marketplace.insert_many(pedidos_criados)
         
+        # Criar mensagem detalhada
+        mensagem = f"{len(pedidos_criados)} pedidos importados com sucesso"
+        if pedidos_duplicados:
+            mensagem += f". {len(pedidos_duplicados)} pedidos duplicados foram ignorados"
+        
         return {
-            "message": f"{len(pedidos_criados)} pedidos importados com sucesso da planilha Shopee",
+            "message": mensagem,
             "total_importados": len(pedidos_criados),
+            "total_duplicados": len(pedidos_duplicados),
             "total_linhas": len(df),
-            "erros": len(df) - len(pedidos_criados)
+            "erros": len(df) - len(pedidos_criados) - len(pedidos_duplicados),
+            "pedidos_duplicados": pedidos_duplicados[:10] if pedidos_duplicados else []  # Primeiros 10 para referência
         }
         
     except Exception as e:
