@@ -569,13 +569,24 @@ export default function MarketplaceProjetoDetalhes() {
                       </select>
                     </td>
                     
+                    {/* Nome do Produto - Editável */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        defaultValue={pedido.produto_nome}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'produto_nome', e.target.value)}
+                        placeholder="Nome do produto"
+                        className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
+                      />
+                    </td>
+                    
                     {/* SKU - Editável */}
                     <td className="px-4 py-3">
                       <input
                         type="text"
                         defaultValue={pedido.sku}
                         onBlur={(e) => handleUpdatePedido(pedido.id, 'sku', e.target.value)}
-                        placeholder="-"
+                        placeholder="SKU"
                         className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
                       />
                     </td>
@@ -652,6 +663,28 @@ export default function MarketplaceProjetoDetalhes() {
                         defaultValue={pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toISOString().split('T')[0] : ''}
                         onBlur={(e) => handleUpdatePedido(pedido.id, 'data_prevista_envio', e.target.value)}
                         className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1"
+                      />
+                    </td>
+                    
+                    {/* Cliente - Editável */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        defaultValue={pedido.cliente_nome}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'cliente_nome', e.target.value)}
+                        placeholder="Nome do cliente"
+                        className="bg-transparent text-white text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
+                      />
+                    </td>
+                    
+                    {/* Telefone - Editável */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        defaultValue={pedido.cliente_contato}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'cliente_contato', e.target.value)}
+                        placeholder="Telefone"
+                        className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
                       />
                     </td>
                   </tr>
