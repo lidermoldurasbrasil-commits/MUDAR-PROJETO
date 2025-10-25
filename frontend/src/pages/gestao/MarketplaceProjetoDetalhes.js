@@ -134,22 +134,22 @@ export default function MarketplaceProjetoDetalhes() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-900 p-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/marketplace/production')}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-700 rounded-full transition-colors"
             >
-              <ArrowLeft className="w-6 h-6 text-gray-600" />
+              <ArrowLeft className="w-6 h-6 text-gray-400" />
             </button>
             <div className="flex items-center gap-3">
               <span className="text-5xl">{projeto.icone}</span>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">{projeto.nome}</h1>
-                <p className="text-sm text-gray-600">{projeto.descricao}</p>
+                <h1 className="text-3xl font-bold text-white">{projeto.nome}</h1>
+                <p className="text-sm text-gray-400">{projeto.descricao}</p>
               </div>
             </div>
           </div>
