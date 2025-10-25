@@ -213,6 +213,18 @@ backend:
           agent: "testing"
           comment: "✅ MÓDULO FINANCEIRO TESTADO - MAIORIA FUNCIONANDO! Testado fluxo completo conforme solicitado: 1) Login realizado ✅ 2) Criação conta Itaú (saldo_inicial=15000, saldo_atual=15000) ✅ 3) Listagem contas por loja=fabrica ✅ 4) Criação conta Bradesco (Poupança, saldo=20000) ✅ 5) Criação conta Mercado Pago (saldo=5000) ✅ 6) Atualização conta Itaú (agência e conta alteradas) ✅ 7) Deleção conta Mercado Pago ✅ 8) Validação final (2 contas restantes) ✅. PROBLEMA IDENTIFICADO: ❌ Filtro por banco não funciona - GET /api/gestao/financeiro/contas-bancarias?banco=Itaú retorna TODAS as contas ao invés de filtrar apenas Itaú. Endpoint só suporta filtros 'loja' e 'status', mas NÃO 'banco'. CRUD básico 100% funcional, apenas filtro por banco precisa ser implementado."
 
+  - task: "CRUD de Formas de Pagamento (/api/gestao/financeiro/formas-pagamento)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ CRUD DE FORMAS DE PAGAMENTO TESTADO COM SUCESSO TOTAL! Fluxo completo testado conforme solicitação: 1) Login para obter token ✅ 2) Criação conta bancária (nome='Teste Banco', banco='Itaú', tipo='Corrente', saldo_inicial=1000) ✅ 3) Criação forma de pagamento (forma_pagamento='Cartão Crédito', tipo='C', tef=false, pagamento_sefaz=false, bandeira='Visa', numero_parcelas=6, espaco_parcelas_dias=30, taxa_banco_percentual=2.5, ativa=true) ✅ 4) Listagem formas de pagamento da conta (1 método encontrado) ✅ 5) Edição da forma de pagamento (bandeira alterada para 'Mastercard', parcelas para 12) ✅ 6) Deleção da forma de pagamento ✅ VALIDAÇÕES APROVADAS: ✅ Status 200 em todas operações ✅ Forma criada com todos os campos corretos ✅ Bandeira salva e retornada corretamente ✅ Edição funcionando (bandeira e parcelas atualizadas) ✅ Deleção funcionando (método removido da lista). CORREÇÃO APLICADA: Corrigido bug no endpoint PUT que estava gerando novo ID ao atualizar. Agora mantém ID original. Sistema de formas de pagamento 100% funcional!"
+
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
     implemented: true
