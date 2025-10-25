@@ -2396,5 +2396,26 @@ def main():
     
     return 0 if all_passed else 1
 
+def main_financial_test():
+    """Run only the financial module test"""
+    tester = BusinessManagementSystemTester()
+    
+    # Authentication is required
+    if not tester.test_authentication():
+        print("❌ Authentication failed - cannot proceed")
+        return 1
+    
+    # Run the financial module test
+    success = tester.test_financial_module_bank_accounts()
+    
+    # Print final results
+    all_passed = tester.print_summary()
+    
+    return 0 if all_passed else 1
+
 if __name__ == "__main__":
-    sys.exit(main())
+    # Check if we want to run financial test specifically
+    if len(sys.argv) > 1 and sys.argv[1] == "financial":
+        sys.exit(main_financial_test())
+    else:
+        sys.exit(main())
