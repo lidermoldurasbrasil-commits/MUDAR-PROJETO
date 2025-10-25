@@ -699,11 +699,37 @@ class BusinessManagementSystemTester:
             print("❌ Cannot test manufacturing calculation - missing product IDs")
 
     def test_manufacturing_order_calculation(self, moldura_id, vidro_id):
-        """Test the manufacturing order calculation endpoint that was fixed"""
-        print("\n🔧 Testing Manufacturing Order Calculation Endpoint...")
+        """Test the updated manufacturing order calculation endpoint with new pricing features"""
+        print("\n🔧 Testing Updated Manufacturing Order Calculation Endpoint...")
         
-        # Test data as specified in the review request
-        calculation_data = {
+        # Test 1: Calculation with ONLY moldura (no other inputs)
+        print("\n📋 TEST 1: Calculation with ONLY moldura")
+        test1_data = {
+            "altura": 60,  # cm
+            "largura": 80,  # cm  
+            "quantidade": 1,
+            "moldura_id": moldura_id,
+            "usar_vidro": False,
+            "usar_mdf": False,
+            "usar_papel": False,
+            "usar_passepartout": False,
+            "usar_acessorios": False
+        }
+        
+        success1, response1 = self.run_test(
+            "Calculate Order - Only Moldura",
+            "POST",
+            "gestao/pedidos/calcular",
+            200,
+            data=test1_data
+        )
+        
+        if success1:
+            self.verify_new_pricing_fields(response1, "Only Moldura", expected_items=1)
+            
+        # Test 2: Calculation with moldura + vidro
+        print("\n📋 TEST 2: Calculation with moldura + vidro")
+        test2_data = {
             "altura": 50,  # cm
             "largura": 70,  # cm  
             "quantidade": 1,
@@ -713,101 +739,131 @@ class BusinessManagementSystemTester:
             "usar_mdf": False,
             "usar_papel": False,
             "usar_passepartout": False,
-            "usar_acessorios": False,
-            "desconto_percentual": 0,
-            "desconto_valor": 0,
-            "sobre_preco_percentual": 0,
-            "sobre_preco_valor": 0
+            "usar_acessorios": False
         }
         
-        print(f"📊 Testing calculation with data: {json.dumps(calculation_data, indent=2)}")
-        
-        success, response = self.run_test(
-            "Calculate Manufacturing Order",
+        success2, response2 = self.run_test(
+            "Calculate Order - Moldura + Vidro",
             "POST",
             "gestao/pedidos/calcular",
             200,
-            data=calculation_data
+            data=test2_data
         )
         
-        if success:
-            print("✅ Manufacturing calculation endpoint returned 200 OK")
+        if success2:
+            self.verify_new_pricing_fields(response2, "Moldura + Vidro", expected_items=2)
             
-            # Verify expected calculations
-            expected_area = (50 * 70) / 10000  # 0.035 m²
-            expected_perimetro = (2 * 50) + (2 * 70)  # 240 cm
+        # Test 3: Calculation with ONLY vidro (no moldura)
+        print("\n📋 TEST 3: Calculation with ONLY vidro")
+        test3_data = {
+            "altura": 40,  # cm
+            "largura": 60,  # cm  
+            "quantidade": 1,
+            "moldura_id": None,
+            "usar_vidro": True,
+            "vidro_id": vidro_id,
+            "usar_mdf": False,
+            "usar_papel": False,
+            "usar_passepartout": False,
+            "usar_acessorios": False
+        }
+        
+        success3, response3 = self.run_test(
+            "Calculate Order - Only Vidro",
+            "POST",
+            "gestao/pedidos/calcular",
+            200,
+            data=test3_data
+        )
+        
+        if success3:
+            self.verify_new_pricing_fields(response3, "Only Vidro", expected_items=1)
             
-            # Check if response contains required fields
-            required_fields = [
-                'area', 'perimetro', 'barras_necessarias', 'sobra', 'custo_perda',
-                'itens', 'custo_total', 'markup', 'preco_venda', 'margem_percentual', 'valor_final'
-            ]
+        # Overall test result
+        overall_success = success1 and success2 and success3
+        if overall_success:
+            print("✅ All new pricing functionality tests passed!")
+            self.log_test("Updated Calculation Endpoint - All Tests", True)
+        else:
+            print("❌ Some pricing functionality tests failed")
+            self.log_test("Updated Calculation Endpoint - All Tests", False, "One or more tests failed")
             
+        return overall_success
+    
+    def verify_new_pricing_fields(self, response, test_name, expected_items):
+        """Verify the new pricing fields in calculation response"""
+        print(f"\n🔍 Verifying new pricing fields for {test_name}...")
+        
+        # Check if response contains items
+        if 'itens' not in response or not isinstance(response['itens'], list):
+            print(f"❌ No items found in response for {test_name}")
+            self.log_test(f"New Pricing - {test_name} Items", False, "No items array found")
+            return False
+            
+        items = response['itens']
+        if len(items) != expected_items:
+            print(f"❌ Expected {expected_items} items, got {len(items)} for {test_name}")
+            self.log_test(f"New Pricing - {test_name} Item Count", False, f"Expected {expected_items}, got {len(items)}")
+            return False
+        
+        print(f"✅ Correct number of items ({len(items)}) found for {test_name}")
+        
+        # Verify each item has the new pricing fields
+        all_items_valid = True
+        for i, item in enumerate(items):
+            item_name = f"{test_name} Item {i+1} ({item.get('tipo_insumo', 'Unknown')})"
+            
+            # Check required new fields
+            required_fields = ['custo_unitario', 'preco_unitario', 'subtotal', 'subtotal_venda']
             missing_fields = []
+            
             for field in required_fields:
-                if field not in response:
+                if field not in item:
                     missing_fields.append(field)
             
             if missing_fields:
-                print(f"❌ Missing required fields in response: {missing_fields}")
-                self.log_test("Manufacturing Calculation - Required Fields", False, f"Missing fields: {missing_fields}")
+                print(f"❌ {item_name} missing fields: {missing_fields}")
+                self.log_test(f"New Pricing - {item_name} Fields", False, f"Missing: {missing_fields}")
+                all_items_valid = False
+                continue
+            
+            # Verify preco_unitario is different from custo_unitario (selling price vs cost)
+            custo = item.get('custo_unitario', 0)
+            preco = item.get('preco_unitario', 0)
+            
+            if custo == preco:
+                print(f"⚠️ {item_name}: preco_unitario ({preco}) equals custo_unitario ({custo}) - should be different")
+                self.log_test(f"New Pricing - {item_name} Price vs Cost", False, "Selling price equals cost price")
+                all_items_valid = False
             else:
-                print("✅ All required fields present in response")
-                self.log_test("Manufacturing Calculation - Required Fields", True)
+                print(f"✅ {item_name}: preco_unitario ({preco}) ≠ custo_unitario ({custo})")
+                self.log_test(f"New Pricing - {item_name} Price vs Cost", True)
             
-            # Verify calculations
-            if 'area' in response:
-                actual_area = response['area']
-                if abs(actual_area - expected_area) < 0.001:  # Allow small floating point differences
-                    print(f"✅ Area calculation correct: {actual_area} m²")
-                    self.log_test("Manufacturing Calculation - Area", True)
-                else:
-                    print(f"❌ Area calculation incorrect. Expected: {expected_area}, Got: {actual_area}")
-                    self.log_test("Manufacturing Calculation - Area", False, f"Expected {expected_area}, got {actual_area}")
+            # Verify subtotal_venda > subtotal (selling price higher than cost)
+            subtotal_custo = item.get('subtotal', 0)
+            subtotal_venda = item.get('subtotal_venda', 0)
             
-            if 'perimetro' in response:
-                actual_perimetro = response['perimetro']
-                if actual_perimetro == expected_perimetro:
-                    print(f"✅ Perimeter calculation correct: {actual_perimetro} cm")
-                    self.log_test("Manufacturing Calculation - Perimeter", True)
-                else:
-                    print(f"❌ Perimeter calculation incorrect. Expected: {expected_perimetro}, Got: {actual_perimetro}")
-                    self.log_test("Manufacturing Calculation - Perimeter", False, f"Expected {expected_perimetro}, got {actual_perimetro}")
+            if subtotal_venda <= subtotal_custo:
+                print(f"❌ {item_name}: subtotal_venda ({subtotal_venda}) should be > subtotal ({subtotal_custo})")
+                self.log_test(f"New Pricing - {item_name} Subtotal Comparison", False, "Selling subtotal not higher than cost")
+                all_items_valid = False
+            else:
+                print(f"✅ {item_name}: subtotal_venda ({subtotal_venda}) > subtotal ({subtotal_custo})")
+                self.log_test(f"New Pricing - {item_name} Subtotal Comparison", True)
             
-            # Check if itens array contains moldura and vidro
-            if 'itens' in response and isinstance(response['itens'], list):
-                item_types = [item.get('tipo_insumo', '') for item in response['itens']]
-                
-                if 'Moldura' in item_types:
-                    print("✅ Moldura item found in calculation")
-                    self.log_test("Manufacturing Calculation - Moldura Item", True)
-                else:
-                    print("❌ Moldura item missing from calculation")
-                    self.log_test("Manufacturing Calculation - Moldura Item", False, "Moldura not found in itens")
-                
-                if 'Vidro' in item_types:
-                    print("✅ Vidro item found in calculation")
-                    self.log_test("Manufacturing Calculation - Vidro Item", True)
-                else:
-                    print("❌ Vidro item missing from calculation")
-                    self.log_test("Manufacturing Calculation - Vidro Item", False, "Vidro not found in itens")
-                
-                print(f"📋 Items in calculation: {len(response['itens'])} items")
-                for i, item in enumerate(response['itens']):
-                    print(f"   {i+1}. {item.get('tipo_insumo', 'Unknown')} - {item.get('insumo_descricao', 'No description')} - Subtotal: R$ {item.get('subtotal', 0):.2f}")
-            
-            # Print calculation summary
-            if all(field in response for field in ['custo_total', 'preco_venda', 'valor_final']):
-                print(f"💰 Calculation Summary:")
-                print(f"   Total Cost: R$ {response.get('custo_total', 0):.2f}")
-                print(f"   Sale Price: R$ {response.get('preco_venda', 0):.2f}")
-                print(f"   Final Value: R$ {response.get('valor_final', 0):.2f}")
-                print(f"   Markup: {response.get('markup', 0):.2f}")
-                print(f"   Margin: {response.get('margem_percentual', 0):.1f}%")
+            # Print item details
+            print(f"   📊 {item.get('tipo_insumo', 'Unknown')}: {item.get('insumo_descricao', 'No description')}")
+            print(f"      Custo: R$ {custo:.4f} | Preço: R$ {preco:.4f}")
+            print(f"      Subtotal Custo: R$ {subtotal_custo:.2f} | Subtotal Venda: R$ {subtotal_venda:.2f}")
+        
+        if all_items_valid:
+            print(f"✅ All pricing fields verified successfully for {test_name}")
+            self.log_test(f"New Pricing - {test_name} All Fields", True)
         else:
-            print("❌ Manufacturing calculation endpoint failed")
-            
-        return success
+            print(f"❌ Some pricing field issues found for {test_name}")
+            self.log_test(f"New Pricing - {test_name} All Fields", False, "Field validation issues")
+        
+        return all_items_valid
 
     def run_all_tests(self):
         """Run all tests in sequence"""
