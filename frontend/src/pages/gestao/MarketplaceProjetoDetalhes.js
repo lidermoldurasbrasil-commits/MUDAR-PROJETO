@@ -1114,6 +1114,104 @@ export default function MarketplaceProjetoDetalhes() {
           </div>
         </div>
       )}
+      
+      {/* Modal de Upload de Planilha */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl border border-gray-700">
+            <div className="p-6 border-b border-gray-700">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-white">Upload de Planilha de Pedidos</h3>
+                <button
+                  onClick={() => {
+                    setShowUploadModal(false);
+                    setUploadFile(null);
+                  }}
+                  className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6 text-gray-400" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <p className="text-sm text-gray-400 mb-4">
+                  Faça upload da planilha de pedidos exportada do {projeto?.nome}. 
+                  Formatos aceitos: Excel (.xlsx, .xls) ou CSV (.csv)
+                </p>
+                
+                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-white font-medium mb-2">
+                      {uploadFile ? uploadFile.name : 'Clique para selecionar arquivo'}
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      ou arraste e solte aqui
+                    </p>
+                  </label>
+                </div>
+              </div>
+
+              <div className="bg-gray-900 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-white mb-2">Colunas esperadas na planilha:</h4>
+                <ul className="text-sm text-gray-400 space-y-1">
+                  <li>• ID do Pedido (obrigatório)</li>
+                  <li>• Número de Referência SKU</li>
+                  <li>• Nome Variação</li>
+                  <li>• Quantidade</li>
+                  <li>• Preço Acordado</li>
+                  <li>• Taxa de Comissão (%)</li>
+                  <li>• Taxa de Serviço (%)</li>
+                  <li>• Opção de Envio</li>
+                  <li>• Data Prevista de Envio</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-700 flex gap-3">
+              <button
+                onClick={handleConfirmarUpload}
+                disabled={!uploadFile || uploadProgress}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 ${
+                  uploadFile && !uploadProgress
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {uploadProgress ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Processando...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Importar Pedidos
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  setShowUploadModal(false);
+                  setUploadFile(null);
+                }}
+                className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
