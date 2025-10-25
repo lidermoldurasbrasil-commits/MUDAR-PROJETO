@@ -290,13 +290,21 @@ export default function Pedidos() {
             <tbody>
               {filteredPedidos.length === 0 ? (
                 <tr>
-                  <td colSpan="12" className="no-data">
+                  <td colSpan="13" className="no-data">
                     Nenhum pedido encontrado
                   </td>
                 </tr>
               ) : (
                 filteredPedidos.map((pedido) => (
                   <tr key={pedido.id}>
+                    <td>
+                      <input 
+                        type="checkbox"
+                        checked={selectedIds.includes(pedido.id)}
+                        onChange={() => handleSelectOne(pedido.id)}
+                        style={{cursor: 'pointer', width: '18px', height: '18px'}}
+                      />
+                    </td>
                     <td className="pedido-numero">#{pedido.numero_pedido}</td>
                     <td>{pedido.cliente_nome}</td>
                     <td>{pedido.tipo_produto}</td>
