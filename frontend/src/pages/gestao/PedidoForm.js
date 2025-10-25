@@ -424,16 +424,41 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // Calcular total dos insumos
+      // Calcular total dos insumos deste produto
       const totalInsumos = response.data.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
+      
+      // Criar objeto do produto calculado
+      const produtoCalculado = {
+        id: Date.now(), // ID temporário único
+        tipo_produto: formData.tipo_produto,
+        altura: formData.altura,
+        largura: formData.largura,
+        quantidade: formData.quantidade,
+        area: response.data.area,
+        perimetro: response.data.perimetro,
+        itens: response.data.itens,
+        total: totalInsumos,
+        moldura_descricao: response.data.moldura_descricao,
+        vidro_descricao: response.data.vidro_descricao,
+        mdf_descricao: response.data.mdf_descricao,
+        papel_descricao: response.data.papel_descricao,
+        passepartout_descricao: response.data.passepartout_descricao
+      };
+      
+      // Adicionar produto ao array
+      setProdutosPedido(prev => [...prev, produtoCalculado]);
+      
+      // Recalcular total geral
+      const novosProdutos = [...produtosPedido, produtoCalculado];
+      const totalGeral = novosProdutos.reduce((sum, p) => sum + p.total, 0);
       
       setFormData(prev => ({
         ...prev,
         ...response.data,
-        valor_final: totalInsumos  // Inicialmente sem desconto/sobre-preço
+        valor_final: totalGeral  // Total de todos os produtos
       }));
       
-      toast.success('Cálculo realizado!');
+      toast.success('Produto adicionado ao orçamento!');
       setActiveTab('orcamento');
     } catch (error) {
       console.error('Erro ao calcular:', error);
