@@ -375,6 +375,126 @@ export default function Pedidos() {
         )}
       </div>
 
+      {/* Modal de Visualização de Orçamento */}
+      {showOrcamento && pedidoOrcamento && (
+        <div className="modal-overlay" onClick={() => setShowOrcamento(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{maxWidth: '900px', maxHeight: '90vh', overflow: 'auto'}}>
+            <div className="modal-header">
+              <h2>Orçamento - Pedido #{pedidoOrcamento.numero_pedido}</h2>
+              <button className="btn-close" onClick={() => setShowOrcamento(false)}>×</button>
+            </div>
+            
+            <div className="modal-body" style={{padding: '20px'}}>
+              {/* Informações do Pedido */}
+              <div style={{marginBottom: '20px', padding: '15px', background: '#f9fafb', borderRadius: '8px'}}>
+                <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px'}}>
+                  <div>
+                    <strong>Cliente:</strong> {pedidoOrcamento.cliente_nome}
+                  </div>
+                  <div>
+                    <strong>Tipo:</strong> {pedidoOrcamento.tipo_produto}
+                  </div>
+                  <div>
+                    <strong>Dimensões:</strong> {pedidoOrcamento.altura}cm × {pedidoOrcamento.largura}cm
+                  </div>
+                  <div>
+                    <strong>Quantidade:</strong> {pedidoOrcamento.quantidade} un.
+                  </div>
+                  <div>
+                    <strong>Status:</strong> <span style={{padding: '4px 12px', background: STATUS_COLORS[pedidoOrcamento.status], color: 'white', borderRadius: '4px', fontSize: '12px'}}>{pedidoOrcamento.status}</span>
+                  </div>
+                  <div>
+                    <strong>Data:</strong> {formatDate(pedidoOrcamento.data_abertura)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Composição do Orçamento */}
+              <h3 style={{marginBottom: '15px', color: '#1f2937'}}>Composição</h3>
+              <table style={{width: '100%', borderCollapse: 'collapse', marginBottom: '20px'}}>
+                <thead>
+                  <tr style={{background: '#f3f4f6'}}>
+                    <th style={{padding: '12px', textAlign: 'left', border: '1px solid #e5e7eb'}}>Insumo</th>
+                    <th style={{padding: '12px', textAlign: 'right', border: '1px solid #e5e7eb'}}>Qtd</th>
+                    <th style={{padding: '12px', textAlign: 'left', border: '1px solid #e5e7eb'}}>Un.</th>
+                    <th style={{padding: '12px', textAlign: 'right', border: '1px solid #e5e7eb'}}>Preço Unit.</th>
+                    <th style={{padding: '12px', textAlign: 'right', border: '1px solid #e5e7eb'}}>Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pedidoOrcamento.itens && pedidoOrcamento.itens.length > 0 ? (
+                    pedidoOrcamento.itens.map((item, index) => (
+                      <tr key={index}>
+                        <td style={{padding: '10px', border: '1px solid #e5e7eb'}}>{item.insumo_descricao}</td>
+                        <td style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb'}}>{item.quantidade?.toFixed(2)}</td>
+                        <td style={{padding: '10px', border: '1px solid #e5e7eb'}}>{item.unidade}</td>
+                        <td style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb'}}>{formatCurrency(item.preco_unitario || 0)}</td>
+                        <td style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb', fontWeight: '600'}}>{formatCurrency(item.subtotal_venda || 0)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" style={{padding: '20px', textAlign: 'center', color: '#9ca3af'}}>Nenhum item cadastrado</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+
+              {/* Totais */}
+              <div style={{display: 'grid', gap: '10px', padding: '20px', background: '#f9fafb', borderRadius: '8px'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '16px'}}>
+                  <span>Custo Total:</span>
+                  <span style={{fontWeight: '600'}}>{formatCurrency(pedidoOrcamento.custo_total)}</span>
+                </div>
+                <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '16px'}}>
+                  <span>Preço de Venda:</span>
+                  <span style={{fontWeight: '600'}}>{formatCurrency(pedidoOrcamento.preco_venda)}</span>
+                </div>
+                {pedidoOrcamento.desconto_valor > 0 && (
+                  <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#dc2626'}}>
+                    <span>Desconto:</span>
+                    <span>- {formatCurrency(pedidoOrcamento.desconto_valor)}</span>
+                  </div>
+                )}
+                {pedidoOrcamento.sobre_preco_valor > 0 && (
+                  <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#059669'}}>
+                    <span>Sobre-preço:</span>
+                    <span>+ {formatCurrency(pedidoOrcamento.sobre_preco_valor)}</span>
+                  </div>
+                )}
+                <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '20px', fontWeight: '700', color: '#2563eb', borderTop: '2px solid #cbd5e1', paddingTop: '10px'}}>
+                  <span>VALOR FINAL:</span>
+                  <span>{formatCurrency(pedidoOrcamento.valor_final)}</span>
+                </div>
+                
+                {/* Resumo de Pagamento */}
+                {pedidoOrcamento.valor_entrada > 0 && (
+                  <div style={{marginTop: '15px', padding: '15px', background: '#f0fdf4', borderRadius: '6px', border: '2px solid #86efac'}}>
+                    <div style={{fontSize: '14px', fontWeight: '600', color: '#166534', marginBottom: '10px'}}>
+                      💰 Pagamento
+                    </div>
+                    <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '5px'}}>
+                      <span style={{color: '#064e3b'}}>Entrada Paga:</span>
+                      <span style={{color: '#059669', fontWeight: '700'}}>{formatCurrency(pedidoOrcamento.valor_entrada)}</span>
+                    </div>
+                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                      <span style={{color: '#064e3b'}}>Saldo Restante:</span>
+                      <span style={{color: '#dc2626', fontWeight: '700'}}>{formatCurrency(pedidoOrcamento.valor_final - pedidoOrcamento.valor_entrada)}</span>
+                    </div>
+                  </div>
+                )}
+                
+                {pedidoOrcamento.forma_pagamento && (
+                  <div style={{marginTop: '10px', fontSize: '14px', color: '#6b7280'}}>
+                    <strong>Forma de Pagamento:</strong> {pedidoOrcamento.forma_pagamento}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .pedidos-container {
           padding: 30px;
