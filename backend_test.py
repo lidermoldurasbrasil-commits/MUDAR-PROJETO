@@ -867,6 +867,205 @@ class BusinessManagementSystemTester:
         
         return all_items_valid
 
+    def test_preco_manufatura_validation(self):
+        """CRITICAL TEST: Verify calculation endpoint uses preco_manufatura instead of preco_venda"""
+        print("\n🔍 CRITICAL TEST: Validating preco_manufatura usage...")
+        
+        # Create test products with DISTINCT pricing to verify correct field usage
+        moldura_test_data = {
+            "loja_id": "fabrica",
+            "referencia": "MOLD-PRECO-TEST",
+            "descricao": "Moldura Teste Preço Manufatura",
+            "familia": "Moldura",
+            "largura": 3.0,
+            "comprimento": 270.0,
+            "custo_120dias": 10.00,        # Cost: R$ 10.00 per bar
+            "preco_manufatura": 25.00,     # Manufacturing price: R$ 25.00 per bar (SHOULD BE USED)
+            "preco_venda": 35.00,          # Selling price: R$ 35.00 per bar (SHOULD NOT BE USED)
+            "markup_manufatura": 150.0,
+            "ativo": True
+        }
+        
+        vidro_test_data = {
+            "loja_id": "fabrica",
+            "referencia": "VID-PRECO-TEST", 
+            "descricao": "Vidro Teste Preço Manufatura",
+            "familia": "Vidro",
+            "custo_120dias": 10.00,        # Cost: R$ 10.00 per m²
+            "preco_manufatura": 25.00,     # Manufacturing price: R$ 25.00 per m² (SHOULD BE USED)
+            "preco_venda": 35.00,          # Selling price: R$ 35.00 per m² (SHOULD NOT BE USED)
+            "markup_manufatura": 150.0,
+            "ativo": True
+        }
+        
+        # Create moldura test product
+        success_moldura, moldura_response = self.run_test(
+            "Create Moldura Test Product (Distinct Pricing)",
+            "POST",
+            "gestao/produtos",
+            200,
+            data=moldura_test_data
+        )
+        
+        # Create vidro test product
+        success_vidro, vidro_response = self.run_test(
+            "Create Vidro Test Product (Distinct Pricing)",
+            "POST", 
+            "gestao/produtos",
+            200,
+            data=vidro_test_data
+        )
+        
+        if not (success_moldura and success_vidro):
+            print("❌ CRITICAL: Failed to create test products - cannot validate preco_manufatura")
+            self.log_test("Preco Manufatura Validation", False, "Failed to create test products")
+            return False
+            
+        moldura_id = moldura_response.get('id')
+        vidro_id = vidro_response.get('id')
+        
+        if not (moldura_id and vidro_id):
+            print("❌ CRITICAL: Missing product IDs - cannot validate preco_manufatura")
+            self.log_test("Preco Manufatura Validation", False, "Missing product IDs")
+            return False
+        
+        print(f"✅ Created test products - Moldura ID: {moldura_id}, Vidro ID: {vidro_id}")
+        
+        # Test 1: Moldura calculation (price per cm)
+        print("\n📋 Testing Moldura - preco_manufatura validation")
+        moldura_calc_data = {
+            "altura": 50,  # cm
+            "largura": 70,  # cm
+            "quantidade": 1,
+            "moldura_id": moldura_id,
+            "usar_vidro": False,
+            "usar_mdf": False,
+            "usar_papel": False,
+            "usar_passepartout": False,
+            "usar_acessorios": False
+        }
+        
+        success_calc1, calc1_response = self.run_test(
+            "Calculate Order - Moldura preco_manufatura test",
+            "POST",
+            "gestao/pedidos/calcular", 
+            200,
+            data=moldura_calc_data
+        )
+        
+        moldura_valid = False
+        if success_calc1:
+            moldura_valid = self.validate_preco_manufatura_usage(
+                calc1_response, 
+                "Moldura",
+                expected_preco_manufatura_per_bar=25.00,
+                expected_preco_venda_per_bar=35.00,
+                bar_length=270.0
+            )
+        
+        # Test 2: Vidro calculation (price per m²)
+        print("\n📋 Testing Vidro - preco_manufatura validation")
+        vidro_calc_data = {
+            "altura": 50,  # cm  
+            "largura": 70,  # cm
+            "quantidade": 1,
+            "moldura_id": None,
+            "usar_vidro": True,
+            "vidro_id": vidro_id,
+            "usar_mdf": False,
+            "usar_papel": False,
+            "usar_passepartout": False,
+            "usar_acessorios": False
+        }
+        
+        success_calc2, calc2_response = self.run_test(
+            "Calculate Order - Vidro preco_manufatura test",
+            "POST",
+            "gestao/pedidos/calcular",
+            200,
+            data=vidro_calc_data
+        )
+        
+        vidro_valid = False
+        if success_calc2:
+            vidro_valid = self.validate_preco_manufatura_usage(
+                calc2_response,
+                "Vidro", 
+                expected_preco_manufatura_per_unit=25.00,
+                expected_preco_venda_per_unit=35.00
+            )
+        
+        # Overall validation result
+        overall_success = moldura_valid and vidro_valid
+        
+        if overall_success:
+            print("✅ CRITICAL TEST PASSED: Endpoint correctly uses preco_manufatura")
+            self.log_test("Preco Manufatura Validation - CRITICAL", True)
+        else:
+            print("❌ CRITICAL TEST FAILED: Endpoint may be using preco_venda instead of preco_manufatura")
+            self.log_test("Preco Manufatura Validation - CRITICAL", False, "Using wrong price field")
+        
+        return overall_success
+    
+    def validate_preco_manufatura_usage(self, response, product_type, expected_preco_manufatura_per_bar=None, 
+                                      expected_preco_venda_per_bar=None, bar_length=None,
+                                      expected_preco_manufatura_per_unit=None, expected_preco_venda_per_unit=None):
+        """Validate that the calculation uses preco_manufatura and NOT preco_venda"""
+        print(f"\n🔍 Validating {product_type} pricing...")
+        
+        if 'itens' not in response or not response['itens']:
+            print(f"❌ No items found in response for {product_type}")
+            return False
+        
+        # Find the item for this product type
+        target_item = None
+        for item in response['itens']:
+            if product_type.lower() in item.get('tipo_insumo', '').lower():
+                target_item = item
+                break
+        
+        if not target_item:
+            print(f"❌ No {product_type} item found in response")
+            return False
+        
+        preco_unitario = target_item.get('preco_unitario', 0)
+        
+        # Calculate expected preco_unitario based on preco_manufatura
+        if product_type == "Moldura" and expected_preco_manufatura_per_bar and bar_length:
+            # For moldura: convert bar price to per-cm price
+            expected_preco_unitario = expected_preco_manufatura_per_bar / bar_length
+            wrong_preco_unitario = expected_preco_venda_per_bar / bar_length
+            unit = "cm"
+        elif expected_preco_manufatura_per_unit:
+            # For vidro and others: use per-unit price directly
+            expected_preco_unitario = expected_preco_manufatura_per_unit
+            wrong_preco_unitario = expected_preco_venda_per_unit
+            unit = "m²" if product_type == "Vidro" else "unit"
+        else:
+            print(f"❌ Invalid validation parameters for {product_type}")
+            return False
+        
+        print(f"📊 {product_type} Analysis:")
+        print(f"   Expected preco_unitario (from preco_manufatura): R$ {expected_preco_unitario:.4f} per {unit}")
+        print(f"   WRONG preco_unitario (from preco_venda): R$ {wrong_preco_unitario:.4f} per {unit}")
+        print(f"   Actual preco_unitario in response: R$ {preco_unitario:.4f} per {unit}")
+        
+        # Check if using correct price (preco_manufatura)
+        tolerance = 0.0001  # Small tolerance for floating point comparison
+        
+        if abs(preco_unitario - expected_preco_unitario) <= tolerance:
+            print(f"✅ CORRECT: {product_type} is using preco_manufatura (R$ {preco_unitario:.4f})")
+            self.log_test(f"Preco Manufatura - {product_type} Correct Price", True)
+            return True
+        elif abs(preco_unitario - wrong_preco_unitario) <= tolerance:
+            print(f"❌ WRONG: {product_type} is using preco_venda (R$ {preco_unitario:.4f}) instead of preco_manufatura")
+            self.log_test(f"Preco Manufatura - {product_type} Wrong Price", False, "Using preco_venda instead of preco_manufatura")
+            return False
+        else:
+            print(f"⚠️ UNEXPECTED: {product_type} preco_unitario (R$ {preco_unitario:.4f}) doesn't match either expected value")
+            self.log_test(f"Preco Manufatura - {product_type} Unexpected Price", False, f"Unexpected price: {preco_unitario}")
+            return False
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
@@ -875,6 +1074,10 @@ class BusinessManagementSystemTester:
         # Authentication is required for all other tests
         if not self.test_authentication():
             return False
+        
+        # PRIORITY: Run the critical preco_manufatura validation test first
+        print("\n🚨 RUNNING CRITICAL TEST FIRST...")
+        self.test_preco_manufatura_validation()
         
         # Run all module tests
         self.test_dashboard()
