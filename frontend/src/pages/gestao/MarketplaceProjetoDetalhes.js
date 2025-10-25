@@ -471,6 +471,22 @@ export default function MarketplaceProjetoDetalhes() {
     }
     
     return true;
+  }).sort((a, b) => {
+    // Ordenação por data prevista de envio
+    const dataA = a.data_prevista_envio ? new Date(a.data_prevista_envio) : null;
+    const dataB = b.data_prevista_envio ? new Date(b.data_prevista_envio) : null;
+    
+    // Pedidos sem data vão para o final
+    if (!dataA && !dataB) return 0;
+    if (!dataA) return 1;
+    if (!dataB) return -1;
+    
+    // Ordenação ascendente (mais próxima primeiro) ou descendente (mais distante primeiro)
+    if (ordenacaoData === 'asc') {
+      return dataA - dataB;
+    } else {
+      return dataB - dataA;
+    }
   });
 
   // Agrupar pedidos por status para o Kanban
