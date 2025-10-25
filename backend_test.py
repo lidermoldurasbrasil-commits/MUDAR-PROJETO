@@ -832,6 +832,9 @@ class BusinessManagementSystemTester:
         self.test_complaints_management()
         self.test_crm_leads()
         
+        # Test the new Sistema de Gestão (Manufacturing Management)
+        self.test_gestao_system()
+        
         return True
 
     def print_summary(self):
