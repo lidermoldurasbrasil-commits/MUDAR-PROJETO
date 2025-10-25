@@ -266,23 +266,29 @@ export default function MarketplaceProjetoDetalhes() {
         return;
       }
       
-      // Converter data para ISO
-      const prazoEntrega = novaLinhaInline.prazo_entrega ? 
-        new Date(novaLinhaInline.prazo_entrega).toISOString() : 
+      // Converter data para ISO se fornecida
+      const dataPrevistaEnvio = novaLinhaInline.data_prevista_envio ? 
+        new Date(novaLinhaInline.data_prevista_envio).toISOString() : 
+        null;
+      
+      const prazoEntrega = novaLinhaInline.data_prevista_envio ? 
+        new Date(novaLinhaInline.data_prevista_envio).toISOString() : 
         new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       
       const pedidoData = {
         numero_pedido: novaLinhaInline.numero_pedido,
         sku: novaLinhaInline.sku,
-        cliente_nome: novaLinhaInline.cliente_nome,
+        nome_variacao: novaLinhaInline.nome_variacao,
         produto_nome: novaLinhaInline.numero_pedido, // Usar número do pedido como produto por padrão
         quantidade: novaLinhaInline.quantidade,
-        valor_unitario: 0,
-        valor_total: 0,
+        preco_acordado: novaLinhaInline.preco_acordado || 0,
+        valor_unitario: novaLinhaInline.preco_acordado || 0,
+        valor_total: (novaLinhaInline.preco_acordado || 0) * novaLinhaInline.quantidade,
+        opcao_envio: novaLinhaInline.opcao_envio,
+        data_prevista_envio: dataPrevistaEnvio,
         status: novaLinhaInline.status,
         prioridade: novaLinhaInline.prioridade,
         prazo_entrega: prazoEntrega,
-        responsavel: novaLinhaInline.responsavel,
         projeto_id: projetoId,
         plataforma: projeto.plataforma,
         loja_id: lojaAtual
