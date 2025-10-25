@@ -242,15 +242,18 @@ backend:
   
   - task: "Upload de Planilha de Pedidos Marketplace (Backend)"
     implemented: true
-    working: "unknown"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "unknown"
           agent: "main"
           comment: "Implementado endpoint POST /api/gestao/marketplaces/pedidos/upload-planilha para processar planilhas Shopee (Excel/CSV). Usa pandas e openpyxl para leitura. Mapeia colunas: 'ID do pedido' → numero_pedido, 'Número de referência SKU' → sku, 'Nome da variação' → nome_variacao, 'Quantidade' → quantidade, 'Preço acordado' → preco_acordado, 'Taxa de comissão' → valor_taxa_comissao, 'Taxa de serviço' → valor_taxa_servico, 'Opção de envio' → opcao_envio, 'Data prevista de envio' → data_prevista_envio. Calcula taxas percentuais e valor líquido. Insere pedidos em lote no MongoDB. Retorna contadores de sucesso/erro. Pronto para teste com planilha real Order.toship.xlsx fornecida pelo usuário."
+        - working: true
+          agent: "testing"
+          comment: "✅ MARKETPLACE SPREADSHEET UPLOAD TESTADO COM SUCESSO TOTAL! Fluxo completo testado conforme solicitação específica: 1) Login realizado ✅ 2) Projeto marketplace criado (Shopee) ✅ 3) Planilha Excel baixada (36.030 bytes) ✅ 4) Upload realizado com sucesso via multipart/form-data ✅ 5) 82 pedidos importados da planilha real Order.toship.xlsx ✅ 6) Response validado: message, total_importados=82, total_linhas=82 ✅ 7) Pedidos verificados no banco de dados (82 encontrados) ✅ 8) Mapeamento de campos validado: numero_pedido, sku, nome_variacao, quantidade, preco_acordado, valor_taxa_comissao, valor_taxa_servico, opcao_envio, data_prevista_envio ✅ 9) Cálculos validados: valor_liquido=preco_acordado-taxas, taxa_comissao e taxa_servico calculadas como percentuais ✅ 10) Exemplo validado: Pedido 251023RWB6GBKX, SKU KIT-3-40x60-PERSONALIZADO-MM, R$139.00 → R$103.72 líquido (18% comissão + 7.38% serviço) ✅. Sistema 100% funcional e pronto para produção! Corrigido bug de timezone em get_pedidos_marketplace durante teste."
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
