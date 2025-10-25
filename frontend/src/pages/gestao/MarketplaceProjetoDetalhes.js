@@ -282,7 +282,9 @@ export default function MarketplaceProjetoDetalhes() {
         numero_pedido: novaLinhaInline.numero_pedido,
         sku: novaLinhaInline.sku,
         nome_variacao: novaLinhaInline.nome_variacao,
-        produto_nome: novaLinhaInline.numero_pedido, // Usar número do pedido como produto por padrão
+        produto_nome: novaLinhaInline.produto_nome || novaLinhaInline.numero_pedido,
+        cliente_nome: novaLinhaInline.cliente_nome,
+        cliente_contato: novaLinhaInline.cliente_contato,
         quantidade: novaLinhaInline.quantidade,
         preco_acordado: novaLinhaInline.preco_acordado || 0,
         valor_unitario: novaLinhaInline.preco_acordado || 0,
