@@ -1156,16 +1156,19 @@ class BusinessManagementSystemTester:
         
         print("✅ Frame item found in response")
         
-        # Expected values based on specification
+        # Expected values based on specification and business logic
         expected_perimeter_cm = 240  # 2×50 + 2×70 = 240 cm
         expected_cut_loss_cm = 3.0 * 8  # largura × 8 = 24 cm
-        expected_charged_perimeter_cm = expected_perimeter_cm + expected_cut_loss_cm  # ~264 cm
-        expected_charged_meters = expected_charged_perimeter_cm / 100  # ~2.64 meters
+        expected_bars_needed = math.ceil(expected_perimeter_cm / 270)  # 1 bar
+        expected_leftover_cm = (expected_bars_needed * 270) - expected_perimeter_cm  # 30 cm
+        # Since leftover (30cm) < 100cm, it's charged as additional loss
+        expected_charged_perimeter_cm = expected_perimeter_cm + expected_cut_loss_cm + expected_leftover_cm  # 294 cm
+        expected_charged_meters = expected_charged_perimeter_cm / 100  # 2.94 meters
         
         expected_cost_per_meter = 50.00
         expected_price_per_meter = 150.00
-        expected_subtotal_cost = expected_charged_meters * expected_cost_per_meter  # ~132.00
-        expected_subtotal_venda = expected_charged_meters * expected_price_per_meter  # ~396.00
+        expected_subtotal_cost = expected_charged_meters * expected_cost_per_meter  # 147.00
+        expected_subtotal_venda = expected_charged_meters * expected_price_per_meter  # 441.00
         
         print(f"📊 Expected Calculation:")
         print(f"   Perimeter: {expected_perimeter_cm} cm")
