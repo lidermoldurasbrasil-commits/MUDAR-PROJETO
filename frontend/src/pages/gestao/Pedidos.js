@@ -113,6 +113,50 @@ export default function Pedidos() {
       toast.error('Erro ao excluir pedido');
     }
   };
+  
+  // NOVAS FUNÇÕES: Seleção múltipla
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      const allIds = filteredPedidos.map(p => p.id);
+      setSelectedIds(allIds);
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter(i => i !== id));
+    } else {
+      setSelectedIds([...selectedIds, id]);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedIds.length === 0) {
+      toast.error('Nenhum pedido selecionado');
+      return;
+    }
+
+    if (!window.confirm(`Tem certeza que deseja excluir ${selectedIds.length} pedido(s)?`)) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await Promise.all(
+        selectedIds.map(id =>
+          axios.delete(`${API}/pedidos/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        )
+      );
+      toast.success(`${selectedIds.length} pedido(s) excluído(s) com sucesso!`);
+      setSelectedIds([]);
+      fetchPedidos();
+    } catch (error) {
+      console.error('Erro ao excluir pedidos:', error);
+      toast.error('Erro ao excluir pedidos');
+    }
+  };
 
   const handleStatusChange = async (pedidoId, novoStatus) => {
     try {
