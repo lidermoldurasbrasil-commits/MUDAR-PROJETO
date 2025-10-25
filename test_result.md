@@ -135,6 +135,9 @@ frontend:
         - working: "unknown"
           agent: "main"
           comment: "Frontend já possui implementação da aba Orçamento com exibição de itens. Precisa testar se dados calculados estão aparecendo corretamente após fix do backend."
+        - working: "unknown"
+          agent: "main"
+          comment: "Removidos campos editáveis (quantidade, preço unitário, botão remover) da tabela de orçamento. Campos agora são somente leitura. Atualizado para exibir preco_unitario e subtotal_venda vindos do backend. Adicionado estilos CSS para melhor visualização."
 
 metadata:
   created_by: "main_agent"
