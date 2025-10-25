@@ -3920,24 +3920,33 @@ async def get_pedidos_marketplace(
         # Verificar atraso
         if pedido.get('status') not in ['Entregue', 'Cancelado']:
             prazo = pedido.get('prazo_entrega')
-            if isinstance(prazo, str):
+            if prazo:
                 try:
-                    prazo = datetime.fromisoformat(prazo.replace('Z', '+00:00'))
-                except:
-                    # If parsing fails, skip atraso check
+                    if isinstance(prazo, str):
+                        # Handle ISO format strings
+                        if prazo.endswith('Z'):
+                            prazo = datetime.fromisoformat(prazo.replace('Z', '+00:00'))
+                        elif '+' in prazo or prazo.endswith('00:00'):
+                            prazo = datetime.fromisoformat(prazo)
+                        else:
+                            # Assume UTC if no timezone info
+                            prazo = datetime.fromisoformat(prazo).replace(tzinfo=timezone.utc)
+                    elif isinstance(prazo, datetime):
+                        # Ensure timezone awareness
+                        if prazo.tzinfo is None:
+                            prazo = prazo.replace(tzinfo=timezone.utc)
+                    else:
+                        # Skip if prazo is not a valid type
+                        continue
+                        
+                    if prazo < datetime.now(timezone.utc):
+                        dias_atraso = (datetime.now(timezone.utc) - prazo).days
+                        pedido['atrasado'] = True
+                        pedido['dias_atraso'] = dias_atraso
+                except Exception as e:
+                    # If any parsing fails, skip atraso check for this pedido
+                    print(f"Error parsing prazo_entrega: {e}")
                     continue
-            elif isinstance(prazo, datetime):
-                # Ensure timezone awareness
-                if prazo.tzinfo is None:
-                    prazo = prazo.replace(tzinfo=timezone.utc)
-            else:
-                # Skip if prazo is None or invalid type
-                continue
-                
-            if prazo < datetime.now(timezone.utc):
-                dias_atraso = (datetime.now(timezone.utc) - prazo).days
-                pedido['atrasado'] = True
-                pedido['dias_atraso'] = dias_atraso
     
     return pedidos
 
