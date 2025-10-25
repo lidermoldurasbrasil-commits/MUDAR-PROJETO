@@ -63,7 +63,20 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     
     descricao_orcamento: pedido?.descricao_orcamento || '',
     forma_pagamento: pedido?.forma_pagamento || '',
-    valor_entrada: pedido?.valor_entrada || 0,  // NOVO: Valor de entrada
+    valor_entrada: pedido?.valor_entrada || 0,
+    
+    // NOVOS CAMPOS FINANCEIROS
+    conta_bancaria_id: pedido?.conta_bancaria_id || '',
+    conta_bancaria_nome: pedido?.conta_bancaria_nome || '',
+    forma_pagamento_id: pedido?.forma_pagamento_id || '',
+    forma_pagamento_nome: pedido?.forma_pagamento_nome || '',
+    forma_pagamento_parcelas: pedido?.forma_pagamento_parcelas || 1,
+    forma_pagamento_bandeira: pedido?.forma_pagamento_bandeira || '',
+    taxa_percentual: pedido?.taxa_percentual || 0,
+    taxa_valor_real: pedido?.taxa_valor_real || 0,
+    valor_bruto: pedido?.valor_bruto || 0,
+    valor_liquido_empresa: pedido?.valor_liquido_empresa || 0,
+    
     desconto_percentual: pedido?.desconto_percentual || 0,
     desconto_valor: pedido?.desconto_valor || 0,
     sobre_preco_percentual: pedido?.sobre_preco_percentual || 0,
