@@ -2191,6 +2191,94 @@ async def update_status_pedido(pedido_id: str, novo_status: str, observacao: Opt
             print(f"❌ Erro ao criar ordem de produção: {e}")
             # Não interromper o fluxo, apenas logar o erro
     
+    # AUTOMAÇÃO: Se status for "Montagem", criar Contas a Receber automaticamente
+    if novo_status == "Montagem":
+        try:
+            print(f"\n💰 AUTOMAÇÃO: Criando Contas a Receber para pedido #{pedido['numero_pedido']}")
+            
+            # Verificar se tem forma de pagamento definida
+            if not pedido.get('forma_pagamento_id'):
+                print(f"⚠️ Pedido sem forma de pagamento definida - pulando criação de contas a receber")
+            else:
+                # Verificar se já existem contas a receber para este pedido
+                contas_existentes = await db.contas_receber.find_one({"pedido_id": pedido_id})
+                
+                if not contas_existentes:
+                    # Buscar dados da forma de pagamento
+                    forma_pagamento = await db.formas_pagamento_banco.find_one({"id": pedido.get('forma_pagamento_id')})
+                    
+                    if forma_pagamento:
+                        total_parcelas = forma_pagamento.get('numero_parcelas', 1)
+                        espaco_dias = forma_pagamento.get('espaco_parcelas_dias', 30)
+                        valor_bruto = pedido.get('valor_bruto', pedido.get('valor_final', 0))
+                        taxa_percentual = pedido.get('taxa_percentual', 0)
+                        valor_liquido = pedido.get('valor_liquido_empresa', valor_bruto)
+                        
+                        # Calcular valor por parcela
+                        valor_bruto_parcela = valor_bruto / total_parcelas
+                        valor_liquido_parcela = valor_liquido / total_parcelas
+                        
+                        print(f"📊 Gerando {total_parcelas} parcela(s) - Valor bruto: R${valor_bruto:.2f} - Valor líquido: R${valor_liquido:.2f}")
+                        
+                        # Criar uma conta a receber para cada parcela
+                        for i in range(1, total_parcelas + 1):
+                            # Calcular data de vencimento da parcela
+                            dias_adicionar = (i - 1) * espaco_dias
+                            data_venc = datetime.now(timezone.utc) + timedelta(days=dias_adicionar)
+                            
+                            conta_receber = {
+                                'id': str(uuid.uuid4()),
+                                'pedido_id': pedido_id,
+                                'documento': f"Pedido_{pedido.get('numero_pedido', 0)}-{i}/{total_parcelas}",
+                                'cliente_origem': pedido.get('cliente_nome', 'Cliente não informado'),
+                                'loja_id': pedido.get('loja_id', 'fabrica'),
+                                'vendedor': current_user.get('username', ''),
+                                'valor_bruto': valor_bruto_parcela,
+                                'valor_liquido': valor_liquido_parcela,
+                                'valor': valor_liquido_parcela,
+                                'forma_pagamento_id': pedido.get('forma_pagamento_id'),
+                                'forma_pagamento_nome': pedido.get('forma_pagamento_nome', ''),
+                                'conta_bancaria_id': pedido.get('conta_bancaria_id', ''),
+                                'conta_bancaria_nome': pedido.get('conta_bancaria_nome', ''),
+                                'taxa_percentual': taxa_percentual,
+                                'numero_parcela': i,
+                                'total_parcelas': total_parcelas,
+                                'data_emissao': datetime.now(timezone.utc).isoformat(),
+                                'data_vencimento': data_venc.isoformat(),
+                                'data_prevista': data_venc.isoformat(),
+                                'data_operacao_bancaria': None,
+                                'data_pago_loja': None,
+                                'data_recebimento': None,
+                                'categoria_id': '',
+                                'categoria_nome': 'Venda de Produtos e Serviços',
+                                'grupo_categoria': 'Receita Bruta',
+                                'status': 'Pendente',
+                                'dc': 'C',
+                                'recorrencia': 'ÚNICA',
+                                'lote': '',
+                                'conta_id_interno': '',
+                                'descricao': f"Venda {pedido.get('loja_id', 'fabrica')} - Pedido #{pedido.get('numero_pedido', 0)}",
+                                'observacoes': f"Parcela {i} de {total_parcelas}",
+                                'created_at': datetime.now(timezone.utc).isoformat(),
+                                'updated_at': datetime.now(timezone.utc).isoformat(),
+                                'created_by': current_user.get('username', '')
+                            }
+                            
+                            await db.contas_receber.insert_one(conta_receber)
+                            print(f"✅ Conta a Receber criada: Parcela {i}/{total_parcelas} - Vencimento: {data_venc.strftime('%d/%m/%Y')}")
+                        
+                        print(f"✅ Total de {total_parcelas} Conta(s) a Receber criada(s) com sucesso!")
+                    else:
+                        print(f"⚠️ Forma de pagamento não encontrada")
+                else:
+                    print(f"⚠️ Contas a Receber já existem para este pedido")
+                    
+        except Exception as e:
+            print(f"❌ Erro ao criar contas a receber: {e}")
+            import traceback
+            print(traceback.format_exc())
+            # Não interromper o fluxo, apenas logar o erro
+    
     # Se status for "Pronto" ou "Entregue", gerar lançamento financeiro
     if novo_status in ["Pronto", "Entregue"]:
         try:
