@@ -1640,8 +1640,8 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             prazo = passepartout_produto.get('prazo_selecionado', '120dias')
             custo_unitario = get_custo_por_prazo(passepartout_produto, prazo)
             
-            # NOVO: Pegar preço de venda
-            preco_unitario = passepartout_produto.get('preco_venda', custo_unitario)
+            # NOVO: Pegar preço de manufatura
+            preco_unitario = passepartout_produto.get('preco_manufatura', custo_unitario)
             
             if passepartout_produto.get('markup_manufatura'):
                 markup_item = (passepartout_produto['markup_manufatura'] / 100) + 1
