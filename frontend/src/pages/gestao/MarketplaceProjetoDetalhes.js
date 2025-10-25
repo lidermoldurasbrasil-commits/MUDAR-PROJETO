@@ -606,13 +606,51 @@ export default function MarketplaceProjetoDetalhes() {
               Upload Planilha
             </button>
             {selectedPedidos.length > 0 && (
-              <button
-                onClick={handleDeleteSelected}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                <X className="w-5 h-5" />
-                Deletar {selectedPedidos.length} Selecionado(s)
-              </button>
+              <>
+                <button
+                  onClick={handleDeleteSelected}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  <X className="w-5 h-5" />
+                  Deletar {selectedPedidos.length}
+                </button>
+                
+                {/* Dropdown para Status Geral */}
+                <div className="relative">
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        handleUpdateStatusBatch('status', e.target.value);
+                      }
+                    }}
+                    defaultValue=""
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+                  >
+                    <option value="" disabled>Mudar Status ({selectedPedidos.length})</option>
+                    {STATUS_OPTIONS.map(s => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Dropdown para Status Impressão */}
+                <div className="relative">
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        handleUpdateStatusBatch('status_impressao', e.target.value);
+                      }
+                    }}
+                    defaultValue=""
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer"
+                  >
+                    <option value="" disabled>Mudar Impressão ({selectedPedidos.length})</option>
+                    {STATUS_IMPRESSAO_OPTIONS.map(s => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
             )}
             <button
               onClick={() => setShowFilters(!showFilters)}
