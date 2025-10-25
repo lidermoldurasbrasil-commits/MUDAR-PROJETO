@@ -204,7 +204,6 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validar tipo e tamanho
     if (!file.type.startsWith('image/')) {
       toast.error('Por favor, selecione uma imagem');
       return;
@@ -237,6 +236,59 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
       console.error('Erro ao fazer upload:', error);
       toast.error('Erro ao anexar imagem');
     }
+  };
+
+  const handleEditarItem = (index, campo, valor) => {
+    const novosItens = [...formData.itens];
+    novosItens[index][campo] = parseFloat(valor) || 0;
+    
+    // Recalcular subtotal
+    if (campo === 'quantidade' || campo === 'custo_unitario') {
+      novosItens[index].subtotal = novosItens[index].quantidade * novosItens[index].custo_unitario;
+    }
+    
+    // Recalcular custo total
+    const novoCustoTotal = novosItens.reduce((sum, item) => sum + item.subtotal, 0);
+    
+    // Recalcular preço de venda
+    const novoPrecoVenda = novoCustoTotal * formData.markup;
+    
+    // Recalcular valor final mantendo descontos/sobre-preços proporcionais
+    const desconto = formData.desconto_valor;
+    const sobrePreco = formData.sobre_preco_valor;
+    const novoValorFinal = novoPrecoVenda - desconto + sobrePreco;
+    
+    setFormData(prev => ({
+      ...prev,
+      itens: novosItens,
+      custo_total: novoCustoTotal,
+      preco_venda: novoPrecoVenda,
+      valor_final: novoValorFinal,
+      margem_percentual: ((novoPrecoVenda - novoCustoTotal) / novoPrecoVenda * 100) || 0
+    }));
+    
+    toast.success('Item atualizado!');
+  };
+
+  const handleRemoverItem = (index) => {
+    if (!window.confirm('Deseja remover este item?')) return;
+    
+    const novosItens = formData.itens.filter((_, i) => i !== index);
+    const novoCustoTotal = novosItens.reduce((sum, item) => sum + item.subtotal, 0);
+    const novoPrecoVenda = novoCustoTotal * formData.markup;
+    const desconto = formData.desconto_valor;
+    const sobrePreco = formData.sobre_preco_valor;
+    
+    setFormData(prev => ({
+      ...prev,
+      itens: novosItens,
+      custo_total: novoCustoTotal,
+      preco_venda: novoPrecoVenda,
+      valor_final: novoPrecoVenda - desconto + sobrePreco,
+      margem_percentual: ((novoPrecoVenda - novoCustoTotal) / novoPrecoVenda * 100) || 0
+    }));
+    
+    toast.success('Item removido!');
   };
 
   const handleDescontoPercentualChange = (e) => {
