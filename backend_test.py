@@ -2081,7 +2081,19 @@ class BusinessManagementSystemTester:
 def main():
     tester = BusinessManagementSystemTester()
     
-    success = tester.run_all_tests()
+    # Run only the Production Order automation test as requested
+    print("🚀 Starting Production Order Automation Test...")
+    print(f"🌐 Testing against: {tester.base_url}")
+    
+    # Authentication is required
+    if not tester.test_authentication():
+        print("❌ Authentication failed - stopping tests")
+        return 1
+    
+    # Run only the Production Order automation test
+    success = tester.test_production_order_automation()
+    
+    # Print final results
     all_passed = tester.print_summary()
     
     return 0 if all_passed else 1
