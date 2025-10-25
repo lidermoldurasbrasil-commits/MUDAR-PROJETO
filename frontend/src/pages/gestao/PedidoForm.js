@@ -21,6 +21,12 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
   const [showClienteForm, setShowClienteForm] = useState(false);
   const [molduraSku, setMolduraSku] = useState('');
   
+  // NOVOS ESTADOS PARA FORMAS DE PAGAMENTO
+  const [contasBancarias, setContasBancarias] = useState([]);
+  const [formasPagamentoDisponiveis, setFormasPagamentoDisponiveis] = useState([]);
+  const [contaBancariaSelecionada, setContaBancariaSelecionada] = useState('');
+  const [formaPagamentoSelecionada, setFormaPagamentoSelecionada] = useState(null);
+  
   const [formData, setFormData] = useState({
     cliente_id: pedido?.cliente_id || '',
     cliente_nome: pedido?.cliente_nome || '',
