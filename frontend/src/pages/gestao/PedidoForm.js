@@ -200,6 +200,45 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     }));
   };
 
+  const handleImagemUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validar tipo e tamanho
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor, selecione uma imagem');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Imagem muito grande (máx 5MB)');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await axios.post(`${API}/pedidos/upload-imagem`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      setFormData(prev => ({
+        ...prev,
+        imagem_anexada: response.data.url
+      }));
+
+      toast.success('Imagem anexada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error);
+      toast.error('Erro ao anexar imagem');
+    }
+  };
+
   const handleDescontoPercentualChange = (e) => {
     const percentual = parseFloat(e.target.value) || 0;
     const valorDesconto = (formData.preco_venda * percentual) / 100;
