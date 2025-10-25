@@ -127,7 +127,15 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
       };
       
       setProdutosPedido([produtoReconstruido]);
+      
+      // Atualizar formData com o valor_final correto
+      setFormData(prev => ({
+        ...prev,
+        valor_final: pedido.valor_final || totalItens
+      }));
+      
       console.log('Pedido carregado para edição:', produtoReconstruido);
+      console.log('Valor final:', pedido.valor_final || totalItens);
     }
   }, []);
 
