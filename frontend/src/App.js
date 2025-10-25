@@ -27,6 +27,7 @@ import Producao from './pages/gestao/Producao';
 import Estoque from './pages/gestao/Estoque';
 import Financeiro from './pages/gestao/Financeiro';
 import ContasBancarias from './pages/gestao/financeiro/ContasBancarias';
+import ContasAReceber from './pages/gestao/financeiro/ContasAReceber';
 import Clientes from './pages/gestao/Clientes';
 import Relatorios from './pages/gestao/Relatorios';
 
