@@ -389,7 +389,19 @@ export default function ContasBancarias() {
                                     </div>
                                   )}
                                 </td>
-                                <td>{editingFormaId === forma.id ? <select value={formaData.forma_pagamento} onChange={(e) => setFormaData(p => ({...p, forma_pagamento: e.target.value}))}>{FORMAS_PAGAMENTO.map(f => <option key={f} value={f}>{f}</option>)}</select> : forma.forma_pagamento}</td>
+                                <td>
+                                  {editingFormaId === forma.id ? (
+                                    <input 
+                                      type="text" 
+                                      value={formaData.forma_pagamento} 
+                                      onChange={(e) => setFormaData(p => ({...p, forma_pagamento: e.target.value}))}
+                                      placeholder="Ex: Mercado Pago Crédito 6x"
+                                      style={{width: '100%'}}
+                                    />
+                                  ) : (
+                                    forma.forma_pagamento
+                                  )}
+                                </td>
                                 <td>{editingFormaId === forma.id ? <select value={formaData.tipo} onChange={(e) => setFormaData(p => ({...p, tipo: e.target.value}))}><option value="D">D</option><option value="C">C</option></select> : forma.tipo}</td>
                                 <td>{editingFormaId === forma.id ? <select value={formaData.bandeira} onChange={(e) => setFormaData(p => ({...p, bandeira: e.target.value}))}><option value="">Selecione</option>{BANDEIRAS.map(b => <option key={b} value={b}>{b}</option>)}</select> : forma.bandeira}</td>
                                 <td>{editingFormaId === forma.id ? <input type="number" min="1" value={formaData.numero_parcelas} onChange={(e) => setFormaData(p => ({...p, numero_parcelas: parseInt(e.target.value) || 1}))} /> : forma.numero_parcelas}</td>
