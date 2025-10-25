@@ -64,6 +64,10 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     prazo_entrega: pedido?.prazo_entrega || '',
     observacoes: pedido?.observacoes || '',
     
+    // Campos do objeto do cliente
+    imagem_anexada: pedido?.imagem_anexada || '',
+    sku_objeto_cliente: pedido?.sku_objeto_cliente || '',
+    
     area: pedido?.area || 0,
     perimetro: pedido?.perimetro || 0,
     barras_necessarias: pedido?.barras_necessarias || 0,
