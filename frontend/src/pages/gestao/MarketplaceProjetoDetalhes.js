@@ -697,7 +697,19 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">📊 Agrupar por</label>
+              <select
+                value={agruparPor}
+                onChange={(e) => setAgruparPor(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg"
+              >
+                <option value="">Sem Agrupamento</option>
+                <option value="sku">🏷️ Agrupar por SKU</option>
+                <option value="status">🔵 Agrupar por Status</option>
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Prazo de Envio</label>
               <select
