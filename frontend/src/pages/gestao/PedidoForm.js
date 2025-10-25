@@ -469,69 +469,80 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validar se tem cliente
-    if (!formData.cliente_nome) {
-      toast.error('Selecione um cliente');
-      return;
-    }
-    
-    // Validar se tem ao menos um produto calculado
-    if (!produtosPedido || produtosPedido.length === 0) {
-      toast.error('Adicione ao menos um produto ao orçamento (clique em "Calcular Orçamento")');
-      return;
-    }
-
     setLoading(true);
 
     try {
       const token = localStorage.getItem('token');
       
-      // Usar o primeiro produto para dados básicos (altura, largura, etc)
-      const primeiroProduto = produtosPedido[0];
-      
-      // Consolidar todos os itens de todos os produtos
-      const todosItens = produtosPedido.flatMap(p => p.itens || []);
-      
-      // Calcular totais
-      const totalGeral = produtosPedido.reduce((sum, p) => sum + (p.total || 0), 0);
-      
-      // Preparar dados para envio
-      const dadosEnvio = {
-        ...formData,
-        // Usar dimensões do primeiro produto
-        altura: primeiroProduto.altura,
-        largura: primeiroProduto.largura,
-        quantidade: primeiroProduto.quantidade,
-        tipo_produto: primeiroProduto.tipo_produto,
-        // Itens consolidados
-        itens: todosItens,
-        // Totais
-        custo_total: totalGeral,
-        preco_venda: totalGeral,
-        // Aplicar desconto/sobre-preço ao total
-        valor_final: totalGeral - (formData.desconto_valor || 0) + (formData.sobre_preco_valor || 0)
-      };
-      
-      console.log('Enviando dados:', dadosEnvio);
-      
-      if (pedido?.id) {
-        await axios.put(`${API}/pedidos/${pedido.id}`, dadosEnvio, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        toast.success('Pedido atualizado!');
+      // Se tem produtos calculados, usar estrutura completa
+      if (produtosPedido && produtosPedido.length > 0) {
+        const primeiroProduto = produtosPedido[0];
+        const todosItens = produtosPedido.flatMap(p => p.itens || []);
+        const totalGeral = produtosPedido.reduce((sum, p) => sum + (p.total || 0), 0);
+        
+        const dadosEnvio = {
+          ...formData,
+          altura: primeiroProduto.altura || formData.altura || 0,
+          largura: primeiroProduto.largura || formData.largura || 0,
+          quantidade: primeiroProduto.quantidade || formData.quantidade || 1,
+          tipo_produto: primeiroProduto.tipo_produto || formData.tipo_produto || 'Quadro',
+          cliente_nome: formData.cliente_nome || 'Cliente não informado',
+          itens: todosItens,
+          custo_total: totalGeral,
+          preco_venda: totalGeral,
+          valor_final: totalGeral - (formData.desconto_valor || 0) + (formData.sobre_preco_valor || 0)
+        };
+        
+        console.log('Enviando dados (com produtos):', dadosEnvio);
+        
+        if (pedido?.id) {
+          await axios.put(`${API}/pedidos/${pedido.id}`, dadosEnvio, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          toast.success('Pedido atualizado!');
+        } else {
+          const response = await axios.post(`${API}/pedidos`, dadosEnvio, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          console.log('Resposta do servidor:', response.data);
+          toast.success('Pedido criado com sucesso!');
+        }
       } else {
-        const response = await axios.post(`${API}/pedidos`, dadosEnvio, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        console.log('Resposta do servidor:', response.data);
-        toast.success('Pedido criado com sucesso!');
+        // Sem produtos calculados, salvar dados básicos
+        const dadosEnvio = {
+          ...formData,
+          cliente_nome: formData.cliente_nome || 'Cliente não informado',
+          altura: formData.altura || 0,
+          largura: formData.largura || 0,
+          quantidade: formData.quantidade || 1,
+          tipo_produto: formData.tipo_produto || 'Quadro',
+          itens: [],
+          custo_total: 0,
+          preco_venda: 0,
+          valor_final: 0
+        };
+        
+        console.log('Enviando dados (sem produtos):', dadosEnvio);
+        
+        if (pedido?.id) {
+          await axios.put(`${API}/pedidos/${pedido.id}`, dadosEnvio, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          toast.success('Pedido atualizado!');
+        } else {
+          const response = await axios.post(`${API}/pedidos`, dadosEnvio, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          console.log('Resposta do servidor:', response.data);
+          toast.success('Pedido criado com sucesso!');
+        }
       }
       
       onSave();
     } catch (error) {
       console.error('Erro completo:', error);
-      console.error('Erro ao salvar:', error.response?.data);
-      toast.error('Erro ao salvar pedido: ' + (error.response?.data?.detail || error.message));
+      console.error('Detalhes do erro:', error.response?.data);
+      toast.error('Erro ao salvar: ' + (error.response?.data?.detail || error.message));
     } finally {
       setLoading(false);
     }
