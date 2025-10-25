@@ -1084,6 +1084,13 @@ export default function MarketplaceProjetoDetalhes() {
                     <td className="px-4 py-3">
                       <span className="text-white font-medium text-center">{pedido.quantidade}</span>
                     </td>
+                    
+                    {/* Data Prevista Envio */}
+                    <td className="px-4 py-3">
+                      <span className="text-gray-300 text-sm">
+                        {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
