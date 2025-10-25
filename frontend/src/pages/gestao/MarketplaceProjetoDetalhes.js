@@ -460,27 +460,35 @@ export default function MarketplaceProjetoDetalhes() {
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
                 {pedidos.map((pedido) => (
-                  <tr key={pedido.id} className="hover:bg-gray-700/50 group">
+                  <tr key={pedido.id} className="hover:bg-gray-700/30 group">
                     <td className="px-4 py-3">
                       <input type="checkbox" className="rounded" />
                     </td>
+                    
+                    {/* Elemento - Editável */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <button className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white">
+                        <button className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white transition-opacity">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                         <input
                           type="text"
                           defaultValue={pedido.numero_pedido}
-                          className="bg-transparent text-white border-none focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-2 py-1"
+                          onBlur={(e) => handleUpdatePedido(pedido.id, 'numero_pedido', e.target.value)}
+                          className="bg-transparent text-white border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
                         />
                       </div>
                     </td>
+                    
+                    {/* Status - Dropdown */}
                     <td className="px-4 py-3">
                       <select
                         value={pedido.status}
-                        onChange={(e) => handleStatusChange(pedido.id, e.target.value)}
-                        className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onChange={(e) => {
+                          handleStatusChange(pedido.id, e.target.value);
+                          handleUpdatePedido(pedido.id, 'status', e.target.value);
+                        }}
+                        className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                         style={{
                           backgroundColor: STATUS_OPTIONS.find(s => s.value === pedido.status)?.color || '#94A3B8',
                           color: 'white'
@@ -491,34 +499,72 @@ export default function MarketplaceProjetoDetalhes() {
                         ))}
                       </select>
                     </td>
+                    
+                    {/* Quantidade - Editável */}
                     <td className="px-4 py-3">
                       <input
                         type="number"
                         defaultValue={pedido.quantidade}
-                        className="w-20 bg-transparent text-white border-none focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-2 py-1"
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'quantidade', parseInt(e.target.value))}
+                        className="w-20 bg-transparent text-white text-center border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1"
                       />
                     </td>
-                    <td className="px-4 py-3 text-gray-300 text-sm">{pedido.sku || '-'}</td>
+                    
+                    {/* SKU - Editável */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        defaultValue={pedido.sku}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'sku', e.target.value)}
+                        placeholder="-"
+                        className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
+                      />
+                    </td>
+                    
+                    {/* Cliente - Editável */}
                     <td className="px-4 py-3">
                       <input
                         type="text"
                         defaultValue={pedido.cliente_nome}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'cliente_nome', e.target.value)}
                         placeholder="Nome do cliente"
-                        className="bg-transparent text-white border-none focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-2 py-1"
+                        className="bg-transparent text-white border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
                       />
                     </td>
+                    
+                    {/* Sala de Impressão - Badge */}
                     <td className="px-4 py-3 text-center">
-                      <span className="inline-block px-3 py-1 bg-teal-600 text-white text-xs rounded">
-                        {pedido.status === 'Sala de Impressão' ? 'Impresso' : '-'}
-                      </span>
+                      {pedido.status === 'Sala de Impressão' ? (
+                        <span className="inline-block px-3 py-1 bg-teal-600 text-white text-xs rounded font-medium">
+                          Impresso
+                        </span>
+                      ) : pedido.status === 'Aguardando Impressão' ? (
+                        <span className="inline-block px-3 py-1 bg-yellow-600 text-white text-xs rounded font-medium">
+                          Aguardando
+                        </span>
+                      ) : (
+                        <span className="text-gray-500 text-xs">-</span>
+                      )}
                     </td>
-                    <td className="px-4 py-3 text-gray-300 text-sm">{formatDate(pedido.prazo_entrega)}</td>
+                    
+                    {/* Prazo - Editável */}
+                    <td className="px-4 py-3">
+                      <input
+                        type="date"
+                        defaultValue={pedido.prazo_entrega ? new Date(pedido.prazo_entrega).toISOString().split('T')[0] : ''}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'prazo_entrega', e.target.value)}
+                        className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1"
+                      />
+                    </td>
+                    
+                    {/* Responsável - Editável */}
                     <td className="px-4 py-3">
                       <input
                         type="text"
                         defaultValue={pedido.responsavel}
+                        onBlur={(e) => handleUpdatePedido(pedido.id, 'responsavel', e.target.value)}
                         placeholder="Responsável"
-                        className="bg-transparent text-white border-none focus:outline-none focus:ring-1 focus:ring-blue-500 rounded px-2 py-1"
+                        className="bg-transparent text-white border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
                       />
                     </td>
                   </tr>
