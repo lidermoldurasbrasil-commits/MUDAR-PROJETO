@@ -1537,6 +1537,12 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           color: #2d3748;
         }
 
+        .quantidade-value, .preco-value {
+          text-align: right;
+          font-family: 'Courier New', monospace;
+          color: #4a5568;
+        }
+
         .edit-input {
           width: 100%;
           max-width: 120px;
