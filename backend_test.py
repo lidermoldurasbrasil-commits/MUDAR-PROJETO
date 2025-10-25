@@ -1939,9 +1939,8 @@ class BusinessManagementSystemTester:
         success_duplicate, duplicate_response = self.run_test(
             "Change Status to Montagem Again (Duplicate Test)",
             "PUT",
-            f"gestao/pedidos/{pedido_id}/status",
-            200,
-            data=status_data
+            f"gestao/pedidos/{pedido_id}/status?novo_status=Montagem&observacao=Teste de automação duplicado",
+            200
         )
         
         if success_duplicate:
