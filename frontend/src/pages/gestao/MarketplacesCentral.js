@@ -28,6 +28,8 @@ export default function MarketplacesCentral() {
   const [loading, setLoading] = useState(true);
   const [editandoMensagem, setEditandoMensagem] = useState(false);
   const [novaMensagem, setNovaMensagem] = useState('');
+  const [editandoProjeto, setEditandoProjeto] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const podeEditarMensagem = user?.role === 'director' || user?.role === 'manager';
 
