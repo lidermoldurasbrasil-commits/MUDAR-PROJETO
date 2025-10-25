@@ -836,6 +836,15 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
             {formData.itens && formData.itens.length > 0 && (
               <>
                 <div className="section-title" style={{marginTop: '30px'}}>Composição do Orçamento</div>
+                
+                {/* Informação da quantidade de peças */}
+                <div style={{marginBottom: '15px', padding: '10px', background: '#f7fafc', borderRadius: '6px', border: '1px solid #e2e8f0'}}>
+                  <strong>Quantidade de peças:</strong> {formData.quantidade} unidade(s)
+                  <span style={{marginLeft: '20px', color: '#718096'}}>
+                    | Dimensões: {formData.altura}cm × {formData.largura}cm
+                  </span>
+                </div>
+                
                 <div className="table-responsive">
                   <table className="orcamento-table">
                     <thead>
