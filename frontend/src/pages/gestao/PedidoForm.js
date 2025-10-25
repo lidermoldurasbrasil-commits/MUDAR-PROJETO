@@ -861,46 +861,77 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
               />
             </div>
 
-            {/* NOVA SEÇÃO: Composição do Orçamento */}
-            {formData.itens && formData.itens.length > 0 && (
+            {/* NOVA SEÇÃO: Composição do Orçamento - Múltiplos Produtos */}
+            {produtosPedido && produtosPedido.length > 0 && (
               <>
                 <div className="section-title" style={{marginTop: '30px'}}>Composição do Orçamento</div>
                 
-                {/* Informação da quantidade de peças */}
-                <div style={{marginBottom: '15px', padding: '10px', background: '#f7fafc', borderRadius: '6px', border: '1px solid #e2e8f0'}}>
-                  <strong>Quantidade de peças:</strong> {formData.quantidade} unidade(s)
-                  <span style={{marginLeft: '20px', color: '#718096'}}>
-                    | Dimensões: {formData.altura}cm × {formData.largura}cm
-                  </span>
-                </div>
+                {produtosPedido.map((produto, produtoIndex) => (
+                  <div key={produto.id} style={{marginBottom: '30px', padding: '15px', background: '#f7fafc', borderRadius: '8px', border: '2px solid #e2e8f0'}}>
+                    {/* Cabeçalho do Produto */}
+                    <div style={{marginBottom: '15px', padding: '10px', background: 'white', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <div>
+                        <strong style={{fontSize: '16px', color: '#2d7a5e'}}>Produto {produtoIndex + 1}: {produto.tipo_produto}</strong>
+                        <div style={{fontSize: '13px', color: '#718096', marginTop: '5px'}}>
+                          <strong>Quantidade:</strong> {produto.quantidade} unidade(s)
+                          <span style={{marginLeft: '15px'}}>|</span>
+                          <span style={{marginLeft: '15px'}}><strong>Dimensões:</strong> {produto.altura}cm × {produto.largura}cm</span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm('Remover este produto do orçamento?')) {
+                            const novosProdutos = produtosPedido.filter((_, i) => i !== produtoIndex);
+                            setProdutosPedido(novosProdutos);
+                            const novoTotal = novosProdutos.reduce((sum, p) => sum + p.total, 0);
+                            setFormData(prev => ({...prev, valor_final: novoTotal}));
+                            toast.success('Produto removido!');
+                          }
+                        }}
+                        style={{padding: '8px 16px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: '600'}}
+                      >
+                        Remover
+                      </button>
+                    </div>
+                    
+                    {/* Tabela de Insumos do Produto */}
+                    <div className="table-responsive">
+                      <table className="orcamento-table">
+                        <thead>
+                          <tr>
+                            <th>Insumo</th>
+                            <th>Quantidade</th>
+                            <th>Unidade</th>
+                            <th>Preço Unit.</th>
+                            <th>Subtotal</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {produto.itens.map((item, index) => (
+                            <tr key={index}>
+                              <td className="item-descricao">{item.insumo_descricao}</td>
+                              <td className="quantidade-value">{item.quantidade?.toFixed(2)}</td>
+                              <td>{item.unidade}</td>
+                              <td className="preco-value">{formatCurrency(item.preco_unitario || 0)}</td>
+                              <td className="subtotal-value">{formatCurrency(item.subtotal_venda || 0)}</td>
+                            </tr>
+                          ))}
+                          <tr className="total-row">
+                            <td colSpan="4"><strong>SUBTOTAL PRODUTO {produtoIndex + 1}</strong></td>
+                            <td className="subtotal-value"><strong>{formatCurrency(produto.total)}</strong></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
                 
-                <div className="table-responsive">
-                  <table className="orcamento-table">
-                    <thead>
-                      <tr>
-                        <th>Insumo</th>
-                        <th>Quantidade</th>
-                        <th>Unidade</th>
-                        <th>Preço Unit.</th>
-                        <th>Subtotal</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {formData.itens.map((item, index) => (
-                        <tr key={index}>
-                          <td className="item-descricao">{item.insumo_descricao}</td>
-                          <td className="quantidade-value">{item.quantidade?.toFixed(2)}</td>
-                          <td>{item.unidade}</td>
-                          <td className="preco-value">{formatCurrency(item.preco_unitario || 0)}</td>
-                          <td className="subtotal-value">{formatCurrency(item.subtotal_venda || 0)}</td>
-                        </tr>
-                      ))}
-                      <tr className="total-row">
-                        <td colSpan="4"><strong>TOTAL</strong></td>
-                        <td className="subtotal-value"><strong>{formatCurrency(formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0))}</strong></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                {/* Total Geral de Todos os Produtos */}
+                <div style={{marginTop: '20px', padding: '15px', background: '#2d7a5e', color: 'white', borderRadius: '8px', textAlign: 'right'}}>
+                  <div style={{fontSize: '18px', fontWeight: '700'}}>
+                    TOTAL GERAL: {formatCurrency(produtosPedido.reduce((sum, p) => sum + p.total, 0))}
+                  </div>
                 </div>
                 
                 {/* Botão para adicionar mais produtos */}
