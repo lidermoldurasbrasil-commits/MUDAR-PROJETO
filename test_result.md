@@ -253,6 +253,18 @@ frontend:
           agent: "main"
           comment: "Removidos campos editáveis (quantidade, preço unitário, botão remover) da tabela de orçamento. Campos agora são somente leitura. Atualizado para exibir preco_unitario e subtotal_venda vindos do backend. Adicionado estilos CSS para melhor visualização."
 
+  - task: "Módulo Contas a Receber - Frontend"
+    implemented: true
+    working: "unknown"
+    file: "/app/frontend/src/pages/gestao/financeiro/ContasAReceber.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "unknown"
+          agent: "main"
+          comment: "Implementado frontend completo de Contas a Receber: 1) Página principal com filtros avançados (status, cliente, documento, forma pagamento, conta bancária, data vencimento) ✅ 2) Cards de resumo (Valor Bruto Total, Valor Líquido Total, Contas Pendentes, Total Registros) ✅ 3) Tabela detalhada com todas as informações (documento, cliente, parcela, forma pagamento, vencimento, valores, status) ✅ 4) Modal de baixa/confirmação de recebimento com campos (data baixa, valor recebido, observações) ✅ 5) Integração com backend via API para listar contas e realizar baixa ✅ 6) Rotas adicionadas no App.js ✅ 7) Botão já existente no menu da página Financeiro.js ✅. Pronto para teste frontend e e2e completo."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
