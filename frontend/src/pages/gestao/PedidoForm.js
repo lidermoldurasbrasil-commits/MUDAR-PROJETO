@@ -293,49 +293,57 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
 
   const handleDescontoPercentualChange = (e) => {
     const percentual = parseFloat(e.target.value) || 0;
-    const valorDesconto = (formData.preco_venda * percentual) / 100;
+    // Calcular total dos insumos
+    const totalInsumos = formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
+    const valorDesconto = (totalInsumos * percentual) / 100;
     
     setFormData(prev => ({
       ...prev,
       desconto_percentual: percentual,
       desconto_valor: valorDesconto,
-      valor_final: prev.preco_venda - valorDesconto + prev.sobre_preco_valor
+      valor_final: totalInsumos - valorDesconto + prev.sobre_preco_valor
     }));
   };
 
   const handleDescontoValorChange = (e) => {
     const valor = parseFloat(e.target.value) || 0;
-    const percentual = formData.preco_venda > 0 ? (valor / formData.preco_venda) * 100 : 0;
+    // Calcular total dos insumos
+    const totalInsumos = formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
+    const percentual = totalInsumos > 0 ? (valor / totalInsumos) * 100 : 0;
     
     setFormData(prev => ({
       ...prev,
       desconto_valor: valor,
       desconto_percentual: percentual,
-      valor_final: prev.preco_venda - valor + prev.sobre_preco_valor
+      valor_final: totalInsumos - valor + prev.sobre_preco_valor
     }));
   };
 
   const handleSobrePrecoPercentualChange = (e) => {
     const percentual = parseFloat(e.target.value) || 0;
-    const valorSobre = (formData.preco_venda * percentual) / 100;
+    // Calcular total dos insumos
+    const totalInsumos = formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
+    const valorSobre = (totalInsumos * percentual) / 100;
     
     setFormData(prev => ({
       ...prev,
       sobre_preco_percentual: percentual,
       sobre_preco_valor: valorSobre,
-      valor_final: prev.preco_venda - prev.desconto_valor + valorSobre
+      valor_final: totalInsumos - prev.desconto_valor + valorSobre
     }));
   };
 
   const handleSobrePrecoValorChange = (e) => {
     const valor = parseFloat(e.target.value) || 0;
-    const percentual = formData.preco_venda > 0 ? (valor / formData.preco_venda) * 100 : 0;
+    // Calcular total dos insumos
+    const totalInsumos = formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0) || 0;
+    const percentual = totalInsumos > 0 ? (valor / totalInsumos) * 100 : 0;
     
     setFormData(prev => ({
       ...prev,
       sobre_preco_valor: valor,
       sobre_preco_percentual: percentual,
-      valor_final: prev.preco_venda - prev.desconto_valor + valor
+      valor_final: totalInsumos - prev.desconto_valor + valor
     }));
   };
 
