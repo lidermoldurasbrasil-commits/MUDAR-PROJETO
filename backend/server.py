@@ -1244,6 +1244,10 @@ class PedidoManufatura(BaseModel):
     tipo_produto: str  # Quadro, Espelho, Moldura avulsa, Fine-Art
     quantidade: int = 1
     
+    # Anexo do cliente (objeto para emoldurar)
+    imagem_anexada: Optional[str] = ""  # URL da imagem
+    sku_objeto_cliente: Optional[str] = ""  # SKU do objeto trazido pelo cliente
+    
     # Dimensões
     altura: float  # cm
     largura: float  # cm
