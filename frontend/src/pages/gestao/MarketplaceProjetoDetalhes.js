@@ -699,7 +699,7 @@ export default function MarketplaceProjetoDetalhes() {
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
-                {pedidos.map((pedido) => (
+                {pedidosFiltrados.map((pedido) => (
                   <tr key={pedido.id} className="hover:bg-gray-700/30 group">
                     <td className="px-4 py-3">
                       <input 
@@ -1089,7 +1089,7 @@ export default function MarketplaceProjetoDetalhes() {
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
-                {pedidos.map((pedido) => (
+                {pedidosFiltrados.map((pedido) => (
                   <tr key={pedido.id} className="hover:bg-gray-700/30 group">
                     <td className="px-4 py-3">
                       <input 
