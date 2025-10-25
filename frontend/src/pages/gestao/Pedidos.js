@@ -265,6 +265,14 @@ export default function Pedidos() {
           <table className="pedidos-table">
             <thead>
               <tr>
+                <th style={{width: '40px'}}>
+                  <input 
+                    type="checkbox"
+                    checked={selectedIds.length === filteredPedidos.length && filteredPedidos.length > 0}
+                    onChange={handleSelectAll}
+                    style={{cursor: 'pointer', width: '18px', height: '18px'}}
+                  />
+                </th>
                 <th>Nº Pedido</th>
                 <th>Cliente</th>
                 <th>Tipo</th>
