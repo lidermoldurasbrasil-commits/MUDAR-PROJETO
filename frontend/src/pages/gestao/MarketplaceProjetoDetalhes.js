@@ -474,6 +474,22 @@ export default function MarketplaceProjetoDetalhes() {
         if (dataPrevista < hoje || dataPrevista > fimSemana) {
           return false;
         }
+      } else if (filtros.prazoEnvio === 'personalizado') {
+        // Filtro de data personalizada
+        if (filtros.dataInicio) {
+          const dataInicio = new Date(filtros.dataInicio);
+          dataInicio.setHours(0, 0, 0, 0);
+          if (dataPrevista < dataInicio) {
+            return false;
+          }
+        }
+        if (filtros.dataFim) {
+          const dataFim = new Date(filtros.dataFim);
+          dataFim.setHours(23, 59, 59, 999);
+          if (dataPrevista > dataFim) {
+            return false;
+          }
+        }
       }
     }
     
