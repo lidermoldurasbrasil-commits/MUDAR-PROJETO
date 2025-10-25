@@ -1289,7 +1289,9 @@ export default function MarketplaceProjetoDetalhes() {
             </table>
           </div>
         </div>
-      )}
+      ))}
+    </div>
+  )}
 
       {/* Produção View - Visão Simplificada sem Preços */}
       {viewMode === 'producao' && (
