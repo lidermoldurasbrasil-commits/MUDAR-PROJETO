@@ -140,21 +140,31 @@ export default function ContasBancarias() {
   };
 
   const handleSaveForma = async (contaId) => {
+    console.log('=== SALVANDO FORMA DE PAGAMENTO ===');
+    console.log('contaId:', contaId);
+    console.log('isAddingForma:', isAddingForma);
+    console.log('editingFormaId:', editingFormaId);
+    console.log('formaData:', formaData);
+    
     try {
       const token = localStorage.getItem('token');
       if (isAddingForma === contaId) {
-        await axios.post(`${API}/contas-bancarias/${contaId}/formas-pagamento`, formaData, { headers: { Authorization: `Bearer ${token}` } });
+        console.log('✅ Criando nova forma de pagamento...');
+        const response = await axios.post(`${API}/contas-bancarias/${contaId}/formas-pagamento`, formaData, { headers: { Authorization: `Bearer ${token}` } });
+        console.log('✅ Resposta do servidor:', response.data);
         toast.success('Forma de pagamento criada!');
       } else if (editingFormaId) {
-        await axios.put(`${API}/formas-pagamento/${editingFormaId}`, formaData, { headers: { Authorization: `Bearer ${token}` } });
+        console.log('✅ Editando forma existente...');
+        const response = await axios.put(`${API}/formas-pagamento/${editingFormaId}`, formaData, { headers: { Authorization: `Bearer ${token}` } });
+        console.log('✅ Resposta do servidor:', response.data);
         toast.success('Forma de pagamento atualizada!');
       }
       handleCancelForma();
       await fetchFormasPagamento(contaId);
     } catch (error) {
-      console.error('Erro ao salvar forma:', error);
-      toast.error('Erro ao salvar forma de pagamento');
-      console.error('Detalhes do erro:', error.response?.data);
+      console.error('❌ Erro ao salvar forma:', error);
+      console.error('❌ Detalhes do erro:', error.response?.data);
+      toast.error('Erro ao salvar forma de pagamento: ' + (error.response?.data?.detail || error.message));
     }
   };
 
