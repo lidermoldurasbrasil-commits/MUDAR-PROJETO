@@ -174,35 +174,35 @@ export default function MarketplaceProjetoDetalhes() {
 
         {/* Indicadores Rápidos */}
         <div className="grid grid-cols-4 gap-4 mt-4">
-          <div className="bg-orange-50 rounded-lg p-4">
-            <p className="text-sm text-gray-600">Em Produção</p>
-            <p className="text-2xl font-bold text-orange-600">{projeto.pedidos_em_producao}</p>
+          <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+            <p className="text-sm text-gray-400">Em Produção</p>
+            <p className="text-2xl font-bold text-orange-400">{projeto.pedidos_em_producao}</p>
           </div>
-          <div className="bg-blue-50 rounded-lg p-4">
-            <p className="text-sm text-gray-600">Enviados</p>
-            <p className="text-2xl font-bold text-blue-600">{projeto.pedidos_enviados}</p>
+          <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+            <p className="text-sm text-gray-400">Enviados</p>
+            <p className="text-2xl font-bold text-blue-400">{projeto.pedidos_enviados}</p>
           </div>
-          <div className="bg-green-50 rounded-lg p-4">
-            <p className="text-sm text-gray-600">Entregues</p>
-            <p className="text-2xl font-bold text-green-600">{projeto.pedidos_entregues}</p>
+          <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+            <p className="text-sm text-gray-400">Entregues</p>
+            <p className="text-2xl font-bold text-green-400">{projeto.pedidos_entregues}</p>
           </div>
-          <div className="bg-red-50 rounded-lg p-4">
-            <p className="text-sm text-gray-600">Atrasados</p>
-            <p className="text-2xl font-bold text-red-600">{projeto.pedidos_atrasados}</p>
+          <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+            <p className="text-sm text-gray-400">Atrasados</p>
+            <p className="text-2xl font-bold text-red-400">{projeto.pedidos_atrasados}</p>
           </div>
         </div>
       </div>
 
       {/* Filtros */}
       {showFilters && (
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-4 mb-6 border border-gray-700">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
               <select
                 value={filtros.status}
                 onChange={(e) => setFiltros({ ...filtros, status: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg"
               >
                 <option value="">Todos</option>
                 {STATUS_OPTIONS.map(s => (
@@ -211,11 +211,11 @@ export default function MarketplaceProjetoDetalhes() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Situação</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Situação</label>
               <select
                 value={filtros.atrasado === null ? '' : filtros.atrasado}
                 onChange={(e) => setFiltros({ ...filtros, atrasado: e.target.value === '' ? null : e.target.value === 'true' })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg"
               >
                 <option value="">Todos</option>
                 <option value="false">No Prazo</option>
@@ -225,7 +225,7 @@ export default function MarketplaceProjetoDetalhes() {
             <div className="flex items-end">
               <button
                 onClick={() => setFiltros({ status: '', atrasado: null })}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
               >
                 Limpar Filtros
               </button>
@@ -236,16 +236,16 @@ export default function MarketplaceProjetoDetalhes() {
 
       {/* Toggle View Mode */}
       <div className="flex justify-end mb-4">
-        <div className="bg-white rounded-lg shadow p-1 inline-flex">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-1 inline-flex border border-gray-700">
           <button
             onClick={() => setViewMode('kanban')}
-            className={`px-4 py-2 rounded-lg ${viewMode === 'kanban' ? 'bg-blue-600 text-white' : 'text-gray-600'}`}
+            className={`px-4 py-2 rounded-lg ${viewMode === 'kanban' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
           >
             Kanban
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className={`px-4 py-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600'}`}
+            className={`px-4 py-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
           >
             Lista
           </button>
@@ -256,14 +256,14 @@ export default function MarketplaceProjetoDetalhes() {
       {viewMode === 'kanban' && (
         <div className="grid grid-cols-6 gap-4">
           {STATUS_OPTIONS.map(statusOption => (
-            <div key={statusOption.value} className="bg-white rounded-lg shadow p-4">
+            <div key={statusOption.value} className="bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-700">
               <div className="flex items-center gap-2 mb-4">
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: statusOption.color }}
                 ></div>
-                <h3 className="font-bold text-sm text-gray-900">{statusOption.label}</h3>
-                <span className="ml-auto bg-gray-100 px-2 py-1 rounded-full text-xs font-medium">
+                <h3 className="font-bold text-sm text-white">{statusOption.label}</h3>
+                <span className="ml-auto bg-gray-700 px-2 py-1 rounded-full text-xs font-medium text-gray-300">
                   {pedidosPorStatus[statusOption.value]?.length || 0}
                 </span>
               </div>
@@ -272,29 +272,29 @@ export default function MarketplaceProjetoDetalhes() {
                 {pedidosPorStatus[statusOption.value]?.map(pedido => (
                   <div
                     key={pedido.id}
-                    className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer border-l-4"
+                    className="bg-gray-900 rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer border-l-4"
                     style={{ borderLeftColor: statusOption.color }}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <p className="font-medium text-sm text-gray-900">{pedido.numero_pedido}</p>
+                      <p className="font-medium text-sm text-white">{pedido.numero_pedido}</p>
                       {pedido.atrasado && (
-                        <AlertCircle className="w-4 h-4 text-red-500" />
+                        <AlertCircle className="w-4 h-4 text-red-400" />
                       )}
                     </div>
-                    <p className="text-xs text-gray-600 mb-2">{pedido.cliente_nome || 'Cliente não informado'}</p>
+                    <p className="text-xs text-gray-400 mb-2">{pedido.cliente_nome || 'Cliente não informado'}</p>
                     <p className="text-xs text-gray-500 mb-2">{pedido.produto_nome}</p>
                     <div className="flex items-center justify-between text-xs">
                       <span className={`px-2 py-1 rounded-full ${getPrioridadeColor(pedido.prioridade)}`}>
                         {pedido.prioridade}
                       </span>
-                      <span className="text-gray-500">{formatDate(pedido.prazo_entrega)}</span>
+                      <span className="text-gray-400">{formatDate(pedido.prazo_entrega)}</span>
                     </div>
                     
                     {/* Dropdown de mudança de status */}
                     <select
                       value={pedido.status}
                       onChange={(e) => handleStatusChange(pedido.id, e.target.value)}
-                      className="w-full mt-2 px-2 py-1 text-xs border border-gray-300 rounded"
+                      className="w-full mt-2 px-2 py-1 text-xs border border-gray-600 bg-gray-800 text-white rounded"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {STATUS_OPTIONS.map(s => (
@@ -311,52 +311,52 @@ export default function MarketplaceProjetoDetalhes() {
 
       {/* List View */}
       {viewMode === 'list' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
           {pedidos.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-              <PackageIcon className="w-16 h-16 mb-4 text-gray-400" />
+            <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+              <PackageIcon className="w-16 h-16 mb-4 text-gray-600" />
               <p className="text-lg font-medium">Nenhum pedido encontrado</p>
               <p className="text-sm">Faça upload de uma planilha para adicionar pedidos</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-700">
+                <thead className="bg-gray-900">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nº Pedido</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produto</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qtd</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prioridade</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prazo</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Responsável</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Nº Pedido</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Cliente</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Produto</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Qtd</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Valor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Prioridade</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Prazo</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Responsável</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-gray-800 divide-y divide-gray-700">
                   {pedidos.map(pedido => (
-                    <tr key={pedido.id} className={pedido.atrasado ? 'bg-red-50' : 'hover:bg-gray-50'}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={pedido.id} className={pedido.atrasado ? 'bg-red-900/20' : 'hover:bg-gray-700/50'}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                         {pedido.numero_pedido}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {pedido.cliente_nome || '-'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-gray-300">
                         {pedido.produto_nome}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {pedido.quantidade}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                         {formatCurrency(pedido.valor_total)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <select
                           value={pedido.status}
                           onChange={(e) => handleStatusChange(pedido.id, e.target.value)}
-                          className="px-3 py-1 text-sm border border-gray-300 rounded"
+                          className="px-3 py-1 text-sm border border-gray-600 bg-gray-700 text-white rounded"
                           style={{ 
                             backgroundColor: STATUS_OPTIONS.find(s => s.value === pedido.status)?.color || '#94A3B8',
                             color: 'white'
@@ -372,18 +372,18 @@ export default function MarketplaceProjetoDetalhes() {
                           {pedido.prioridade}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         <div className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
                           {formatDate(pedido.prazo_entrega)}
                           {pedido.atrasado && (
-                            <span className="ml-2 text-red-600 font-bold">
+                            <span className="ml-2 text-red-400 font-bold">
                               ({pedido.dias_atraso}d)
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         <div className="flex items-center gap-1">
                           <User className="w-4 h-4" />
                           {pedido.responsavel || '-'}
