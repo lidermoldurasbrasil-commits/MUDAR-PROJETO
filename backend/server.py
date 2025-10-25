@@ -1326,6 +1326,7 @@ class PedidoManufatura(BaseModel):
     
     # Orçamento (campos comerciais)
     forma_pagamento: Optional[str] = ""
+    valor_entrada: float = 0  # NOVO: Valor de entrada (sinal/adiantamento)
     desconto_percentual: float = 0
     desconto_valor: float = 0
     sobre_preco_percentual: float = 0
