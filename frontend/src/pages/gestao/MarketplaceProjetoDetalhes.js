@@ -403,6 +403,37 @@ export default function MarketplaceProjetoDetalhes() {
     }
   };
 
+  // Atualizar status em lote
+  const handleUpdateStatusBatch = async (campo, valor) => {
+    if (selectedPedidos.length === 0) {
+      toast.error('Selecione pelo menos um pedido');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Atualizar cada pedido selecionado
+      await Promise.all(
+        selectedPedidos.map(pedidoId =>
+          axios.put(
+            `${API}/pedidos/${pedidoId}`,
+            { [campo]: valor },
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+        )
+      );
+
+      toast.success(`${selectedPedidos.length} pedido(s) atualizado(s) com sucesso!`);
+      setSelectedPedidos([]);
+      setSelectAll(false);
+      fetchDados();
+    } catch (error) {
+      console.error('Erro ao atualizar pedidos:', error);
+      toast.error('Erro ao atualizar pedidos');
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     try {
