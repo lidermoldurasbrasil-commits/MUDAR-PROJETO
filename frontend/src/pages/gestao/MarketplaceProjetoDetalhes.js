@@ -1236,7 +1236,7 @@ export default function MarketplaceProjetoDetalhes() {
       {/* List View */}
       {viewMode === 'list' && (
         <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
-          {pedidos.length === 0 ? (
+          {pedidosFiltrados.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-400">
               <PackageIcon className="w-16 h-16 mb-4 text-gray-600" />
               <p className="text-lg font-medium">Nenhum pedido encontrado</p>
