@@ -4190,6 +4190,108 @@ async def delete_many_pedidos_marketplace(
         "deleted_count": result.deleted_count
     }
 
+# VENDAS MARKETPLACE
+@api_router.get("/gestao/marketplaces/vendas")
+async def get_vendas_marketplace(
+    data_inicio: str = None,
+    data_fim: str = None,
+    plataforma: str = None,
+    projeto_id: str = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Lista vendas do marketplace com filtros"""
+    query = {}
+    
+    if data_inicio and data_fim:
+        query['data_venda'] = {
+            "$gte": data_inicio,
+            "$lte": data_fim
+        }
+    
+    if plataforma:
+        query['plataforma'] = plataforma
+    
+    if projeto_id:
+        query['projeto_marketplace'] = projeto_id
+    
+    vendas = await db.vendas_marketplace.find(query).to_list(None)
+    return vendas
+
+@api_router.get("/gestao/marketplaces/relatorio-vendas")
+async def get_relatorio_vendas_marketplace(
+    data_inicio: str = None,
+    data_fim: str = None,
+    agrupar_por: str = "plataforma",  # plataforma, projeto, dia, mes
+    current_user: dict = Depends(get_current_user)
+):
+    """Relatório de vendas do marketplace com totalizadores"""
+    query = {}
+    
+    if data_inicio and data_fim:
+        query['data_venda'] = {
+            "$gte": data_inicio,
+            "$lte": data_fim
+        }
+    
+    vendas = await db.vendas_marketplace.find(query).to_list(None)
+    
+    # Calcular totalizadores
+    total_vendas = len(vendas)
+    valor_total_bruto = sum(v.get('valor_bruto', 0) for v in vendas)
+    valor_total_taxas = sum(v.get('taxa_comissao', 0) + v.get('taxa_servico', 0) for v in vendas)
+    valor_total_liquido = sum(v.get('valor_liquido', 0) for v in vendas)
+    
+    # Agrupar dados
+    agrupados = {}
+    
+    if agrupar_por == "plataforma":
+        for venda in vendas:
+            plat = venda.get('plataforma', 'Sem Plataforma')
+            if plat not in agrupados:
+                agrupados[plat] = {
+                    "total_vendas": 0,
+                    "valor_bruto": 0,
+                    "valor_taxas": 0,
+                    "valor_liquido": 0
+                }
+            agrupados[plat]["total_vendas"] += 1
+            agrupados[plat]["valor_bruto"] += venda.get('valor_bruto', 0)
+            agrupados[plat]["valor_taxas"] += venda.get('taxa_comissao', 0) + venda.get('taxa_servico', 0)
+            agrupados[plat]["valor_liquido"] += venda.get('valor_liquido', 0)
+    
+    elif agrupar_por == "projeto":
+        projetos_dict = {}
+        projetos_list = await db.projetos_marketplace.find().to_list(None)
+        for p in projetos_list:
+            projetos_dict[p['id']] = p.get('nome', 'Sem Nome')
+        
+        for venda in vendas:
+            proj_id = venda.get('projeto_marketplace', 'Sem Projeto')
+            proj_nome = projetos_dict.get(proj_id, proj_id)
+            if proj_nome not in agrupados:
+                agrupados[proj_nome] = {
+                    "total_vendas": 0,
+                    "valor_bruto": 0,
+                    "valor_taxas": 0,
+                    "valor_liquido": 0
+                }
+            agrupados[proj_nome]["total_vendas"] += 1
+            agrupados[proj_nome]["valor_bruto"] += venda.get('valor_bruto', 0)
+            agrupados[proj_nome]["valor_taxas"] += venda.get('taxa_comissao', 0) + venda.get('taxa_servico', 0)
+            agrupados[proj_nome]["valor_liquido"] += venda.get('valor_liquido', 0)
+    
+    return {
+        "totalizadores": {
+            "total_vendas": total_vendas,
+            "valor_total_bruto": valor_total_bruto,
+            "valor_total_taxas": valor_total_taxas,
+            "valor_total_liquido": valor_total_liquido,
+            "ticket_medio": valor_total_bruto / total_vendas if total_vendas > 0 else 0
+        },
+        "agrupados": agrupados,
+        "vendas": vendas
+    }
+
 # MENSAGEM DO DIA
 @api_router.get("/gestao/marketplaces/mensagem-do-dia")
 async def get_mensagem_do_dia(current_user: dict = Depends(get_current_user)):
