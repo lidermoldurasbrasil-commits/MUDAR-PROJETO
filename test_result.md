@@ -111,7 +111,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "unknown"
           agent: "main"
@@ -119,6 +119,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ ENDPOINT FUNCIONANDO PERFEITAMENTE! Testado com dados reais: altura=50cm, largura=70cm, moldura+vidro. Retorna 200 OK sem erro 422. Cálculos corretos: área=0.35m², perímetro=240cm. Response contém todos os campos obrigatórios: area, perimetro, barras_necessarias, sobra, custo_perda, itens (moldura+vidro), custo_total, markup, preco_venda, margem_percentual, valor_final. Perda técnica calculada corretamente (24cm corte + 30cm sobra). Custo total R$18.47, preço venda R$55.42, margem 66.7%."
+        - working: "unknown"
+          agent: "main"
+          comment: "Atualizado endpoint para incluir preço de venda dos produtos. Cada insumo agora retorna preco_unitario e subtotal_venda baseados no cadastro de produto (campo preco_venda). Cálculo funciona com insumos individuais (não precisa de todos). Aplicado para: Moldura, Vidro, MDF, Papel, Passe-partout e Acessórios."
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
