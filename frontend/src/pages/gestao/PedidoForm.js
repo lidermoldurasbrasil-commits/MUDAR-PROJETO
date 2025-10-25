@@ -519,6 +519,18 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     }
   };
 
+  // Função auxiliar para remover campos vazios que causam erro de validação
+  const limparDadosVazios = (dados) => {
+    const dadosLimpos = { ...dados };
+    
+    // Remover prazo_entrega se estiver vazio (causa erro 422)
+    if (dadosLimpos.prazo_entrega === '' || !dadosLimpos.prazo_entrega) {
+      delete dadosLimpos.prazo_entrega;
+    }
+    
+    return dadosLimpos;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -543,7 +555,7 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
         console.log('Total Venda:', totalGeralVenda);
         console.log('Total Custo:', totalGeralCusto);
         
-        const dadosEnvio = {
+        const dadosEnvio = limparDadosVazios({
           ...formData,
           altura: primeiroProduto.altura || formData.altura || 0,
           largura: primeiroProduto.largura || formData.largura || 0,
@@ -556,7 +568,7 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           valor_final: totalGeralVenda - (formData.desconto_valor || 0) + (formData.sobre_preco_valor || 0),
           // NOVO: Salvar estrutura de múltiplos produtos como JSON
           produtos_detalhes: JSON.stringify(produtosPedido)
-        };
+        });
         
         console.log('📤 Enviando dados (com produtos):', dadosEnvio);
         
@@ -578,7 +590,7 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
         console.log('⚠️ Sem produtos calculados, salvando dados básicos');
         
         // Sem produtos calculados, salvar dados básicos
-        const dadosEnvio = {
+        const dadosEnvio = limparDadosVazios({
           ...formData,
           cliente_nome: formData.cliente_nome || 'Cliente não informado',
           altura: formData.altura || 0,
@@ -590,7 +602,7 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           preco_venda: 0,
           valor_final: 0,
           produtos_detalhes: "[]"
-        };
+        });
         
         console.log('📤 Enviando dados (sem produtos):', dadosEnvio);
         
