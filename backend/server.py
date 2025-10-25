@@ -1621,6 +1621,95 @@ class FormaPagamentoBanco(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# ========================================
+# MODELOS MARKETPLACES
+# ========================================
+
+class ProjetoMarketplace(BaseModel):
+    """Projeto de Marketplace (Shopee, Mercado Livre, TikTok Shop)"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nome: str  # Ex: "Shopee Brasil"
+    plataforma: str  # shopee, mercadolivre, tiktok
+    descricao: str = ""
+    icone: str = ""  # URL ou emoji do ícone
+    cor_primaria: str = "#FF6B00"  # Cor do card
+    status_ativo: bool = True
+    
+    # Métricas
+    pedidos_em_producao: int = 0
+    pedidos_enviados: int = 0
+    pedidos_entregues: int = 0
+    pedidos_atrasados: int = 0
+    progresso_percentual: float = 0  # % de conclusão geral
+    
+    # Performance
+    performance_icone: str = "🚀"  # 🔥🚀🧊
+    valor_total_vendido: float = 0
+    
+    # Metadata
+    loja_id: str = "fabrica"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = ""
+
+class PedidoMarketplace(BaseModel):
+    """Pedido de Marketplace (importado de planilha ou API)"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    projeto_id: str  # Referência ao ProjetoMarketplace
+    plataforma: str  # shopee, mercadolivre, tiktok
+    
+    # Dados do Pedido
+    numero_pedido: str  # Número do pedido no marketplace
+    sku: str = ""
+    cliente_nome: str = ""
+    cliente_contato: str = ""
+    
+    # Produto
+    produto_nome: str = ""
+    quantidade: int = 1
+    valor_unitario: float = 0
+    valor_total: float = 0
+    
+    # Status e Fluxo
+    status: str = "Aguardando Impressão"  # Aguardando Impressão, Sala de Impressão, Em Produção, Expedição, Enviado, Entregue
+    status_cor: str = "#94A3B8"  # Cor do badge de status
+    
+    # Datas
+    data_pedido: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    data_impressao: Optional[datetime] = None
+    data_producao: Optional[datetime] = None
+    data_expedicao: Optional[datetime] = None
+    data_envio: Optional[datetime] = None
+    data_entrega: Optional[datetime] = None
+    prazo_entrega: datetime = Field(default_factory=lambda: datetime.now(timezone.utc) + timedelta(days=7))
+    
+    # Controle
+    responsavel: str = ""
+    prioridade: str = "Normal"  # Baixa, Normal, Alta, Urgente
+    observacoes: str = ""
+    atrasado: bool = False
+    dias_atraso: int = 0
+    
+    # Metadata
+    loja_id: str = "fabrica"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = ""
+
+class MensagemDoDia(BaseModel):
+    """Mensagem motivacional do dia"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    data: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    mensagem: str = "🚀 Lembre-se: a constância vence o talento. Vamos entregar tudo hoje!"
+    created_by: str = ""
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # Contador para número de ordem
 async def get_next_numero_ordem():
     """Gera o próximo número de ordem sequencial"""
