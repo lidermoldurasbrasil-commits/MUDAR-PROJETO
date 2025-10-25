@@ -522,6 +522,10 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('=== INICIANDO SALVAMENTO DO PEDIDO ===');
+    console.log('produtosPedido:', produtosPedido);
+    console.log('formData:', formData);
+    
     setLoading(true);
 
     try {
@@ -529,10 +533,15 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
       
       // Se tem produtos calculados, usar estrutura completa
       if (produtosPedido && produtosPedido.length > 0) {
+        console.log('✅ Tem produtos calculados:', produtosPedido.length);
+        
         const primeiroProduto = produtosPedido[0];
         const todosItens = produtosPedido.flatMap(p => p.itens || []);
         const totalGeralVenda = produtosPedido.reduce((sum, p) => sum + (p.total || 0), 0);
         const totalGeralCusto = produtosPedido.reduce((sum, p) => sum + (p.custo || 0), 0);
+        
+        console.log('Total Venda:', totalGeralVenda);
+        console.log('Total Custo:', totalGeralCusto);
         
         const dadosEnvio = {
           ...formData,
@@ -549,21 +558,25 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           produtos_detalhes: JSON.stringify(produtosPedido)
         };
         
-        console.log('Enviando dados (com produtos):', dadosEnvio);
+        console.log('📤 Enviando dados (com produtos):', dadosEnvio);
         
         if (pedido?.id) {
+          console.log('🔄 Atualizando pedido ID:', pedido.id);
           await axios.put(`${API}/pedidos/${pedido.id}`, dadosEnvio, {
             headers: { Authorization: `Bearer ${token}` }
           });
           toast.success('Pedido atualizado!');
         } else {
+          console.log('➕ Criando novo pedido');
           const response = await axios.post(`${API}/pedidos`, dadosEnvio, {
             headers: { Authorization: `Bearer ${token}` }
           });
-          console.log('Resposta do servidor:', response.data);
+          console.log('✅ Resposta do servidor:', response.data);
           toast.success('Pedido criado com sucesso!');
         }
       } else {
+        console.log('⚠️ Sem produtos calculados, salvando dados básicos');
+        
         // Sem produtos calculados, salvar dados básicos
         const dadosEnvio = {
           ...formData,
@@ -579,29 +592,34 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
           produtos_detalhes: "[]"
         };
         
-        console.log('Enviando dados (sem produtos):', dadosEnvio);
+        console.log('📤 Enviando dados (sem produtos):', dadosEnvio);
         
         if (pedido?.id) {
+          console.log('🔄 Atualizando pedido ID:', pedido.id);
           await axios.put(`${API}/pedidos/${pedido.id}`, dadosEnvio, {
             headers: { Authorization: `Bearer ${token}` }
           });
           toast.success('Pedido atualizado!');
         } else {
+          console.log('➕ Criando novo pedido');
           const response = await axios.post(`${API}/pedidos`, dadosEnvio, {
             headers: { Authorization: `Bearer ${token}` }
           });
-          console.log('Resposta do servidor:', response.data);
+          console.log('✅ Resposta do servidor:', response.data);
           toast.success('Pedido criado com sucesso!');
         }
       }
       
+      console.log('✅ Salvamento concluído, chamando onSave()');
       onSave();
     } catch (error) {
-      console.error('Erro completo:', error);
+      console.error('❌ ERRO AO SALVAR:', error);
       console.error('Detalhes do erro:', error.response?.data);
+      console.error('Status do erro:', error.response?.status);
       toast.error('Erro ao salvar: ' + (error.response?.data?.detail || error.message));
     } finally {
       setLoading(false);
+      console.log('=== FIM DO SALVAMENTO ===');
     }
   };
 
