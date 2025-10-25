@@ -37,6 +37,9 @@ export default function Pedidos() {
   const [selectedPedido, setSelectedPedido] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('Todos');
+  
+  // NOVO: Estado para seleção múltipla
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
     fetchPedidos();
@@ -45,6 +48,11 @@ export default function Pedidos() {
   useEffect(() => {
     filterPedidos();
   }, [pedidos, searchTerm, statusFilter]);
+  
+  // NOVA: Limpar seleção ao filtrar
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [filteredPedidos]);
 
   const fetchPedidos = async () => {
     setLoading(true);
