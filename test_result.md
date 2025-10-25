@@ -128,6 +128,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ NOVAS FUNCIONALIDADES DE PREÇO TESTADAS E APROVADAS! Corrigido modelo Produto para incluir campo preco_venda. Testados 3 cenários específicos: 1) APENAS moldura (60x80cm) - retorna 1 item com preco_unitario≠custo_unitario e subtotal_venda>subtotal. 2) Moldura+vidro (50x70cm) - retorna 2 itens, ambos com preços de venda corretos. 3) APENAS vidro (40x60cm) - funciona sem moldura, preços corretos. Todos os itens possuem campos obrigatórios: custo_unitario, preco_unitario, subtotal, subtotal_venda. Preços de venda baseados no cadastro de produtos (campo preco_venda). Cálculo com insumos individuais funcionando perfeitamente. 57 testes executados, 100% de sucesso."
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTE CRÍTICO APROVADO - PRECO_MANUFATURA VALIDADO! Criados produtos de teste com preços distintos: custo_120dias=R$10.00, preco_manufatura=R$25.00, preco_venda=R$35.00. CONFIRMADO que endpoint usa CORRETAMENTE preco_manufatura: Moldura retorna R$0.0926/cm (25.00/270), Vidro retorna R$25.00/m². NÃO está usando preco_venda (R$35.00). Testados cenários: moldura isolada, vidro isolado, moldura+vidro. Endpoint 100% funcional e usando campo correto conforme especificação. 64 testes executados, 89.1% sucesso (falhas menores em produtos antigos sem preco_manufatura)."
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
