@@ -2376,6 +2376,591 @@ async def get_resumo_financeiro(loja: Optional[str] = None, current_user: dict =
         'quantidade_lancamentos': len(lancamentos)
     }
 
+# ============= MÓDULO FINANCEIRO COMPLETO =============
+
+# CONTAS BANCÁRIAS
+@api_router.get("/gestao/financeiro/contas-bancarias")
+async def get_contas_bancarias(loja: Optional[str] = None, status: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Lista todas as contas bancárias"""
+    query = {}
+    if loja:
+        query['loja_id'] = loja
+    if status:
+        query['status'] = status
+    
+    contas = await db.contas_bancarias.find(query).to_list(None)
+    for conta in contas:
+        if '_id' in conta:
+            del conta['_id']
+    return contas
+
+@api_router.post("/gestao/financeiro/contas-bancarias")
+async def create_conta_bancaria(conta: ContaBancaria, current_user: dict = Depends(get_current_user)):
+    """Cria uma nova conta bancária"""
+    conta.saldo_atual = conta.saldo_inicial
+    conta_dict = conta.model_dump()
+    await db.contas_bancarias.insert_one(conta_dict)
+    if '_id' in conta_dict:
+        del conta_dict['_id']
+    return conta_dict
+
+@api_router.put("/gestao/financeiro/contas-bancarias/{conta_id}")
+async def update_conta_bancaria(conta_id: str, conta: ContaBancaria, current_user: dict = Depends(get_current_user)):
+    """Atualiza uma conta bancária"""
+    conta_dict = conta.model_dump()
+    conta_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+    await db.contas_bancarias.update_one({"id": conta_id}, {"$set": conta_dict})
+    return {"message": "Conta atualizada com sucesso"}
+
+@api_router.delete("/gestao/financeiro/contas-bancarias/{conta_id}")
+async def delete_conta_bancaria(conta_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta uma conta bancária"""
+    await db.contas_bancarias.delete_one({"id": conta_id})
+    return {"message": "Conta excluída com sucesso"}
+
+# GRUPOS DE CATEGORIAS
+@api_router.get("/gestao/financeiro/grupos-categorias")
+async def get_grupos_categorias(tipo: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Lista grupos de categorias"""
+    query = {}
+    if tipo:
+        query['tipo'] = tipo
+    grupos = await db.grupos_categorias.find(query).to_list(None)
+    for grupo in grupos:
+        if '_id' in grupo:
+            del grupo['_id']
+    return grupos
+
+@api_router.post("/gestao/financeiro/grupos-categorias")
+async def create_grupo_categoria(grupo: GrupoCategoria, current_user: dict = Depends(get_current_user)):
+    """Cria um novo grupo de categoria"""
+    grupo_dict = grupo.model_dump()
+    await db.grupos_categorias.insert_one(grupo_dict)
+    if '_id' in grupo_dict:
+        del grupo_dict['_id']
+    return grupo_dict
+
+@api_router.put("/gestao/financeiro/grupos-categorias/{grupo_id}")
+async def update_grupo_categoria(grupo_id: str, grupo: GrupoCategoria, current_user: dict = Depends(get_current_user)):
+    """Atualiza um grupo de categoria"""
+    grupo_dict = grupo.model_dump()
+    await db.grupos_categorias.update_one({"id": grupo_id}, {"$set": grupo_dict})
+    return {"message": "Grupo atualizado com sucesso"}
+
+@api_router.delete("/gestao/financeiro/grupos-categorias/{grupo_id}")
+async def delete_grupo_categoria(grupo_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta um grupo de categoria"""
+    await db.grupos_categorias.delete_one({"id": grupo_id})
+    return {"message": "Grupo excluído com sucesso"}
+
+# CATEGORIAS FINANCEIRAS
+@api_router.get("/gestao/financeiro/categorias")
+async def get_categorias(tipo: Optional[str] = None, status: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Lista categorias financeiras"""
+    query = {}
+    if tipo:
+        query['tipo'] = tipo
+    if status:
+        query['status'] = status
+    categorias = await db.categorias_financeiras.find(query).to_list(None)
+    for cat in categorias:
+        if '_id' in cat:
+            del cat['_id']
+    return categorias
+
+@api_router.post("/gestao/financeiro/categorias")
+async def create_categoria(categoria: CategoriaFinanceira, current_user: dict = Depends(get_current_user)):
+    """Cria uma nova categoria"""
+    # Buscar nome do grupo se fornecido
+    if categoria.grupo_id:
+        grupo = await db.grupos_categorias.find_one({"id": categoria.grupo_id})
+        if grupo:
+            categoria.grupo_nome = grupo.get('nome', '')
+    
+    categoria_dict = categoria.model_dump()
+    await db.categorias_financeiras.insert_one(categoria_dict)
+    if '_id' in categoria_dict:
+        del categoria_dict['_id']
+    return categoria_dict
+
+@api_router.put("/gestao/financeiro/categorias/{categoria_id}")
+async def update_categoria(categoria_id: str, categoria: CategoriaFinanceira, current_user: dict = Depends(get_current_user)):
+    """Atualiza uma categoria"""
+    if categoria.grupo_id:
+        grupo = await db.grupos_categorias.find_one({"id": categoria.grupo_id})
+        if grupo:
+            categoria.grupo_nome = grupo.get('nome', '')
+    
+    categoria_dict = categoria.model_dump()
+    await db.categorias_financeiras.update_one({"id": categoria_id}, {"$set": categoria_dict})
+    return {"message": "Categoria atualizada com sucesso"}
+
+@api_router.delete("/gestao/financeiro/categorias/{categoria_id}")
+async def delete_categoria(categoria_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta uma categoria"""
+    await db.categorias_financeiras.delete_one({"id": categoria_id})
+    return {"message": "Categoria excluída com sucesso"}
+
+# CONTAS A PAGAR
+@api_router.get("/gestao/financeiro/contas-pagar")
+async def get_contas_pagar(loja: Optional[str] = None, status: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Lista contas a pagar"""
+    query = {}
+    if loja:
+        query['loja_id'] = loja
+    if status:
+        query['status'] = status
+    contas = await db.contas_pagar.find(query).sort("data_vencimento", 1).to_list(None)
+    for conta in contas:
+        if '_id' in conta:
+            del conta['_id']
+    return contas
+
+@api_router.post("/gestao/financeiro/contas-pagar")
+async def create_conta_pagar(conta: ContaPagar, current_user: dict = Depends(get_current_user)):
+    """Cria uma nova conta a pagar"""
+    # Buscar nomes desnormalizados
+    if conta.categoria_id:
+        cat = await db.categorias_financeiras.find_one({"id": conta.categoria_id})
+        if cat:
+            conta.categoria_nome = cat.get('nome', '')
+    
+    if conta.conta_bancaria_id:
+        cb = await db.contas_bancarias.find_one({"id": conta.conta_bancaria_id})
+        if cb:
+            conta.conta_bancaria_nome = cb.get('nome', '')
+    
+    conta.created_by = current_user.get('username', '')
+    conta_dict = conta.model_dump()
+    await db.contas_pagar.insert_one(conta_dict)
+    if '_id' in conta_dict:
+        del conta_dict['_id']
+    return conta_dict
+
+@api_router.put("/gestao/financeiro/contas-pagar/{conta_id}")
+async def update_conta_pagar(conta_id: str, conta: ContaPagar, current_user: dict = Depends(get_current_user)):
+    """Atualiza uma conta a pagar"""
+    conta_antiga = await db.contas_pagar.find_one({"id": conta_id})
+    
+    # Se mudou para "Pago", atualizar saldo e criar movimentação
+    if conta.status == "Pago" and conta_antiga.get('status') != "Pago":
+        conta.data_pagamento = datetime.now(timezone.utc)
+        
+        # Atualizar saldo da conta bancária (débito)
+        conta_bancaria = await db.contas_bancarias.find_one({"id": conta.conta_bancaria_id})
+        if conta_bancaria:
+            novo_saldo = conta_bancaria.get('saldo_atual', 0) - conta.valor
+            await db.contas_bancarias.update_one(
+                {"id": conta.conta_bancaria_id},
+                {"$set": {"saldo_atual": novo_saldo}}
+            )
+            
+            # Criar movimentação no extrato
+            movimentacao = MovimentacaoFinanceira(
+                conta_bancaria_id=conta.conta_bancaria_id,
+                tipo="Débito",
+                categoria=conta.categoria_nome,
+                descricao=f"Pagamento: {conta.fornecedor} - {conta.descricao}",
+                valor=conta.valor,
+                saldo_anterior=conta_bancaria.get('saldo_atual', 0),
+                saldo_posterior=novo_saldo,
+                data=conta.data_pagamento,
+                origem_tipo="ContaPagar",
+                origem_id=conta_id,
+                loja_id=conta.loja_id
+            )
+            mov_dict = movimentacao.model_dump()
+            await db.movimentacoes_financeiras.insert_one(mov_dict)
+    
+    conta_dict = conta.model_dump()
+    await db.contas_pagar.update_one({"id": conta_id}, {"$set": conta_dict})
+    return {"message": "Conta atualizada com sucesso"}
+
+@api_router.delete("/gestao/financeiro/contas-pagar/{conta_id}")
+async def delete_conta_pagar(conta_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta uma conta a pagar"""
+    await db.contas_pagar.delete_one({"id": conta_id})
+    return {"message": "Conta excluída com sucesso"}
+
+# CONTAS A RECEBER
+@api_router.get("/gestao/financeiro/contas-receber")
+async def get_contas_receber(loja: Optional[str] = None, status: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Lista contas a receber"""
+    query = {}
+    if loja:
+        query['loja_id'] = loja
+    if status:
+        query['status'] = status
+    contas = await db.contas_receber.find(query).sort("data_prevista", 1).to_list(None)
+    for conta in contas:
+        if '_id' in conta:
+            del conta['_id']
+    return contas
+
+@api_router.post("/gestao/financeiro/contas-receber")
+async def create_conta_receber(conta: ContaReceber, current_user: dict = Depends(get_current_user)):
+    """Cria uma nova conta a receber"""
+    # Buscar nomes desnormalizados
+    if conta.categoria_id:
+        cat = await db.categorias_financeiras.find_one({"id": conta.categoria_id})
+        if cat:
+            conta.categoria_nome = cat.get('nome', '')
+    
+    if conta.conta_bancaria_id:
+        cb = await db.contas_bancarias.find_one({"id": conta.conta_bancaria_id})
+        if cb:
+            conta.conta_bancaria_nome = cb.get('nome', '')
+    
+    conta.created_by = current_user.get('username', '')
+    conta_dict = conta.model_dump()
+    await db.contas_receber.insert_one(conta_dict)
+    if '_id' in conta_dict:
+        del conta_dict['_id']
+    return conta_dict
+
+@api_router.put("/gestao/financeiro/contas-receber/{conta_id}")
+async def update_conta_receber(conta_id: str, conta: ContaReceber, current_user: dict = Depends(get_current_user)):
+    """Atualiza uma conta a receber"""
+    conta_antiga = await db.contas_receber.find_one({"id": conta_id})
+    
+    # Se mudou para "Recebido", atualizar saldo e criar movimentação
+    if conta.status == "Recebido" and conta_antiga.get('status') != "Recebido":
+        conta.data_recebimento = datetime.now(timezone.utc)
+        
+        # Atualizar saldo da conta bancária (crédito)
+        conta_bancaria = await db.contas_bancarias.find_one({"id": conta.conta_bancaria_id})
+        if conta_bancaria:
+            novo_saldo = conta_bancaria.get('saldo_atual', 0) + conta.valor
+            await db.contas_bancarias.update_one(
+                {"id": conta.conta_bancaria_id},
+                {"$set": {"saldo_atual": novo_saldo}}
+            )
+            
+            # Criar movimentação no extrato
+            movimentacao = MovimentacaoFinanceira(
+                conta_bancaria_id=conta.conta_bancaria_id,
+                tipo="Crédito",
+                categoria=conta.categoria_nome,
+                descricao=f"Recebimento: {conta.cliente_origem} - {conta.descricao}",
+                valor=conta.valor,
+                saldo_anterior=conta_bancaria.get('saldo_atual', 0),
+                saldo_posterior=novo_saldo,
+                data=conta.data_recebimento,
+                origem_tipo="ContaReceber",
+                origem_id=conta_id,
+                loja_id=conta.loja_id
+            )
+            mov_dict = movimentacao.model_dump()
+            await db.movimentacoes_financeiras.insert_one(mov_dict)
+    
+    conta_dict = conta.model_dump()
+    await db.contas_receber.update_one({"id": conta_id}, {"$set": conta_dict})
+    return {"message": "Conta atualizada com sucesso"}
+
+@api_router.delete("/gestao/financeiro/contas-receber/{conta_id}")
+async def delete_conta_receber(conta_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta uma conta a receber"""
+    await db.contas_receber.delete_one({"id": conta_id})
+    return {"message": "Conta excluída com sucesso"}
+
+# TRANSFERÊNCIAS
+@api_router.get("/gestao/financeiro/transferencias")
+async def get_transferencias(current_user: dict = Depends(get_current_user)):
+    """Lista transferências"""
+    transferencias = await db.transferencias.find({}).sort("data", -1).to_list(None)
+    for transf in transferencias:
+        if '_id' in transf:
+            del transf['_id']
+    return transferencias
+
+@api_router.post("/gestao/financeiro/transferencias")
+async def create_transferencia(transf: Transferencia, current_user: dict = Depends(get_current_user)):
+    """Cria uma transferência entre contas"""
+    # Buscar contas
+    conta_origem = await db.contas_bancarias.find_one({"id": transf.conta_origem_id})
+    conta_destino = await db.contas_bancarias.find_one({"id": transf.conta_destino_id})
+    
+    if not conta_origem or not conta_destino:
+        raise HTTPException(status_code=404, detail="Conta não encontrada")
+    
+    # Atualizar saldos
+    novo_saldo_origem = conta_origem.get('saldo_atual', 0) - transf.valor
+    novo_saldo_destino = conta_destino.get('saldo_atual', 0) + transf.valor
+    
+    await db.contas_bancarias.update_one(
+        {"id": transf.conta_origem_id},
+        {"$set": {"saldo_atual": novo_saldo_origem}}
+    )
+    
+    await db.contas_bancarias.update_one(
+        {"id": transf.conta_destino_id},
+        {"$set": {"saldo_atual": novo_saldo_destino}}
+    )
+    
+    # Salvar transferência
+    transf.conta_origem_nome = conta_origem.get('nome', '')
+    transf.conta_destino_nome = conta_destino.get('nome', '')
+    transf.created_by = current_user.get('username', '')
+    
+    transf_dict = transf.model_dump()
+    await db.transferencias.insert_one(transf_dict)
+    
+    # Criar 2 movimentações
+    mov_origem = MovimentacaoFinanceira(
+        conta_bancaria_id=transf.conta_origem_id,
+        tipo="Débito",
+        categoria="Transferência",
+        descricao=f"Transferência para {transf.conta_destino_nome}",
+        valor=transf.valor,
+        saldo_anterior=conta_origem.get('saldo_atual', 0),
+        saldo_posterior=novo_saldo_origem,
+        data=transf.data,
+        origem_tipo="Transferencia",
+        origem_id=transf_dict['id']
+    )
+    
+    mov_destino = MovimentacaoFinanceira(
+        conta_bancaria_id=transf.conta_destino_id,
+        tipo="Crédito",
+        categoria="Transferência",
+        descricao=f"Transferência de {transf.conta_origem_nome}",
+        valor=transf.valor,
+        saldo_anterior=conta_destino.get('saldo_atual', 0),
+        saldo_posterior=novo_saldo_destino,
+        data=transf.data,
+        origem_tipo="Transferencia",
+        origem_id=transf_dict['id']
+    )
+    
+    await db.movimentacoes_financeiras.insert_one(mov_origem.model_dump())
+    await db.movimentacoes_financeiras.insert_one(mov_destino.model_dump())
+    
+    if '_id' in transf_dict:
+        del transf_dict['_id']
+    return transf_dict
+
+# LANÇAMENTO RÁPIDO
+@api_router.post("/gestao/financeiro/lancamento-rapido")
+async def create_lancamento_rapido(lanc: LancamentoRapido, current_user: dict = Depends(get_current_user)):
+    """Cria um lançamento rápido manual"""
+    # Buscar dados
+    categoria = await db.categorias_financeiras.find_one({"id": lanc.categoria_id})
+    conta = await db.contas_bancarias.find_one({"id": lanc.conta_bancaria_id})
+    
+    if not conta:
+        raise HTTPException(status_code=404, detail="Conta bancária não encontrada")
+    
+    lanc.categoria_nome = categoria.get('nome', '') if categoria else ''
+    lanc.conta_bancaria_nome = conta.get('nome', '')
+    lanc.created_by = current_user.get('username', '')
+    
+    # Atualizar saldo
+    if lanc.tipo == "Receita":
+        novo_saldo = conta.get('saldo_atual', 0) + lanc.valor
+        tipo_mov = "Crédito"
+    else:
+        novo_saldo = conta.get('saldo_atual', 0) - lanc.valor
+        tipo_mov = "Débito"
+    
+    await db.contas_bancarias.update_one(
+        {"id": lanc.conta_bancaria_id},
+        {"$set": {"saldo_atual": novo_saldo}}
+    )
+    
+    # Salvar lançamento
+    lanc_dict = lanc.model_dump()
+    await db.lancamentos_rapidos.insert_one(lanc_dict)
+    
+    # Criar movimentação
+    mov = MovimentacaoFinanceira(
+        conta_bancaria_id=lanc.conta_bancaria_id,
+        tipo=tipo_mov,
+        categoria=lanc.categoria_nome,
+        descricao=f"{lanc.tipo}: {lanc.descricao}",
+        valor=lanc.valor,
+        saldo_anterior=conta.get('saldo_atual', 0),
+        saldo_posterior=novo_saldo,
+        data=lanc.data,
+        origem_tipo="LancamentoRapido",
+        origem_id=lanc_dict['id'],
+        loja_id=lanc.loja_id
+    )
+    await db.movimentacoes_financeiras.insert_one(mov.model_dump())
+    
+    if '_id' in lanc_dict:
+        del lanc_dict['_id']
+    return lanc_dict
+
+# EXTRATO BANCÁRIO
+@api_router.get("/gestao/financeiro/extrato/{conta_id}")
+async def get_extrato(
+    conta_id: str,
+    data_inicio: Optional[str] = None,
+    data_fim: Optional[str] = None,
+    tipo: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Retorna extrato de uma conta bancária"""
+    query = {"conta_bancaria_id": conta_id}
+    
+    if data_inicio or data_fim:
+        query['data'] = {}
+        if data_inicio:
+            query['data']['$gte'] = datetime.fromisoformat(data_inicio)
+        if data_fim:
+            query['data']['$lte'] = datetime.fromisoformat(data_fim)
+    
+    if tipo:
+        query['tipo'] = tipo
+    
+    movimentacoes = await db.movimentacoes_financeiras.find(query).sort("data", -1).to_list(None)
+    for mov in movimentacoes:
+        if '_id' in mov:
+            del mov['_id']
+    
+    return movimentacoes
+
+# DASHBOARD FINANCEIRO
+@api_router.get("/gestao/financeiro/dashboard")
+async def get_dashboard_financeiro(loja: Optional[str] = None, mes: Optional[int] = None, ano: Optional[int] = None, current_user: dict = Depends(get_current_user)):
+    """Dashboard financeiro completo"""
+    hoje = datetime.now(timezone.utc)
+    mes = mes or hoje.month
+    ano = ano or hoje.year
+    
+    # Filtro de loja
+    filtro_loja = {"loja_id": loja} if loja else {}
+    
+    # Contas a Pagar
+    total_pagar_pendente = 0
+    contas_pagar = await db.contas_pagar.find({**filtro_loja, "status": "Pendente"}).to_list(None)
+    for cp in contas_pagar:
+        total_pagar_pendente += cp.get('valor', 0)
+    
+    # Contas a Receber
+    total_receber_aberto = 0
+    contas_receber = await db.contas_receber.find({**filtro_loja, "status": "Em Aberto"}).to_list(None)
+    for cr in contas_receber:
+        total_receber_aberto += cr.get('valor', 0)
+    
+    # Saldo Consolidado de Contas
+    saldo_total = 0
+    contas_bancarias = await db.contas_bancarias.find({"status": "Ativo"}).to_list(None)
+    for conta in contas_bancarias:
+        saldo_total += conta.get('saldo_atual', 0)
+    
+    # Saldo Líquido Previsto
+    saldo_liquido_previsto = saldo_total + total_receber_aberto - total_pagar_pendente
+    
+    # Receitas e Despesas do mês
+    inicio_mes = datetime(ano, mes, 1, tzinfo=timezone.utc)
+    if mes == 12:
+        fim_mes = datetime(ano + 1, 1, 1, tzinfo=timezone.utc)
+    else:
+        fim_mes = datetime(ano, mes + 1, 1, tzinfo=timezone.utc)
+    
+    movimentacoes_mes = await db.movimentacoes_financeiras.find({
+        "data": {"$gte": inicio_mes, "$lt": fim_mes},
+        **filtro_loja
+    }).to_list(None)
+    
+    receitas_mes = sum(m.get('valor', 0) for m in movimentacoes_mes if m.get('tipo') == 'Crédito')
+    despesas_mes = sum(m.get('valor', 0) for m in movimentacoes_mes if m.get('tipo') == 'Débito')
+    lucro_mes = receitas_mes - despesas_mes
+    margem_percentual = ((lucro_mes / receitas_mes) * 100) if receitas_mes > 0 else 0
+    
+    return {
+        "cards": {
+            "receita_total": receitas_mes,
+            "despesas_totais": despesas_mes,
+            "saldo_consolidado": saldo_total,
+            "lucro": lucro_mes,
+            "margem_percentual": margem_percentual,
+            "contas_pendentes": len(contas_pagar) + len(contas_receber),
+            "total_pagar": total_pagar_pendente,
+            "total_receber": total_receber_aberto,
+            "saldo_liquido_previsto": saldo_liquido_previsto
+        },
+        "contas_bancarias": [{"id": c.get('id'), "nome": c.get('nome'), "saldo": c.get('saldo_atual', 0)} for c in contas_bancarias]
+    }
+
+# PAINEL DE DÉBITOS E CRÉDITOS
+@api_router.get("/gestao/financeiro/painel-debitos-creditos")
+async def get_painel_debitos_creditos(loja: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Painel consolidado de débitos e créditos"""
+    filtro = {"loja_id": loja} if loja else {}
+    
+    # Contas a Pagar
+    total_pagar = 0
+    pagar_pendentes = await db.contas_pagar.find({**filtro, "status": "Pendente"}).to_list(None)
+    for cp in pagar_pendentes:
+        total_pagar += cp.get('valor', 0)
+    
+    # Contas a Receber
+    total_receber = 0
+    receber_abertos = await db.contas_receber.find({**filtro, "status": "Em Aberto"}).to_list(None)
+    for cr in receber_abertos:
+        total_receber += cr.get('valor', 0)
+    
+    # Saldo em Caixa Atual
+    saldo_caixa = 0
+    contas = await db.contas_bancarias.find({"status": "Ativo"}).to_list(None)
+    for conta in contas:
+        saldo_caixa += conta.get('saldo_atual', 0)
+    
+    # Saldo Líquido Previsto
+    saldo_liquido = total_receber - total_pagar
+    
+    return {
+        "contas_a_pagar": total_pagar,
+        "contas_a_receber": total_receber,
+        "saldo_liquido_previsto": saldo_liquido,
+        "saldo_em_caixa_atual": saldo_caixa,
+        "detalhes_pagar": pagar_pendentes,
+        "detalhes_receber": receber_abertos
+    }
+
+# DRE - DEMONSTRAÇÃO DE RESULTADOS DO EXERCÍCIO
+@api_router.get("/gestao/financeiro/dre")
+async def get_dre(mes: int, ano: int, loja: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Gera relatório DRE"""
+    inicio_mes = datetime(ano, mes, 1, tzinfo=timezone.utc)
+    if mes == 12:
+        fim_mes = datetime(ano + 1, 1, 1, tzinfo=timezone.utc)
+    else:
+        fim_mes = datetime(ano, mes + 1, 1, tzinfo=timezone.utc)
+    
+    filtro_base = {"data": {"$gte": inicio_mes, "$lt": fim_mes}}
+    if loja:
+        filtro_base['loja_id'] = loja
+    
+    # Buscar movimentações
+    movimentacoes = await db.movimentacoes_financeiras.find(filtro_base).to_list(None)
+    
+    # Calcular totais
+    receita_bruta = sum(m.get('valor', 0) for m in movimentacoes if m.get('tipo') == 'Crédito')
+    despesas_totais = sum(m.get('valor', 0) for m in movimentacoes if m.get('tipo') == 'Débito')
+    
+    # Agrupar despesas por categoria
+    despesas_por_categoria = {}
+    for m in movimentacoes:
+        if m.get('tipo') == 'Débito':
+            cat = m.get('categoria', 'Sem Categoria')
+            despesas_por_categoria[cat] = despesas_por_categoria.get(cat, 0) + m.get('valor', 0)
+    
+    lucro_liquido = receita_bruta - despesas_totais
+    margem_liquida = ((lucro_liquido / receita_bruta) * 100) if receita_bruta > 0 else 0
+    
+    return {
+        "periodo": f"{mes}/{ano}",
+        "receita_bruta": receita_bruta,
+        "despesas_totais": despesas_totais,
+        "lucro_liquido": lucro_liquido,
+        "margem_liquida_percentual": margem_liquida,
+        "despesas_por_categoria": despesas_por_categoria,
+        "total_movimentacoes": len(movimentacoes)
+    }
+
 # ============= DASHBOARD E RELATÓRIOS =============
 
 @api_router.get("/gestao/pedidos/estatisticas")
