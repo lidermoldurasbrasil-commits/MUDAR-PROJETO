@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Plus, Edit2, Trash2, Check, X, Filter, FilterX } from 'lucide-react';
+import { Plus, Edit2, Trash2, Check, X, Filter, FilterX, ChevronDown, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
