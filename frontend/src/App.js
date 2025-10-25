@@ -33,6 +33,7 @@ import Relatorios from './pages/gestao/Relatorios';
 import MarketplacesCentral from './pages/gestao/MarketplacesCentral';
 import MarketplaceProjetoDetalhes from './pages/gestao/MarketplaceProjetoDetalhes';
 import RelatorioVendasMarketplace from './pages/gestao/RelatorioVendasMarketplace';
+import ConfiguracoesStatus from './pages/gestao/ConfiguracoesStatus';
 
 import axios from 'axios';
 import './App.css';
