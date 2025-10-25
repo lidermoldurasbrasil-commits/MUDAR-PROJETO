@@ -1329,7 +1329,20 @@ class PedidoManufatura(BaseModel):
     
     # Orçamento (campos comerciais)
     forma_pagamento: Optional[str] = ""
-    valor_entrada: float = 0  # NOVO: Valor de entrada (sinal/adiantamento)
+    
+    # NOVOS CAMPOS FINANCEIROS
+    conta_bancaria_id: Optional[str] = None  # Banco escolhido
+    conta_bancaria_nome: Optional[str] = ""  # Nome do banco
+    forma_pagamento_id: Optional[str] = None  # ID da forma de pagamento escolhida
+    forma_pagamento_nome: Optional[str] = ""  # Ex: "Mercado Pago - Crédito 6x - Taxa 8.39%"
+    forma_pagamento_parcelas: int = 1  # Número de parcelas
+    forma_pagamento_bandeira: Optional[str] = ""  # Bandeira do cartão
+    taxa_percentual: float = 0  # Taxa em %
+    taxa_valor_real: float = 0  # Taxa em R$
+    valor_bruto: float = 0  # Valor total da venda
+    valor_liquido_empresa: float = 0  # Valor que a empresa recebe (bruto - taxa)
+    
+    valor_entrada: float = 0  # Valor de entrada (sinal/adiantamento)
     desconto_percentual: float = 0
     desconto_valor: float = 0
     sobre_preco_percentual: float = 0
