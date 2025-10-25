@@ -752,7 +752,6 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
                         <th>Unidade</th>
                         <th>Preço Unit.</th>
                         <th>Subtotal</th>
-                        <th>Ações</th>
                       </tr>
                     </thead>
                     <tbody>
