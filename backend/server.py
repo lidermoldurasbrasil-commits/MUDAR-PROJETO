@@ -1495,25 +1495,61 @@ class ContaPagar(BaseModel):
     created_by: str = ""
 
 class ContaReceber(BaseModel):
-    """Conta a Receber (Receita)"""
+    """Conta a Receber (Receita) - Sistema completo"""
     model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    cliente_origem: str  # Nome do cliente ou origem (Shopee, Loja 2, etc)
-    categoria_id: str
-    categoria_nome: str = ""
-    descricao: str = ""
-    valor: float
-    data_emissao: datetime
-    data_prevista: datetime
-    data_recebimento: Optional[datetime] = None
-    conta_bancaria_id: str
-    conta_bancaria_nome: str = ""
-    loja_id: str = "fabrica"
-    status: str = "Em Aberto"  # Em Aberto / Recebido / Atrasado / Cancelado
+    
+    # Identificação
     pedido_id: Optional[str] = None  # Referência ao pedido de origem
+    documento: str = ""  # Ex: "Pedido_3253-2/8"
+    cliente_origem: str = ""  # Nome do cliente
+    loja_id: str = "fabrica"  # Loja origem
+    vendedor: str = ""  # Nome do vendedor
+    
+    # Valores
+    valor_bruto: float = 0  # Valor total da venda (sem descontar taxa)
+    valor_liquido: float = 0  # Valor após taxa da adquirente
+    valor: float = 0  # Alias para compatibilidade (= valor_liquido)
+    
+    # Forma de Pagamento e Taxas
+    forma_pagamento_id: Optional[str] = None
+    forma_pagamento_nome: str = ""  # Ex: "MERCADO PAGO - CRÉDITO 8X"
+    conta_bancaria_id: str = ""
+    conta_bancaria_nome: str = ""
+    taxa_percentual: float = 0  # Taxa da adquirente
+    
+    # Parcelamento
+    numero_parcela: int = 1  # Parcela atual (ex: 2)
+    total_parcelas: int = 1  # Total de parcelas (ex: 8)
+    
+    # Datas
+    data_emissao: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    data_vencimento: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  # Data prevista
+    data_prevista: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))  # Alias
+    data_operacao_bancaria: Optional[datetime] = None  # Quando entrou no banco
+    data_pago_loja: Optional[datetime] = None  # Quando loja marcou como pago
+    data_recebimento: Optional[datetime] = None  # Quando foi baixado
+    
+    # Categorização
+    categoria_id: str = ""
+    categoria_nome: str = ""  # Ex: "Venda de Produtos e Serviços"
+    grupo_categoria: str = ""  # Ex: "Receita Bruta"
+    
+    # Status e Controle
+    status: str = "Pendente"  # Pendente / Recebido / Atrasado / Cancelado
+    dc: str = "C"  # D (Débito) ou C (Crédito) - sempre C para receber
+    recorrencia: str = "ÚNICA"  # ÚNICA / MENSAL / SEMANAL
+    lote: str = ""  # Número do lote/repasse da adquirente
+    conta_id_interno: str = ""  # ID interno para conciliação
+    
+    # Informações adicionais
+    descricao: str = ""
     observacoes: str = ""
+    
+    # Metadata
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str = ""
 
 class Transferencia(BaseModel):
