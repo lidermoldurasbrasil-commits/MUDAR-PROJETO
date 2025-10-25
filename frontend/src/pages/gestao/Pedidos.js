@@ -409,36 +409,118 @@ export default function Pedidos() {
                 </div>
               </div>
 
-              {/* Composição do Orçamento */}
-              <h3 style={{marginBottom: '15px', color: '#1f2937'}}>Composição</h3>
-              <table style={{width: '100%', borderCollapse: 'collapse', marginBottom: '20px'}}>
-                <thead>
-                  <tr style={{background: '#f3f4f6'}}>
-                    <th style={{padding: '12px', textAlign: 'left', border: '1px solid #e5e7eb'}}>Insumo</th>
-                    <th style={{padding: '12px', textAlign: 'right', border: '1px solid #e5e7eb'}}>Qtd</th>
-                    <th style={{padding: '12px', textAlign: 'left', border: '1px solid #e5e7eb'}}>Un.</th>
-                    <th style={{padding: '12px', textAlign: 'right', border: '1px solid #e5e7eb'}}>Preço Unit.</th>
-                    <th style={{padding: '12px', textAlign: 'right', border: '1px solid #e5e7eb'}}>Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pedidoOrcamento.itens && pedidoOrcamento.itens.length > 0 ? (
-                    pedidoOrcamento.itens.map((item, index) => (
-                      <tr key={index}>
-                        <td style={{padding: '10px', border: '1px solid #e5e7eb'}}>{item.insumo_descricao}</td>
-                        <td style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb'}}>{item.quantidade?.toFixed(2)}</td>
-                        <td style={{padding: '10px', border: '1px solid #e5e7eb'}}>{item.unidade}</td>
-                        <td style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb'}}>{formatCurrency(item.preco_unitario || 0)}</td>
-                        <td style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb', fontWeight: '600'}}>{formatCurrency(item.subtotal_venda || 0)}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" style={{padding: '20px', textAlign: 'center', color: '#9ca3af'}}>Nenhum item cadastrado</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+              {/* Composição do Orçamento - Produtos Individuais */}
+              <h3 style={{marginBottom: '15px', color: '#1f2937'}}>Composição do Orçamento</h3>
+              
+              {(() => {
+                // Tentar carregar produtos_detalhes primeiro
+                let produtos = [];
+                if (pedidoOrcamento.produtos_detalhes) {
+                  try {
+                    produtos = JSON.parse(pedidoOrcamento.produtos_detalhes);
+                  } catch (e) {
+                    console.error('Erro ao parsear produtos_detalhes:', e);
+                  }
+                }
+                
+                // Se não tem produtos_detalhes, criar um produto único com todos os itens
+                if (!produtos || produtos.length === 0) {
+                  if (pedidoOrcamento.itens && pedidoOrcamento.itens.length > 0) {
+                    produtos = [{
+                      id: 1,
+                      tipo_produto: pedidoOrcamento.tipo_produto,
+                      altura: pedidoOrcamento.altura,
+                      largura: pedidoOrcamento.largura,
+                      quantidade: pedidoOrcamento.quantidade,
+                      itens: pedidoOrcamento.itens,
+                      total: pedidoOrcamento.itens.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0)
+                    }];
+                  }
+                }
+                
+                return produtos.length > 0 ? (
+                  produtos.map((produto, produtoIndex) => (
+                    <div key={produto.id || produtoIndex} style={{marginBottom: '25px', padding: '15px', background: '#f7fafc', borderRadius: '8px', border: '2px solid #e2e8f0'}}>
+                      {/* Cabeçalho do Produto */}
+                      <div style={{marginBottom: '12px', padding: '10px', background: 'white', borderRadius: '6px'}}>
+                        <div style={{fontSize: '16px', fontWeight: '700', color: '#2d7a5e', marginBottom: '8px'}}>
+                          Produto {produtoIndex + 1}: {produto.tipo_produto}
+                        </div>
+                        <div style={{fontSize: '13px', color: '#718096'}}>
+                          <strong>Quantidade:</strong> {produto.quantidade} unidade(s)
+                          <span style={{marginLeft: '15px'}}>|</span>
+                          <span style={{marginLeft: '15px'}}><strong>Dimensões:</strong> {produto.altura}cm × {produto.largura}cm</span>
+                          {produto.area && (
+                            <>
+                              <span style={{marginLeft: '15px'}}>|</span>
+                              <span style={{marginLeft: '15px'}}><strong>Área:</strong> {produto.area.toFixed(4)} m²</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Tabela de Insumos do Produto */}
+                      <table style={{width: '100%', borderCollapse: 'collapse', marginBottom: '10px', background: 'white'}}>
+                        <thead>
+                          <tr style={{background: '#f3f4f6'}}>
+                            <th style={{padding: '10px', textAlign: 'left', border: '1px solid #e5e7eb', fontSize: '13px'}}>Insumo</th>
+                            <th style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb', fontSize: '13px'}}>Qtd</th>
+                            <th style={{padding: '10px', textAlign: 'left', border: '1px solid #e5e7eb', fontSize: '13px'}}>Un.</th>
+                            <th style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb', fontSize: '13px'}}>Preço Unit.</th>
+                            <th style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb', fontSize: '13px'}}>Subtotal</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {produto.itens && produto.itens.length > 0 ? (
+                            produto.itens.map((item, itemIndex) => (
+                              <tr key={itemIndex}>
+                                <td style={{padding: '8px', border: '1px solid #e5e7eb', fontSize: '13px'}}>{item.insumo_descricao}</td>
+                                <td style={{padding: '8px', textAlign: 'right', border: '1px solid #e5e7eb', fontSize: '13px'}}>{item.quantidade?.toFixed(2)}</td>
+                                <td style={{padding: '8px', border: '1px solid #e5e7eb', fontSize: '13px'}}>{item.unidade}</td>
+                                <td style={{padding: '8px', textAlign: 'right', border: '1px solid #e5e7eb', fontSize: '13px'}}>{formatCurrency(item.preco_unitario || 0)}</td>
+                                <td style={{padding: '8px', textAlign: 'right', border: '1px solid #e5e7eb', fontWeight: '600', fontSize: '13px'}}>{formatCurrency(item.subtotal_venda || 0)}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="5" style={{padding: '15px', textAlign: 'center', color: '#9ca3af', fontSize: '13px'}}>Nenhum insumo</td>
+                            </tr>
+                          )}
+                          <tr style={{background: '#f3f4f6'}}>
+                            <td colSpan="4" style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb', fontWeight: '700', fontSize: '14px'}}>SUBTOTAL PRODUTO {produtoIndex + 1}:</td>
+                            <td style={{padding: '10px', textAlign: 'right', border: '1px solid #e5e7eb', fontWeight: '700', color: '#2563eb', fontSize: '14px'}}>{formatCurrency(produto.total || 0)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{padding: '30px', textAlign: 'center', color: '#9ca3af', background: '#f9fafb', borderRadius: '8px'}}>
+                    Nenhum produto cadastrado neste orçamento
+                  </div>
+                );
+              })()}
+              
+              {/* Total Geral de Todos os Produtos */}
+              {(() => {
+                let produtos = [];
+                if (pedidoOrcamento.produtos_detalhes) {
+                  try {
+                    produtos = JSON.parse(pedidoOrcamento.produtos_detalhes);
+                  } catch (e) {}
+                }
+                
+                if (produtos.length > 1) {
+                  return (
+                    <div style={{marginBottom: '20px', padding: '15px', background: '#2d7a5e', color: 'white', borderRadius: '8px', textAlign: 'right'}}>
+                      <div style={{fontSize: '18px', fontWeight: '700'}}>
+                        TOTAL DE TODOS OS PRODUTOS: {formatCurrency(produtos.reduce((sum, p) => sum + (p.total || 0), 0))}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
 
               {/* Totais */}
               <div style={{display: 'grid', gap: '10px', padding: '20px', background: '#f9fafb', borderRadius: '8px'}}>
