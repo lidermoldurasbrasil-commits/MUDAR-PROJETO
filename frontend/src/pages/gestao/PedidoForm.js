@@ -788,6 +788,37 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
               </div>
             )}
 
+            <div className="section-title" style={{marginTop: '30px'}}>Objeto do Cliente para Emoldurar</div>
+
+            <div className="form-grid">
+              <div className="input-group">
+                <label>SKU do Objeto</label>
+                <input
+                  type="text"
+                  name="sku_objeto_cliente"
+                  value={formData.sku_objeto_cliente}
+                  onChange={handleChange}
+                  placeholder="Ex: GRAV-001"
+                />
+              </div>
+              <div className="input-group">
+                <label>Anexar Foto do Objeto</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImagemUpload}
+                  className="file-input"
+                />
+              </div>
+            </div>
+
+            {formData.imagem_anexada && (
+              <div className="image-preview-box">
+                <div className="preview-title">Imagem Anexada:</div>
+                <img src={formData.imagem_anexada} alt="Objeto do cliente" className="preview-image" />
+              </div>
+            )}
+
             <div className="section-title" style={{marginTop: '30px'}}>Controle Interno</div>
 
             <div className="form-grid">
