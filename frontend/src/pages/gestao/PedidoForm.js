@@ -765,23 +765,14 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
                         </tr>
                       ))}
                       <tr className="total-row">
-                        <td colSpan="4"><strong>SUBTOTAL</strong></td>
-                        <td className="subtotal-value"><strong>{formatCurrency(formData.custo_total)}</strong></td>
-                      </tr>
-                      <tr className="total-row">
-                        <td colSpan="4"><strong>PREÇO DE VENDA (Markup {formData.markup?.toFixed(1)}x)</strong></td>
-                        <td className="subtotal-value"><strong>{formatCurrency(formData.preco_venda)}</strong></td>
+                        <td colSpan="4"><strong>TOTAL</strong></td>
+                        <td className="subtotal-value"><strong>{formatCurrency(formData.itens?.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0))}</strong></td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </>
             )}
-
-            <div className="valor-display" style={{marginTop: '20px'}}>
-              <div className="valor-label">Preço de Venda Base</div>
-              <div className="valor-amount">{formatCurrency(formData.preco_venda)}</div>
-            </div>
 
             <div className="form-grid">
               <div className="input-group">
