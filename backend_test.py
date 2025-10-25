@@ -629,6 +629,186 @@ class BusinessManagementSystemTester:
                 200
             )
 
+    def test_gestao_system(self):
+        """Test Sistema de Gestão - Products, Insumos and Manufacturing Orders"""
+        print("\n🏭 Testing Sistema de Gestão...")
+        
+        # First, create some test products for Moldura and Vidro families
+        moldura_data = {
+            "loja_id": "fabrica",
+            "referencia": "MOLD-001",
+            "descricao": "Moldura Madeira Marrom 3cm",
+            "familia": "Moldura",
+            "largura": 3.0,
+            "comprimento": 270.0,
+            "custo_120dias": 2.50,
+            "markup_manufatura": 200.0,
+            "ativo": True
+        }
+        
+        vidro_data = {
+            "loja_id": "fabrica", 
+            "referencia": "VID-001",
+            "descricao": "Vidro Comum 3mm",
+            "familia": "Vidro",
+            "custo_120dias": 45.00,
+            "markup_manufatura": 150.0,
+            "ativo": True
+        }
+        
+        # Create moldura product
+        success, moldura_response = self.run_test(
+            "Create Moldura Product",
+            "POST",
+            "gestao/produtos",
+            200,
+            data=moldura_data
+        )
+        
+        moldura_id = None
+        if success and 'id' in moldura_response:
+            moldura_id = moldura_response['id']
+            print(f"✅ Created Moldura with ID: {moldura_id}")
+        
+        # Create vidro product  
+        success, vidro_response = self.run_test(
+            "Create Vidro Product",
+            "POST",
+            "gestao/produtos", 
+            200,
+            data=vidro_data
+        )
+        
+        vidro_id = None
+        if success and 'id' in vidro_response:
+            vidro_id = vidro_response['id']
+            print(f"✅ Created Vidro with ID: {vidro_id}")
+        
+        # Test getting products
+        self.run_test(
+            "Get All Products",
+            "GET",
+            "gestao/produtos",
+            200
+        )
+        
+        # Now test the manufacturing order calculation endpoint
+        if moldura_id and vidro_id:
+            self.test_manufacturing_order_calculation(moldura_id, vidro_id)
+        else:
+            print("❌ Cannot test manufacturing calculation - missing product IDs")
+
+    def test_manufacturing_order_calculation(self, moldura_id, vidro_id):
+        """Test the manufacturing order calculation endpoint that was fixed"""
+        print("\n🔧 Testing Manufacturing Order Calculation Endpoint...")
+        
+        # Test data as specified in the review request
+        calculation_data = {
+            "altura": 50,  # cm
+            "largura": 70,  # cm  
+            "quantidade": 1,
+            "moldura_id": moldura_id,
+            "usar_vidro": True,
+            "vidro_id": vidro_id,
+            "usar_mdf": False,
+            "usar_papel": False,
+            "usar_passepartout": False,
+            "usar_acessorios": False,
+            "desconto_percentual": 0,
+            "desconto_valor": 0,
+            "sobre_preco_percentual": 0,
+            "sobre_preco_valor": 0
+        }
+        
+        print(f"📊 Testing calculation with data: {json.dumps(calculation_data, indent=2)}")
+        
+        success, response = self.run_test(
+            "Calculate Manufacturing Order",
+            "POST",
+            "gestao/pedidos/calcular",
+            200,
+            data=calculation_data
+        )
+        
+        if success:
+            print("✅ Manufacturing calculation endpoint returned 200 OK")
+            
+            # Verify expected calculations
+            expected_area = (50 * 70) / 10000  # 0.035 m²
+            expected_perimetro = (2 * 50) + (2 * 70)  # 240 cm
+            
+            # Check if response contains required fields
+            required_fields = [
+                'area', 'perimetro', 'barras_necessarias', 'sobra', 'custo_perda',
+                'itens', 'custo_total', 'markup', 'preco_venda', 'margem_percentual', 'valor_final'
+            ]
+            
+            missing_fields = []
+            for field in required_fields:
+                if field not in response:
+                    missing_fields.append(field)
+            
+            if missing_fields:
+                print(f"❌ Missing required fields in response: {missing_fields}")
+                self.log_test("Manufacturing Calculation - Required Fields", False, f"Missing fields: {missing_fields}")
+            else:
+                print("✅ All required fields present in response")
+                self.log_test("Manufacturing Calculation - Required Fields", True)
+            
+            # Verify calculations
+            if 'area' in response:
+                actual_area = response['area']
+                if abs(actual_area - expected_area) < 0.001:  # Allow small floating point differences
+                    print(f"✅ Area calculation correct: {actual_area} m²")
+                    self.log_test("Manufacturing Calculation - Area", True)
+                else:
+                    print(f"❌ Area calculation incorrect. Expected: {expected_area}, Got: {actual_area}")
+                    self.log_test("Manufacturing Calculation - Area", False, f"Expected {expected_area}, got {actual_area}")
+            
+            if 'perimetro' in response:
+                actual_perimetro = response['perimetro']
+                if actual_perimetro == expected_perimetro:
+                    print(f"✅ Perimeter calculation correct: {actual_perimetro} cm")
+                    self.log_test("Manufacturing Calculation - Perimeter", True)
+                else:
+                    print(f"❌ Perimeter calculation incorrect. Expected: {expected_perimetro}, Got: {actual_perimetro}")
+                    self.log_test("Manufacturing Calculation - Perimeter", False, f"Expected {expected_perimetro}, got {actual_perimetro}")
+            
+            # Check if itens array contains moldura and vidro
+            if 'itens' in response and isinstance(response['itens'], list):
+                item_types = [item.get('tipo_insumo', '') for item in response['itens']]
+                
+                if 'Moldura' in item_types:
+                    print("✅ Moldura item found in calculation")
+                    self.log_test("Manufacturing Calculation - Moldura Item", True)
+                else:
+                    print("❌ Moldura item missing from calculation")
+                    self.log_test("Manufacturing Calculation - Moldura Item", False, "Moldura not found in itens")
+                
+                if 'Vidro' in item_types:
+                    print("✅ Vidro item found in calculation")
+                    self.log_test("Manufacturing Calculation - Vidro Item", True)
+                else:
+                    print("❌ Vidro item missing from calculation")
+                    self.log_test("Manufacturing Calculation - Vidro Item", False, "Vidro not found in itens")
+                
+                print(f"📋 Items in calculation: {len(response['itens'])} items")
+                for i, item in enumerate(response['itens']):
+                    print(f"   {i+1}. {item.get('tipo_insumo', 'Unknown')} - {item.get('insumo_descricao', 'No description')} - Subtotal: R$ {item.get('subtotal', 0):.2f}")
+            
+            # Print calculation summary
+            if all(field in response for field in ['custo_total', 'preco_venda', 'valor_final']):
+                print(f"💰 Calculation Summary:")
+                print(f"   Total Cost: R$ {response.get('custo_total', 0):.2f}")
+                print(f"   Sale Price: R$ {response.get('preco_venda', 0):.2f}")
+                print(f"   Final Value: R$ {response.get('valor_final', 0):.2f}")
+                print(f"   Markup: {response.get('markup', 0):.2f}")
+                print(f"   Margin: {response.get('margem_percentual', 0):.1f}%")
+        else:
+            print("❌ Manufacturing calculation endpoint failed")
+            
+        return success
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
