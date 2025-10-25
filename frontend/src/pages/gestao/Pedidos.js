@@ -206,7 +206,7 @@ export default function Pedidos() {
             <tbody>
               {filteredPedidos.length === 0 ? (
                 <tr>
-                  <td colSpan="11" className="no-data">
+                  <td colSpan="12" className="no-data">
                     Nenhum pedido encontrado
                   </td>
                 </tr>
