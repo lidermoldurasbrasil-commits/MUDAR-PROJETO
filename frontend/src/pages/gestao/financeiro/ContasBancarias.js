@@ -142,7 +142,7 @@ export default function ContasBancarias() {
   const handleSaveForma = async (contaId) => {
     try {
       const token = localStorage.getItem('token');
-      if (isAddingForma) {
+      if (isAddingForma === contaId) {
         await axios.post(`${API}/contas-bancarias/${contaId}/formas-pagamento`, formaData, { headers: { Authorization: `Bearer ${token}` } });
         toast.success('Forma de pagamento criada!');
       } else if (editingFormaId) {
@@ -154,6 +154,7 @@ export default function ContasBancarias() {
     } catch (error) {
       console.error('Erro ao salvar forma:', error);
       toast.error('Erro ao salvar forma de pagamento');
+      console.error('Detalhes do erro:', error.response?.data);
     }
   };
 
