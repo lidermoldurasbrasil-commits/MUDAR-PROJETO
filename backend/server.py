@@ -1728,15 +1728,18 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
                 })
         resultado['acessorios_descricoes'] = descricoes
     
-    # 4. Calcular totais com markup do produto
+    # 4. Calcular totais
     resultado['itens'] = itens
     resultado['custo_total'] = custo_total
     resultado['markup'] = markup_sugerido
-    resultado['preco_venda'] = custo_total * markup_sugerido
-    resultado['margem_percentual'] = ((resultado['preco_venda'] - custo_total) / resultado['preco_venda'] * 100) if resultado['preco_venda'] > 0 else 0
+    
+    # Calcular preço de venda como soma dos subtotais_venda (não custo * markup)
+    preco_venda_total = sum(item.get('subtotal_venda', 0) for item in itens)
+    resultado['preco_venda'] = preco_venda_total
+    resultado['margem_percentual'] = ((preco_venda_total - custo_total) / preco_venda_total * 100) if preco_venda_total > 0 else 0
     
     # 5. Calcular valor final com desconto/sobre-preço
-    valor_base = resultado['preco_venda']
+    valor_base = preco_venda_total
     
     # Aplicar desconto (% ou valor)
     desconto_total = 0
