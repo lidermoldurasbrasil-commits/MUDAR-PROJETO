@@ -1280,7 +1280,13 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
                         </td>
                       </tr>
                       <tr>
-                        <td style={{padding: '8px'}}>Taxa ({formData.taxa_percentual}%)</td>
+                        <td style={{padding: '8px'}}>
+                          <strong>Taxa {formData.forma_pagamento_nome?.split('–')[0] || ''}</strong>
+                          <br />
+                          <span style={{fontSize: '12px', color: '#718096'}}>
+                            ({formData.taxa_percentual}%)
+                          </span>
+                        </td>
                         <td style={{padding: '8px', textAlign: 'right', color: '#ef4444', fontWeight: '600'}}>
                           - {formatCurrency(formData.taxa_valor_real)}
                         </td>
