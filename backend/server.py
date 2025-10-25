@@ -1431,6 +1431,10 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             # Converter custo de barra para custo por cm
             custo_por_cm = custo_unitario_barra / 270 if custo_unitario_barra > 0 else 0
             
+            # NOVO: Pegar preço de venda do produto
+            preco_venda_barra = moldura_produto.get('preco_venda', custo_unitario_barra)
+            preco_venda_por_cm = preco_venda_barra / 270 if preco_venda_barra > 0 else 0
+            
             # Pegar markup do produto (usar markup_manufatura)
             if moldura_produto.get('markup_manufatura'):
                 markup_sugerido = (moldura_produto['markup_manufatura'] / 100) + 1  # Converter % para multiplicador
@@ -1439,6 +1443,7 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
                 'id': moldura_produto['id'],
                 'descricao': moldura_produto['descricao'],
                 'custo_unitario': custo_por_cm,
+                'preco_unitario': preco_venda_por_cm,  # NOVO
                 'barra_padrao': 270,
                 'largura_moldura': moldura_produto.get('largura', 0)  # Largura da frente da moldura
             }
