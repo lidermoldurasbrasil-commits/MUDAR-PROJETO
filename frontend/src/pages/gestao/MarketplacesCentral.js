@@ -95,6 +95,25 @@ export default function MarketplacesCentral() {
   }
 
   const indicadores = dashboard?.indicadores || {};
+  const graficos = dashboard?.graficos || {};
+  
+  // Cores para os gráficos
+  const COLORS_STATUS = {
+    'Aguardando Impressão': '#94A3B8',
+    'Sala de Impressão': '#60A5FA',
+    'Em Produção': '#F59E0B',
+    'Expedição': '#FBBF24',
+    'Enviado': '#3B82F6',
+    'Entregue': '#10B981'
+  };
+  
+  // Preparar dados do gráfico de pizza
+  const statusData = Object.entries(graficos.status_atual || {}).map(([status, value]) => ({
+    name: status,
+    value: value
+  }));
+  
+  const COLORS_PIE = Object.values(COLORS_STATUS);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
