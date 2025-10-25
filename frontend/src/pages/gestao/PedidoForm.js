@@ -1185,14 +1185,107 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
               </>
             )}
 
-            <div className="form-grid">
-              <div className="input-group">
-                <label>Forma de Pagamento</label>
-                <select name="forma_pagamento" value={formData.forma_pagamento} onChange={handleChange}>
-                  <option value="">Selecione...</option>
-                  {FORMAS_PAGAMENTO.map(f => <option key={f} value={f}>{f}</option>)}
-                </select>
+            {/* SEÇÃO: CONDIÇÕES DE PAGAMENTO */}
+            <div style={{
+              marginTop: '30px',
+              padding: '20px',
+              background: '#f0fdf9',
+              border: '2px solid #5dceaa',
+              borderRadius: '12px'
+            }}>
+              <div className="section-title" style={{color: '#5dceaa', marginBottom: '20px'}}>
+                💳 Condições de Pagamento
               </div>
+              
+              <div className="form-grid">
+                <div className="input-group">
+                  <label>Banco / Conta para Recebimento *</label>
+                  <select 
+                    value={contaBancariaSelecionada}
+                    onChange={(e) => handleBancoChange(e.target.value)}
+                    style={{border: '2px solid #5dceaa'}}
+                  >
+                    <option value="">Selecione o banco...</option>
+                    {contasBancarias.map(conta => (
+                      <option key={conta.id} value={conta.id}>
+                        {conta.nome} - {conta.banco}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="input-group">
+                  <label>Forma de Pagamento *</label>
+                  <select 
+                    value={formData.forma_pagamento_id}
+                    onChange={(e) => handleFormaPagamentoChange(e.target.value)}
+                    disabled={!contaBancariaSelecionada}
+                    style={{border: '2px solid #5dceaa'}}
+                  >
+                    <option value="">Selecione a forma...</option>
+                    {formasPagamentoDisponiveis.map(forma => (
+                      <option key={forma.id} value={forma.id}>
+                        {forma.nome_formatado}
+                      </option>
+                    ))}
+                  </select>
+                  {!contaBancariaSelecionada && (
+                    <small style={{color: '#718096'}}>Selecione primeiro o banco</small>
+                  )}
+                </div>
+              </div>
+
+              {formaPagamentoSelecionada && (
+                <div style={{
+                  marginTop: '20px',
+                  padding: '15px',
+                  background: 'white',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <table style={{width: '100%', fontSize: '14px'}}>
+                    <thead>
+                      <tr style={{borderBottom: '2px solid #e2e8f0'}}>
+                        <th style={{padding: '8px', textAlign: 'left', color: '#4a5568'}}>Item</th>
+                        <th style={{padding: '8px', textAlign: 'right', color: '#4a5568'}}>Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style={{padding: '8px'}}>Valor Bruto da Venda</td>
+                        <td style={{padding: '8px', textAlign: 'right', fontWeight: '600'}}>
+                          {formatCurrency(formData.valor_bruto)}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={{padding: '8px'}}>Taxa ({formData.taxa_percentual}%)</td>
+                        <td style={{padding: '8px', textAlign: 'right', color: '#ef4444', fontWeight: '600'}}>
+                          - {formatCurrency(formData.taxa_valor_real)}
+                        </td>
+                      </tr>
+                      <tr style={{borderTop: '2px solid #e2e8f0', background: '#f0fdf9'}}>
+                        <td style={{padding: '8px', fontWeight: '700', color: '#10b981'}}>Valor Líquido Empresa</td>
+                        <td style={{padding: '8px', textAlign: 'right', fontWeight: '700', fontSize: '18px', color: '#10b981'}}>
+                          {formatCurrency(formData.valor_liquido_empresa)}
+                        </td>
+                      </tr>
+                      {formData.forma_pagamento_parcelas > 1 && (
+                        <tr>
+                          <td style={{padding: '8px', fontSize: '12px', color: '#718096'}}>
+                            Parcelas: {formData.forma_pagamento_parcelas}x
+                          </td>
+                          <td style={{padding: '8px', textAlign: 'right', fontSize: '12px', color: '#718096'}}>
+                            Aprox. {formatCurrency(formData.valor_bruto / formData.forma_pagamento_parcelas)} por parcela
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div className="form-grid" style={{marginTop: '20px'}}>
               <div className="input-group">
                 <label>Valor de Entrada (Sinal/Adiantamento)</label>
                 <input 
