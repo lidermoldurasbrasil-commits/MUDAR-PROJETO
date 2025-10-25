@@ -1639,6 +1639,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             prazo = passepartout_produto.get('prazo_selecionado', '120dias')
             custo_unitario = get_custo_por_prazo(passepartout_produto, prazo)
             
+            # NOVO: Pegar preço de venda
+            preco_unitario = passepartout_produto.get('preco_venda', custo_unitario)
+            
             if passepartout_produto.get('markup_manufatura'):
                 markup_item = (passepartout_produto['markup_manufatura'] / 100) + 1
                 if markup_item > markup_sugerido:
@@ -1647,13 +1650,17 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             passepartout = {
                 'id': passepartout_produto['id'],
                 'descricao': passepartout_produto['descricao'],
-                'custo_unitario': custo_unitario
+                'custo_unitario': custo_unitario,
+                'preco_unitario': preco_unitario  # NOVO
             }
         
         if passepartout:
             resultado['passepartout_descricao'] = passepartout['descricao']
             custo_passepartout = resultado['area'] * passepartout['custo_unitario'] * pedido.quantidade
             custo_total += custo_passepartout
+            
+            # NOVO: Preço de venda do passe-partout
+            preco_venda_passepartout = resultado['area'] * passepartout['preco_unitario'] * pedido.quantidade
             
             itens.append({
                 'insumo_id': passepartout['id'],
@@ -1662,7 +1669,9 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
                 'quantidade': resultado['area'],
                 'unidade': 'm²',
                 'custo_unitario': passepartout['custo_unitario'],
-                'subtotal': custo_passepartout
+                'preco_unitario': passepartout['preco_unitario'],  # NOVO
+                'subtotal': custo_passepartout,
+                'subtotal_venda': preco_venda_passepartout  # NOVO
             })
     
     # 3.6 Acessórios
