@@ -244,9 +244,15 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
     setFormaPagamentoSelecionada(forma);
     
     // Calcular valores
-    const valorBruto = formData.valor_final;
+    const valorBruto = formData.valor_final || 0;
     const taxaValor = valorBruto * (forma.taxa_banco_percentual / 100);
     const valorLiquido = valorBruto - taxaValor;
+    
+    console.log('=== CÁLCULO DE TAXA ===');
+    console.log('Valor Bruto:', valorBruto);
+    console.log('Taxa %:', forma.taxa_banco_percentual);
+    console.log('Taxa R$:', taxaValor);
+    console.log('Valor Líquido:', valorLiquido);
     
     setFormData(prev => ({
       ...prev,
@@ -260,6 +266,22 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
       valor_liquido_empresa: valorLiquido
     }));
   };
+
+  // Recalcular taxas quando valor_final mudar
+  useEffect(() => {
+    if (formaPagamentoSelecionada && formData.valor_final > 0) {
+      const valorBruto = formData.valor_final;
+      const taxaValor = valorBruto * (formaPagamentoSelecionada.taxa_banco_percentual / 100);
+      const valorLiquido = valorBruto - taxaValor;
+      
+      setFormData(prev => ({
+        ...prev,
+        taxa_valor_real: taxaValor,
+        valor_bruto: valorBruto,
+        valor_liquido_empresa: valorLiquido
+      }));
+    }
+  }, [formData.valor_final]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
