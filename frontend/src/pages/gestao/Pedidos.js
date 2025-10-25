@@ -40,6 +40,10 @@ export default function Pedidos() {
   
   // NOVO: Estado para seleção múltipla
   const [selectedIds, setSelectedIds] = useState([]);
+  
+  // NOVO: Estado para visualização de orçamento
+  const [showOrcamento, setShowOrcamento] = useState(false);
+  const [pedidoOrcamento, setPedidoOrcamento] = useState(null);
 
   useEffect(() => {
     fetchPedidos();
