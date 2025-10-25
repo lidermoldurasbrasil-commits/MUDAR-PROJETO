@@ -21,7 +21,17 @@ const PRIORIDADE_OPTIONS = ['Baixa', 'Normal', 'Alta', 'Urgente'];
 export default function MarketplaceProjetoDetalhes() {
   const { projetoId } = useParams();
   const navigate = useNavigate();
-  const { lojaAtual } = useOutletContext();
+  
+  // Tentar pegar context do Outlet (quando usado em /gestao/marketplaces)
+  // Se não existir, usar valores padrão (quando usado em /marketplace/production)
+  let outletContext;
+  try {
+    outletContext = useOutletContext();
+  } catch (e) {
+    outletContext = { lojaAtual: 'fabrica' };
+  }
+  
+  const { lojaAtual = 'fabrica' } = outletContext || {};
   
   const [projeto, setProjeto] = useState(null);
   const [pedidos, setPedidos] = useState([]);
