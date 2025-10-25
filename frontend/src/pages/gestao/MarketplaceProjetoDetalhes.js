@@ -570,6 +570,12 @@ export default function MarketplaceProjetoDetalhes() {
             Monday
           </button>
           <button
+            onClick={() => setViewMode('producao')}
+            className={`px-4 py-2 rounded-lg ${viewMode === 'producao' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
+          >
+            Produção
+          </button>
+          <button
             onClick={() => setViewMode('kanban')}
             className={`px-4 py-2 rounded-lg ${viewMode === 'kanban' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
           >
