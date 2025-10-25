@@ -200,6 +200,8 @@ export default function MarketplaceProjetoDetalhes() {
       toast.error('Erro ao atualizar pedido');
     }
   };
+
+  const handleAddInline = async () => {
     try {
       const token = localStorage.getItem('token');
       
