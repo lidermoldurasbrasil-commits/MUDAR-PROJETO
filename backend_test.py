@@ -2307,6 +2307,239 @@ class BusinessManagementSystemTester:
         
         return all_valid
 
+    def test_payment_methods_crud(self):
+        """Test CRUD operations for Payment Methods (Formas de Pagamento)"""
+        print("\n💳 TESTING PAYMENT METHODS CRUD...")
+        
+        # Step 1: Create a bank account first (required for payment methods)
+        print("\n📋 Step 1: Creating bank account...")
+        conta_data = {
+            "nome": "Teste Banco",
+            "banco": "Itaú", 
+            "tipo": "Corrente",
+            "saldo_inicial": 1000,
+            "saldo_atual": 1000,
+            "cnpj_titular": "12.345.678/0001-90",
+            "status": "Ativo",
+            "loja_id": "fabrica"
+        }
+        
+        success_conta, conta_response = self.run_test(
+            "Create Bank Account for Payment Methods",
+            "POST",
+            "gestao/financeiro/contas-bancarias",
+            200,
+            data=conta_data
+        )
+        
+        if not success_conta or 'id' not in conta_response:
+            print("❌ CRITICAL: Failed to create bank account - cannot test payment methods")
+            self.log_test("Payment Methods CRUD", False, "Failed to create bank account")
+            return False
+        
+        conta_id = conta_response['id']
+        print(f"✅ Bank account created successfully with ID: {conta_id}")
+        
+        # Step 2: Create a payment method for this account
+        print("\n📋 Step 2: Creating payment method...")
+        forma_pagamento_data = {
+            "conta_bancaria_id": conta_id,
+            "forma_pagamento": "Cartão Crédito",
+            "tipo": "C",
+            "tef": False,
+            "pagamento_sefaz": False,
+            "bandeira": "Visa",
+            "numero_parcelas": 6,
+            "espaco_parcelas_dias": 30,
+            "taxa_banco_percentual": 2.5,
+            "ativa": True
+        }
+        
+        success_create, create_response = self.run_test(
+            "Create Payment Method",
+            "POST",
+            f"gestao/financeiro/contas-bancarias/{conta_id}/formas-pagamento",
+            200,
+            data=forma_pagamento_data
+        )
+        
+        if not success_create or 'id' not in create_response:
+            print("❌ CRITICAL: Failed to create payment method")
+            self.log_test("Payment Methods CRUD - Create", False, "Failed to create payment method")
+            return False
+        
+        forma_id = create_response['id']
+        print(f"✅ Payment method created successfully with ID: {forma_id}")
+        
+        # Validate created payment method fields
+        validation_results = []
+        
+        # Check forma_pagamento
+        if create_response.get('forma_pagamento') == "Cartão Crédito":
+            print("✅ forma_pagamento correctly set")
+            validation_results.append(True)
+        else:
+            print(f"❌ forma_pagamento incorrect: {create_response.get('forma_pagamento')}")
+            validation_results.append(False)
+        
+        # Check bandeira
+        if create_response.get('bandeira') == "Visa":
+            print("✅ bandeira correctly set to Visa")
+            validation_results.append(True)
+        else:
+            print(f"❌ bandeira incorrect: {create_response.get('bandeira')}")
+            validation_results.append(False)
+        
+        # Check numero_parcelas
+        if create_response.get('numero_parcelas') == 6:
+            print("✅ numero_parcelas correctly set to 6")
+            validation_results.append(True)
+        else:
+            print(f"❌ numero_parcelas incorrect: {create_response.get('numero_parcelas')}")
+            validation_results.append(False)
+        
+        # Step 3: List payment methods for this account
+        print("\n📋 Step 3: Listing payment methods for account...")
+        success_list, list_response = self.run_test(
+            "List Payment Methods",
+            "GET",
+            f"gestao/financeiro/contas-bancarias/{conta_id}/formas-pagamento",
+            200
+        )
+        
+        if success_list and isinstance(list_response, list) and len(list_response) > 0:
+            print(f"✅ Payment methods listed successfully - found {len(list_response)} method(s)")
+            
+            # Verify our created payment method is in the list
+            method_found = False
+            for method in list_response:
+                if method.get('id') == forma_id:
+                    method_found = True
+                    print("✅ Created payment method found in list")
+                    validation_results.append(True)
+                    break
+            
+            if not method_found:
+                print("❌ Created payment method not found in list")
+                validation_results.append(False)
+        else:
+            print("❌ Failed to list payment methods or empty list")
+            validation_results.append(False)
+            self.log_test("Payment Methods CRUD - List", False, "Failed to list or empty list")
+        
+        # Step 4: Edit the payment method
+        print("\n📋 Step 4: Editing payment method...")
+        updated_forma_data = forma_pagamento_data.copy()
+        updated_forma_data['bandeira'] = "Mastercard"
+        updated_forma_data['numero_parcelas'] = 12
+        
+        success_update, update_response = self.run_test(
+            "Update Payment Method",
+            "PUT",
+            f"gestao/financeiro/formas-pagamento/{forma_id}",
+            200,
+            data=updated_forma_data
+        )
+        
+        if success_update:
+            print("✅ Payment method updated successfully")
+            validation_results.append(True)
+            
+            # Verify the update by listing again
+            success_verify, verify_response = self.run_test(
+                "Verify Payment Method Update",
+                "GET",
+                f"gestao/financeiro/contas-bancarias/{conta_id}/formas-pagamento",
+                200
+            )
+            
+            if success_verify and isinstance(verify_response, list):
+                updated_method = None
+                for method in verify_response:
+                    if method.get('id') == forma_id:
+                        updated_method = method
+                        break
+                
+                if updated_method:
+                    # Check if bandeira was updated to Mastercard
+                    if updated_method.get('bandeira') == "Mastercard":
+                        print("✅ Bandeira successfully updated to Mastercard")
+                        validation_results.append(True)
+                    else:
+                        print(f"❌ Bandeira not updated: {updated_method.get('bandeira')}")
+                        validation_results.append(False)
+                    
+                    # Check if numero_parcelas was updated to 12
+                    if updated_method.get('numero_parcelas') == 12:
+                        print("✅ numero_parcelas successfully updated to 12")
+                        validation_results.append(True)
+                    else:
+                        print(f"❌ numero_parcelas not updated: {updated_method.get('numero_parcelas')}")
+                        validation_results.append(False)
+                else:
+                    print("❌ Updated payment method not found")
+                    validation_results.append(False)
+        else:
+            print("❌ Failed to update payment method")
+            validation_results.append(False)
+            self.log_test("Payment Methods CRUD - Update", False, "Failed to update")
+        
+        # Step 5: Delete the payment method
+        print("\n📋 Step 5: Deleting payment method...")
+        success_delete, delete_response = self.run_test(
+            "Delete Payment Method",
+            "DELETE",
+            f"gestao/financeiro/formas-pagamento/{forma_id}",
+            200
+        )
+        
+        if success_delete:
+            print("✅ Payment method deleted successfully")
+            validation_results.append(True)
+            
+            # Verify deletion by listing again
+            success_verify_delete, verify_delete_response = self.run_test(
+                "Verify Payment Method Deletion",
+                "GET",
+                f"gestao/financeiro/contas-bancarias/{conta_id}/formas-pagamento",
+                200
+            )
+            
+            if success_verify_delete and isinstance(verify_delete_response, list):
+                deleted_method_found = False
+                for method in verify_delete_response:
+                    if method.get('id') == forma_id:
+                        deleted_method_found = True
+                        break
+                
+                if not deleted_method_found:
+                    print("✅ Payment method successfully deleted (not found in list)")
+                    validation_results.append(True)
+                else:
+                    print("❌ Payment method still exists after deletion")
+                    validation_results.append(False)
+            else:
+                print("❌ Failed to verify deletion")
+                validation_results.append(False)
+        else:
+            print("❌ Failed to delete payment method")
+            validation_results.append(False)
+            self.log_test("Payment Methods CRUD - Delete", False, "Failed to delete")
+        
+        # Overall result
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ ALL PAYMENT METHODS CRUD TESTS PASSED!")
+            print("✅ Create, List, Update, and Delete operations working correctly")
+            self.log_test("Payment Methods CRUD - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ PAYMENT METHODS CRUD FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("Payment Methods CRUD - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
