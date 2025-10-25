@@ -3922,31 +3922,32 @@ async def get_pedidos_marketplace(
             prazo = pedido.get('prazo_entrega')
             if prazo:
                 try:
+                    prazo_dt = None
                     if isinstance(prazo, str):
                         # Handle ISO format strings
                         if prazo.endswith('Z'):
-                            prazo = datetime.fromisoformat(prazo.replace('Z', '+00:00'))
-                        elif '+' in prazo or prazo.endswith('00:00'):
-                            prazo = datetime.fromisoformat(prazo)
+                            prazo_dt = datetime.fromisoformat(prazo.replace('Z', '+00:00'))
+                        elif '+' in prazo:
+                            prazo_dt = datetime.fromisoformat(prazo)
                         else:
                             # Assume UTC if no timezone info
-                            prazo = datetime.fromisoformat(prazo).replace(tzinfo=timezone.utc)
+                            try:
+                                prazo_dt = datetime.fromisoformat(prazo).replace(tzinfo=timezone.utc)
+                            except:
+                                # If parsing fails, skip
+                                pass
                     elif isinstance(prazo, datetime):
                         # Ensure timezone awareness
-                        if prazo.tzinfo is None:
-                            prazo = prazo.replace(tzinfo=timezone.utc)
-                    else:
-                        # Skip if prazo is not a valid type
-                        continue
-                        
-                    if prazo < datetime.now(timezone.utc):
-                        dias_atraso = (datetime.now(timezone.utc) - prazo).days
+                        prazo_dt = prazo if prazo.tzinfo else prazo.replace(tzinfo=timezone.utc)
+                    
+                    if prazo_dt and prazo_dt < datetime.now(timezone.utc):
+                        dias_atraso = (datetime.now(timezone.utc) - prazo_dt).days
                         pedido['atrasado'] = True
                         pedido['dias_atraso'] = dias_atraso
                 except Exception as e:
                     # If any parsing fails, skip atraso check for this pedido
                     print(f"Error parsing prazo_entrega: {e}")
-                    continue
+                    pass
     
     return pedidos
 
