@@ -116,13 +116,14 @@ export default function MarketplacesCentral() {
   const COLORS_PIE = Object.values(COLORS_STATUS);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-900 p-6">
       {/* Cabeçalho */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">📦 Central de Operações dos Marketplaces</h1>
+        <h1 className="text-4xl font-bold text-white mb-2">📦 Central de Operações dos Marketplaces</h1>
+        <p className="text-gray-400 text-lg">Plataforma para controlar a produção de diversos marketplaces em um só lugar</p>
         
         {/* Mensagem do Dia */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white mt-4">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-lg p-4 text-white mt-4">
           {editandoMensagem ? (
             <div className="flex items-center gap-2">
               <input
@@ -166,59 +167,59 @@ export default function MarketplacesCentral() {
 
       {/* Cards de Indicadores */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Performance Geral</p>
-              <p className="text-2xl font-bold text-gray-900">{indicadores.performance_geral || 0}%</p>
+              <p className="text-sm text-gray-400">Performance Geral</p>
+              <p className="text-2xl font-bold text-white">{indicadores.performance_geral || 0}%</p>
             </div>
-            <Activity className="w-8 h-8 text-blue-500" />
+            <Activity className="w-8 h-8 text-blue-400" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-orange-500">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Em Produção</p>
-              <p className="text-2xl font-bold text-gray-900">{indicadores.pedidos_em_producao || 0}</p>
+              <p className="text-sm text-gray-400">Em Produção</p>
+              <p className="text-2xl font-bold text-white">{indicadores.pedidos_em_producao || 0}</p>
             </div>
-            <Package className="w-8 h-8 text-orange-500" />
+            <Package className="w-8 h-8 text-orange-400" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-600">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pedidos Enviados</p>
-              <p className="text-2xl font-bold text-gray-900">{indicadores.pedidos_enviados || 0}</p>
+              <p className="text-sm text-gray-400">Pedidos Enviados</p>
+              <p className="text-2xl font-bold text-white">{indicadores.pedidos_enviados || 0}</p>
             </div>
-            <Send className="w-8 h-8 text-blue-600" />
+            <Send className="w-8 h-8 text-blue-400" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pedidos Entregues</p>
-              <p className="text-2xl font-bold text-gray-900">{indicadores.pedidos_entregues || 0}</p>
+              <p className="text-sm text-gray-400">Pedidos Entregues</p>
+              <p className="text-2xl font-bold text-white">{indicadores.pedidos_entregues || 0}</p>
             </div>
-            <CheckCircle className="w-8 h-8 text-green-500" />
+            <CheckCircle className="w-8 h-8 text-green-400" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Atrasos</p>
-              <p className="text-2xl font-bold text-gray-900">{indicadores.pedidos_atrasados || 0}</p>
+              <p className="text-sm text-gray-400">Atrasos</p>
+              <p className="text-2xl font-bold text-white">{indicadores.pedidos_atrasados || 0}</p>
             </div>
-            <AlertTriangle className="w-8 h-8 text-red-500" />
+            <AlertTriangle className="w-8 h-8 text-red-400" />
           </div>
         </div>
       </div>
 
       {/* Valor Produzido Hoje */}
-      <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg shadow p-6 mb-6 text-white">
+      <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-lg shadow-lg p-6 mb-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm opacity-90">💰 Valor Produzido Hoje</p>
@@ -228,12 +229,12 @@ export default function MarketplacesCentral() {
         </div>
       </div>
 
-      {/* Seção de Projetos */}
+      {/* Seção de Projetos - ESTILO GRID DE CARDS ESCURO */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-900">Projetos Marketplace</h2>
+          <h2 className="text-2xl font-bold text-white">Projetos Marketplace</h2>
           <button
-            onClick={() => toast.info('Funcionalidade de adicionar projeto será implementada na Fase 2')}
+            onClick={() => toast.info('Funcionalidade de adicionar projeto será implementada na Fase 3')}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -241,13 +242,12 @@ export default function MarketplacesCentral() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {projetos.map((projeto) => (
             <div
               key={projeto.id}
               onClick={() => handleProjetoClick(projeto)}
-              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border-t-4"
-              style={{ borderTopColor: projeto.cor_primaria }}
+              className="bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-gray-700 hover:border-blue-500"
             >
               <div className="p-6">
                 {/* Cabeçalho do Card */}
@@ -255,54 +255,63 @@ export default function MarketplacesCentral() {
                   <div className="flex items-center gap-3">
                     <span className="text-4xl">{projeto.icone}</span>
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{projeto.nome}</h3>
-                      <p className="text-sm text-gray-600">{projeto.descricao}</p>
+                      <h3 className="text-lg font-bold text-white">{projeto.nome}</h3>
+                      <p className="text-xs text-gray-400">{projeto.descricao}</p>
                     </div>
                   </div>
-                  <span className="text-2xl">{projeto.performance_icone}</span>
                 </div>
+
+                {/* Badge Recomendado (se houver) */}
+                {projeto.performance_icone === '🚀' && (
+                  <div className="mb-3">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs rounded-full">
+                      <span className="w-4 h-4 flex items-center justify-center">ℹ️</span>
+                      Recomendado
+                    </span>
+                  </div>
+                )}
 
                 {/* Barra de Progresso */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-700">Progresso</span>
-                    <span className="text-sm font-bold text-gray-900">{projeto.progresso_percentual}%</span>
+                    <span className="text-xs font-medium text-gray-400">Progresso</span>
+                    <span className="text-xs font-bold text-white">{projeto.progresso_percentual}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
                         width: `${projeto.progresso_percentual}%`,
-                        background: `linear-gradient(90deg, ${projeto.cor_primaria}, ${projeto.cor_primaria}dd)`
+                        backgroundColor: projeto.cor_primaria
                       }}
                     ></div>
                   </div>
                 </div>
 
-                {/* Indicadores Rápidos */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-orange-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600">Em Produção</p>
-                    <p className="text-xl font-bold text-orange-600">{projeto.pedidos_em_producao}</p>
+                {/* Indicadores Rápidos em Grid 2x2 */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-gray-900 rounded-lg p-3 border border-gray-700">
+                    <p className="text-xs text-gray-400">Em Produção</p>
+                    <p className="text-lg font-bold text-orange-400">{projeto.pedidos_em_producao}</p>
                   </div>
-                  <div className="bg-blue-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600">Enviados</p>
-                    <p className="text-xl font-bold text-blue-600">{projeto.pedidos_enviados}</p>
+                  <div className="bg-gray-900 rounded-lg p-3 border border-gray-700">
+                    <p className="text-xs text-gray-400">Enviados</p>
+                    <p className="text-lg font-bold text-blue-400">{projeto.pedidos_enviados}</p>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600">Entregues</p>
-                    <p className="text-xl font-bold text-green-600">{projeto.pedidos_entregues}</p>
+                  <div className="bg-gray-900 rounded-lg p-3 border border-gray-700">
+                    <p className="text-xs text-gray-400">Entregues</p>
+                    <p className="text-lg font-bold text-green-400">{projeto.pedidos_entregues}</p>
                   </div>
-                  <div className="bg-red-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600">Atrasados</p>
-                    <p className="text-xl font-bold text-red-600">{projeto.pedidos_atrasados}</p>
+                  <div className="bg-gray-900 rounded-lg p-3 border border-gray-700">
+                    <p className="text-xs text-gray-400">Atrasados</p>
+                    <p className="text-lg font-bold text-red-400">{projeto.pedidos_atrasados}</p>
                   </div>
                 </div>
               </div>
 
               {/* Footer do Card */}
-              <div className="bg-gray-50 px-6 py-3 border-t">
-                <p className="text-xs text-gray-500">
+              <div className="bg-gray-900 px-6 py-3 border-t border-gray-700">
+                <p className="text-xs text-gray-400">
                   Clique para ver detalhes e gerenciar pedidos
                 </p>
               </div>
@@ -311,18 +320,20 @@ export default function MarketplacesCentral() {
         </div>
       </div>
 
-      {/* Placeholder para Gráficos (Fase 2) */}
+      {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Gráfico 1: Volume de Produção */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">📊 Volume de Produção (Últimos 7 Dias)</h3>
+        <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <h3 className="text-lg font-bold text-white mb-4">📊 Volume de Produção (Últimos 7 Dias)</h3>
           {graficos.volume_producao && graficos.volume_producao.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={graficos.volume_producao}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="data" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="data" stroke="#9CA3AF" />
+                <YAxis stroke="#9CA3AF" />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', color: '#fff' }}
+                />
                 <Legend />
                 <Bar dataKey="quantidade" fill="#3B82F6" name="Pedidos Produzidos" />
               </BarChart>
@@ -335,8 +346,8 @@ export default function MarketplacesCentral() {
         </div>
 
         {/* Gráfico 2: Status Atual dos Pedidos */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">🔥 Status Atual dos Pedidos</h3>
+        <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <h3 className="text-lg font-bold text-white mb-4">🔥 Status Atual dos Pedidos</h3>
           {statusData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -354,7 +365,9 @@ export default function MarketplacesCentral() {
                     <Cell key={`cell-${index}`} fill={COLORS_PIE[index % COLORS_PIE.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', color: '#fff' }}
+                />
               </PieChart>
             </ResponsiveContainer>
           ) : (
@@ -366,15 +379,17 @@ export default function MarketplacesCentral() {
       </div>
 
       {/* Gráfico 3: Desempenho por Plataforma */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">📈 Desempenho por Plataforma</h3>
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-700">
+        <h3 className="text-lg font-bold text-white mb-4">📈 Desempenho por Plataforma</h3>
         {graficos.desempenho_plataformas && graficos.desempenho_plataformas.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={graficos.desempenho_plataformas} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="plataforma" type="category" width={100} />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis type="number" stroke="#9CA3AF" />
+              <YAxis dataKey="plataforma" type="category" width={100} stroke="#9CA3AF" />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', color: '#fff' }}
+              />
               <Legend />
               <Bar dataKey="vendas" fill="#8B5CF6" name="Vendas" />
               <Bar dataKey="producao" fill="#F59E0B" name="Em Produção" />
