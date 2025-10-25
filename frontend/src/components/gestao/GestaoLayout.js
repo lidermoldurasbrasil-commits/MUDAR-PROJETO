@@ -82,7 +82,7 @@ export default function GestaoLayout({ user, onLogout }) {
 
       {/* Conteúdo */}
       <div className="gestao-content">
-        <Outlet context={{ lojaAtual }} />
+        <Outlet context={{ lojaAtual, user }} />
       </div>
 
       <style jsx>{`
