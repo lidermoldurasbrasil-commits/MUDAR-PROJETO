@@ -1398,7 +1398,7 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
     resultado['area'] = (pedido.altura * pedido.largura) / 10000
     
     # 2. Calcular perímetro (cm)
-    pedido.perimetro = (2 * pedido.altura) + (2 * pedido.largura)
+    resultado['perimetro'] = (2 * pedido.altura) + (2 * pedido.largura)
     
     # 3. Buscar insumos e calcular custos
     itens = []
@@ -1434,14 +1434,14 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             pass
         
         if moldura:
-            pedido.moldura_descricao = moldura['descricao']
+            resultado['moldura_descricao'] = moldura['descricao']
             
             # Calcular barras necessárias
             barra_padrao = moldura.get('barra_padrao', 270)
-            pedido.barras_necessarias = math.ceil(pedido.perimetro / barra_padrao)
+            resultado['barras_necessarias'] = math.ceil(resultado['perimetro'] / barra_padrao)
             
             # Calcular sobra e perda
-            pedido.sobra = (pedido.barras_necessarias * barra_padrao) - pedido.perimetro
+            resultado['sobra'] = (resultado['barras_necessarias'] * barra_padrao) - resultado['perimetro']
             
             # PERDA TÉCNICA 1: Perda de corte baseada na largura da moldura
             # Largura da moldura × 8 (padrão da indústria para corte de molduras)
@@ -1450,29 +1450,29 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             
             # PERDA TÉCNICA 2: Se sobra < 100cm, considerar como perda adicional
             perda_sobra_cm = 0
-            if pedido.sobra < 100:
-                perda_sobra_cm = pedido.sobra
+            if resultado['sobra'] < 100:
+                perda_sobra_cm = resultado['sobra']
             
             # Total de perda a cobrar
             perda_total_cm = perda_corte_cm + perda_sobra_cm
-            pedido.custo_perda = perda_total_cm * moldura['custo_unitario']
+            resultado['custo_perda'] = perda_total_cm * moldura['custo_unitario']
             
             # Perímetro cobrado = perímetro + perdas
-            perimetro_cobrado = pedido.perimetro + perda_total_cm
+            perimetro_cobrado = resultado['perimetro'] + perda_total_cm
             
             # Custo da moldura
             custo_moldura = perimetro_cobrado * moldura['custo_unitario'] * pedido.quantidade
             custo_total += custo_moldura
             
-            itens.append(ItemOrcamento(
-                insumo_id=moldura['id'],
-                insumo_descricao=f"{moldura['descricao']} (Perda corte: {perda_corte_cm:.0f}cm, Sobra: {perda_sobra_cm:.0f}cm)",
-                tipo_insumo='Moldura',
-                quantidade=perimetro_cobrado,
-                unidade='cm',
-                custo_unitario=moldura['custo_unitario'],
-                subtotal=custo_moldura
-            ))
+            itens.append({
+                'insumo_id': moldura['id'],
+                'insumo_descricao': f"{moldura['descricao']} (Perda corte: {perda_corte_cm:.0f}cm, Sobra: {perda_sobra_cm:.0f}cm)",
+                'tipo_insumo': 'Moldura',
+                'quantidade': perimetro_cobrado,
+                'unidade': 'cm',
+                'custo_unitario': moldura['custo_unitario'],
+                'subtotal': custo_moldura
+            })
     
     # 3.2 Vidro
     if pedido.usar_vidro and pedido.vidro_id:
@@ -1496,19 +1496,19 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             }
         
         if vidro:
-            pedido.vidro_descricao = vidro['descricao']
-            custo_vidro = pedido.area * vidro['custo_unitario'] * pedido.quantidade
+            resultado['vidro_descricao'] = vidro['descricao']
+            custo_vidro = resultado['area'] * vidro['custo_unitario'] * pedido.quantidade
             custo_total += custo_vidro
             
-            itens.append(ItemOrcamento(
-                insumo_id=vidro['id'],
-                insumo_descricao=vidro['descricao'],
-                tipo_insumo='Vidro',
-                quantidade=pedido.area,
-                unidade='m²',
-                custo_unitario=vidro['custo_unitario'],
-                subtotal=custo_vidro
-            ))
+            itens.append({
+                'insumo_id': vidro['id'],
+                'insumo_descricao': vidro['descricao'],
+                'tipo_insumo': 'Vidro',
+                'quantidade': resultado['area'],
+                'unidade': 'm²',
+                'custo_unitario': vidro['custo_unitario'],
+                'subtotal': custo_vidro
+            })
     
     # 3.3 MDF
     if pedido.usar_mdf and pedido.mdf_id:
@@ -1531,19 +1531,19 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             }
         
         if mdf:
-            pedido.mdf_descricao = mdf['descricao']
-            custo_mdf = pedido.area * mdf['custo_unitario'] * pedido.quantidade
+            resultado['mdf_descricao'] = mdf['descricao']
+            custo_mdf = resultado['area'] * mdf['custo_unitario'] * pedido.quantidade
             custo_total += custo_mdf
             
-            itens.append(ItemOrcamento(
-                insumo_id=mdf['id'],
-                insumo_descricao=mdf['descricao'],
-                tipo_insumo='MDF',
-                quantidade=pedido.area,
-                unidade='m²',
-                custo_unitario=mdf['custo_unitario'],
-                subtotal=custo_mdf
-            ))
+            itens.append({
+                'insumo_id': mdf['id'],
+                'insumo_descricao': mdf['descricao'],
+                'tipo_insumo': 'MDF',
+                'quantidade': resultado['area'],
+                'unidade': 'm²',
+                'custo_unitario': mdf['custo_unitario'],
+                'subtotal': custo_mdf
+            })
     
     # 3.4 Papel/Adesivo
     if pedido.usar_papel and pedido.papel_id:
@@ -1566,19 +1566,19 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             }
         
         if papel:
-            pedido.papel_descricao = papel['descricao']
-            custo_papel = pedido.area * papel['custo_unitario'] * pedido.quantidade
+            resultado['papel_descricao'] = papel['descricao']
+            custo_papel = resultado['area'] * papel['custo_unitario'] * pedido.quantidade
             custo_total += custo_papel
             
-            itens.append(ItemOrcamento(
-                insumo_id=papel['id'],
-                insumo_descricao=papel['descricao'],
-                tipo_insumo='Papel/Adesivo',
-                quantidade=pedido.area,
-                unidade='m²',
-                custo_unitario=papel['custo_unitario'],
-                subtotal=custo_papel
-            ))
+            itens.append({
+                'insumo_id': papel['id'],
+                'insumo_descricao': papel['descricao'],
+                'tipo_insumo': 'Papel/Adesivo',
+                'quantidade': resultado['area'],
+                'unidade': 'm²',
+                'custo_unitario': papel['custo_unitario'],
+                'subtotal': custo_papel
+            })
     
     # 3.5 Passe-partout
     if pedido.usar_passepartout and pedido.passepartout_id:
@@ -1601,19 +1601,19 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
             }
         
         if passepartout:
-            pedido.passepartout_descricao = passepartout['descricao']
-            custo_passepartout = pedido.area * passepartout['custo_unitario'] * pedido.quantidade
+            resultado['passepartout_descricao'] = passepartout['descricao']
+            custo_passepartout = resultado['area'] * passepartout['custo_unitario'] * pedido.quantidade
             custo_total += custo_passepartout
             
-            itens.append(ItemOrcamento(
-                insumo_id=passepartout['id'],
-                insumo_descricao=passepartout['descricao'],
-                tipo_insumo='Passe-partout',
-                quantidade=pedido.area,
-                unidade='m²',
-                custo_unitario=passepartout['custo_unitario'],
-                subtotal=custo_passepartout
-            ))
+            itens.append({
+                'insumo_id': passepartout['id'],
+                'insumo_descricao': passepartout['descricao'],
+                'tipo_insumo': 'Passe-partout',
+                'quantidade': resultado['area'],
+                'unidade': 'm²',
+                'custo_unitario': passepartout['custo_unitario'],
+                'subtotal': custo_passepartout
+            })
     
     # 3.6 Acessórios
     if pedido.usar_acessorios and pedido.acessorios_ids:
@@ -1642,49 +1642,49 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
                 custo_acessorio = acessorio['custo_unitario'] * pedido.quantidade
                 custo_total += custo_acessorio
                 
-                itens.append(ItemOrcamento(
-                    insumo_id=acessorio['id'],
-                    insumo_descricao=acessorio['descricao'],
-                    tipo_insumo='Acessório',
-                    quantidade=pedido.quantidade,
-                    unidade='unidade',
-                    custo_unitario=acessorio['custo_unitario'],
-                    subtotal=custo_acessorio
-                ))
-        pedido.acessorios_descricoes = descricoes
+                itens.append({
+                    'insumo_id': acessorio['id'],
+                    'insumo_descricao': acessorio['descricao'],
+                    'tipo_insumo': 'Acessório',
+                    'quantidade': pedido.quantidade,
+                    'unidade': 'unidade',
+                    'custo_unitario': acessorio['custo_unitario'],
+                    'subtotal': custo_acessorio
+                })
+        resultado['acessorios_descricoes'] = descricoes
     
     # 4. Calcular totais com markup do produto
-    pedido.itens = itens
-    pedido.custo_total = custo_total
-    pedido.markup = markup_sugerido
-    pedido.preco_venda = custo_total * markup_sugerido
-    pedido.margem_percentual = ((pedido.preco_venda - custo_total) / pedido.preco_venda * 100) if pedido.preco_venda > 0 else 0
+    resultado['itens'] = itens
+    resultado['custo_total'] = custo_total
+    resultado['markup'] = markup_sugerido
+    resultado['preco_venda'] = custo_total * markup_sugerido
+    resultado['margem_percentual'] = ((resultado['preco_venda'] - custo_total) / resultado['preco_venda'] * 100) if resultado['preco_venda'] > 0 else 0
     
     # 5. Calcular valor final com desconto/sobre-preço
-    valor_base = pedido.preco_venda
+    valor_base = resultado['preco_venda']
     
     # Aplicar desconto (% ou valor)
     desconto_total = 0
     if pedido.desconto_percentual > 0:
         desconto_total = valor_base * (pedido.desconto_percentual / 100)
-        pedido.desconto_valor = desconto_total
+        resultado['desconto_valor'] = desconto_total
     elif pedido.desconto_valor > 0:
         desconto_total = pedido.desconto_valor
-        pedido.desconto_percentual = (desconto_total / valor_base * 100) if valor_base > 0 else 0
+        resultado['desconto_percentual'] = (desconto_total / valor_base * 100) if valor_base > 0 else 0
     
     # Aplicar sobre-preço (% ou valor)
     sobre_preco_total = 0
     if pedido.sobre_preco_percentual > 0:
         sobre_preco_total = valor_base * (pedido.sobre_preco_percentual / 100)
-        pedido.sobre_preco_valor = sobre_preco_total
+        resultado['sobre_preco_valor'] = sobre_preco_total
     elif pedido.sobre_preco_valor > 0:
         sobre_preco_total = pedido.sobre_preco_valor
-        pedido.sobre_preco_percentual = (sobre_preco_total / valor_base * 100) if valor_base > 0 else 0
+        resultado['sobre_preco_percentual'] = (sobre_preco_total / valor_base * 100) if valor_base > 0 else 0
     
     # Valor final
-    pedido.valor_final = valor_base - desconto_total + sobre_preco_total
+    resultado['valor_final'] = valor_base - desconto_total + sobre_preco_total
     
-    return pedido
+    return resultado
 
 @api_router.post("/gestao/pedidos")
 async def create_pedido(pedido: PedidoManufatura, current_user: dict = Depends(get_current_user)):
