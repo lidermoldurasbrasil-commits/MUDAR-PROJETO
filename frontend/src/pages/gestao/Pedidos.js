@@ -230,6 +230,9 @@ export default function Pedidos() {
                       </select>
                     </td>
                     <td>{formatCurrency(pedido.custo_total)}</td>
+                    <td style={{fontWeight: '600', color: pedido.valor_entrada > 0 ? '#059669' : '#9ca3af'}}>
+                      {formatCurrency(pedido.valor_entrada || 0)}
+                    </td>
                     <td>{formatCurrency(pedido.preco_venda)}</td>
                     <td className="margem">{pedido.margem_percentual.toFixed(1)}%</td>
                     <td>{pedido.responsavel || '-'}</td>
