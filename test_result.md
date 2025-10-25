@@ -138,6 +138,30 @@ backend:
           agent: "testing"
           comment: "✅ TESTE ESPECÍFICO METRO LINEAR APROVADO! Testado cálculo da moldura com metro linear conforme solicitado: Produto moldura com custo_120dias=R$50.00/ml, preco_manufatura=R$150.00/ml, largura=3cm. Cálculo com altura=50cm, largura=70cm: Perímetro=240cm, Perda corte=24cm (3×8), Sobra=30cm (<100cm, cobrada), Total cobrado=294cm=2.94ml. VALIDAÇÕES APROVADAS: ✅ Unidade='ml' ✅ Quantidade=2.94 metros ✅ Custo unitário=R$50.00/ml ✅ Preço unitário=R$150.00/ml ✅ Subtotal custo=R$147.00 ✅ Subtotal venda=R$441.00. Cálculo metro linear funcionando perfeitamente conforme especificação técnica!"
 
+  - task: "Endpoint de criação de pedidos de manufatura (/api/gestao/pedidos)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ ENDPOINT DE CRIAÇÃO DE PEDIDOS FUNCIONANDO PERFEITAMENTE! Testado conforme solicitação do usuário: 1) Login realizado com sucesso para obter token. 2) Cliente criado com dados: nome='Cliente Teste', cpf='12345678900', telefone='(11) 98765-4321', endereço='Rua Teste, 123', cidade='São Paulo'. 3) Pedido de manufatura criado com sucesso: tipo_produto='Quadro', altura=50cm, largura=70cm, quantidade=1, itens com moldura (2.4ml, R$50.00/ml custo, R$150.00/ml preço), custo_total=R$120.00, preco_venda=R$360.00, valor_final=R$360.00, forma_pagamento='Dinheiro', valor_entrada=R$100.00. 4) Response retorna status 200 com ID do pedido, numero_pedido=1, todos os campos corretos. 5) Pedido salvo no banco confirmado via GET /api/gestao/pedidos. 6) Busca específica por ID funcionando. Todas as validações aprovadas: ID gerado, numero_pedido sequencial, cliente_nome correto, itens presentes, valor_final e valor_entrada corretos, persistência no banco confirmada."
+
+  - task: "Endpoint de clientes (/api/gestao/clientes)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ ENDPOINT DE CLIENTES FUNCIONANDO! Testado durante criação de pedido: POST /api/gestao/clientes retorna status 200, cria cliente com ID único, todos os campos salvos corretamente (nome, cpf, telefone, celular, endereco, cidade). Cliente necessário para criação de pedidos de manufatura."
+
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
     implemented: true
