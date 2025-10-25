@@ -1444,7 +1444,7 @@ async def calcular_pedido(pedido: PedidoCalculoRequest, current_user: dict = Dep
                 'id': moldura_produto['id'],
                 'descricao': moldura_produto['descricao'],
                 'custo_unitario': custo_por_cm,
-                'preco_unitario': preco_venda_por_cm,  # NOVO
+                'preco_unitario': preco_manufatura_por_cm,  # Preço de manufatura por cm
                 'barra_padrao': 270,
                 'largura_moldura': moldura_produto.get('largura', 0)  # Largura da frente da moldura
             }
