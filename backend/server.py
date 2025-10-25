@@ -3921,7 +3921,19 @@ async def get_pedidos_marketplace(
         if pedido.get('status') not in ['Entregue', 'Cancelado']:
             prazo = pedido.get('prazo_entrega')
             if isinstance(prazo, str):
-                prazo = datetime.fromisoformat(prazo.replace('Z', '+00:00'))
+                try:
+                    prazo = datetime.fromisoformat(prazo.replace('Z', '+00:00'))
+                except:
+                    # If parsing fails, skip atraso check
+                    continue
+            elif isinstance(prazo, datetime):
+                # Ensure timezone awareness
+                if prazo.tzinfo is None:
+                    prazo = prazo.replace(tzinfo=timezone.utc)
+            else:
+                # Skip if prazo is None or invalid type
+                continue
+                
             if prazo < datetime.now(timezone.utc):
                 dias_atraso = (datetime.now(timezone.utc) - prazo).days
                 pedido['atrasado'] = True
