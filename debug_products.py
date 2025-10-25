@@ -2,7 +2,7 @@ import requests
 import json
 
 # Test the products endpoint to see what was actually created
-base_url = "https://production-hub-30.preview.emergentagent.com"
+base_url = "https://manufatura-sys.preview.emergentagent.com"
 api_url = f"{base_url}/api"
 
 # First register and login to get a token
