@@ -16,6 +16,12 @@ const STATUS_OPTIONS = [
   { value: 'Entregue', label: 'Entregue', color: '#10B981' }
 ];
 
+const STATUS_IMPRESSAO_OPTIONS = [
+  { value: 'Aguardando Impressão', label: 'Aguardando Impressão', color: '#94A3B8' },
+  { value: 'Imprimindo', label: 'Imprimindo', color: '#F59E0B' },
+  { value: 'Impresso', label: 'Impresso', color: '#10B981' }
+];
+
 const PRIORIDADE_OPTIONS = ['Baixa', 'Normal', 'Alta', 'Urgente'];
 
 export default function MarketplaceProjetoDetalhes() {
