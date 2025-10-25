@@ -767,12 +767,10 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
                       <tr className="total-row">
                         <td colSpan="4"><strong>SUBTOTAL</strong></td>
                         <td className="subtotal-value"><strong>{formatCurrency(formData.custo_total)}</strong></td>
-                        <td></td>
                       </tr>
                       <tr className="total-row">
-                        <td colSpan="4"><strong>PREÇO DE VENDA (Markup {formData.markup.toFixed(1)}x)</strong></td>
+                        <td colSpan="4"><strong>PREÇO DE VENDA (Markup {formData.markup?.toFixed(1)}x)</strong></td>
                         <td className="subtotal-value"><strong>{formatCurrency(formData.preco_venda)}</strong></td>
-                        <td></td>
                       </tr>
                     </tbody>
                   </table>
