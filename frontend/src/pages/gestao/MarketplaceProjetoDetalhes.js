@@ -173,7 +173,33 @@ export default function MarketplaceProjetoDetalhes() {
     }
   };
 
-  const handleAddInline = async () => {
+  const handleUpdatePedido = async (pedidoId, campo, valor) => {
+    try {
+      const token = localStorage.getItem('token');
+      const pedido = pedidos.find(p => p.id === pedidoId);
+      
+      if (!pedido) return;
+      
+      const pedidoAtualizado = {
+        ...pedido,
+        [campo]: valor,
+        updated_at: new Date().toISOString()
+      };
+      
+      await axios.put(
+        `${API}/pedidos/${pedidoId}`,
+        pedidoAtualizado,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // Atualizar local
+      setPedidos(pedidos.map(p => p.id === pedidoId ? pedidoAtualizado : p));
+      
+    } catch (error) {
+      console.error('Erro ao atualizar pedido:', error);
+      toast.error('Erro ao atualizar pedido');
+    }
+  };
     try {
       const token = localStorage.getItem('token');
       
