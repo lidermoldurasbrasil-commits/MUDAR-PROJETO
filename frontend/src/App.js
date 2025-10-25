@@ -112,6 +112,7 @@ function App() {
               
               {/* Marketplace */}
               <Route path="/marketplace/production" element={<MarketplacesCentral />} />
+              <Route path="/marketplace/production/projeto/:projetoId" element={<MarketplaceProjetoDetalhes />} />
               <Route path="/marketplace/returns" element={<ReturnsManagement />} />
               <Route path="/marketplace/marketing" element={<MarketingTasks />} />
               <Route path="/marketplace/purchases" element={<PurchaseRequests />} />
