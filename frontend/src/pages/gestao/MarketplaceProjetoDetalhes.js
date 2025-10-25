@@ -309,12 +309,15 @@ export default function MarketplaceProjetoDetalhes() {
       setShowInlineAdd(false);
       setNovaLinhaInline({
         numero_pedido: '',
+        produto_nome: '',
         quantidade: 1,
         sku: '',
         nome_variacao: '',
         preco_acordado: 0,
         opcao_envio: '',
         data_prevista_envio: '',
+        cliente_nome: '',
+        cliente_contato: '',
         status: 'Aguardando Impressão',
         prioridade: 'Normal'
       });
