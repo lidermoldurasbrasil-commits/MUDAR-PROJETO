@@ -446,6 +446,90 @@ export default function MarketplacesCentral() {
           </div>
         )}
       </div>
+
+      {/* Modal de Edição de Projeto */}
+      {showEditModal && editandoProjeto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md border border-gray-700">
+            <h3 className="text-xl font-bold text-white mb-4">Editar Projeto</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Nome</label>
+                <input
+                  type="text"
+                  value={editandoProjeto.nome}
+                  onChange={(e) => setEditandoProjeto({...editandoProjeto, nome: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Descrição</label>
+                <textarea
+                  value={editandoProjeto.descricao}
+                  onChange={(e) => setEditandoProjeto({...editandoProjeto, descricao: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  rows="3"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Plataforma</label>
+                <select
+                  value={editandoProjeto.plataforma}
+                  onChange={(e) => setEditandoProjeto({...editandoProjeto, plataforma: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="shopee">Shopee</option>
+                  <option value="mercado_livre">Mercado Livre</option>
+                  <option value="tiktok">TikTok Shop</option>
+                  <option value="amazon">Amazon</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Ícone (emoji)</label>
+                <input
+                  type="text"
+                  value={editandoProjeto.icone}
+                  onChange={(e) => setEditandoProjeto({...editandoProjeto, icone: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  maxLength="2"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Cor Primária</label>
+                <input
+                  type="color"
+                  value={editandoProjeto.cor_primaria}
+                  onChange={(e) => setEditandoProjeto({...editandoProjeto, cor_primaria: e.target.value})}
+                  className="w-full h-10 bg-gray-700 border border-gray-600 rounded-lg cursor-pointer"
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleSaveProjeto}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Salvar
+              </button>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditandoProjeto(null);
+                }}
+                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
