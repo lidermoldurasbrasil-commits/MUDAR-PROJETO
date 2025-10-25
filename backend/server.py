@@ -1662,17 +1662,31 @@ class PedidoMarketplace(BaseModel):
     projeto_id: str  # Referência ao ProjetoMarketplace
     plataforma: str  # shopee, mercadolivre, tiktok
     
-    # Dados do Pedido
-    numero_pedido: str  # Número do pedido no marketplace
+    # Dados do Pedido - CAMPOS DA PLANILHA SHOPEE
+    numero_pedido: str  # ID do pedido / Número do pedido no marketplace
+    numero_referencia_sku: str = ""  # Número de referência SKU
     sku: str = ""
     cliente_nome: str = ""
     cliente_contato: str = ""
     
     # Produto
     produto_nome: str = ""
+    nome_variacao: str = ""  # Nome da variação do produto
     quantidade: int = 1
     valor_unitario: float = 0
+    preco_acordado: float = 0  # Preço acordado (pode ser diferente do valor unitário)
     valor_total: float = 0
+    
+    # Taxas e Comissões
+    taxa_comissao: float = 0  # Taxa de comissão (%)
+    taxa_servico: float = 0  # Taxa de serviço (%)
+    valor_taxa_comissao: float = 0  # Valor calculado da comissão
+    valor_taxa_servico: float = 0  # Valor calculado do serviço
+    valor_liquido: float = 0  # Valor final após taxas
+    
+    # Envio
+    opcao_envio: str = ""  # Opção de envio (Ex: Normal, Expresso, etc)
+    data_prevista_envio: Optional[datetime] = None  # Data prevista de envio
     
     # Status e Fluxo
     status: str = "Aguardando Impressão"  # Aguardando Impressão, Sala de Impressão, Em Produção, Expedição, Enviado, Entregue
