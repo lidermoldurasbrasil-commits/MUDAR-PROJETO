@@ -1269,8 +1269,8 @@ class PedidoManufatura(BaseModel):
     # Dados básicos
     data_abertura: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     cliente_id: Optional[str] = ""  # ID do cliente cadastrado
-    cliente_nome: str
-    tipo_produto: str  # Quadro, Espelho, Moldura avulsa, Fine-Art
+    cliente_nome: str = "Cliente não informado"  # Valor padrão
+    tipo_produto: str = "Quadro"  # Valor padrão
     quantidade: int = 1
     
     # Anexo do cliente (objeto para emoldurar)
@@ -1278,8 +1278,8 @@ class PedidoManufatura(BaseModel):
     sku_objeto_cliente: Optional[str] = ""  # SKU do objeto trazido pelo cliente
     
     # Dimensões
-    altura: float  # cm
-    largura: float  # cm
+    altura: float = 0  # cm - valor padrão
+    largura: float = 0  # cm - valor padrão
     
     # Insumos selecionados
     moldura_id: Optional[str] = None
