@@ -126,7 +126,7 @@ export default function MarketplaceProjetoDetalhes() {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <p className="text-xl text-gray-600 mb-4">Projeto não encontrado</p>
-        <button onClick={() => navigate('/gestao/marketplaces')} className="px-4 py-2 bg-blue-600 text-white rounded">
+        <button onClick={() => navigate('/marketplace/production')} className="px-4 py-2 bg-blue-600 text-white rounded">
           Voltar
         </button>
       </div>
