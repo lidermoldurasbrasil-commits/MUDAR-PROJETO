@@ -44,6 +44,8 @@ export default function MarketplaceProjetoDetalhes() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(false);
+  const [selectedPedidos, setSelectedPedidos] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
   const [novaLinhaInline, setNovaLinhaInline] = useState({
     numero_pedido: '',
     produto_nome: '',
