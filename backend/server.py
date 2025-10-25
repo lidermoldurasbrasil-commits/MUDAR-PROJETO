@@ -3055,6 +3055,165 @@ async def get_dre(mes: int, ano: int, loja: Optional[str] = None, current_user: 
         "total_movimentacoes": len(movimentacoes)
     }
 
+# ENDPOINT PARA ORÇAMENTO - FORMAS DE PAGAMENTO ATIVAS
+@api_router.get("/gestao/financeiro/formas-pagamento-ativas")
+async def get_formas_pagamento_ativas(banco_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Retorna formas de pagamento ativas para usar no orçamento"""
+    query = {"ativa": True}
+    if banco_id:
+        query['conta_bancaria_id'] = banco_id
+    
+    formas = await db.formas_pagamento_banco.find(query).to_list(None)
+    
+    # Buscar nome do banco para cada forma
+    resultado = []
+    for forma in formas:
+        if '_id' in forma:
+            del forma['_id']
+        
+        # Buscar nome do banco
+        if forma.get('conta_bancaria_id'):
+            banco = await db.contas_bancarias.find_one({"id": forma['conta_bancaria_id']})
+            if banco:
+                forma['banco_nome'] = banco.get('nome', '')
+                # Formatar nome completo: [Banco] - [Forma] - [Parcelas]x - Taxa [Taxa%]
+                forma['nome_formatado'] = f"{banco.get('nome', '')} – {forma.get('forma_pagamento', '')} – {forma.get('numero_parcelas', 1)}x – Taxa {forma.get('taxa_banco_percentual', 0)}%"
+        
+        resultado.append(forma)
+    
+    return resultado
+
+# RELATÓRIO DE TAXAS - VENDAS × PAGAMENTOS
+@api_router.get("/gestao/financeiro/relatorio-taxas")
+async def get_relatorio_taxas(
+    data_inicio: Optional[str] = None,
+    data_fim: Optional[str] = None,
+    loja: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Relatório de análise de taxas por forma de pagamento"""
+    
+    # Construir filtro de data
+    query = {}
+    if data_inicio and data_fim:
+        query['data_abertura'] = {
+            '$gte': datetime.fromisoformat(data_inicio),
+            '$lte': datetime.fromisoformat(data_fim)
+        }
+    
+    if loja:
+        query['loja_id'] = loja
+    
+    # Buscar apenas pedidos com forma de pagamento definida
+    query['forma_pagamento_id'] = {'$ne': None}
+    
+    pedidos = await db.pedidos_manufatura.find(query).to_list(None)
+    
+    # Métricas principais
+    faturamento_bruto = sum(p.get('valor_bruto', 0) for p in pedidos)
+    total_taxas = sum(p.get('taxa_valor_real', 0) for p in pedidos)
+    valor_liquido = sum(p.get('valor_liquido_empresa', 0) for p in pedidos)
+    taxa_media = (total_taxas / faturamento_bruto * 100) if faturamento_bruto > 0 else 0
+    ticket_medio = valor_liquido / len(pedidos) if pedidos else 0
+    
+    # Ranking por forma de pagamento
+    ranking_forma = {}
+    for p in pedidos:
+        forma_nome = p.get('forma_pagamento_nome', 'Não informado')
+        if forma_nome not in ranking_forma:
+            ranking_forma[forma_nome] = {
+                'forma': forma_nome,
+                'total_vendido': 0,
+                'total_taxas': 0,
+                'valor_liquido': 0,
+                'quantidade': 0
+            }
+        
+        ranking_forma[forma_nome]['total_vendido'] += p.get('valor_bruto', 0)
+        ranking_forma[forma_nome]['total_taxas'] += p.get('taxa_valor_real', 0)
+        ranking_forma[forma_nome]['valor_liquido'] += p.get('valor_liquido_empresa', 0)
+        ranking_forma[forma_nome]['quantidade'] += 1
+    
+    # Calcular taxa média por forma
+    for forma in ranking_forma.values():
+        if forma['total_vendido'] > 0:
+            forma['taxa_media_percentual'] = (forma['total_taxas'] / forma['total_vendido']) * 100
+    
+    # Ranking por loja
+    ranking_loja = {}
+    for p in pedidos:
+        loja_id = p.get('loja_id', 'Não informado')
+        if loja_id not in ranking_loja:
+            ranking_loja[loja_id] = {
+                'loja': loja_id,
+                'total_vendido': 0,
+                'total_taxas': 0,
+                'quantidade': 0,
+                'formas_usadas': {}
+            }
+        
+        ranking_loja[loja_id]['total_vendido'] += p.get('valor_bruto', 0)
+        ranking_loja[loja_id]['total_taxas'] += p.get('taxa_valor_real', 0)
+        ranking_loja[loja_id]['quantidade'] += 1
+        
+        # Contar formas usadas
+        forma = p.get('forma_pagamento_nome', 'Não informado')
+        ranking_loja[loja_id]['formas_usadas'][forma] = ranking_loja[loja_id]['formas_usadas'].get(forma, 0) + 1
+    
+    # Determinar forma mais usada por loja
+    for loja_data in ranking_loja.values():
+        if loja_data['formas_usadas']:
+            loja_data['forma_mais_usada'] = max(loja_data['formas_usadas'].items(), key=lambda x: x[1])[0]
+        else:
+            loja_data['forma_mais_usada'] = 'Nenhuma'
+        
+        if loja_data['total_vendido'] > 0:
+            loja_data['taxa_media_percentual'] = (loja_data['total_taxas'] / loja_data['total_vendido']) * 100
+    
+    # Ranking por banco
+    ranking_banco = {}
+    for p in pedidos:
+        banco_nome = p.get('conta_bancaria_nome', 'Não informado')
+        if banco_nome not in ranking_banco:
+            ranking_banco[banco_nome] = {
+                'banco': banco_nome,
+                'total_processado': 0,
+                'total_taxas': 0,
+                'quantidade': 0,
+                'parcelas_usadas': {}
+            }
+        
+        ranking_banco[banco_nome]['total_processado'] += p.get('valor_bruto', 0)
+        ranking_banco[banco_nome]['total_taxas'] += p.get('taxa_valor_real', 0)
+        ranking_banco[banco_nome]['quantidade'] += 1
+        
+        parcelas = p.get('forma_pagamento_parcelas', 1)
+        ranking_banco[banco_nome]['parcelas_usadas'][parcelas] = ranking_banco[banco_nome]['parcelas_usadas'].get(parcelas, 0) + 1
+    
+    # Determinar parcelamento mais usado
+    for banco_data in ranking_banco.values():
+        if banco_data['parcelas_usadas']:
+            banco_data['parcelamento_mais_usado'] = f"{max(banco_data['parcelas_usadas'].items(), key=lambda x: x[1])[0]}x"
+        else:
+            banco_data['parcelamento_mais_usado'] = '1x'
+        
+        if banco_data['total_processado'] > 0:
+            banco_data['taxa_media_percentual'] = (banco_data['total_taxas'] / banco_data['total_processado']) * 100
+    
+    return {
+        "metricas": {
+            "faturamento_bruto_total": faturamento_bruto,
+            "valor_total_taxas": total_taxas,
+            "valor_liquido_recebido": valor_liquido,
+            "taxa_media_percentual": taxa_media,
+            "ticket_medio_liquido": ticket_medio,
+            "total_vendas": len(pedidos)
+        },
+        "ranking_por_forma": list(ranking_forma.values()),
+        "ranking_por_loja": list(ranking_loja.values()),
+        "ranking_por_banco": list(ranking_banco.values())
+    }
+
 # ============= DASHBOARD E RELATÓRIOS =============
 
 @api_router.get("/gestao/pedidos/estatisticas")
