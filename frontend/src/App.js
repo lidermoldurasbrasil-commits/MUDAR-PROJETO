@@ -31,6 +31,7 @@ import ContasAReceber from './pages/gestao/financeiro/ContasAReceber';
 import Clientes from './pages/gestao/Clientes';
 import Relatorios from './pages/gestao/Relatorios';
 import MarketplacesCentral from './pages/gestao/MarketplacesCentral';
+import MarketplaceProjetoDetalhes from './pages/gestao/MarketplaceProjetoDetalhes';
 
 import axios from 'axios';
 import './App.css';
