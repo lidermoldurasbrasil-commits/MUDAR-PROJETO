@@ -23,6 +23,7 @@ export default function ContasBancarias() {
   const [editingFormaId, setEditingFormaId] = useState(null);
   const [isAddingForma, setIsAddingForma] = useState(false);
   const [filtros, setFiltros] = useState({ banco: '', status: '' });
+  const [selecionarTodos, setSelecionarTodos] = useState(false);
 
   const [formData, setFormData] = useState({
     nome: '', tipo: 'Corrente', banco: '', agencia: '', conta: '', saldo_inicial: 0, cnpj_titular: '', status: 'Ativo', loja_id: lojaAtual
