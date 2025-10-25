@@ -1416,6 +1416,144 @@ class OrdemProducao(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: Optional[str] = ""
 
+# ============= MÓDULO FINANCEIRO =============
+
+class ContaBancaria(BaseModel):
+    """Conta Bancária para controle financeiro"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nome: str  # Ex: "Itaú Fábrica"
+    tipo: str  # Corrente, Poupança, Caixa, Mercado Pago, Shopee
+    banco: str = ""  # Ex: "Itaú"
+    agencia: str = ""
+    conta: str = ""
+    saldo_inicial: float = 0
+    saldo_atual: float = 0  # Calculado automaticamente
+    cnpj_titular: str = ""
+    status: str = "Ativo"  # Ativo / Inativo
+    loja_id: str = "fabrica"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class GrupoCategoria(BaseModel):
+    """Grupo de Categorias Financeiras"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nome: str  # Ex: "Despesas Operacionais", "Vendas", "Logística"
+    tipo: str  # Receita / Despesa
+    descricao: str = ""
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CategoriaFinanceira(BaseModel):
+    """Categoria Financeira (Receita ou Despesa)"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nome: str  # Ex: "Energia Elétrica", "Venda de Quadros"
+    tipo: str  # Receita / Despesa
+    grupo_id: Optional[str] = None  # Referência ao grupo
+    grupo_nome: str = ""  # Nome do grupo para facilitar queries
+    descricao: str = ""
+    status: str = "Ativo"  # Ativo / Inativo
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ContaPagar(BaseModel):
+    """Conta a Pagar (Despesa)"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    fornecedor: str
+    categoria_id: str
+    categoria_nome: str = ""  # Desnormalizado para facilitar
+    descricao: str = ""
+    valor: float
+    data_emissao: datetime
+    data_vencimento: datetime
+    data_pagamento: Optional[datetime] = None
+    conta_bancaria_id: str
+    conta_bancaria_nome: str = ""  # Desnormalizado
+    loja_id: str = "fabrica"
+    status: str = "Pendente"  # Pendente / Pago / Atrasado / Cancelado
+    forma_pagamento: str = ""  # PIX, Boleto, Cartão, Transferência
+    observacoes: str = ""
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = ""
+
+class ContaReceber(BaseModel):
+    """Conta a Receber (Receita)"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    cliente_origem: str  # Nome do cliente ou origem (Shopee, Loja 2, etc)
+    categoria_id: str
+    categoria_nome: str = ""
+    descricao: str = ""
+    valor: float
+    data_emissao: datetime
+    data_prevista: datetime
+    data_recebimento: Optional[datetime] = None
+    conta_bancaria_id: str
+    conta_bancaria_nome: str = ""
+    loja_id: str = "fabrica"
+    status: str = "Em Aberto"  # Em Aberto / Recebido / Atrasado / Cancelado
+    pedido_id: Optional[str] = None  # Referência ao pedido de origem
+    observacoes: str = ""
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = ""
+
+class Transferencia(BaseModel):
+    """Transferência entre Contas Internas"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    conta_origem_id: str
+    conta_origem_nome: str = ""
+    conta_destino_id: str
+    conta_destino_nome: str = ""
+    valor: float
+    data: datetime
+    observacoes: str = ""
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = ""
+
+class LancamentoRapido(BaseModel):
+    """Lançamento Rápido Manual"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tipo: str  # Receita / Despesa
+    categoria_id: str
+    categoria_nome: str = ""
+    valor: float
+    data: datetime
+    conta_bancaria_id: str
+    conta_bancaria_nome: str = ""
+    loja_id: str = "fabrica"
+    descricao: str = ""
+    observacoes: str = ""
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = ""
+
+class MovimentacaoFinanceira(BaseModel):
+    """Registro de movimentação para o extrato"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    conta_bancaria_id: str
+    tipo: str  # Crédito / Débito
+    categoria: str = ""
+    descricao: str
+    valor: float
+    saldo_anterior: float
+    saldo_posterior: float
+    data: datetime
+    origem_tipo: str = ""  # ContaPagar, ContaReceber, Transferencia, LancamentoRapido
+    origem_id: str = ""
+    loja_id: str = "fabrica"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # Contador para número de ordem
 async def get_next_numero_ordem():
     """Gera o próximo número de ordem sequencial"""
