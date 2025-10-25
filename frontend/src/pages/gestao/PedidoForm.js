@@ -85,7 +85,7 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
   });
 
   // NOVO: Array para armazenar múltiplos produtos no pedido
-  const [produtosPedido, setProdutosPedido] = useState(pedido?.produtos_pedido || []);
+  const [produtosPedido, setProdutosPedido] = useState([]);
 
   const [novoCliente, setNovoCliente] = useState({
     nome: '',
@@ -100,6 +100,33 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
   useEffect(() => {
     checkPermissions();
     fetchData();
+    
+    // NOVO: Reconstruir produtosPedido ao editar um pedido existente
+    if (pedido && pedido.itens && pedido.itens.length > 0) {
+      // Calcular total dos itens
+      const totalItens = pedido.itens.reduce((sum, item) => sum + (item.subtotal_venda || 0), 0);
+      
+      // Criar um produto a partir dos dados do pedido
+      const produtoReconstruido = {
+        id: Date.now(),
+        tipo_produto: pedido.tipo_produto || 'Quadro',
+        altura: pedido.altura || 0,
+        largura: pedido.largura || 0,
+        quantidade: pedido.quantidade || 1,
+        area: pedido.area || 0,
+        perimetro: pedido.perimetro || 0,
+        itens: pedido.itens || [],
+        total: totalItens,
+        moldura_descricao: pedido.moldura_descricao,
+        vidro_descricao: pedido.vidro_descricao,
+        mdf_descricao: pedido.mdf_descricao,
+        papel_descricao: pedido.papel_descricao,
+        passepartout_descricao: pedido.passepartout_descricao
+      };
+      
+      setProdutosPedido([produtoReconstruido]);
+      console.log('Pedido carregado para edição:', produtoReconstruido);
+    }
   }, []);
 
   const checkPermissions = async () => {
