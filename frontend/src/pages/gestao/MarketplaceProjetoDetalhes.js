@@ -173,6 +173,64 @@ export default function MarketplaceProjetoDetalhes() {
     }
   };
 
+  const handleAddInline = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Validar campos obrigatórios
+      if (!novaLinhaInline.numero_pedido) {
+        toast.error('Número do pedido é obrigatório');
+        return;
+      }
+      
+      // Converter data para ISO
+      const prazoEntrega = novaLinhaInline.prazo_entrega ? 
+        new Date(novaLinhaInline.prazo_entrega).toISOString() : 
+        new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      
+      const pedidoData = {
+        numero_pedido: novaLinhaInline.numero_pedido,
+        sku: novaLinhaInline.sku,
+        cliente_nome: novaLinhaInline.cliente_nome,
+        produto_nome: novaLinhaInline.numero_pedido, // Usar número do pedido como produto por padrão
+        quantidade: novaLinhaInline.quantidade,
+        valor_unitario: 0,
+        valor_total: 0,
+        status: novaLinhaInline.status,
+        prioridade: novaLinhaInline.prioridade,
+        prazo_entrega: prazoEntrega,
+        responsavel: novaLinhaInline.responsavel,
+        projeto_id: projetoId,
+        plataforma: projeto.plataforma,
+        loja_id: lojaAtual
+      };
+      
+      await axios.post(
+        `${API}/pedidos`,
+        pedidoData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success('Pedido adicionado!');
+      setShowInlineAdd(false);
+      setNovaLinhaInline({
+        numero_pedido: '',
+        quantidade: 1,
+        sku: '',
+        cliente_nome: '',
+        sala_impressao: 'Aguardando Impressão',
+        status: 'Aguardando Impressão',
+        prioridade: 'Normal',
+        prazo_entrega: '',
+        responsavel: ''
+      });
+      fetchDados();
+    } catch (error) {
+      console.error('Erro ao adicionar pedido:', error);
+      toast.error('Erro ao adicionar pedido');
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     try {
