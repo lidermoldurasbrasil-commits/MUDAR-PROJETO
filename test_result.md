@@ -107,15 +107,18 @@ user_problem_statement: "Criar lista detalhada e editável de insumos, preços d
 backend:
   - task: "Endpoint de cálculo de pedidos (/api/gestao/pedidos/calcular)"
     implemented: true
-    working: "unknown"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "unknown"
           agent: "main"
           comment: "Criado modelo PedidoCalculoRequest separado do PedidoManufatura para permitir cálculos sem campos obrigatórios. Reescrito endpoint completo para usar dicionário resultado ao invés de modificar objeto diretamente. Todos os campos calculados inicializados com valores padrão."
+        - working: true
+          agent: "testing"
+          comment: "✅ ENDPOINT FUNCIONANDO PERFEITAMENTE! Testado com dados reais: altura=50cm, largura=70cm, moldura+vidro. Retorna 200 OK sem erro 422. Cálculos corretos: área=0.35m², perímetro=240cm. Response contém todos os campos obrigatórios: area, perimetro, barras_necessarias, sobra, custo_perda, itens (moldura+vidro), custo_total, markup, preco_venda, margem_percentual, valor_final. Perda técnica calculada corretamente (24cm corte + 30cm sobra). Custo total R$18.47, preço venda R$55.42, margem 66.7%."
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
