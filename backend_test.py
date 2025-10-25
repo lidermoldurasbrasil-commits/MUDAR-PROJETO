@@ -1066,6 +1066,211 @@ class BusinessManagementSystemTester:
             self.log_test(f"Preco Manufatura - {product_type} Unexpected Price", False, f"Unexpected price: {preco_unitario}")
             return False
 
+    def test_linear_meter_frame_calculation(self):
+        """SPECIFIC TEST: Frame calculation with linear meters as requested"""
+        print("\n📏 TESTING LINEAR METER FRAME CALCULATION...")
+        
+        # Create frame product with specific pricing for linear meter test
+        moldura_linear_data = {
+            "loja_id": "fabrica",
+            "referencia": "MOLD-LINEAR-TEST",
+            "descricao": "Moldura Teste Metro Linear 3cm",
+            "familia": "Moldura",
+            "largura": 3.0,  # 3.0 cm width as specified
+            "comprimento": 270.0,  # Standard bar length
+            "custo_120dias": 50.00,        # R$ 50.00 per linear meter (cost)
+            "preco_manufatura": 150.00,    # R$ 150.00 per linear meter (selling price)
+            "markup_manufatura": 200.0,
+            "ativo": True
+        }
+        
+        # Create the test frame product
+        success, moldura_response = self.run_test(
+            "Create Linear Meter Frame Product",
+            "POST",
+            "gestao/produtos",
+            200,
+            data=moldura_linear_data
+        )
+        
+        if not success or 'id' not in moldura_response:
+            print("❌ CRITICAL: Failed to create linear meter test product")
+            self.log_test("Linear Meter Frame Test", False, "Failed to create test product")
+            return False
+            
+        moldura_id = moldura_response['id']
+        print(f"✅ Created linear meter frame product with ID: {moldura_id}")
+        
+        # Test calculation with specified dimensions
+        # altura: 50 cm, largura: 70 cm, quantidade: 1
+        # Perimeter = 2×50 + 2×70 = 240 cm = 2.40 linear meters
+        calc_data = {
+            "altura": 50,  # cm
+            "largura": 70,  # cm
+            "quantidade": 1,
+            "moldura_id": moldura_id,
+            "usar_vidro": False,
+            "usar_mdf": False,
+            "usar_papel": False,
+            "usar_passepartout": False,
+            "usar_acessorios": False
+        }
+        
+        success_calc, calc_response = self.run_test(
+            "Calculate Linear Meter Frame Order",
+            "POST",
+            "gestao/pedidos/calcular",
+            200,
+            data=calc_data
+        )
+        
+        if not success_calc:
+            print("❌ CRITICAL: Frame calculation failed")
+            self.log_test("Linear Meter Frame Calculation", False, "Calculation endpoint failed")
+            return False
+        
+        # Validate the linear meter calculation results
+        return self.validate_linear_meter_results(calc_response)
+    
+    def validate_linear_meter_results(self, response):
+        """Validate linear meter calculation results according to specifications"""
+        print("\n🔍 Validating Linear Meter Calculation Results...")
+        
+        # Check basic response structure
+        if 'itens' not in response or not response['itens']:
+            print("❌ No items found in calculation response")
+            self.log_test("Linear Meter - Response Structure", False, "No items in response")
+            return False
+        
+        # Find the frame item
+        frame_item = None
+        for item in response['itens']:
+            if 'moldura' in item.get('tipo_insumo', '').lower():
+                frame_item = item
+                break
+        
+        if not frame_item:
+            print("❌ No frame item found in response")
+            self.log_test("Linear Meter - Frame Item", False, "Frame item not found")
+            return False
+        
+        print("✅ Frame item found in response")
+        
+        # Expected values based on specification
+        expected_perimeter_cm = 240  # 2×50 + 2×70 = 240 cm
+        expected_cut_loss_cm = 3.0 * 8  # largura × 8 = 24 cm
+        expected_charged_perimeter_cm = expected_perimeter_cm + expected_cut_loss_cm  # ~264 cm
+        expected_charged_meters = expected_charged_perimeter_cm / 100  # ~2.64 meters
+        
+        expected_cost_per_meter = 50.00
+        expected_price_per_meter = 150.00
+        expected_subtotal_cost = expected_charged_meters * expected_cost_per_meter  # ~132.00
+        expected_subtotal_venda = expected_charged_meters * expected_price_per_meter  # ~396.00
+        
+        print(f"📊 Expected Calculation:")
+        print(f"   Perimeter: {expected_perimeter_cm} cm")
+        print(f"   Cut loss: {expected_cut_loss_cm} cm")
+        print(f"   Charged perimeter: {expected_charged_perimeter_cm} cm = {expected_charged_meters:.2f} meters")
+        print(f"   Expected subtotal cost: R$ {expected_subtotal_cost:.2f}")
+        print(f"   Expected subtotal venda: R$ {expected_subtotal_venda:.2f}")
+        
+        # Validation results
+        validation_results = []
+        
+        # 1. Check unit is 'ml' (linear meter)
+        unit = frame_item.get('unidade', '')
+        if unit == 'ml':
+            print("✅ Unit is 'ml' (linear meter) - CORRECT")
+            validation_results.append(True)
+            self.log_test("Linear Meter - Unit Validation", True)
+        else:
+            print(f"❌ Unit is '{unit}', should be 'ml' (linear meter)")
+            validation_results.append(False)
+            self.log_test("Linear Meter - Unit Validation", False, f"Unit is '{unit}', not 'ml'")
+        
+        # 2. Check quantity is in meters (around 2.64), NOT cm (240)
+        quantidade = frame_item.get('quantidade', 0)
+        if 2.4 <= quantidade <= 2.8:  # Allow some tolerance for losses
+            print(f"✅ Quantity is {quantidade:.2f} meters - CORRECT (within expected range)")
+            validation_results.append(True)
+            self.log_test("Linear Meter - Quantity in Meters", True)
+        elif 240 <= quantidade <= 280:  # If it's in cm (wrong)
+            print(f"❌ Quantity is {quantidade} - appears to be in CM, should be in METERS")
+            validation_results.append(False)
+            self.log_test("Linear Meter - Quantity in Meters", False, f"Quantity {quantidade} appears to be in cm")
+        else:
+            print(f"⚠️ Quantity is {quantidade} - unexpected value")
+            validation_results.append(False)
+            self.log_test("Linear Meter - Quantity in Meters", False, f"Unexpected quantity: {quantidade}")
+        
+        # 3. Check custo_unitario is R$ 50.00 (cost per linear meter)
+        custo_unitario = frame_item.get('custo_unitario', 0)
+        if abs(custo_unitario - expected_cost_per_meter) < 0.01:
+            print(f"✅ Cost per unit is R$ {custo_unitario:.2f} (per linear meter) - CORRECT")
+            validation_results.append(True)
+            self.log_test("Linear Meter - Cost Per Unit", True)
+        else:
+            print(f"❌ Cost per unit is R$ {custo_unitario:.2f}, should be R$ {expected_cost_per_meter:.2f}")
+            validation_results.append(False)
+            self.log_test("Linear Meter - Cost Per Unit", False, f"Cost {custo_unitario}, expected {expected_cost_per_meter}")
+        
+        # 4. Check preco_unitario is R$ 150.00 (price per linear meter)
+        preco_unitario = frame_item.get('preco_unitario', 0)
+        if abs(preco_unitario - expected_price_per_meter) < 0.01:
+            print(f"✅ Price per unit is R$ {preco_unitario:.2f} (per linear meter) - CORRECT")
+            validation_results.append(True)
+            self.log_test("Linear Meter - Price Per Unit", True)
+        else:
+            print(f"❌ Price per unit is R$ {preco_unitario:.2f}, should be R$ {expected_price_per_meter:.2f}")
+            validation_results.append(False)
+            self.log_test("Linear Meter - Price Per Unit", False, f"Price {preco_unitario}, expected {expected_price_per_meter}")
+        
+        # 5. Check subtotal (cost) is approximately correct
+        subtotal = frame_item.get('subtotal', 0)
+        tolerance = 10.0  # Allow R$ 10 tolerance for losses calculation
+        if abs(subtotal - expected_subtotal_cost) <= tolerance:
+            print(f"✅ Subtotal cost is R$ {subtotal:.2f} (within tolerance) - CORRECT")
+            validation_results.append(True)
+            self.log_test("Linear Meter - Subtotal Cost", True)
+        else:
+            print(f"❌ Subtotal cost is R$ {subtotal:.2f}, expected ~R$ {expected_subtotal_cost:.2f}")
+            validation_results.append(False)
+            self.log_test("Linear Meter - Subtotal Cost", False, f"Subtotal {subtotal}, expected ~{expected_subtotal_cost}")
+        
+        # 6. Check subtotal_venda (selling price) is approximately correct
+        subtotal_venda = frame_item.get('subtotal_venda', 0)
+        if abs(subtotal_venda - expected_subtotal_venda) <= tolerance * 3:  # Larger tolerance for selling price
+            print(f"✅ Subtotal venda is R$ {subtotal_venda:.2f} (within tolerance) - CORRECT")
+            validation_results.append(True)
+            self.log_test("Linear Meter - Subtotal Venda", True)
+        else:
+            print(f"❌ Subtotal venda is R$ {subtotal_venda:.2f}, expected ~R$ {expected_subtotal_venda:.2f}")
+            validation_results.append(False)
+            self.log_test("Linear Meter - Subtotal Venda", False, f"Subtotal venda {subtotal_venda}, expected ~{expected_subtotal_venda}")
+        
+        # Print actual item details
+        print(f"\n📋 Actual Frame Item Details:")
+        print(f"   Description: {frame_item.get('insumo_descricao', 'N/A')}")
+        print(f"   Type: {frame_item.get('tipo_insumo', 'N/A')}")
+        print(f"   Quantity: {quantidade} {unit}")
+        print(f"   Cost per unit: R$ {custo_unitario:.2f}")
+        print(f"   Price per unit: R$ {preco_unitario:.2f}")
+        print(f"   Subtotal cost: R$ {subtotal:.2f}")
+        print(f"   Subtotal venda: R$ {subtotal_venda:.2f}")
+        
+        # Overall result
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ ALL LINEAR METER VALIDATIONS PASSED!")
+            self.log_test("Linear Meter Frame Calculation - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ LINEAR METER VALIDATION FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("Linear Meter Frame Calculation - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
@@ -1075,8 +1280,12 @@ class BusinessManagementSystemTester:
         if not self.test_authentication():
             return False
         
-        # PRIORITY: Run the critical preco_manufatura validation test first
-        print("\n🚨 RUNNING CRITICAL TEST FIRST...")
+        # PRIORITY: Run the specific linear meter frame calculation test
+        print("\n🚨 RUNNING SPECIFIC LINEAR METER FRAME TEST...")
+        self.test_linear_meter_frame_calculation()
+        
+        # PRIORITY: Run the critical preco_manufatura validation test
+        print("\n🚨 RUNNING CRITICAL TEST...")
         self.test_preco_manufatura_validation()
         
         # Run all module tests
