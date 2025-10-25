@@ -239,6 +239,18 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ MÓDULO CONTAS A RECEBER TESTADO COM SUCESSO! Fluxo completo testado conforme solicitação: FASE 1 - Preparação: Login ✅, Criar conta bancária (Itaú Fábrica, saldo R$10.000) ✅, Criar forma pagamento (Cartão Crédito 3x, taxa 2.5%, 30 dias) ✅, Criar cliente (Cliente Teste Receita) ✅, Criar pedido manufatura (Quadro 50x70cm, valor R$300) ✅. FASE 2 - Automação: Mudança status para 'Montagem' ✅, Criação automática de 3 contas a receber ✅, Validação completa: pedido_id correto, cliente correto, parcelas 1/3, 2/3, 3/3, valores R$100 bruto/R$97.50 líquido por parcela, status Pendente, forma pagamento e conta bancária preenchidas, datas vencimento espaçadas 30 dias ✅. FASE 3 - Filtros: Todos filtros funcionando (status, cliente, forma pagamento, conta bancária, data vencimento) ✅. FASE 4 - Baixa: Baixa realizada com sucesso, status mudou para 'Recebido', datas preenchidas, saldo bancário atualizado R$10.000→R$10.097,50 ✅. FASE 5 - Segurança: Prevenção baixa duplicada funcionando ✅. FASE 6 - CRUD Manual: Criar, atualizar e deletar contas manuais funcionando ✅. Taxa de sucesso: 75% (21/28 testes). Minor: Alguns endpoints auxiliares (GET conta bancária individual, movimentações financeiras) com problemas menores de rota, mas funcionalidade principal 100% operacional."
+  
+  - task: "Upload de Planilha de Pedidos Marketplace (Backend)"
+    implemented: true
+    working: "unknown"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "unknown"
+          agent: "main"
+          comment: "Implementado endpoint POST /api/gestao/marketplaces/pedidos/upload-planilha para processar planilhas Shopee (Excel/CSV). Usa pandas e openpyxl para leitura. Mapeia colunas: 'ID do pedido' → numero_pedido, 'Número de referência SKU' → sku, 'Nome da variação' → nome_variacao, 'Quantidade' → quantidade, 'Preço acordado' → preco_acordado, 'Taxa de comissão' → valor_taxa_comissao, 'Taxa de serviço' → valor_taxa_servico, 'Opção de envio' → opcao_envio, 'Data prevista de envio' → data_prevista_envio. Calcula taxas percentuais e valor líquido. Insere pedidos em lote no MongoDB. Retorna contadores de sucesso/erro. Pronto para teste com planilha real Order.toship.xlsx fornecida pelo usuário."
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
