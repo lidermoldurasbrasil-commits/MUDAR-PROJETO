@@ -42,7 +42,7 @@ export default function MarketplaceProjetoDetalhes() {
   const [projeto, setProjeto] = useState(null);
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filtros, setFiltros] = useState({ status: '', atrasado: null });
+  const [filtros, setFiltros] = useState({ status: '', atrasado: null, sku: '', prazoEnvio: '' });
   const [showFilters, setShowFilters] = useState(false);
   const [editingPedido, setEditingPedido] = useState(null);
   const [viewMode, setViewMode] = useState('monday'); // 'kanban', 'list', ou 'monday'
