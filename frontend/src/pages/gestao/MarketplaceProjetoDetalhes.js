@@ -481,6 +481,197 @@ export default function MarketplaceProjetoDetalhes() {
           )}
         </div>
       )}
+      
+      {/* Modal de Adicionar Pedido */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-6 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-white">Adicionar Novo Pedido - {projeto.nome}</h3>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-400" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              {/* Linha 1: Número do Pedido e SKU */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Número do Pedido *</label>
+                  <input
+                    type="text"
+                    value={novoPedido.numero_pedido}
+                    onChange={(e) => setNovoPedido({...novoPedido, numero_pedido: e.target.value})}
+                    placeholder="Ex: ML-12345"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">SKU</label>
+                  <input
+                    type="text"
+                    value={novoPedido.sku}
+                    onChange={(e) => setNovoPedido({...novoPedido, sku: e.target.value})}
+                    placeholder="Ex: PROD-001"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Linha 2: Cliente e Contato */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Nome do Cliente *</label>
+                  <input
+                    type="text"
+                    value={novoPedido.cliente_nome}
+                    onChange={(e) => setNovoPedido({...novoPedido, cliente_nome: e.target.value})}
+                    placeholder="Nome completo"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Contato</label>
+                  <input
+                    type="text"
+                    value={novoPedido.cliente_contato}
+                    onChange={(e) => setNovoPedido({...novoPedido, cliente_contato: e.target.value})}
+                    placeholder="Telefone ou email"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Linha 3: Produto */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Nome do Produto *</label>
+                <input
+                  type="text"
+                  value={novoPedido.produto_nome}
+                  onChange={(e) => setNovoPedido({...novoPedido, produto_nome: e.target.value})}
+                  placeholder="Descrição do produto"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Linha 4: Quantidade e Valores */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Quantidade *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={novoPedido.quantidade}
+                    onChange={(e) => setNovoPedido({...novoPedido, quantidade: parseInt(e.target.value) || 1})}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Valor Unitário (R$) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={novoPedido.valor_unitario}
+                    onChange={(e) => setNovoPedido({...novoPedido, valor_unitario: parseFloat(e.target.value) || 0})}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Valor Total (R$)</label>
+                  <input
+                    type="text"
+                    value={formatCurrency(novoPedido.quantidade * novoPedido.valor_unitario)}
+                    disabled
+                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 text-gray-400 rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Linha 5: Status e Prioridade */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Status Inicial</label>
+                  <select
+                    value={novoPedido.status}
+                    onChange={(e) => setNovoPedido({...novoPedido, status: e.target.value})}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    {STATUS_OPTIONS.map(s => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Prioridade</label>
+                  <select
+                    value={novoPedido.prioridade}
+                    onChange={(e) => setNovoPedido({...novoPedido, prioridade: e.target.value})}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    {PRIORIDADE_OPTIONS.map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Linha 6: Prazo e Responsável */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Prazo de Entrega *</label>
+                  <input
+                    type="date"
+                    value={novoPedido.prazo_entrega}
+                    onChange={(e) => setNovoPedido({...novoPedido, prazo_entrega: e.target.value})}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Responsável</label>
+                  <input
+                    type="text"
+                    value={novoPedido.responsavel}
+                    onChange={(e) => setNovoPedido({...novoPedido, responsavel: e.target.value})}
+                    placeholder="Nome do responsável"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Linha 7: Observações */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Observações</label>
+                <textarea
+                  value={novoPedido.observacoes}
+                  onChange={(e) => setNovoPedido({...novoPedido, observacoes: e.target.value})}
+                  rows={3}
+                  placeholder="Detalhes adicionais sobre o pedido..."
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-6 flex gap-3">
+              <button
+                onClick={handleAddPedido}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              >
+                Criar Pedido
+              </button>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
