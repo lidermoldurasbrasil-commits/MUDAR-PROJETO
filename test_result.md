@@ -134,6 +134,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ TESTE CRÍTICO APROVADO - PRECO_MANUFATURA VALIDADO! Criados produtos de teste com preços distintos: custo_120dias=R$10.00, preco_manufatura=R$25.00, preco_venda=R$35.00. CONFIRMADO que endpoint usa CORRETAMENTE preco_manufatura: Moldura retorna R$0.0926/cm (25.00/270), Vidro retorna R$25.00/m². NÃO está usando preco_venda (R$35.00). Testados cenários: moldura isolada, vidro isolado, moldura+vidro. Endpoint 100% funcional e usando campo correto conforme especificação. 64 testes executados, 89.1% sucesso (falhas menores em produtos antigos sem preco_manufatura)."
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTE ESPECÍFICO METRO LINEAR APROVADO! Testado cálculo da moldura com metro linear conforme solicitado: Produto moldura com custo_120dias=R$50.00/ml, preco_manufatura=R$150.00/ml, largura=3cm. Cálculo com altura=50cm, largura=70cm: Perímetro=240cm, Perda corte=24cm (3×8), Sobra=30cm (<100cm, cobrada), Total cobrado=294cm=2.94ml. VALIDAÇÕES APROVADAS: ✅ Unidade='ml' ✅ Quantidade=2.94 metros ✅ Custo unitário=R$50.00/ml ✅ Preço unitário=R$150.00/ml ✅ Subtotal custo=R$147.00 ✅ Subtotal venda=R$441.00. Cálculo metro linear funcionando perfeitamente conforme especificação técnica!"
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
