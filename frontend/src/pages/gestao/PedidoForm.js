@@ -186,13 +186,15 @@ export default function PedidoForm({ pedido, lojaAtual, onClose, onSave }) {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      const [clientesRes, produtosRes] = await Promise.all([
+      const [clientesRes, produtosRes, contasRes] = await Promise.all([
         axios.get(`${API}/clientes`, { headers }),
-        axios.get(`${API}/produtos`, { headers })
+        axios.get(`${API}/produtos`, { headers }),
+        axios.get(`${API}/financeiro/contas-bancarias?status=Ativo`, { headers })
       ]);
       
       setClientes(clientesRes.data);
       setProdutos(produtosRes.data);
+      setContasBancarias(contasRes.data);
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
     }
