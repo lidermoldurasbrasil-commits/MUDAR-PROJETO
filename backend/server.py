@@ -3981,6 +3981,43 @@ async def get_projetos_marketplace(current_user: dict = Depends(get_current_user
         projeto['envio_hoje'] = envio_hoje
         projeto['envio_amanha'] = envio_amanha
         
+        # Métricas por tipo de envio
+        tipos_envio = {}
+        
+        # Mercado Envios Flex
+        flex_count = await db.pedidos_marketplace.count_documents({
+            "projeto_id": projeto_id,
+            "tipo_envio": "Mercado Envios Flex",
+            "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
+        })
+        tipos_envio['flex'] = flex_count
+        
+        # Correios
+        correios_count = await db.pedidos_marketplace.count_documents({
+            "projeto_id": projeto_id,
+            "tipo_envio": "Correios e pontos de envio",
+            "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
+        })
+        tipos_envio['correios'] = correios_count
+        
+        # Agência Mercado Livre
+        agencia_count = await db.pedidos_marketplace.count_documents({
+            "projeto_id": projeto_id,
+            "tipo_envio": "Agência Mercado Livre",
+            "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
+        })
+        tipos_envio['agencia'] = agencia_count
+        
+        projeto['tipos_envio'] = tipos_envio
+        
+        # Horários de postagem (configuráveis por projeto)
+        horarios_postagem = projeto.get('horarios_postagem', {
+            'flex_mercadolivre': '14:00',
+            'flex_shopee': '16:00',
+            'agencia_mercadolivre': '17:00'
+        })
+        projeto['horarios_postagem'] = horarios_postagem
+        
         # Calcular progresso percentual
         total_pedidos = em_producao + enviados + entregues
         if total_pedidos > 0:
