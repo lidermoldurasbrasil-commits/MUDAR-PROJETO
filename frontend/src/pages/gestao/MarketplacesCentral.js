@@ -74,8 +74,12 @@ export default function MarketplacesCentral() {
   const [novaMensagem, setNovaMensagem] = useState('');
   const [editandoProjeto, setEditandoProjeto] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showHorariosModal, setShowHorariosModal] = useState(false);
+  const [projetoHorarios, setProjetoHorarios] = useState(null);
+  const [horariosTemp, setHorariosTemp] = useState({});
 
   const podeEditarMensagem = user?.role === 'director' || user?.role === 'manager';
+  const podeEditarHorarios = user?.role === 'director' || user?.role === 'manager';
 
   useEffect(() => {
     fetchDados();
