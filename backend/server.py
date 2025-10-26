@@ -4245,6 +4245,8 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
     if pd.isna(forma_entrega):
         forma_entrega = ''
     
+    print(f"DEBUG SHOPEE - forma_entrega encontrada: '{forma_entrega}'")
+    
     tipo_envio = 'Outro'
     
     # Regras de identificação de tipo de envio Shopee
@@ -4254,6 +4256,8 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         tipo_envio = 'Coleta'
     elif 'shopee entrega direta' in forma_entrega.lower():
         tipo_envio = 'Flex Shopee'
+    
+    print(f"DEBUG SHOPEE - tipo_envio identificado: '{tipo_envio}'")
     
     # Adicionar tipo_envio ao pedido_data
     pedido_data['tipo_envio'] = tipo_envio
