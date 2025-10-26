@@ -880,24 +880,28 @@ export default function MarketplaceProjetoDetalhes() {
       {/* Toggle View Mode */}
       <div className="flex justify-end mb-4">
         <div className="bg-gray-800 rounded-lg shadow-lg p-1 inline-flex border border-gray-700">
-          <button
-            onClick={() => setViewMode('monday')}
-            className={`px-4 py-2 rounded-lg ${viewMode === 'monday' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
-          >
-            Monday
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setViewMode('monday')}
+              className={`px-4 py-2 rounded-lg ${viewMode === 'monday' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
+            >
+              Monday
+            </button>
+          )}
           <button
             onClick={() => setViewMode('producao')}
             className={`px-4 py-2 rounded-lg ${viewMode === 'producao' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
           >
             Produção
           </button>
-          <button
-            onClick={() => setViewMode('kanban')}
-            className={`px-4 py-2 rounded-lg ${viewMode === 'kanban' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
-          >
-            Kanban
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={`px-4 py-2 rounded-lg ${viewMode === 'kanban' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
+            >
+              Kanban
+            </button>
+          )}
           <button
             onClick={() => setViewMode('list')}
             className={`px-4 py-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
