@@ -4021,8 +4021,6 @@ async def get_projetos_marketplace(current_user: dict = Depends(get_current_user
         projeto['tipos_envio'] = tipos_envio
         
         # Horários de postagem (configuráveis por projeto e específicos por plataforma)
-        plataforma = projeto.get('plataforma', '')
-        
         # Horários padrão baseados na plataforma
         if plataforma == 'shopee':
             horarios_padrao = {
