@@ -939,7 +939,7 @@ export default function MarketplaceProjetoDetalhes() {
       {viewMode === 'monday' && (
         <div className="space-y-6">
           {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
-            <div key={grupo} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+            <div key={`${filtroTipoEnvio}-${grupo}`} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
               {agruparPor && (
                 <div className="bg-gray-900 px-6 py-3 border-b border-gray-700">
                   <h3 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -1428,7 +1428,7 @@ export default function MarketplaceProjetoDetalhes() {
           </div>
           
           {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
-            <div key={grupo} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+            <div key={`${filtroTipoEnvio}-${grupo}`} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
               {agruparPor && (
                 <div className="bg-gray-900 px-6 py-3 border-b border-gray-700">
                   <h3 className="text-lg font-semibold text-white flex items-center gap-2">
