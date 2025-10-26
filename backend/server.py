@@ -4850,7 +4850,7 @@ async def get_dashboard_marketplaces(current_user: dict = Depends(get_current_us
     
     # Estatísticas gerais
     total_pedidos_producao = await db.pedidos_marketplace.count_documents({
-        "status": {"$in": ["Sala de Impressão", "Em Produção", "Expedição"]}
+        "status": {"$in": ["Aguardando Produção", "Em Produção", "Pronto", "Embalagem"]}
     })
     
     total_pedidos_enviados = await db.pedidos_marketplace.count_documents({
