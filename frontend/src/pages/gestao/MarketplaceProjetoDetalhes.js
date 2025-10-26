@@ -1470,36 +1470,12 @@ export default function MarketplaceProjetoDetalhes() {
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[140px]">Status Impressão</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">SKU</th>
-                      {projeto?.plataforma === 'mercadolivre' ? (
-                        <>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Variação</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Unidades</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Comprador</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Forma de Entrega</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Receita (R$)</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Tarifa Venda</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Tarifa Envio</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Total (R$)</th>
-                        </>
-                      ) : (
-                        <>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome Variação</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[130px]">
-                            <button 
-                              onClick={() => setOrdenacaoData(ordenacaoData === 'asc' ? 'desc' : 'asc')}
-                              className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
-                            >
-                              Data Prevista Envio
-                              {ordenacaoData === 'asc' ? (
-                                <ChevronUp className="w-4 h-4" />
-                              ) : (
-                                <ChevronDown className="w-4 h-4" />
-                              )}
-                            </button>
-                          </th>
-                        </>
-                      )}
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">
+                        {projeto?.plataforma === 'mercadolivre' ? 'Variação' : 'Nome Variação'}
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Unidades</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Comprador</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[180px]">Forma de Entrega</th>
                     </tr>
                   </thead>
                   <tbody className="bg-gray-800 divide-y divide-gray-700">
