@@ -4267,8 +4267,8 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
 
 @api_router.post("/gestao/marketplaces/pedidos/upload-planilha")
 async def upload_planilha_pedidos(
-    projeto_id: str,
-    formato: str,  # "shopee" ou "mercadolivre"
+    projeto_id: str = Query(...),
+    formato: str = Query(...),  # "shopee" ou "mercadolivre"
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user)
 ):
