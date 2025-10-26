@@ -1793,7 +1793,7 @@ class PedidoMarketplace(BaseModel):
     data_prevista_envio: Optional[datetime] = None  # Data prevista de envio
     
     # Status e Fluxo
-    status: str = "Aguardando Impressão"  # Aguardando Impressão, Sala de Impressão, Em Produção, Expedição, Enviado, Entregue
+    status: str = "Aguardando Produção"  # Aguardando Produção, Em Produção, Pronto, Embalagem, Enviado, Entregue
     status_cor: str = "#94A3B8"  # Cor do badge de status
     status_impressao: str = "Aguardando Impressão"  # Aguardando Impressão, Imprimindo, Impresso
     
