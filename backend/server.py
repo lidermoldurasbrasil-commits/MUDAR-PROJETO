@@ -4115,6 +4115,156 @@ async def create_pedidos_bulk(pedidos: list[PedidoMarketplace], current_user: di
     
     return {"message": f"{len(pedidos_dict)} pedidos criados com sucesso", "pedidos": pedidos_dict}
 
+# ============= FUNÇÕES DE PROCESSAMENTO DE PLANILHAS =============
+
+def processar_linha_shopee(row, projeto_id, projeto, current_user):
+    """Processa uma linha da planilha Shopee"""
+    import pandas as pd
+    
+    # Obter ID do pedido
+    numero_pedido = str(row.get('ID do pedido', ''))
+    
+    if not numero_pedido:
+        return None
+    
+    # Mapear colunas da planilha Shopee para o modelo
+    pedido_data = {
+        'id': str(uuid.uuid4()),
+        'projeto_id': projeto_id,
+        'plataforma': projeto['plataforma'],
+        
+        # Dados do pedido
+        'numero_pedido': str(row.get('ID do pedido', '')),
+        'numero_referencia_sku': str(row.get('Número de referência SKU', row.get('Nº de referência do SKU principal', ''))),
+        'sku': str(row.get('Número de referência SKU', '')),
+        'nome_variacao': str(row.get('Nome da variação', '')),
+        'produto_nome': str(row.get('Nome do Produto', '')),
+        
+        # Cliente
+        'cliente_nome': str(row.get('Nome do destinatário', row.get('Nome de usuário (comprador)', ''))),
+        'cliente_contato': str(row.get('Telefone', '')),
+        
+        # Valores
+        'quantidade': int(row.get('Quantidade', 1)),
+        'preco_acordado': float(row.get('Preço acordado', 0)),
+        'valor_unitario': float(row.get('Preço original', row.get('Preço acordado', 0))),
+        'valor_total': float(row.get('Total global', row.get('Cartão de Crédito', 0))),
+        
+        # Taxas - Extraindo os valores corretos da planilha
+        'taxa_comissao': 0,  # Será calculado como percentual
+        'taxa_servico': 0,   # Será calculado como percentual
+        'valor_taxa_comissao': float(row.get('Taxa de comissão', 0)),
+        'valor_taxa_servico': float(row.get('Taxa de serviço', 0)),
+        
+        # Envio
+        'opcao_envio': str(row.get('Opção de envio', '')),
+        'status': 'Aguardando Impressão',
+        
+        # Metadata
+        'loja_id': projeto.get('loja_id', 'fabrica'),
+        'created_by': current_user.get('username', ''),
+        'created_at': datetime.now(timezone.utc).isoformat(),
+        'updated_at': datetime.now(timezone.utc).isoformat(),
+        'prazo_entrega': (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+    }
+    
+    # Processar data prevista de envio
+    if 'Data prevista de envio' in row and pd.notna(row['Data prevista de envio']):
+        try:
+            pedido_data['data_prevista_envio'] = pd.to_datetime(row['Data prevista de envio']).isoformat()
+            pedido_data['prazo_entrega'] = pd.to_datetime(row['Data prevista de envio']).isoformat()
+        except:
+            pass
+    
+    # Calcular taxas como percentual se houver valor
+    if pedido_data['preco_acordado'] > 0:
+        if pedido_data['valor_taxa_comissao'] > 0:
+            pedido_data['taxa_comissao'] = (pedido_data['valor_taxa_comissao'] / pedido_data['preco_acordado']) * 100
+        
+        if pedido_data['valor_taxa_servico'] > 0:
+            pedido_data['taxa_servico'] = (pedido_data['valor_taxa_servico'] / pedido_data['preco_acordado']) * 100
+        
+        # Calcular valor líquido
+        pedido_data['valor_liquido'] = pedido_data['preco_acordado'] - pedido_data['valor_taxa_comissao'] - pedido_data['valor_taxa_servico']
+    else:
+        pedido_data['valor_liquido'] = 0
+    
+    return pedido_data
+
+def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
+    """Processa uma linha da planilha Mercado Livre"""
+    import pandas as pd
+    
+    # Obter número da venda
+    numero_pedido = str(row.get('N.º de venda', ''))
+    
+    if not numero_pedido or numero_pedido == 'nan':
+        return None
+    
+    # Mapear colunas da planilha Mercado Livre
+    pedido_data = {
+        'id': str(uuid.uuid4()),
+        'projeto_id': projeto_id,
+        'plataforma': projeto['plataforma'],
+        
+        # Dados do pedido
+        'numero_pedido': numero_pedido,
+        'sku': str(row.get('SKU', '')),
+        'nome_variacao': str(row.get('Variação', '')),
+        'produto_nome': str(row.get('Título do anúncio', '')),
+        
+        # Cliente
+        'cliente_nome': str(row.get('Comprador', '')),
+        'cliente_contato': '',
+        
+        # Valores
+        'quantidade': int(row.get('Unidades', 1)) if pd.notna(row.get('Unidades')) else 1,
+        'preco_acordado': float(row.get('Receita por produtos (BRL)', 0)) if pd.notna(row.get('Receita por produtos (BRL)')) else 0,
+        'valor_unitario': float(row.get('Receita por produtos (BRL)', 0)) if pd.notna(row.get('Receita por produtos (BRL)')) else 0,
+        'valor_total': float(row.get('Total (BRL)', 0)) if pd.notna(row.get('Total (BRL)')) else 0,
+        
+        # Taxas - Mercado Livre
+        'taxa_comissao': 0,
+        'taxa_servico': 0,
+        'valor_taxa_comissao': abs(float(row.get('Tarifa de venda e impostos (BRL)', 0))) if pd.notna(row.get('Tarifa de venda e impostos (BRL)')) else 0,
+        'valor_taxa_servico': abs(float(row.get('Tarifas de envio (BRL)', 0))) if pd.notna(row.get('Tarifas de envio (BRL)')) else 0,
+        
+        # Envio
+        'opcao_envio': str(row.get('Forma de entrega', '')),
+        'status': str(row.get('Estado', 'Aguardando Impressão')),
+        'status_impressao': 'Pendente',
+        
+        # Metadata
+        'loja_id': projeto.get('loja_id', 'fabrica'),
+        'created_by': current_user.get('username', ''),
+        'created_at': datetime.now(timezone.utc).isoformat(),
+        'updated_at': datetime.now(timezone.utc).isoformat(),
+        'prazo_entrega': (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+    }
+    
+    # Processar data de entrega
+    if 'Data de entrega' in row and pd.notna(row['Data de entrega']):
+        try:
+            pedido_data['data_prevista_envio'] = pd.to_datetime(row['Data de entrega']).isoformat()
+            pedido_data['prazo_entrega'] = pd.to_datetime(row['Data de entrega']).isoformat()
+        except:
+            pass
+    
+    # Calcular taxas como percentual se houver valor
+    if pedido_data['preco_acordado'] > 0:
+        if pedido_data['valor_taxa_comissao'] > 0:
+            pedido_data['taxa_comissao'] = (pedido_data['valor_taxa_comissao'] / pedido_data['preco_acordado']) * 100
+        
+        if pedido_data['valor_taxa_servico'] > 0:
+            pedido_data['taxa_servico'] = (pedido_data['valor_taxa_servico'] / pedido_data['preco_acordado']) * 100
+        
+        # Calcular valor líquido
+        pedido_data['valor_liquido'] = pedido_data['preco_acordado'] - pedido_data['valor_taxa_comissao'] - pedido_data['valor_taxa_servico']
+    else:
+        pedido_data['valor_liquido'] = 0
+    
+    return pedido_data
+
 @api_router.post("/gestao/marketplaces/pedidos/upload-planilha")
 async def upload_planilha_pedidos(
     projeto_id: str,
