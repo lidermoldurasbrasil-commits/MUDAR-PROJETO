@@ -69,7 +69,7 @@ export default function MarketplaceProjetoDetalhes() {
   const [selectAll, setSelectAll] = useState(false);
   const [ordenacaoData, setOrdenacaoData] = useState('asc'); // 'asc' = próxima primeiro, 'desc' = distante primeiro
   const [agruparPor, setAgruparPor] = useState(''); // '', 'sku', 'status'
-  const [filtroTipoEnvio, setFiltroTipoEnvio] = useState('todos'); // 'todos', 'flex', 'agencia', 'correios', 'coleta'
+  const [filtroTipoEnvio, setFiltroTipoEnvio] = useState('todos'); // 'todos', 'flex', 'correios_pontos', 'coleta'
   const [novaLinhaInline, setNovaLinhaInline] = useState({
     numero_pedido: '',
     produto_nome: '',
