@@ -4077,7 +4077,9 @@ async def get_pedidos_marketplace(
     if atrasado is not None:
         query['atrasado'] = atrasado
     
+    print(f"[DEBUG] Query: {query}")
     pedidos = await db.pedidos_marketplace.find(query).sort("created_at", -1).to_list(None)
+    print(f"[DEBUG] Found {len(pedidos)} pedidos")
     
     for pedido in pedidos:
         if '_id' in pedido:
