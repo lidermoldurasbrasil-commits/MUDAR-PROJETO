@@ -3401,6 +3401,461 @@ class BusinessManagementSystemTester:
         
         return all_valid
 
+    def test_marketplace_shopee_tipo_envio(self):
+        """Test Shopee spreadsheet upload and tipo_envio identification"""
+        print("\n🛍️ TESTING SHOPEE TIPO_ENVIO IDENTIFICATION...")
+        
+        # Step 1: Login and get token
+        if not self.token:
+            print("❌ No authentication token available")
+            return False
+        
+        # Step 2: Create or get Shopee marketplace project
+        print("\n📋 Step 1: Creating/Getting Shopee marketplace project...")
+        
+        # Try to get existing Shopee project first
+        success_get, projects_response = self.run_test(
+            "Get Marketplace Projects",
+            "GET",
+            "gestao/marketplaces/projetos",
+            200
+        )
+        
+        shopee_project_id = None
+        if success_get and isinstance(projects_response, list):
+            for project in projects_response:
+                if project.get('plataforma') == 'shopee':
+                    shopee_project_id = project.get('id')
+                    print(f"✅ Found existing Shopee project with ID: {shopee_project_id}")
+                    break
+        
+        if not shopee_project_id:
+            # Create new Shopee project
+            shopee_project_data = {
+                "nome": "Shopee Test Project",
+                "plataforma": "shopee",
+                "descricao": "Projeto de teste para Shopee",
+                "loja_id": "fabrica",
+                "ativo": True
+            }
+            
+            success_create, create_response = self.run_test(
+                "Create Shopee Project",
+                "POST",
+                "gestao/marketplaces/projetos",
+                200,
+                data=shopee_project_data
+            )
+            
+            if success_create and 'id' in create_response:
+                shopee_project_id = create_response['id']
+                print(f"✅ Created new Shopee project with ID: {shopee_project_id}")
+            else:
+                print("❌ Failed to create Shopee project")
+                self.log_test("Shopee Project Creation", False, "Failed to create project")
+                return False
+        
+        # Step 3: Create test spreadsheet data for Shopee
+        print("\n📋 Step 2: Creating test Shopee spreadsheet data...")
+        
+        # Create a mock Excel file with Shopee data including different shipping types
+        import pandas as pd
+        import io
+        
+        shopee_test_data = [
+            {
+                'ID do pedido': '251023TEST001',
+                'Número de referência SKU': 'KIT-TEST-001',
+                'Nome da variação': 'Kit Teste Shopee Xpress',
+                'Quantidade': 1,
+                'Preço acordado': 100.00,
+                'Taxa de comissão': 15.00,
+                'Taxa de serviço': 5.00,
+                'Forma de Entrega': 'Shopee Xpress',  # Should result in tipo_envio='Coleta'
+                'Data prevista de envio': '2024-12-31'
+            },
+            {
+                'ID do pedido': '251023TEST002',
+                'Número de referência SKU': 'KIT-TEST-002',
+                'Nome da variação': 'Kit Teste Retirada',
+                'Quantidade': 2,
+                'Preço acordado': 150.00,
+                'Taxa de comissão': 22.50,
+                'Taxa de serviço': 7.50,
+                'Forma de Entrega': 'Retirada pelo Comprador',  # Should result in tipo_envio='Coleta'
+                'Data prevista de envio': '2024-12-31'
+            },
+            {
+                'ID do pedido': '251023TEST003',
+                'Número de referência SKU': 'KIT-TEST-003',
+                'Nome da variação': 'Kit Teste Flex',
+                'Quantidade': 1,
+                'Preço acordado': 200.00,
+                'Taxa de comissão': 30.00,
+                'Taxa de serviço': 10.00,
+                'Forma de Entrega': 'Shopee Entrega Direta',  # Should result in tipo_envio='Flex Shopee'
+                'Data prevista de envio': '2024-12-31'
+            },
+            {
+                'ID do pedido': '251023TEST004',
+                'Número de referência SKU': 'KIT-TEST-004',
+                'Nome da variação': 'Kit Teste Outro',
+                'Quantidade': 1,
+                'Preço acordado': 120.00,
+                'Taxa de comissão': 18.00,
+                'Taxa de serviço': 6.00,
+                'Forma de Entrega': 'Outro Método de Envio',  # Should result in tipo_envio='Outro'
+                'Data prevista de envio': '2024-12-31'
+            }
+        ]
+        
+        # Create DataFrame and Excel file
+        df = pd.DataFrame(shopee_test_data)
+        excel_buffer = io.BytesIO()
+        df.to_excel(excel_buffer, index=False)
+        excel_buffer.seek(0)
+        
+        # Step 4: Upload the test spreadsheet
+        print("\n📋 Step 3: Uploading Shopee test spreadsheet...")
+        
+        # Prepare multipart form data
+        files = {
+            'file': ('shopee_test.xlsx', excel_buffer.getvalue(), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        }
+        
+        headers = {}
+        if self.token:
+            headers['Authorization'] = f'Bearer {self.token}'
+        
+        import requests
+        upload_url = f"{self.api_url}/gestao/marketplaces/pedidos/upload-planilha?projeto_id={shopee_project_id}&formato=shopee"
+        
+        try:
+            response = requests.post(upload_url, files=files, headers=headers)
+            
+            if response.status_code == 200:
+                upload_response = response.json()
+                print(f"✅ Shopee spreadsheet uploaded successfully")
+                print(f"   Total imported: {upload_response.get('total_importados', 0)}")
+                print(f"   Total lines: {upload_response.get('total_linhas', 0)}")
+                self.log_test("Shopee Spreadsheet Upload", True)
+            else:
+                print(f"❌ Shopee spreadsheet upload failed: {response.status_code}")
+                print(f"   Response: {response.text}")
+                self.log_test("Shopee Spreadsheet Upload", False, f"Status {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Exception during Shopee upload: {e}")
+            self.log_test("Shopee Spreadsheet Upload", False, f"Exception: {e}")
+            return False
+        
+        # Step 5: Verify orders were created with correct tipo_envio
+        print("\n📋 Step 4: Verifying Shopee orders and tipo_envio...")
+        
+        success_get_orders, orders_response = self.run_test(
+            "Get Shopee Orders",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={shopee_project_id}",
+            200
+        )
+        
+        if not success_get_orders:
+            print("❌ Failed to retrieve Shopee orders")
+            self.log_test("Shopee Orders Retrieval", False, "Failed to get orders")
+            return False
+        
+        # Verify tipo_envio for each test order
+        validation_results = []
+        expected_mappings = {
+            '251023TEST001': 'Coleta',  # Shopee Xpress
+            '251023TEST002': 'Coleta',  # Retirada pelo Comprador
+            '251023TEST003': 'Flex Shopee',  # Shopee Entrega Direta
+            '251023TEST004': 'Outro'  # Other method
+        }
+        
+        orders = orders_response if isinstance(orders_response, list) else []
+        
+        for expected_numero, expected_tipo in expected_mappings.items():
+            order_found = False
+            for order in orders:
+                if order.get('numero_pedido') == expected_numero:
+                    order_found = True
+                    actual_tipo = order.get('tipo_envio', '')
+                    
+                    if actual_tipo == expected_tipo:
+                        print(f"✅ Order {expected_numero}: tipo_envio='{actual_tipo}' (correct)")
+                        validation_results.append(True)
+                        self.log_test(f"Shopee tipo_envio - {expected_numero}", True)
+                    else:
+                        print(f"❌ Order {expected_numero}: tipo_envio='{actual_tipo}', expected='{expected_tipo}'")
+                        validation_results.append(False)
+                        self.log_test(f"Shopee tipo_envio - {expected_numero}", False, f"Got '{actual_tipo}', expected '{expected_tipo}'")
+                    break
+            
+            if not order_found:
+                print(f"❌ Order {expected_numero} not found in database")
+                validation_results.append(False)
+                self.log_test(f"Shopee Order Found - {expected_numero}", False, "Order not found")
+        
+        # Overall result
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ ALL SHOPEE TIPO_ENVIO TESTS PASSED!")
+            self.log_test("Shopee tipo_envio Identification - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ SHOPEE TIPO_ENVIO TESTS FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("Shopee tipo_envio Identification - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
+    def test_marketplace_mercadolivre_debug(self):
+        """Test Mercado Livre spreadsheet upload and capture debug logs"""
+        print("\n🛍️ TESTING MERCADO LIVRE DEBUG (0 ORDERS IMPORTED ISSUE)...")
+        
+        # Step 1: Login and get token
+        if not self.token:
+            print("❌ No authentication token available")
+            return False
+        
+        # Step 2: Create or get Mercado Livre marketplace project
+        print("\n📋 Step 1: Creating/Getting Mercado Livre marketplace project...")
+        
+        # Try to get existing ML project first
+        success_get, projects_response = self.run_test(
+            "Get Marketplace Projects",
+            "GET",
+            "gestao/marketplaces/projetos",
+            200
+        )
+        
+        ml_project_id = None
+        if success_get and isinstance(projects_response, list):
+            for project in projects_response:
+                if project.get('plataforma') == 'mercadolivre':
+                    ml_project_id = project.get('id')
+                    print(f"✅ Found existing Mercado Livre project with ID: {ml_project_id}")
+                    break
+        
+        if not ml_project_id:
+            # Create new ML project
+            ml_project_data = {
+                "nome": "Mercado Livre Test Project",
+                "plataforma": "mercadolivre",
+                "descricao": "Projeto de teste para Mercado Livre",
+                "loja_id": "fabrica",
+                "ativo": True
+            }
+            
+            success_create, create_response = self.run_test(
+                "Create Mercado Livre Project",
+                "POST",
+                "gestao/marketplaces/projetos",
+                200,
+                data=ml_project_data
+            )
+            
+            if success_create and 'id' in create_response:
+                ml_project_id = create_response['id']
+                print(f"✅ Created new Mercado Livre project with ID: {ml_project_id}")
+            else:
+                print("❌ Failed to create Mercado Livre project")
+                self.log_test("Mercado Livre Project Creation", False, "Failed to create project")
+                return False
+        
+        # Step 3: Create test spreadsheet data for Mercado Livre (with header=5 format)
+        print("\n📋 Step 2: Creating test Mercado Livre spreadsheet data...")
+        
+        import pandas as pd
+        import io
+        
+        # Create ML spreadsheet with 5 header rows as expected
+        header_rows = [
+            ['Relatório de vendas', '', '', '', '', '', '', '', '', '', '', ''],
+            ['Período: Janeiro 2024', '', '', '', '', '', '', '', '', '', '', ''],
+            ['Gerado em: 2024-01-15', '', '', '', '', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', '', '', '', '', ''],
+            # Row 6 (index 5) - actual headers
+            ['N.º de venda', 'Estado', 'SKU', 'Variação', 'Comprador', 'Título do anúncio', 
+             'Unidades', 'Receita por produtos (BRL)', 'Tarifa de venda e impostos (BRL)', 
+             'Tarifas de envio (BRL)', 'Total (BRL)', 'Forma de entrega']
+        ]
+        
+        # Test data rows
+        ml_test_data = [
+            ['ML001TEST001', 'Aguardando Impressão', 'KIT-ML-001', 'Kit Teste ML Flex', 'Comprador Teste 1', 
+             'Kit Personalizado ML Flex', 1, 100.00, -15.00, -5.00, 80.00, 'Mercado Envios Flex'],
+            ['ML001TEST002', 'Aguardando Impressão', 'KIT-ML-002', 'Kit Teste ML Correios', 'Comprador Teste 2', 
+             'Kit Personalizado ML Correios', 2, 200.00, -30.00, -10.00, 160.00, 'Correios e pontos de envio'],
+            ['ML001TEST003', 'Aguardando Impressão', 'KIT-ML-003', 'Kit Teste ML Coleta', 'Comprador Teste 3', 
+             'Kit Personalizado ML Coleta', 1, 150.00, -22.50, -7.50, 120.00, 'Coleta no ponto'],
+            ['ML001TEST004', 'Aguardando Impressão', 'KIT-ML-004', 'Kit Teste ML Agência', 'Comprador Teste 4', 
+             'Kit Personalizado ML Agência', 1, 120.00, -18.00, -6.00, 96.00, 'Agência Mercado Livre']
+        ]
+        
+        # Combine all rows
+        all_rows = header_rows + ml_test_data
+        
+        # Create DataFrame and Excel file
+        df = pd.DataFrame(all_rows)
+        excel_buffer = io.BytesIO()
+        df.to_excel(excel_buffer, index=False, header=False)
+        excel_buffer.seek(0)
+        
+        # Step 4: Upload the test spreadsheet and capture logs
+        print("\n📋 Step 3: Uploading Mercado Livre test spreadsheet...")
+        print("🔍 IMPORTANT: Capturing backend logs to identify 0 orders imported issue...")
+        
+        # Prepare multipart form data
+        files = {
+            'file': ('mercadolivre_test.xlsx', excel_buffer.getvalue(), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        }
+        
+        headers = {}
+        if self.token:
+            headers['Authorization'] = f'Bearer {self.token}'
+        
+        import requests
+        upload_url = f"{self.api_url}/gestao/marketplaces/pedidos/upload-planilha?projeto_id={ml_project_id}&formato=mercadolivre"
+        
+        try:
+            response = requests.post(upload_url, files=files, headers=headers)
+            
+            if response.status_code == 200:
+                upload_response = response.json()
+                total_imported = upload_response.get('total_importados', 0)
+                total_lines = upload_response.get('total_linhas', 0)
+                
+                print(f"✅ Mercado Livre spreadsheet upload completed")
+                print(f"   Total imported: {total_imported}")
+                print(f"   Total lines: {total_lines}")
+                print(f"   Errors: {upload_response.get('erros', 0)}")
+                
+                # Check if we have the 0 orders imported issue
+                if total_imported == 0:
+                    print("🚨 CRITICAL ISSUE DETECTED: 0 orders imported!")
+                    print("📋 This confirms the reported problem. Checking backend logs...")
+                    
+                    # Capture backend logs to identify the issue
+                    self.capture_backend_logs_for_ml_debug()
+                    
+                    self.log_test("Mercado Livre Upload - 0 Orders Issue", False, "0 orders imported - issue confirmed")
+                    return False
+                else:
+                    print(f"✅ Orders imported successfully: {total_imported}")
+                    self.log_test("Mercado Livre Upload", True)
+                    
+                    # Verify orders were created correctly
+                    return self.verify_mercadolivre_orders(ml_project_id)
+                    
+            else:
+                print(f"❌ Mercado Livre spreadsheet upload failed: {response.status_code}")
+                print(f"   Response: {response.text}")
+                self.log_test("Mercado Livre Upload", False, f"Status {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Exception during Mercado Livre upload: {e}")
+            self.log_test("Mercado Livre Upload", False, f"Exception: {e}")
+            return False
+
+    def capture_backend_logs_for_ml_debug(self):
+        """Capture backend logs to debug Mercado Livre 0 orders issue"""
+        print("\n🔍 CAPTURING BACKEND LOGS FOR MERCADO LIVRE DEBUG...")
+        
+        try:
+            import subprocess
+            
+            # Get the last 100 lines of backend logs
+            result = subprocess.run(
+                ['tail', '-n', '100', '/var/log/supervisor/backend.out.log'],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            if result.returncode == 0:
+                logs = result.stdout
+                print("📋 Backend Logs (last 100 lines):")
+                print("=" * 80)
+                print(logs)
+                print("=" * 80)
+                
+                # Look for specific debug messages
+                debug_lines = [line for line in logs.split('\n') if 'DEBUG ML' in line]
+                if debug_lines:
+                    print("\n🔍 Mercado Livre Debug Messages Found:")
+                    for line in debug_lines:
+                        print(f"   {line}")
+                else:
+                    print("\n⚠️ No 'DEBUG ML' messages found in logs")
+                
+                # Look for error messages
+                error_lines = [line for line in logs.split('\n') if any(keyword in line.lower() for keyword in ['error', 'exception', 'traceback'])]
+                if error_lines:
+                    print("\n🚨 Error Messages Found:")
+                    for line in error_lines[-10:]:  # Last 10 error lines
+                        print(f"   {line}")
+                
+            else:
+                print(f"❌ Failed to capture backend logs: {result.stderr}")
+                
+        except subprocess.TimeoutExpired:
+            print("❌ Timeout while capturing backend logs")
+        except Exception as e:
+            print(f"❌ Exception while capturing logs: {e}")
+
+    def verify_mercadolivre_orders(self, ml_project_id):
+        """Verify Mercado Livre orders were created correctly"""
+        print("\n📋 Verifying Mercado Livre orders...")
+        
+        success_get_orders, orders_response = self.run_test(
+            "Get Mercado Livre Orders",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={ml_project_id}",
+            200
+        )
+        
+        if not success_get_orders:
+            print("❌ Failed to retrieve Mercado Livre orders")
+            self.log_test("Mercado Livre Orders Retrieval", False, "Failed to get orders")
+            return False
+        
+        orders = orders_response if isinstance(orders_response, list) else []
+        
+        if len(orders) == 0:
+            print("❌ No Mercado Livre orders found in database")
+            self.log_test("Mercado Livre Orders Verification", False, "No orders in database")
+            return False
+        
+        print(f"✅ Found {len(orders)} Mercado Livre orders in database")
+        
+        # Verify specific test orders
+        expected_orders = ['ML001TEST001', 'ML001TEST002', 'ML001TEST003', 'ML001TEST004']
+        found_orders = []
+        
+        for order in orders:
+            numero_pedido = order.get('numero_pedido', '')
+            if numero_pedido in expected_orders:
+                found_orders.append(numero_pedido)
+                print(f"✅ Found test order: {numero_pedido}")
+                print(f"   SKU: {order.get('sku', 'N/A')}")
+                print(f"   Tipo envio: {order.get('tipo_envio', 'N/A')}")
+                print(f"   Valor: R$ {order.get('preco_acordado', 0):.2f}")
+        
+        if len(found_orders) == len(expected_orders):
+            print("✅ All test orders found and verified")
+            self.log_test("Mercado Livre Orders Verification", True)
+            return True
+        else:
+            missing = set(expected_orders) - set(found_orders)
+            print(f"❌ Missing test orders: {missing}")
+            self.log_test("Mercado Livre Orders Verification", False, f"Missing orders: {missing}")
+            return False
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
