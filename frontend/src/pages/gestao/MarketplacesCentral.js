@@ -450,27 +450,44 @@ export default function MarketplacesCentral() {
                 </div>
                 
                 {/* Métricas de Envio por Tipo */}
-                {projeto.tipos_envio && (
+                {projeto.tipos_envio && Object.keys(projeto.tipos_envio).length > 0 && (
                   <div className="mt-3 border-t border-gray-700 pt-3">
                     <p className="text-xs text-gray-400 mb-2 font-semibold">Tipos de Envio (Pendentes)</p>
-                    <div className="grid grid-cols-3 gap-1 text-center">
-                      {projeto.tipos_envio.flex > 0 && (
-                        <div className="bg-gray-900 rounded p-1 border border-gray-700">
-                          <p className="text-xs text-gray-400">Flex</p>
-                          <p className="text-sm font-bold text-purple-400">{projeto.tipos_envio.flex}</p>
-                        </div>
+                    <div className="grid grid-cols-2 gap-1 text-center">
+                      {/* Shopee */}
+                      {projeto.plataforma === 'shopee' && (
+                        <>
+                          {projeto.tipos_envio.flex_shopee !== undefined && (
+                            <div className="bg-gray-900 rounded p-1.5 border border-gray-700">
+                              <p className="text-[10px] text-gray-400">Flex Shopee</p>
+                              <p className="text-sm font-bold text-purple-400">{projeto.tipos_envio.flex_shopee}</p>
+                            </div>
+                          )}
+                          {projeto.tipos_envio.coleta !== undefined && (
+                            <div className="bg-gray-900 rounded p-1.5 border border-gray-700">
+                              <p className="text-[10px] text-gray-400">Coleta</p>
+                              <p className="text-sm font-bold text-yellow-400">{projeto.tipos_envio.coleta}</p>
+                            </div>
+                          )}
+                        </>
                       )}
-                      {projeto.tipos_envio.correios > 0 && (
-                        <div className="bg-gray-900 rounded p-1 border border-gray-700">
-                          <p className="text-xs text-gray-400">Correios</p>
-                          <p className="text-sm font-bold text-yellow-400">{projeto.tipos_envio.correios}</p>
-                        </div>
-                      )}
-                      {projeto.tipos_envio.agencia > 0 && (
-                        <div className="bg-gray-900 rounded p-1 border border-gray-700">
-                          <p className="text-xs text-gray-400">Agência</p>
-                          <p className="text-sm font-bold text-green-400">{projeto.tipos_envio.agencia}</p>
-                        </div>
+                      
+                      {/* Mercado Livre */}
+                      {projeto.plataforma === 'mercadolivre' && (
+                        <>
+                          {projeto.tipos_envio.flex !== undefined && (
+                            <div className="bg-gray-900 rounded p-1.5 border border-gray-700">
+                              <p className="text-[10px] text-gray-400">Mercado Envios Flex</p>
+                              <p className="text-sm font-bold text-purple-400">{projeto.tipos_envio.flex}</p>
+                            </div>
+                          )}
+                          {projeto.tipos_envio.correios !== undefined && (
+                            <div className="bg-gray-900 rounded p-1.5 border border-gray-700">
+                              <p className="text-[10px] text-gray-400">Correios e Pontos</p>
+                              <p className="text-sm font-bold text-yellow-400">{projeto.tipos_envio.correios}</p>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
