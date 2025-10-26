@@ -4317,7 +4317,7 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     # Obter outros campos
     estado = str(row.get('Estado', ''))
     if pd.isna(estado):
-        estado = 'Aguardando Impressão'
+        estado = 'Aguardando Produção'
     
     # SKU
     sku = str(row.get('SKU', ''))
