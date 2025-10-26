@@ -1418,7 +1418,11 @@ export default function MarketplaceProjetoDetalhes() {
               
               {/* Contador de pedidos filtrados */}
               <span className="ml-auto text-sm text-gray-400">
-                {pedidosFiltrados.length} pedido(s) {filtroTipoEnvio !== 'todos' && `(${filtroTipoEnvio === 'correios_pontos' ? 'Correios e pontos de envio' : filtroTipoEnvio})`}
+                {pedidosFiltrados.length} pedido(s) {filtroTipoEnvio !== 'todos' && `(${
+                  filtroTipoEnvio === 'flex' ? 'Mercado Envios Flex' : 
+                  filtroTipoEnvio === 'correios_pontos' ? 'Correios e pontos de envio' : 
+                  filtroTipoEnvio === 'coleta' ? 'Coleta' : ''
+                })`}
               </span>
             </div>
           </div>
