@@ -1362,6 +1362,82 @@ export default function MarketplaceProjetoDetalhes() {
       {/* Produção View - Visão Simplificada sem Preços */}
       {viewMode === 'producao' && (
         <div className="space-y-6">
+          {/* Filtros de Tipo de Envio */}
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-sm font-medium text-gray-400">Filtrar por tipo de envio:</span>
+              <button
+                onClick={() => setFiltroTipoEnvio('todos')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  filtroTipoEnvio === 'todos'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                Todos
+              </button>
+              
+              {/* Mostrar Flex apenas se for Mercado Livre ou Shopee */}
+              {(projeto?.plataforma === 'mercadolivre' || projeto?.plataforma === 'shopee') && (
+                <button
+                  onClick={() => setFiltroTipoEnvio('flex')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    filtroTipoEnvio === 'flex'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  📦 Flex
+                </button>
+              )}
+              
+              {/* Mostrar Agência apenas se for Mercado Livre */}
+              {projeto?.plataforma === 'mercadolivre' && (
+                <button
+                  onClick={() => setFiltroTipoEnvio('agencia')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    filtroTipoEnvio === 'agencia'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  🏢 Agência
+                </button>
+              )}
+              
+              {/* Mostrar Correios */}
+              <button
+                onClick={() => setFiltroTipoEnvio('correios')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  filtroTipoEnvio === 'correios'
+                    ? 'bg-yellow-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                📮 Correios
+              </button>
+              
+              {/* Mostrar Coleta apenas se for Shopee */}
+              {projeto?.plataforma === 'shopee' && (
+                <button
+                  onClick={() => setFiltroTipoEnvio('coleta')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    filtroTipoEnvio === 'coleta'
+                      ? 'bg-cyan-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  🚗 Coleta
+                </button>
+              )}
+              
+              {/* Contador de pedidos filtrados */}
+              <span className="ml-auto text-sm text-gray-400">
+                {pedidosFiltrados.length} pedido(s) {filtroTipoEnvio !== 'todos' && `(${filtroTipoEnvio})`}
+              </span>
+            </div>
+          </div>
+          
           {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
             <div key={grupo} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
               {agruparPor && (
