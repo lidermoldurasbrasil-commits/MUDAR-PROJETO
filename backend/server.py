@@ -3874,6 +3874,8 @@ async def get_projetos_marketplace(current_user: dict = Depends(get_current_user
         projeto['pedidos_enviados'] = enviados
         projeto['pedidos_entregues'] = entregues
         projeto['pedidos_atrasados'] = atrasados
+        projeto['envio_hoje'] = envio_hoje
+        projeto['envio_amanha'] = envio_amanha
         
         # Calcular progresso percentual
         total_pedidos = em_producao + enviados + entregues
