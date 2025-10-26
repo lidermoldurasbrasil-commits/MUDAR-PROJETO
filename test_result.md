@@ -255,6 +255,33 @@ backend:
           agent: "testing"
           comment: "✅ MARKETPLACE SPREADSHEET UPLOAD TESTADO COM SUCESSO TOTAL! Fluxo completo testado conforme solicitação específica: 1) Login realizado ✅ 2) Projeto marketplace criado (Shopee) ✅ 3) Planilha Excel baixada (36.030 bytes) ✅ 4) Upload realizado com sucesso via multipart/form-data ✅ 5) 82 pedidos importados da planilha real Order.toship.xlsx ✅ 6) Response validado: message, total_importados=82, total_linhas=82 ✅ 7) Pedidos verificados no banco de dados (82 encontrados) ✅ 8) Mapeamento de campos validado: numero_pedido, sku, nome_variacao, quantidade, preco_acordado, valor_taxa_comissao, valor_taxa_servico, opcao_envio, data_prevista_envio ✅ 9) Cálculos validados: valor_liquido=preco_acordado-taxas, taxa_comissao e taxa_servico calculadas como percentuais ✅ 10) Exemplo validado: Pedido 251023RWB6GBKX, SKU KIT-3-40x60-PERSONALIZADO-MM, R$139.00 → R$103.72 líquido (18% comissão + 7.38% serviço) ✅. Sistema 100% funcional e pronto para produção! Corrigido bug de timezone em get_pedidos_marketplace durante teste."
 
+  - task: "Identificação de tipo_envio para Shopee"
+    implemented: true
+    working: "unknown"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "unknown"
+          agent: "main"
+          comment: "Implementada lógica de identificação de tipo_envio na função processar_linha_shopee baseado no campo 'Forma de Entrega'/'Opção de envio'. Regras: 'Shopee Xpress' → 'Coleta', 'Retirada pelo Comprador' → 'Coleta', 'Shopee Entrega Direta' → 'Flex Shopee'. Campo tipo_envio adicionado ao objeto pedido_data. Backend reiniciado. Pronto para teste com planilha Shopee real."
+
+  - task: "Investigação problema Mercado Livre - 0 pedidos importados"
+    implemented: true
+    working: "unknown"
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Usuário reportou problema recorrente: upload de planilha Mercado Livre mostra '0 orders imported' apesar de processar linhas individuais."
+        - working: "unknown"
+          agent: "main"
+          comment: "Adicionados logs de debug detalhados na função processar_linha_mercadolivre para identificar problema: 1) Log de colunas disponíveis na primeira linha 2) Log do numero_pedido extraído com tipo 3) Log quando linha é ignorada 4) Log quando pedido é processado com sucesso (numero, SKU, valor). Logs ajudarão a identificar se problema está na leitura de colunas, identificação de numero_pedido, ou outro ponto do processamento. Backend reiniciado com logs. Pronto para teste de upload ML."
+
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
     implemented: true
