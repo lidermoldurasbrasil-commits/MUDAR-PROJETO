@@ -478,7 +478,24 @@ export default function MarketplaceProjetoDetalhes() {
       fetchDados();
     } catch (error) {
       console.error('Erro ao atualizar pedidos:', error);
-      toast.error(error.response?.data?.detail || 'Erro ao atualizar pedidos');
+      
+      // Tratar erro de forma segura
+      let errorMessage = 'Erro ao atualizar pedidos';
+      if (error.response?.data) {
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        } else if (error.response.data.detail) {
+          if (typeof error.response.data.detail === 'string') {
+            errorMessage = error.response.data.detail;
+          } else if (Array.isArray(error.response.data.detail)) {
+            errorMessage = error.response.data.detail.map(e => e.msg || JSON.stringify(e)).join(', ');
+          } else {
+            errorMessage = JSON.stringify(error.response.data.detail);
+          }
+        }
+      }
+      
+      toast.error(errorMessage);
     }
   };
 
