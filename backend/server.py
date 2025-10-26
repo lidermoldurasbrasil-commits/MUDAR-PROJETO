@@ -4267,14 +4267,18 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     """Processa uma linha da planilha Mercado Livre"""
     import pandas as pd
     
-    # Obter número da venda
+    # Obter número da venda - A primeira coluna é "N.º de venda"
     numero_pedido = str(row.get('N.º de venda', ''))
     
-    if not numero_pedido or numero_pedido == 'nan':
+    if not numero_pedido or numero_pedido == 'nan' or pd.isna(numero_pedido):
         return None
     
-    # Identificar tipo de envio
+    # Identificar tipo de envio - A coluna é "Forma de entrega" (última seção)
+    # Preciso pegar da linha duplicada ou correta
     forma_entrega = str(row.get('Forma de entrega', ''))
+    if pd.isna(forma_entrega) or forma_entrega == 'nan':
+        forma_entrega = ''
+    
     tipo_envio = 'Outro'
     
     if 'flex' in forma_entrega.lower():
@@ -4286,6 +4290,59 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     elif 'agência' in forma_entrega.lower() or 'agencia' in forma_entrega.lower():
         tipo_envio = 'Agência Mercado Livre'
     
+    # Obter outros campos
+    estado = str(row.get('Estado', ''))
+    if pd.isna(estado):
+        estado = 'Aguardando Impressão'
+    
+    # SKU
+    sku = str(row.get('SKU', ''))
+    if pd.isna(sku):
+        sku = ''
+    
+    # Variação
+    variacao = str(row.get('Variação', ''))
+    if pd.isna(variacao):
+        variacao = ''
+    
+    # Comprador
+    comprador = str(row.get('Comprador', ''))
+    if pd.isna(comprador):
+        comprador = ''
+    
+    # Título do anúncio
+    titulo = str(row.get('Título do anúncio', ''))
+    if pd.isna(titulo):
+        titulo = ''
+    
+    # Valores monetários - precisam ser tratados cuidadosamente
+    def get_float_value(coluna):
+        val = row.get(coluna, 0)
+        if pd.isna(val):
+            return 0.0
+        if isinstance(val, (int, float)):
+            return float(val)
+        # Tentar converter string
+        try:
+            return float(str(val).replace(',', '.'))
+        except:
+            return 0.0
+    
+    # Unidades - pode estar em formato estranho
+    unidades = row.get('Unidades', 1)
+    try:
+        if pd.isna(unidades):
+            unidades = 1
+        else:
+            unidades = int(float(unidades))
+    except:
+        unidades = 1
+    
+    receita = get_float_value('Receita por produtos (BRL)')
+    tarifa_venda = abs(get_float_value('Tarifa de venda e impostos (BRL)'))
+    tarifa_envio = abs(get_float_value('Tarifas de envio (BRL)'))
+    total = get_float_value('Total (BRL)')
+    
     # Mapear colunas da planilha Mercado Livre
     pedido_data = {
         'id': str(uuid.uuid4()),
@@ -4294,30 +4351,30 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
         
         # Dados do pedido
         'numero_pedido': numero_pedido,
-        'sku': str(row.get('SKU', '')),
-        'nome_variacao': str(row.get('Variação', '')),
-        'produto_nome': str(row.get('Título do anúncio', '')),
+        'sku': sku,
+        'nome_variacao': variacao,
+        'produto_nome': titulo,
         
         # Cliente
-        'cliente_nome': str(row.get('Comprador', '')),
+        'cliente_nome': comprador,
         'cliente_contato': '',
         
         # Valores
-        'quantidade': int(row.get('Unidades', 1)) if pd.notna(row.get('Unidades')) else 1,
-        'preco_acordado': float(row.get('Receita por produtos (BRL)', 0)) if pd.notna(row.get('Receita por produtos (BRL)')) else 0,
-        'valor_unitario': float(row.get('Receita por produtos (BRL)', 0)) if pd.notna(row.get('Receita por produtos (BRL)')) else 0,
-        'valor_total': float(row.get('Total (BRL)', 0)) if pd.notna(row.get('Total (BRL)')) else 0,
+        'quantidade': unidades,
+        'preco_acordado': receita,
+        'valor_unitario': receita,
+        'valor_total': total,
         
         # Taxas - Mercado Livre
         'taxa_comissao': 0,
         'taxa_servico': 0,
-        'valor_taxa_comissao': abs(float(row.get('Tarifa de venda e impostos (BRL)', 0))) if pd.notna(row.get('Tarifa de venda e impostos (BRL)')) else 0,
-        'valor_taxa_servico': abs(float(row.get('Tarifas de envio (BRL)', 0))) if pd.notna(row.get('Tarifas de envio (BRL)')) else 0,
+        'valor_taxa_comissao': tarifa_venda,
+        'valor_taxa_servico': tarifa_envio,
         
         # Envio - COM TIPO DE ENVIO IDENTIFICADO
         'opcao_envio': forma_entrega,
-        'tipo_envio': tipo_envio,  # NOVO CAMPO
-        'status': str(row.get('Estado', 'Aguardando Impressão')),
+        'tipo_envio': tipo_envio,
+        'status': estado,
         'status_impressao': 'Pendente',
         
         # Metadata
@@ -4328,11 +4385,12 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
         'prazo_entrega': (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
     }
     
-    # Processar data de entrega
-    if 'Data de entrega' in row and pd.notna(row['Data de entrega']):
+    # Processar data de entrega se existir
+    data_entrega = row.get('Data de entrega')
+    if data_entrega and not pd.isna(data_entrega):
         try:
-            pedido_data['data_prevista_envio'] = pd.to_datetime(row['Data de entrega']).isoformat()
-            pedido_data['prazo_entrega'] = pd.to_datetime(row['Data de entrega']).isoformat()
+            pedido_data['data_prevista_envio'] = pd.to_datetime(data_entrega).isoformat()
+            pedido_data['prazo_entrega'] = pd.to_datetime(data_entrega).isoformat()
         except:
             pass
     
