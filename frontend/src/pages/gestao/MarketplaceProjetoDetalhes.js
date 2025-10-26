@@ -1389,50 +1389,67 @@ export default function MarketplaceProjetoDetalhes() {
                 Todos
               </button>
               
-              {/* Flex - Mostrar para Mercado Livre e Shopee */}
-              {(projeto?.plataforma === 'mercadolivre' || projeto?.plataforma === 'shopee') && (
-                <button
-                  onClick={() => setFiltroTipoEnvio('flex')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    filtroTipoEnvio === 'flex'
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  📦 Mercado Envios Flex
-                </button>
+              {/* Filtros específicos por plataforma */}
+              {projeto?.plataforma === 'shopee' && (
+                <>
+                  {/* Flex Shopee */}
+                  <button
+                    onClick={() => setFiltroTipoEnvio('flex')}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      filtroTipoEnvio === 'flex'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    📦 Flex Shopee
+                  </button>
+                  
+                  {/* Coleta */}
+                  <button
+                    onClick={() => setFiltroTipoEnvio('coleta')}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      filtroTipoEnvio === 'coleta'
+                        ? 'bg-cyan-600 text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    🚗 Coleta
+                  </button>
+                </>
               )}
               
-              {/* Correios e pontos de envio - Inclui Agência e Correios */}
-              <button
-                onClick={() => setFiltroTipoEnvio('correios_pontos')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  filtroTipoEnvio === 'correios_pontos'
-                    ? 'bg-yellow-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                📮 Correios e pontos de envio
-              </button>
-              
-              {/* Coleta - Apenas para Shopee */}
-              {projeto?.plataforma === 'shopee' && (
-                <button
-                  onClick={() => setFiltroTipoEnvio('coleta')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    filtroTipoEnvio === 'coleta'
-                      ? 'bg-cyan-600 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  🚗 Coleta
-                </button>
+              {projeto?.plataforma === 'mercadolivre' && (
+                <>
+                  {/* Mercado Envios Flex */}
+                  <button
+                    onClick={() => setFiltroTipoEnvio('flex')}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      filtroTipoEnvio === 'flex'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    📦 Mercado Envios Flex
+                  </button>
+                  
+                  {/* Correios e pontos de envio */}
+                  <button
+                    onClick={() => setFiltroTipoEnvio('correios_pontos')}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      filtroTipoEnvio === 'correios_pontos'
+                        ? 'bg-yellow-600 text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    📮 Correios e pontos de envio
+                  </button>
+                </>
               )}
               
               {/* Contador de pedidos filtrados */}
               <span className="ml-auto text-sm text-gray-400">
                 {pedidosFiltrados.length} pedido(s) {filtroTipoEnvio !== 'todos' && `(${
-                  filtroTipoEnvio === 'flex' ? 'Mercado Envios Flex' : 
+                  filtroTipoEnvio === 'flex' ? (projeto?.plataforma === 'shopee' ? 'Flex Shopee' : 'Mercado Envios Flex') : 
                   filtroTipoEnvio === 'correios_pontos' ? 'Correios e pontos de envio' : 
                   filtroTipoEnvio === 'coleta' ? 'Coleta' : ''
                 })`}
