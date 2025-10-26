@@ -113,10 +113,16 @@ export default function ConfiguracoesStatus() {
               <label className="block text-xs text-gray-400 mb-1">Nome do Status</label>
               <input
                 type="text"
-                value={status.label}
-                onChange={(e) => onChange({ ...status, label: e.target.value, valor: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm"
+                value={status.label || ''}
+                onChange={(e) => {
+                  e.preventDefault();
+                  const newLabel = e.target.value;
+                  const newValor = newLabel.toLowerCase().replace(/\s+/g, '_');
+                  onChange({ ...status, label: newLabel, valor: newValor });
+                }}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Ex: Em Produção"
+                autoFocus
               />
             </div>
             <div>
