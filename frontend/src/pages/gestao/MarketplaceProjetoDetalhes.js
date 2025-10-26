@@ -519,12 +519,11 @@ export default function MarketplaceProjetoDetalhes() {
         if (!tipoEnvio.toLowerCase().includes('flex')) {
           return false;
         }
-      } else if (filtroTipoEnvio === 'agencia') {
-        if (!tipoEnvio.toLowerCase().includes('agência') && !tipoEnvio.toLowerCase().includes('agencia')) {
-          return false;
-        }
-      } else if (filtroTipoEnvio === 'correios') {
-        if (!tipoEnvio.toLowerCase().includes('correios')) {
+      } else if (filtroTipoEnvio === 'correios_pontos') {
+        // Inclui tanto Correios quanto Agência
+        const temCorreios = tipoEnvio.toLowerCase().includes('correios');
+        const temAgencia = tipoEnvio.toLowerCase().includes('agência') || tipoEnvio.toLowerCase().includes('agencia');
+        if (!temCorreios && !temAgencia) {
           return false;
         }
       } else if (filtroTipoEnvio === 'coleta') {
