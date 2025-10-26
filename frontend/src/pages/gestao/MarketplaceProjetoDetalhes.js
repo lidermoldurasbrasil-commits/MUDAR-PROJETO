@@ -212,7 +212,7 @@ export default function MarketplaceProjetoDetalhes() {
       formData.append('file', uploadFile);
       
       const response = await axios.post(
-        `${API}/pedidos/upload-planilha?projeto_id=${projetoId}`,
+        `${API}/pedidos/upload-planilha?projeto_id=${projetoId}&formato=${uploadFormato}`,
         formData,
         {
           headers: {
@@ -234,6 +234,7 @@ export default function MarketplaceProjetoDetalhes() {
       
       setShowUploadModal(false);
       setUploadFile(null);
+      setUploadFormato('shopee'); // Resetar para padrão
       fetchDados();
     } catch (error) {
       console.error('Erro ao fazer upload:', error);
