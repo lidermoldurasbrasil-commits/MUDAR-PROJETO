@@ -4118,10 +4118,11 @@ async def create_pedidos_bulk(pedidos: list[PedidoMarketplace], current_user: di
 @api_router.post("/gestao/marketplaces/pedidos/upload-planilha")
 async def upload_planilha_pedidos(
     projeto_id: str,
+    formato: str,  # "shopee" ou "mercadolivre"
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user)
 ):
-    """Upload de planilha Excel/CSV com pedidos do marketplace (formato Shopee)"""
+    """Upload de planilha Excel/CSV com pedidos do marketplace - Múltiplos formatos"""
     try:
         import pandas as pd
         import io
@@ -4142,86 +4143,28 @@ async def upload_planilha_pedidos(
         pedidos_criados = []
         pedidos_duplicados = []
         
-        # Processar cada linha da planilha
+        # Processar cada linha da planilha baseado no formato
         for index, row in df.iterrows():
             try:
-                # Obter ID do pedido
-                numero_pedido = str(row.get('ID do pedido', ''))
+                if formato == 'shopee':
+                    pedido_data = processar_linha_shopee(row, projeto_id, projeto, current_user)
+                elif formato == 'mercadolivre':
+                    pedido_data = processar_linha_mercadolivre(row, projeto_id, projeto, current_user)
+                else:
+                    raise HTTPException(status_code=400, detail=f"Formato '{formato}' não suportado")
                 
-                if not numero_pedido:
+                if not pedido_data:
                     continue
                 
                 # Verificar se já existe pedido com esse numero_pedido no mesmo projeto
                 pedido_existente = await db.pedidos_marketplace.find_one({
                     'projeto_id': projeto_id,
-                    'numero_pedido': numero_pedido
+                    'numero_pedido': pedido_data['numero_pedido']
                 })
                 
                 if pedido_existente:
-                    pedidos_duplicados.append(numero_pedido)
+                    pedidos_duplicados.append(pedido_data['numero_pedido'])
                     continue  # Pular este pedido
-                
-                # Mapear colunas da planilha Shopee para o modelo
-                pedido_data = {
-                    'id': str(uuid.uuid4()),
-                    'projeto_id': projeto_id,
-                    'plataforma': projeto['plataforma'],
-                    
-                    # Dados do pedido
-                    'numero_pedido': str(row.get('ID do pedido', '')),
-                    'numero_referencia_sku': str(row.get('Número de referência SKU', row.get('Nº de referência do SKU principal', ''))),
-                    'sku': str(row.get('Número de referência SKU', '')),
-                    'nome_variacao': str(row.get('Nome da variação', '')),
-                    'produto_nome': str(row.get('Nome do Produto', '')),
-                    
-                    # Cliente
-                    'cliente_nome': str(row.get('Nome do destinatário', row.get('Nome de usuário (comprador)', ''))),
-                    'cliente_contato': str(row.get('Telefone', '')),
-                    
-                    # Valores
-                    'quantidade': int(row.get('Quantidade', 1)),
-                    'preco_acordado': float(row.get('Preço acordado', 0)),
-                    'valor_unitario': float(row.get('Preço original', row.get('Preço acordado', 0))),
-                    'valor_total': float(row.get('Total global', row.get('Cartão de Crédito', 0))),
-                    
-                    # Taxas - Extraindo os valores corretos da planilha
-                    'taxa_comissao': 0,  # Será calculado como percentual
-                    'taxa_servico': 0,   # Será calculado como percentual
-                    'valor_taxa_comissao': float(row.get('Taxa de comissão', 0)),
-                    'valor_taxa_servico': float(row.get('Taxa de serviço', 0)),
-                    
-                    # Envio
-                    'opcao_envio': str(row.get('Opção de envio', '')),
-                    'status': 'Aguardando Impressão',
-                    
-                    # Metadata
-                    'loja_id': projeto.get('loja_id', 'fabrica'),
-                    'created_by': current_user.get('username', ''),
-                    'created_at': datetime.now(timezone.utc).isoformat(),
-                    'updated_at': datetime.now(timezone.utc).isoformat(),
-                    'prazo_entrega': (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
-                }
-                
-                # Processar data prevista de envio
-                if 'Data prevista de envio' in row and pd.notna(row['Data prevista de envio']):
-                    try:
-                        pedido_data['data_prevista_envio'] = pd.to_datetime(row['Data prevista de envio']).isoformat()
-                        pedido_data['prazo_entrega'] = pd.to_datetime(row['Data prevista de envio']).isoformat()
-                    except:
-                        pass
-                
-                # Calcular taxas como percentual se houver valor
-                if pedido_data['preco_acordado'] > 0:
-                    if pedido_data['valor_taxa_comissao'] > 0:
-                        pedido_data['taxa_comissao'] = (pedido_data['valor_taxa_comissao'] / pedido_data['preco_acordado']) * 100
-                    
-                    if pedido_data['valor_taxa_servico'] > 0:
-                        pedido_data['taxa_servico'] = (pedido_data['valor_taxa_servico'] / pedido_data['preco_acordado']) * 100
-                    
-                    # Calcular valor líquido
-                    pedido_data['valor_liquido'] = pedido_data['preco_acordado'] - pedido_data['valor_taxa_comissao'] - pedido_data['valor_taxa_servico']
-                else:
-                    pedido_data['valor_liquido'] = 0
                 
                 pedidos_criados.append(pedido_data)
                 
