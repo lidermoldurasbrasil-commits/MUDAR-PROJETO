@@ -209,10 +209,10 @@ export default function MarketplacesCentral() {
   
   // Cores para os gráficos
   const COLORS_STATUS = {
-    'Aguardando Impressão': '#94A3B8',
-    'Sala de Impressão': '#60A5FA',
+    'Aguardando Produção': '#94A3B8',
     'Em Produção': '#F59E0B',
-    'Expedição': '#FBBF24',
+    'Pronto': '#8B5CF6',
+    'Embalagem': '#FBBF24',
     'Enviado': '#3B82F6',
     'Entregue': '#10B981'
   };
