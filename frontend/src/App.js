@@ -108,6 +108,7 @@ function App() {
               <Route path="marketplaces/relatorio-vendas" element={<RelatorioVendasMarketplace />} />
               <Route path="marketplaces/configuracoes-status" element={<ConfiguracoesStatus />} />
               <Route path="cadastros" element={<Clientes />} />
+              <Route path="usuarios" element={<GestaoUsuarios />} />
               <Route path="relatorios" element={<Relatorios />} />
             </Route>
 
