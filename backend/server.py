@@ -4201,6 +4201,19 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     if not numero_pedido or numero_pedido == 'nan':
         return None
     
+    # Identificar tipo de envio
+    forma_entrega = str(row.get('Forma de entrega', ''))
+    tipo_envio = 'Outro'
+    
+    if 'flex' in forma_entrega.lower():
+        tipo_envio = 'Mercado Envios Flex'
+    elif 'correios' in forma_entrega.lower():
+        tipo_envio = 'Correios e pontos de envio'
+    elif 'coleta' in forma_entrega.lower():
+        tipo_envio = 'Coleta'
+    elif 'agência' in forma_entrega.lower() or 'agencia' in forma_entrega.lower():
+        tipo_envio = 'Agência Mercado Livre'
+    
     # Mapear colunas da planilha Mercado Livre
     pedido_data = {
         'id': str(uuid.uuid4()),
@@ -4229,8 +4242,9 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
         'valor_taxa_comissao': abs(float(row.get('Tarifa de venda e impostos (BRL)', 0))) if pd.notna(row.get('Tarifa de venda e impostos (BRL)')) else 0,
         'valor_taxa_servico': abs(float(row.get('Tarifas de envio (BRL)', 0))) if pd.notna(row.get('Tarifas de envio (BRL)')) else 0,
         
-        # Envio
-        'opcao_envio': str(row.get('Forma de entrega', '')),
+        # Envio - COM TIPO DE ENVIO IDENTIFICADO
+        'opcao_envio': forma_entrega,
+        'tipo_envio': tipo_envio,  # NOVO CAMPO
         'status': str(row.get('Estado', 'Aguardando Impressão')),
         'status_impressao': 'Pendente',
         
