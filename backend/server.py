@@ -3933,7 +3933,7 @@ async def get_projetos_marketplace(current_user: dict = Depends(get_current_user
         # Contar pedidos por status
         em_producao = await db.pedidos_marketplace.count_documents({
             "projeto_id": projeto_id,
-            "status": {"$in": ["Sala de Impressão", "Em Produção"]}
+            "status": {"$in": ["Aguardando Produção", "Em Produção", "Pronto"]}
         })
         
         enviados = await db.pedidos_marketplace.count_documents({
