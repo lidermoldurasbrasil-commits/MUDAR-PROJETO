@@ -3847,6 +3847,28 @@ async def get_projetos_marketplace(current_user: dict = Depends(get_current_user
             "atrasado": True
         })
         
+        # Calcular pedidos para envio hoje e amanhã
+        hoje = datetime.now(timezone.utc).date()
+        amanha = hoje + timedelta(days=1)
+        
+        envio_hoje = await db.pedidos_marketplace.count_documents({
+            "projeto_id": projeto_id,
+            "data_prevista_envio": {
+                "$gte": datetime.combine(hoje, datetime.min.time(), tzinfo=timezone.utc),
+                "$lt": datetime.combine(hoje + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc)
+            },
+            "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
+        })
+        
+        envio_amanha = await db.pedidos_marketplace.count_documents({
+            "projeto_id": projeto_id,
+            "data_prevista_envio": {
+                "$gte": datetime.combine(amanha, datetime.min.time(), tzinfo=timezone.utc),
+                "$lt": datetime.combine(amanha + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc)
+            },
+            "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
+        })
+        
         # Atualizar projeto
         projeto['pedidos_em_producao'] = em_producao
         projeto['pedidos_enviados'] = enviados
