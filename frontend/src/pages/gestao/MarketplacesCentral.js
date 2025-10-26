@@ -419,6 +419,72 @@ export default function MarketplacesCentral() {
                     <p className="text-lg font-bold text-red-400">{projeto.pedidos_atrasados}</p>
                   </div>
                 </div>
+                
+                {/* Métricas de Envio por Tipo */}
+                {projeto.tipos_envio && (
+                  <div className="mt-3 border-t border-gray-700 pt-3">
+                    <p className="text-xs text-gray-400 mb-2 font-semibold">Tipos de Envio (Pendentes)</p>
+                    <div className="grid grid-cols-3 gap-1 text-center">
+                      {projeto.tipos_envio.flex > 0 && (
+                        <div className="bg-gray-900 rounded p-1 border border-gray-700">
+                          <p className="text-xs text-gray-400">Flex</p>
+                          <p className="text-sm font-bold text-purple-400">{projeto.tipos_envio.flex}</p>
+                        </div>
+                      )}
+                      {projeto.tipos_envio.correios > 0 && (
+                        <div className="bg-gray-900 rounded p-1 border border-gray-700">
+                          <p className="text-xs text-gray-400">Correios</p>
+                          <p className="text-sm font-bold text-yellow-400">{projeto.tipos_envio.correios}</p>
+                        </div>
+                      )}
+                      {projeto.tipos_envio.agencia > 0 && (
+                        <div className="bg-gray-900 rounded p-1 border border-gray-700">
+                          <p className="text-xs text-gray-400">Agência</p>
+                          <p className="text-sm font-bold text-green-400">{projeto.tipos_envio.agencia}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Timers de Postagem */}
+                {projeto.horarios_postagem && (
+                  <div className="mt-3 border-t border-gray-700 pt-3">
+                    <p className="text-xs text-gray-400 mb-2 font-semibold">Horários de Postagem</p>
+                    <div className="space-y-1">
+                      {projeto.horarios_postagem.flex_mercadolivre && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400">Flex ML</span>
+                          <CountdownTimer 
+                            targetTime={projeto.horarios_postagem.flex_mercadolivre} 
+                            label="Flex ML"
+                            tipo="flex_mercadolivre"
+                          />
+                        </div>
+                      )}
+                      {projeto.horarios_postagem.flex_shopee && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400">Flex Shopee</span>
+                          <CountdownTimer 
+                            targetTime={projeto.horarios_postagem.flex_shopee} 
+                            label="Flex Shopee"
+                            tipo="flex_shopee"
+                          />
+                        </div>
+                      )}
+                      {projeto.horarios_postagem.agencia_mercadolivre && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400">Agência ML</span>
+                          <CountdownTimer 
+                            targetTime={projeto.horarios_postagem.agencia_mercadolivre} 
+                            label="Agência ML"
+                            tipo="agencia_mercadolivre"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Footer do Card */}
