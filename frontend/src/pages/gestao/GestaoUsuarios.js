@@ -9,9 +9,9 @@ const API = `${BACKEND_URL}/api/gestao`;
 const ROLES = [
   { value: 'director', label: 'Diretor (Acesso Total)', color: '#8B5CF6' },
   { value: 'manager', label: 'Gerente (Acesso Total)', color: '#3B82F6' },
-  { value: 'sala_impressao', label: 'Sala de Impressão', color: '#F59E0B' },
+  { value: 'producao', label: 'Produção', color: '#F59E0B' },
   { value: 'arte', label: 'Setor de Arte', color: '#10B981' },
-  { value: 'expedicao', label: 'Expedição', color: '#06B6D4' },
+  { value: 'embalagem', label: 'Embalagem', color: '#06B6D4' },
   { value: 'montagem', label: 'Montagem', color: '#8B5CF6' },
   { value: 'separacao', label: 'Em Separação', color: '#EC4899' }
 ];
