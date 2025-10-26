@@ -4400,6 +4400,11 @@ async def get_status_customizados(tipo: str = None, current_user: dict = Depends
     
     status_list = await db.status_customizados.find(query).sort("ordem", 1).to_list(None)
     
+    # Remover _id do MongoDB
+    for status in status_list:
+        if '_id' in status:
+            del status['_id']
+    
     # Se não houver status, retornar padrões
     if not status_list:
         status_padrao = []
