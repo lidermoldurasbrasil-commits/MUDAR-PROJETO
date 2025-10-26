@@ -477,39 +477,71 @@ export default function MarketplacesCentral() {
                 )}
                 
                 {/* Timers de Postagem */}
-                {projeto.horarios_postagem && (
+                {projeto.horarios_postagem && Object.keys(projeto.horarios_postagem).length > 0 && (
                   <div className="mt-3 border-t border-gray-700 pt-3">
-                    <p className="text-xs text-gray-400 mb-2 font-semibold">Horários de Postagem</p>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs text-gray-400 font-semibold">Horários de Postagem</p>
+                      {podeEditarHorarios && (
+                        <button
+                          onClick={(e) => handleEditHorarios(e, projeto)}
+                          className="text-xs text-blue-400 hover:text-blue-300"
+                          title="Editar horários"
+                        >
+                          <Edit2 size={12} />
+                        </button>
+                      )}
+                    </div>
                     <div className="space-y-1">
-                      {projeto.horarios_postagem.flex_mercadolivre && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-400">Flex ML</span>
-                          <CountdownTimer 
-                            targetTime={projeto.horarios_postagem.flex_mercadolivre} 
-                            label="Flex ML"
-                            tipo="flex_mercadolivre"
-                          />
-                        </div>
+                      {/* Shopee: Flex Shopee e Coleta Shopee */}
+                      {projeto.plataforma === 'shopee' && (
+                        <>
+                          {projeto.horarios_postagem.flex_shopee && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-400">Flex Shopee</span>
+                              <CountdownTimer 
+                                targetTime={projeto.horarios_postagem.flex_shopee} 
+                                label="Flex Shopee"
+                                tipo="flex_shopee"
+                              />
+                            </div>
+                          )}
+                          {projeto.horarios_postagem.coleta_shopee && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-400">Coleta Shopee</span>
+                              <CountdownTimer 
+                                targetTime={projeto.horarios_postagem.coleta_shopee} 
+                                label="Coleta Shopee"
+                                tipo="coleta_shopee"
+                              />
+                            </div>
+                          )}
+                        </>
                       )}
-                      {projeto.horarios_postagem.flex_shopee && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-400">Flex Shopee</span>
-                          <CountdownTimer 
-                            targetTime={projeto.horarios_postagem.flex_shopee} 
-                            label="Flex Shopee"
-                            tipo="flex_shopee"
-                          />
-                        </div>
-                      )}
-                      {projeto.horarios_postagem.agencia_mercadolivre && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-400">Agência ML</span>
-                          <CountdownTimer 
-                            targetTime={projeto.horarios_postagem.agencia_mercadolivre} 
-                            label="Agência ML"
-                            tipo="agencia_mercadolivre"
-                          />
-                        </div>
+                      
+                      {/* Mercado Livre: Flex ML e Agência ML */}
+                      {projeto.plataforma === 'mercadolivre' && (
+                        <>
+                          {projeto.horarios_postagem.flex_mercadolivre && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-400">Flex ML</span>
+                              <CountdownTimer 
+                                targetTime={projeto.horarios_postagem.flex_mercadolivre} 
+                                label="Flex ML"
+                                tipo="flex_mercadolivre"
+                              />
+                            </div>
+                          )}
+                          {projeto.horarios_postagem.agencia_mercadolivre && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-400">Agência ML</span>
+                              <CountdownTimer 
+                                targetTime={projeto.horarios_postagem.agencia_mercadolivre} 
+                                label="Agência ML"
+                                tipo="agencia_mercadolivre"
+                              />
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
