@@ -4781,10 +4781,10 @@ async def get_status_customizados(tipo: str = None, current_user: dict = Depends
         status_padrao = []
         if not tipo or tipo == "geral":
             status_padrao.extend([
-                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Aguardando Impressão", "valor": "aguardando_impressao", "cor": "#94A3B8", "ordem": 0, "ativo": True},
-                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Sala de Impressão", "valor": "sala_impressao", "cor": "#60A5FA", "ordem": 1, "ativo": True},
-                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Em Produção", "valor": "em_producao", "cor": "#F59E0B", "ordem": 2, "ativo": True},
-                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Expedição", "valor": "expedicao", "cor": "#FBBF24", "ordem": 3, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Aguardando Produção", "valor": "aguardando_producao", "cor": "#94A3B8", "ordem": 0, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Em Produção", "valor": "em_producao", "cor": "#F59E0B", "ordem": 1, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Pronto", "valor": "pronto", "cor": "#8B5CF6", "ordem": 2, "ativo": True},
+                {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Embalagem", "valor": "embalagem", "cor": "#FBBF24", "ordem": 3, "ativo": True},
                 {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Enviado", "valor": "enviado", "cor": "#3B82F6", "ordem": 4, "ativo": True},
                 {"id": str(uuid.uuid4()), "tipo": "geral", "label": "Entregue", "valor": "entregue", "cor": "#10B981", "ordem": 5, "ativo": True}
             ])
