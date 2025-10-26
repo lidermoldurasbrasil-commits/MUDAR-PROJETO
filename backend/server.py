@@ -4070,6 +4070,25 @@ async def update_projeto_marketplace(projeto_id: str, projeto: ProjetoMarketplac
     await db.projetos_marketplace.update_one({"id": projeto_id}, {"$set": projeto_dict})
     return {"message": "Projeto atualizado com sucesso"}
 
+@api_router.patch("/gestao/marketplaces/projetos/{projeto_id}/horarios")
+async def update_horarios_postagem(
+    projeto_id: str, 
+    horarios: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Atualiza apenas os horários de postagem de um projeto"""
+    if current_user.get('role') not in ['director', 'manager']:
+        raise HTTPException(status_code=403, detail="Acesso negado")
+    
+    await db.projetos_marketplace.update_one(
+        {"id": projeto_id}, 
+        {"$set": {
+            "horarios_postagem": horarios,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    return {"message": "Horários atualizados com sucesso", "horarios": horarios}
+
 @api_router.delete("/gestao/marketplaces/projetos/{projeto_id}")
 async def delete_projeto_marketplace(projeto_id: str, current_user: dict = Depends(get_current_user)):
     """Deleta um projeto de marketplace"""
