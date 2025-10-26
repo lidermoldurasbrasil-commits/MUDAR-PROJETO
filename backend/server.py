@@ -4905,7 +4905,7 @@ async def get_dashboard_marketplaces(current_user: dict = Depends(get_current_us
     
     # Gráfico: Status atual dos pedidos (pizza)
     status_counts = {}
-    status_list = ["Aguardando Impressão", "Sala de Impressão", "Em Produção", "Expedição", "Enviado", "Entregue"]
+    status_list = ["Aguardando Produção", "Em Produção", "Pronto", "Embalagem", "Enviado", "Entregue"]
     for status in status_list:
         count = await db.pedidos_marketplace.count_documents({"status": status})
         if count > 0:
