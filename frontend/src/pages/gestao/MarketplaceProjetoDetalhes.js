@@ -1386,7 +1386,7 @@ export default function MarketplaceProjetoDetalhes() {
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
-                  📦 Flex
+                  📦 Mercado Envios Flex
                 </button>
               )}
               
