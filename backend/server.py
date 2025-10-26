@@ -4431,6 +4431,7 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     else:
         pedido_data['valor_liquido'] = 0
     
+    print(f"DEBUG ML - Pedido processado com sucesso: {numero_pedido}, SKU: {pedido_data['sku']}, Valor: {pedido_data['preco_acordado']}")
     return pedido_data
 
 @api_router.post("/gestao/marketplaces/pedidos/upload-planilha")
