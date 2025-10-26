@@ -4431,10 +4431,15 @@ async def upload_planilha_pedidos(
         # Ler o arquivo
         contents = await file.read()
         
+        # Ler planilha com tratamento diferente por formato
         if file.filename.endswith('.csv'):
             df = pd.read_csv(io.BytesIO(contents))
         else:
-            df = pd.read_excel(io.BytesIO(contents))
+            # Excel - Mercado Livre tem 5 linhas de cabeçalho antes dos dados
+            if formato == 'mercadolivre':
+                df = pd.read_excel(io.BytesIO(contents), header=5)  # Cabeçalho na linha 6 (índice 5)
+            else:
+                df = pd.read_excel(io.BytesIO(contents))
         
         # Buscar projeto
         projeto = await db.projetos_marketplace.find_one({"id": projeto_id})
