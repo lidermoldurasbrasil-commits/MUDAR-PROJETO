@@ -348,8 +348,16 @@ export default function MarketplacesCentral() {
                   </div>
                 </div>
 
-                {/* Indicadores Rápidos em Grid 2x2 */}
+                {/* Indicadores Rápidos em Grid 3x2 */}
                 <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-gray-900 rounded-lg p-3 border border-gray-700">
+                    <p className="text-xs text-gray-400">Envio Hoje</p>
+                    <p className="text-lg font-bold text-yellow-400">{projeto.envio_hoje || 0}</p>
+                  </div>
+                  <div className="bg-gray-900 rounded-lg p-3 border border-gray-700">
+                    <p className="text-xs text-gray-400">Envio Amanhã</p>
+                    <p className="text-lg font-bold text-cyan-400">{projeto.envio_amanha || 0}</p>
+                  </div>
                   <div className="bg-gray-900 rounded-lg p-3 border border-gray-700">
                     <p className="text-xs text-gray-400">Em Produção</p>
                     <p className="text-lg font-bold text-orange-400">{projeto.pedidos_em_producao}</p>
