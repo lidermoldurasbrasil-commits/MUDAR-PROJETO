@@ -29,6 +29,7 @@ import Financeiro from './pages/gestao/Financeiro';
 import ContasBancarias from './pages/gestao/financeiro/ContasBancarias';
 import ContasAReceber from './pages/gestao/financeiro/ContasAReceber';
 import Clientes from './pages/gestao/Clientes';
+import GestaoUsuarios from './pages/gestao/GestaoUsuarios';
 import Relatorios from './pages/gestao/Relatorios';
 import MarketplacesCentral from './pages/gestao/MarketplacesCentral';
 import MarketplaceProjetoDetalhes from './pages/gestao/MarketplaceProjetoDetalhes';
