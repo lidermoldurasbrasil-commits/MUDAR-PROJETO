@@ -1877,17 +1877,34 @@ export default function MarketplaceProjetoDetalhes() {
 
               <div className="bg-gray-900 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-white mb-2">Colunas esperadas na planilha:</h4>
-                <ul className="text-sm text-gray-400 space-y-1">
-                  <li>• ID do Pedido (obrigatório)</li>
-                  <li>• Número de Referência SKU</li>
-                  <li>• Nome Variação</li>
-                  <li>• Quantidade</li>
-                  <li>• Preço Acordado</li>
-                  <li>• Taxa de Comissão (%)</li>
-                  <li>• Taxa de Serviço (%)</li>
-                  <li>• Opção de Envio</li>
-                  <li>• Data Prevista de Envio</li>
-                </ul>
+                {uploadFormato === 'shopee' ? (
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    <li>• ID do Pedido (obrigatório)</li>
+                    <li>• Número de Referência SKU</li>
+                    <li>• Nome da Variação</li>
+                    <li>• Nome do Produto</li>
+                    <li>• Quantidade</li>
+                    <li>• Preço Acordado</li>
+                    <li>• Taxa de Comissão</li>
+                    <li>• Taxa de Serviço</li>
+                    <li>• Opção de Envio</li>
+                    <li>• Data Prevista de Envio</li>
+                  </ul>
+                ) : (
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    <li>• N.º de venda (obrigatório)</li>
+                    <li>• Estado</li>
+                    <li>• Unidades</li>
+                    <li>• SKU</li>
+                    <li>• Variação</li>
+                    <li>• Comprador</li>
+                    <li>• Forma de entrega</li>
+                    <li>• Receita por produtos (BRL)</li>
+                    <li>• Tarifa de venda e impostos (BRL)</li>
+                    <li>• Tarifas de envio (BRL)</li>
+                    <li>• Total (BRL)</li>
+                  </ul>
+                )}
               </div>
             </div>
 
