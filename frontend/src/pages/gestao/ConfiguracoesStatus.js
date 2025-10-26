@@ -40,6 +40,17 @@ export default function ConfiguracoesStatus() {
   };
 
   const handleSave = async (status) => {
+    // Validações
+    if (!status.label || status.label.trim() === '') {
+      toast.error('O nome do status não pode estar vazio');
+      return;
+    }
+    
+    if (!status.cor || !status.cor.match(/^#[0-9A-Fa-f]{6}$/)) {
+      toast.error('Cor inválida. Use o formato #RRGGBB');
+      return;
+    }
+    
     try {
       const token = localStorage.getItem('token');
       
