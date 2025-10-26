@@ -4240,6 +4240,24 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         'prazo_entrega': (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
     }
     
+    # Identificar tipo de envio baseado na "Forma de Entrega" (Opção de envio)
+    forma_entrega = str(row.get('Forma de Entrega', row.get('Opção de envio', '')))
+    if pd.isna(forma_entrega):
+        forma_entrega = ''
+    
+    tipo_envio = 'Outro'
+    
+    # Regras de identificação de tipo de envio Shopee
+    if 'shopee xpress' in forma_entrega.lower():
+        tipo_envio = 'Coleta'
+    elif 'retirada pelo comprador' in forma_entrega.lower():
+        tipo_envio = 'Coleta'
+    elif 'shopee entrega direta' in forma_entrega.lower():
+        tipo_envio = 'Flex Shopee'
+    
+    # Adicionar tipo_envio ao pedido_data
+    pedido_data['tipo_envio'] = tipo_envio
+    
     # Processar data prevista de envio
     if 'Data prevista de envio' in row and pd.notna(row['Data prevista de envio']):
         try:
