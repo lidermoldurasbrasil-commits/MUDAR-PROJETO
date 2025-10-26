@@ -4077,7 +4077,7 @@ async def get_pedidos_marketplace(
     if atrasado is not None:
         query['atrasado'] = atrasado
     
-    pedidos = await db.pedidos_marketplace.find(query).sort("data_pedido", -1).to_list(None)
+    pedidos = await db.pedidos_marketplace.find(query).sort("created_at", -1).to_list(None)
     
     for pedido in pedidos:
         if '_id' in pedido:
