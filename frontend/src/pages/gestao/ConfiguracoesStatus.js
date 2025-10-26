@@ -130,16 +130,23 @@ export default function ConfiguracoesStatus() {
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={status.cor}
-                  onChange={(e) => onChange({ ...status, cor: e.target.value })}
+                  value={status.cor || '#94A3B8'}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    onChange({ ...status, cor: e.target.value });
+                  }}
                   className="w-12 h-10 bg-gray-800 border border-gray-600 rounded-lg cursor-pointer"
                 />
                 <input
                   type="text"
-                  value={status.cor}
-                  onChange={(e) => onChange({ ...status, cor: e.target.value })}
-                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm"
+                  value={status.cor || '#94A3B8'}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    onChange({ ...status, cor: e.target.value });
+                  }}
+                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="#94A3B8"
+                  maxLength={7}
                 />
               </div>
             </div>
