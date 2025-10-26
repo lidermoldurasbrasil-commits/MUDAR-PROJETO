@@ -83,7 +83,7 @@ export default function MarketplaceProjetoDetalhes() {
     data_prevista_envio: '',
     cliente_nome: '',
     cliente_contato: '',
-    status: 'Aguardando Impressão',
+    status: 'Aguardando Produção',
     prioridade: 'Normal'
   });
   const [showAddModal, setShowAddModal] = useState(false);
@@ -96,7 +96,7 @@ export default function MarketplaceProjetoDetalhes() {
     quantidade: 1,
     valor_unitario: 0,
     valor_total: 0,
-    status: 'Aguardando Impressão',
+    status: 'Aguardando Produção',
     prioridade: 'Normal',
     prazo_entrega: '',
     responsavel: '',
@@ -285,7 +285,7 @@ export default function MarketplaceProjetoDetalhes() {
         quantidade: 1,
         valor_unitario: 0,
         valor_total: 0,
-        status: 'Aguardando Impressão',
+        status: 'Aguardando Produção',
         prioridade: 'Normal',
         prazo_entrega: '',
         responsavel: '',
@@ -385,7 +385,7 @@ export default function MarketplaceProjetoDetalhes() {
         data_prevista_envio: '',
         cliente_nome: '',
         cliente_contato: '',
-        status: 'Aguardando Impressão',
+        status: 'Aguardando Produção',
         prioridade: 'Normal'
       });
       fetchDados();
@@ -1352,7 +1352,7 @@ export default function MarketplaceProjetoDetalhes() {
                               sku: '',
                               cliente_nome: '',
                               sala_impressao: 'Aguardando Impressão',
-                              status: 'Aguardando Impressão',
+                              status: 'Aguardando Produção',
                               prioridade: 'Normal',
                               prazo_entrega: '',
                               responsavel: ''
