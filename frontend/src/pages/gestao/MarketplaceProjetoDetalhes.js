@@ -512,6 +512,28 @@ export default function MarketplaceProjetoDetalhes() {
       }
     }
     
+    // Filtro de Tipo de Envio
+    if (filtroTipoEnvio !== 'todos') {
+      const tipoEnvio = pedido.tipo_envio || '';
+      if (filtroTipoEnvio === 'flex') {
+        if (!tipoEnvio.toLowerCase().includes('flex')) {
+          return false;
+        }
+      } else if (filtroTipoEnvio === 'agencia') {
+        if (!tipoEnvio.toLowerCase().includes('agência') && !tipoEnvio.toLowerCase().includes('agencia')) {
+          return false;
+        }
+      } else if (filtroTipoEnvio === 'correios') {
+        if (!tipoEnvio.toLowerCase().includes('correios')) {
+          return false;
+        }
+      } else if (filtroTipoEnvio === 'coleta') {
+        if (!tipoEnvio.toLowerCase().includes('coleta')) {
+          return false;
+        }
+      }
+    }
+    
     // Filtro de SKU
     if (filtros.sku && pedido.sku) {
       if (!pedido.sku.toLowerCase().includes(filtros.sku.toLowerCase())) {
