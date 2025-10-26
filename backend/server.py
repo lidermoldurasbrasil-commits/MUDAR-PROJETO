@@ -4529,12 +4529,12 @@ async def update_pedido_marketplace(pedido_id: str, pedido: PedidoMarketplace, c
     pedido_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
     
     # Atualizar datas conforme status
-    if pedido.status == "Sala de Impressão" and not pedido_dict.get('data_impressao'):
-        pedido_dict['data_impressao'] = datetime.now(timezone.utc).isoformat()
-    elif pedido.status == "Em Produção" and not pedido_dict.get('data_producao'):
+    if pedido.status == "Em Produção" and not pedido_dict.get('data_producao'):
         pedido_dict['data_producao'] = datetime.now(timezone.utc).isoformat()
-    elif pedido.status == "Expedição" and not pedido_dict.get('data_expedicao'):
-        pedido_dict['data_expedicao'] = datetime.now(timezone.utc).isoformat()
+    elif pedido.status == "Pronto" and not pedido_dict.get('data_pronto'):
+        pedido_dict['data_pronto'] = datetime.now(timezone.utc).isoformat()
+    elif pedido.status == "Embalagem" and not pedido_dict.get('data_embalagem'):
+        pedido_dict['data_embalagem'] = datetime.now(timezone.utc).isoformat()
     elif pedido.status == "Enviado" and not pedido_dict.get('data_envio'):
         pedido_dict['data_envio'] = datetime.now(timezone.utc).isoformat()
         
