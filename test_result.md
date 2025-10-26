@@ -339,10 +339,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Identificação de tipo_envio para Shopee"
-    - "Investigação problema Mercado Livre - 0 pedidos importados"
-  stuck_tasks:
-    - "Investigação problema Mercado Livre - 0 pedidos importados"
+    - "All priority marketplace tests completed successfully"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
