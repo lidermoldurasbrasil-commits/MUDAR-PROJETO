@@ -4010,12 +4010,28 @@ async def get_projetos_marketplace(current_user: dict = Depends(get_current_user
         
         projeto['tipos_envio'] = tipos_envio
         
-        # Horários de postagem (configuráveis por projeto)
-        horarios_postagem = projeto.get('horarios_postagem', {
-            'flex_mercadolivre': '14:00',
-            'flex_shopee': '16:00',
-            'agencia_mercadolivre': '17:00'
-        })
+        # Horários de postagem (configuráveis por projeto e específicos por plataforma)
+        plataforma = projeto.get('plataforma', '')
+        
+        # Horários padrão baseados na plataforma
+        if plataforma == 'shopee':
+            horarios_padrao = {
+                'flex_shopee': '16:00',
+                'coleta_shopee': '18:00'
+            }
+        elif plataforma == 'mercadolivre':
+            horarios_padrao = {
+                'flex_mercadolivre': '14:00',
+                'agencia_mercadolivre': '17:00'
+            }
+        else:
+            horarios_padrao = {}
+        
+        horarios_postagem = projeto.get('horarios_postagem', horarios_padrao)
+        # Se não tem horários ou está vazio, usar padrão
+        if not horarios_postagem or len(horarios_postagem) == 0:
+            horarios_postagem = horarios_padrao
+            
         projeto['horarios_postagem'] = horarios_postagem
         
         # Calcular progresso percentual
