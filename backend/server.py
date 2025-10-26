@@ -3983,30 +3983,40 @@ async def get_projetos_marketplace(current_user: dict = Depends(get_current_user
         
         # Métricas por tipo de envio
         tipos_envio = {}
+        plataforma = projeto.get('plataforma', '')
         
-        # Mercado Envios Flex
-        flex_count = await db.pedidos_marketplace.count_documents({
-            "projeto_id": projeto_id,
-            "tipo_envio": "Mercado Envios Flex",
-            "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
-        })
-        tipos_envio['flex'] = flex_count
-        
-        # Correios
-        correios_count = await db.pedidos_marketplace.count_documents({
-            "projeto_id": projeto_id,
-            "tipo_envio": "Correios e pontos de envio",
-            "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
-        })
-        tipos_envio['correios'] = correios_count
-        
-        # Agência Mercado Livre
-        agencia_count = await db.pedidos_marketplace.count_documents({
-            "projeto_id": projeto_id,
-            "tipo_envio": "Agência Mercado Livre",
-            "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
-        })
-        tipos_envio['agencia'] = agencia_count
+        if plataforma == 'shopee':
+            # Para Shopee: Flex Shopee e Coleta
+            flex_shopee_count = await db.pedidos_marketplace.count_documents({
+                "projeto_id": projeto_id,
+                "tipo_envio": "Flex Shopee",
+                "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
+            })
+            tipos_envio['flex_shopee'] = flex_shopee_count
+            
+            coleta_count = await db.pedidos_marketplace.count_documents({
+                "projeto_id": projeto_id,
+                "tipo_envio": "Coleta",
+                "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
+            })
+            tipos_envio['coleta'] = coleta_count
+            
+        elif plataforma == 'mercadolivre':
+            # Para Mercado Livre: Mercado Envios Flex
+            flex_count = await db.pedidos_marketplace.count_documents({
+                "projeto_id": projeto_id,
+                "tipo_envio": "Mercado Envios Flex",
+                "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
+            })
+            tipos_envio['flex'] = flex_count
+            
+            # Correios e Agência são agrupados como "Correios e pontos de envio"
+            correios_agencia_count = await db.pedidos_marketplace.count_documents({
+                "projeto_id": projeto_id,
+                "tipo_envio": {"$in": ["Correios e pontos de envio", "Agência Mercado Livre"]},
+                "status": {"$nin": ["Enviado", "Entregue", "Cancelado"]}
+            })
+            tipos_envio['correios'] = correios_agencia_count
         
         projeto['tipos_envio'] = tipos_envio
         
