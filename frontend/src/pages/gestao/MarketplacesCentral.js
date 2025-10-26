@@ -1,12 +1,56 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { Plus, TrendingUp, Package, Send, CheckCircle, AlertTriangle, DollarSign, Activity, Edit2, Settings } from 'lucide-react';
+import { Plus, TrendingUp, Package, Send, CheckCircle, AlertTriangle, DollarSign, Activity, Edit2, Settings, Clock } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api/gestao/marketplaces`;
+
+// Componente de Timer para countdown
+function CountdownTimer({ targetTime, label, tipo }) {
+  const [timeLeft, setTimeLeft] = useState('');
+  const [isUrgent, setIsUrgent] = useState(false);
+  
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const [hours, minutes] = targetTime.split(':').map(Number);
+      const target = new Date();
+      target.setHours(hours, minutes, 0, 0);
+      
+      // Se o horário já passou, considerar para amanhã
+      if (now > target) {
+        target.setDate(target.getDate() + 1);
+      }
+      
+      const diff = target - now;
+      const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
+      const minutesLeft = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      setIsUrgent(hoursLeft < 1); // Vermelho se falta menos de 1 hora
+      setTimeLeft(`${hoursLeft}h ${minutesLeft}m`);
+    };
+    
+    calculateTimeLeft();
+    const interval = setInterval(calculateTimeLeft, 60000); // Atualizar a cada minuto
+    
+    return () => clearInterval(interval);
+  }, [targetTime]);
+  
+  const getColorClass = () => {
+    if (isUrgent) return 'text-red-400 border-red-500';
+    return 'text-blue-400 border-blue-500';
+  };
+  
+  return (
+    <div className={`flex items-center gap-1 px-2 py-1 border rounded ${getColorClass()} text-xs font-medium`}>
+      <Clock className="w-3 h-3" />
+      <span className="font-bold">{timeLeft}</span>
+    </div>
+  );
+}
 
 export default function MarketplacesCentral() {
   const navigate = useNavigate();
