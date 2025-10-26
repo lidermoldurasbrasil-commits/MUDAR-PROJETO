@@ -148,6 +148,31 @@ export default function MarketplacesCentral() {
     setShowEditModal(true);
   };
 
+  const handleEditHorarios = (e, projeto) => {
+    e.stopPropagation();
+    setProjetoHorarios(projeto);
+    setHorariosTemp(projeto.horarios_postagem || {});
+    setShowHorariosModal(true);
+  };
+
+  const handleSaveHorarios = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        `${API}/projetos/${projetoHorarios.id}/horarios`,
+        horariosTemp,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success('Horários atualizados com sucesso!');
+      setShowHorariosModal(false);
+      fetchDados();
+    } catch (error) {
+      console.error('Erro ao salvar horários:', error);
+      toast.error('Erro ao salvar horários');
+    }
+  };
+
   const handleSaveProjeto = async () => {
     try {
       const token = localStorage.getItem('token');
