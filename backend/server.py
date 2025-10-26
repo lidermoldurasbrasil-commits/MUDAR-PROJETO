@@ -4448,7 +4448,10 @@ async def upload_planilha_pedidos(
                     raise HTTPException(status_code=400, detail=f"Formato '{formato}' não suportado")
                 
                 if not pedido_data:
+                    print(f"Linha {index}: Pulada (sem número de pedido ou inválida)")
                     continue
+                
+                print(f"Linha {index}: Pedido {pedido_data.get('numero_pedido')} processado")
                 
                 # Verificar se já existe pedido com esse numero_pedido no mesmo projeto
                 pedido_existente = await db.pedidos_marketplace.find_one({
@@ -4458,6 +4461,7 @@ async def upload_planilha_pedidos(
                 
                 if pedido_existente:
                     pedidos_duplicados.append(pedido_data['numero_pedido'])
+                    print(f"Linha {index}: Duplicado - {pedido_data['numero_pedido']}")
                     continue  # Pular este pedido
                 
                 pedidos_criados.append(pedido_data)
