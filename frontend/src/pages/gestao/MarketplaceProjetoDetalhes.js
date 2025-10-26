@@ -1415,7 +1415,7 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
-                    {/* ID do Pedido */}
+                    {/* ID do Pedido / N.º de Venda */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white transition-opacity">
@@ -1425,7 +1425,7 @@ export default function MarketplaceProjetoDetalhes() {
                       </div>
                     </td>
                     
-                    {/* Status Geral - Dropdown */}
+                    {/* Status Geral / Estado - Dropdown */}
                     <td className="px-4 py-3">
                       <select
                         value={pedido.status}
@@ -1467,22 +1467,77 @@ export default function MarketplaceProjetoDetalhes() {
                       <span className="text-gray-300 text-sm">{pedido.sku || '-'}</span>
                     </td>
                     
-                    {/* Nome Variação */}
-                    <td className="px-4 py-3">
-                      <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
-                    </td>
-                    
-                    {/* Quantidade */}
-                    <td className="px-4 py-3">
-                      <span className="text-white font-medium text-center">{pedido.quantidade}</span>
-                    </td>
-                    
-                    {/* Data Prevista Envio */}
-                    <td className="px-4 py-3">
-                      <span className="text-gray-300 text-sm">
-                        {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
-                      </span>
-                    </td>
+                    {/* Colunas específicas por plataforma */}
+                    {projeto?.plataforma === 'mercadolivre' ? (
+                      <>
+                        {/* Variação */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
+                        </td>
+                        
+                        {/* Unidades */}
+                        <td className="px-4 py-3">
+                          <span className="text-white font-medium text-center">{pedido.quantidade || '-'}</span>
+                        </td>
+                        
+                        {/* Comprador */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.cliente_nome || '-'}</span>
+                        </td>
+                        
+                        {/* Forma de Entrega */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
+                        </td>
+                        
+                        {/* Receita por produtos (BRL) */}
+                        <td className="px-4 py-3">
+                          <span className="text-green-400 font-medium">
+                            {pedido.preco_acordado ? `R$ ${pedido.preco_acordado.toFixed(2)}` : '-'}
+                          </span>
+                        </td>
+                        
+                        {/* Tarifa de venda e impostos (BRL) */}
+                        <td className="px-4 py-3">
+                          <span className="text-red-400 font-medium">
+                            {pedido.valor_taxa_comissao ? `R$ ${pedido.valor_taxa_comissao.toFixed(2)}` : '-'}
+                          </span>
+                        </td>
+                        
+                        {/* Tarifas de envio (BRL) */}
+                        <td className="px-4 py-3">
+                          <span className="text-red-400 font-medium">
+                            {pedido.valor_taxa_servico ? `R$ ${pedido.valor_taxa_servico.toFixed(2)}` : '-'}
+                          </span>
+                        </td>
+                        
+                        {/* Total (BRL) */}
+                        <td className="px-4 py-3">
+                          <span className="text-blue-400 font-bold">
+                            {pedido.valor_total ? `R$ ${pedido.valor_total.toFixed(2)}` : '-'}
+                          </span>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        {/* Nome Variação */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
+                        </td>
+                        
+                        {/* Quantidade */}
+                        <td className="px-4 py-3">
+                          <span className="text-white font-medium text-center">{pedido.quantidade}</span>
+                        </td>
+                        
+                        {/* Data Prevista Envio */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">
+                            {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
+                          </span>
+                        </td>
+                      </>
+                    )}
                   </tr>
                 ))}
               </tbody>
