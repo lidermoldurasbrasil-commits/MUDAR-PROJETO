@@ -38,10 +38,13 @@ export default function MarketplaceProjetoDetalhes() {
   try {
     outletContext = useOutletContext();
   } catch (e) {
-    outletContext = { lojaAtual: 'fabrica' };
+    outletContext = { lojaAtual: 'fabrica', user: null };
   }
   
-  const { lojaAtual = 'fabrica' } = outletContext || {};
+  const { lojaAtual = 'fabrica', user = null } = outletContext || {};
+  
+  // Verificar se usuário é admin (director ou manager)
+  const isAdmin = user?.role === 'director' || user?.role === 'manager';
   
   const [projeto, setProjeto] = useState(null);
   const [pedidos, setPedidos] = useState([]);
