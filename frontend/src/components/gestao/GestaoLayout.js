@@ -24,6 +24,7 @@ export default function GestaoLayout({ user, onLogout }) {
     { path: '/gestao/estoque', icon: Archive, label: 'Estoque' },
     { path: '/gestao/financeiro', icon: DollarSign, label: 'Financeiro' },
     { path: '/gestao/cadastros', icon: Users, label: 'Cadastros' },
+    { path: '/gestao/usuarios', icon: UserCog, label: 'Usuários' },
     { path: '/gestao/relatorios', icon: BarChart3, label: 'Relatórios' }
   ];
 
