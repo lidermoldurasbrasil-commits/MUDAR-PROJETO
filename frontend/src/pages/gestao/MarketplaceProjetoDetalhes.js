@@ -63,6 +63,7 @@ export default function MarketplaceProjetoDetalhes() {
   const [showInlineAdd, setShowInlineAdd] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
+  const [uploadFormato, setUploadFormato] = useState('shopee'); // 'shopee' ou 'mercadolivre'
   const [uploadProgress, setUploadProgress] = useState(false);
   const [selectedPedidos, setSelectedPedidos] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
