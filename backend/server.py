@@ -4918,7 +4918,7 @@ async def get_dashboard_marketplaces(current_user: dict = Depends(get_current_us
         vendas = await db.pedidos_marketplace.count_documents({"plataforma": plataforma})
         producao = await db.pedidos_marketplace.count_documents({
             "plataforma": plataforma,
-            "status": {"$in": ["Em Produção", "Sala de Impressão"]}
+            "status": {"$in": ["Aguardando Produção", "Em Produção", "Pronto"]}
         })
         entregas = await db.pedidos_marketplace.count_documents({
             "plataforma": plataforma,
