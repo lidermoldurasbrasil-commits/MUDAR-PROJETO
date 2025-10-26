@@ -3865,6 +3865,11 @@ class BusinessManagementSystemTester:
         if not self.test_authentication():
             return False
         
+        # PRIORITY MARKETPLACE TESTS (as requested in test_result.md)
+        print("\n🎯 RUNNING PRIORITY MARKETPLACE TESTS...")
+        self.test_marketplace_shopee_tipo_envio()
+        self.test_marketplace_mercadolivre_debug()
+        
         # PRIORITY: Test user's specific order creation request
         print("\n🚨 RUNNING USER REQUESTED ORDER CREATION TEST...")
         self.test_user_requested_order_creation()
