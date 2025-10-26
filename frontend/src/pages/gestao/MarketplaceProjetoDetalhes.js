@@ -1376,7 +1376,7 @@ export default function MarketplaceProjetoDetalhes() {
                 Todos
               </button>
               
-              {/* Mostrar Flex apenas se for Mercado Livre ou Shopee */}
+              {/* Flex - Mostrar para Mercado Livre e Shopee */}
               {(projeto?.plataforma === 'mercadolivre' || projeto?.plataforma === 'shopee') && (
                 <button
                   onClick={() => setFiltroTipoEnvio('flex')}
@@ -1390,33 +1390,19 @@ export default function MarketplaceProjetoDetalhes() {
                 </button>
               )}
               
-              {/* Mostrar Agência apenas se for Mercado Livre */}
-              {projeto?.plataforma === 'mercadolivre' && (
-                <button
-                  onClick={() => setFiltroTipoEnvio('agencia')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    filtroTipoEnvio === 'agencia'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  🏢 Agência
-                </button>
-              )}
-              
-              {/* Mostrar Correios */}
+              {/* Correios e pontos de envio - Inclui Agência e Correios */}
               <button
-                onClick={() => setFiltroTipoEnvio('correios')}
+                onClick={() => setFiltroTipoEnvio('correios_pontos')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  filtroTipoEnvio === 'correios'
+                  filtroTipoEnvio === 'correios_pontos'
                     ? 'bg-yellow-600 text-white'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >
-                📮 Correios
+                📮 Correios e pontos de envio
               </button>
               
-              {/* Mostrar Coleta apenas se for Shopee */}
+              {/* Coleta - Apenas para Shopee */}
               {projeto?.plataforma === 'shopee' && (
                 <button
                   onClick={() => setFiltroTipoEnvio('coleta')}
@@ -1432,7 +1418,7 @@ export default function MarketplaceProjetoDetalhes() {
               
               {/* Contador de pedidos filtrados */}
               <span className="ml-auto text-sm text-gray-400">
-                {pedidosFiltrados.length} pedido(s) {filtroTipoEnvio !== 'todos' && `(${filtroTipoEnvio})`}
+                {pedidosFiltrados.length} pedido(s) {filtroTipoEnvio !== 'todos' && `(${filtroTipoEnvio === 'correios_pontos' ? 'Correios e pontos de envio' : filtroTipoEnvio})`}
               </span>
             </div>
           </div>
