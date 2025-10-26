@@ -4285,10 +4285,16 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     """Processa uma linha da planilha Mercado Livre"""
     import pandas as pd
     
+    # DEBUG: Mostrar colunas disponíveis na primeira vez
+    print(f"DEBUG ML - Colunas disponíveis: {list(row.keys())[:10]}")  # Primeiras 10 colunas
+    
     # Obter número da venda - A primeira coluna é "N.º de venda"
     numero_pedido = str(row.get('N.º de venda', ''))
     
+    print(f"DEBUG ML - numero_pedido extraído: '{numero_pedido}', tipo: {type(row.get('N.º de venda'))}")
+    
     if not numero_pedido or numero_pedido == 'nan' or pd.isna(row.get('N.º de venda')):
+        print(f"DEBUG ML - Linha ignorada: numero_pedido inválido")
         return None
     
     # Identificar tipo de envio - A coluna é "Forma de entrega" (última seção)
