@@ -1831,6 +1831,24 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
 
             <div className="p-6 space-y-4">
+              {/* Seletor de Formato */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Formato da Planilha
+                </label>
+                <select
+                  value={uploadFormato}
+                  onChange={(e) => setUploadFormato(e.target.value)}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="shopee">Shopee</option>
+                  <option value="mercadolivre">Mercado Livre</option>
+                </select>
+                <p className="text-xs text-gray-400 mt-1">
+                  Selecione o marketplace de origem da planilha
+                </p>
+              </div>
+              
               <div>
                 <p className="text-sm text-gray-400 mb-4">
                   Faça upload da planilha de pedidos exportada do {projeto?.nome}. 
