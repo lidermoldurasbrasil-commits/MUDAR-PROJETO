@@ -333,8 +333,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Upload de Planilha de Pedidos Marketplace (Frontend)"
-  stuck_tasks: []
+    - "Identificação de tipo_envio para Shopee"
+    - "Investigação problema Mercado Livre - 0 pedidos importados"
+  stuck_tasks:
+    - "Investigação problema Mercado Livre - 0 pedidos importados"
   test_all: false
   test_priority: "high_first"
 
