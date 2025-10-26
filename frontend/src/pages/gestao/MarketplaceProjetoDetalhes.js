@@ -451,6 +451,11 @@ export default function MarketplaceProjetoDetalhes() {
       return;
     }
 
+    if (!valor) {
+      toast.error('Selecione um valor para atualizar');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       
@@ -458,13 +463,23 @@ export default function MarketplaceProjetoDetalhes() {
       
       // Atualizar cada pedido selecionado
       await Promise.all(
-        selectedPedidos.map(pedidoId =>
-          axios.put(
+        selectedPedidos.map(async (pedidoId) => {
+          // Buscar o pedido completo primeiro
+          const response = await axios.get(`${API}/pedidos/${pedidoId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const pedido = response.data;
+          
+          // Atualizar o campo específico
+          pedido[campo] = valor;
+          
+          // Enviar atualização completa
+          return axios.put(
             `${API}/pedidos/${pedidoId}`,
-            { [campo]: valor },
+            pedido,
             { headers: { Authorization: `Bearer ${token}` } }
-          )
-        )
+          );
+        })
       );
 
       toast.success(`${selectedPedidos.length} pedido(s) atualizado(s) com sucesso!`);
