@@ -4267,17 +4267,10 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     """Processa uma linha da planilha Mercado Livre"""
     import pandas as pd
     
-    # Debug: mostrar o que está vindo
-    numero_pedido_raw = row.get('N.º de venda')
-    print(f"DEBUG: N.º de venda raw = {numero_pedido_raw}, tipo = {type(numero_pedido_raw)}")
-    
     # Obter número da venda - A primeira coluna é "N.º de venda"
     numero_pedido = str(row.get('N.º de venda', ''))
     
-    print(f"DEBUG: N.º de venda convertido = '{numero_pedido}'")
-    
-    if not numero_pedido or numero_pedido == 'nan' or pd.isna(numero_pedido_raw):
-        print(f"DEBUG: Pulando - número vazio ou NaN")
+    if not numero_pedido or numero_pedido == 'nan' or pd.isna(row.get('N.º de venda')):
         return None
     
     # Identificar tipo de envio - A coluna é "Forma de entrega" (última seção)
