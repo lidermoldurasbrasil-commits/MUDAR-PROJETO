@@ -59,7 +59,12 @@ export default function MarketplaceProjetoDetalhes() {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [editingPedido, setEditingPedido] = useState(null);
-  const [viewMode, setViewMode] = useState('monday'); // 'kanban', 'list', ou 'monday'
+  
+  // Verificar se usuário é admin ANTES de definir viewMode
+  const { lojaAtual: lojaContexto = 'fabrica', user: userContexto = null } = outletContext || {};
+  const isAdminCheck = userContexto?.role === 'director' || userContexto?.role === 'manager';
+  
+  const [viewMode, setViewMode] = useState(isAdminCheck ? 'monday' : 'producao'); // 'kanban', 'list', 'monday' ou 'producao'
   const [showInlineAdd, setShowInlineAdd] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
