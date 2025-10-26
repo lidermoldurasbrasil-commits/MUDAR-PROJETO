@@ -454,6 +454,8 @@ export default function MarketplaceProjetoDetalhes() {
     try {
       const token = localStorage.getItem('token');
       
+      console.log(`Atualizando ${selectedPedidos.length} pedidos - ${campo}: ${valor}`);
+      
       // Atualizar cada pedido selecionado
       await Promise.all(
         selectedPedidos.map(pedidoId =>
@@ -466,12 +468,17 @@ export default function MarketplaceProjetoDetalhes() {
       );
 
       toast.success(`${selectedPedidos.length} pedido(s) atualizado(s) com sucesso!`);
+      
+      // Resetar estados
       setSelectedPedidos([]);
       setSelectAll(false);
+      setBatchStatusValue('');
+      setBatchImpressaoValue('');
+      
       fetchDados();
     } catch (error) {
       console.error('Erro ao atualizar pedidos:', error);
-      toast.error('Erro ao atualizar pedidos');
+      toast.error(error.response?.data?.detail || 'Erro ao atualizar pedidos');
     }
   };
 
