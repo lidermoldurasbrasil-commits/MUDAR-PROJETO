@@ -725,6 +725,90 @@ export default function MarketplacesCentral() {
           </div>
         </div>
       )}
+
+      {/* Modal de Edição de Horários */}
+      {showHorariosModal && projetoHorarios && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowHorariosModal(false)}>
+          <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-white mb-4">
+              Horários de Postagem - {projetoHorarios.nome}
+            </h3>
+            
+            <div className="space-y-4">
+              {projetoHorarios.plataforma === 'shopee' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Flex Shopee
+                    </label>
+                    <input
+                      type="time"
+                      value={horariosTemp.flex_shopee || '16:00'}
+                      onChange={(e) => setHorariosTemp({...horariosTemp, flex_shopee: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Coleta Shopee
+                    </label>
+                    <input
+                      type="time"
+                      value={horariosTemp.coleta_shopee || '18:00'}
+                      onChange={(e) => setHorariosTemp({...horariosTemp, coleta_shopee: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </>
+              )}
+              
+              {projetoHorarios.plataforma === 'mercadolivre' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Flex Mercado Livre
+                    </label>
+                    <input
+                      type="time"
+                      value={horariosTemp.flex_mercadolivre || '14:00'}
+                      onChange={(e) => setHorariosTemp({...horariosTemp, flex_mercadolivre: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Agência Mercado Livre
+                    </label>
+                    <input
+                      type="time"
+                      value={horariosTemp.agencia_mercadolivre || '17:00'}
+                      onChange={(e) => setHorariosTemp({...horariosTemp, agencia_mercadolivre: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowHorariosModal(false)}
+                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveHorarios}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
