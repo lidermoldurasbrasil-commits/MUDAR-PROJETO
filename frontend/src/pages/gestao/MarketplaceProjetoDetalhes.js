@@ -720,15 +720,17 @@ export default function MarketplaceProjetoDetalhes() {
                 {/* Dropdown para Status Geral */}
                 <div className="relative">
                   <select
+                    value={batchStatusValue}
                     onChange={(e) => {
-                      if (e.target.value) {
-                        handleUpdateStatusBatch('status', e.target.value);
+                      const valor = e.target.value;
+                      if (valor) {
+                        setBatchStatusValue(valor);
+                        handleUpdateStatusBatch('status', valor);
                       }
                     }}
-                    defaultValue=""
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
                   >
-                    <option value="" disabled>Mudar Status ({selectedPedidos.length})</option>
+                    <option value="">Mudar Status ({selectedPedidos.length})</option>
                     {statusOptions.map(s => (
                       <option key={s.value} value={s.value}>{s.label}</option>
                     ))}
@@ -738,15 +740,17 @@ export default function MarketplaceProjetoDetalhes() {
                 {/* Dropdown para Status Impressão */}
                 <div className="relative">
                   <select
+                    value={batchImpressaoValue}
                     onChange={(e) => {
-                      if (e.target.value) {
-                        handleUpdateStatusBatch('status_impressao', e.target.value);
+                      const valor = e.target.value;
+                      if (valor) {
+                        setBatchImpressaoValue(valor);
+                        handleUpdateStatusBatch('status_impressao', valor);
                       }
                     }}
-                    defaultValue=""
                     className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer"
                   >
-                    <option value="" disabled>Mudar Impressão ({selectedPedidos.length})</option>
+                    <option value="">Mudar Impressão ({selectedPedidos.length})</option>
                     {statusImpressaoOptions.map(s => (
                       <option key={s.value} value={s.value}>{s.label}</option>
                     ))}
