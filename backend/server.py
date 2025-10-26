@@ -4230,7 +4230,7 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         
         # Envio
         'opcao_envio': str(row.get('Opção de envio', '')),
-        'status': 'Aguardando Impressão',
+        'status': 'Aguardando Produção',
         
         # Metadata
         'loja_id': projeto.get('loja_id', 'fabrica'),
