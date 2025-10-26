@@ -391,6 +391,110 @@ async def login(credentials: UserLogin):
 async def get_me(current_user: dict = Depends(get_current_user)):
     return current_user
 
+# ============= GESTÃO DE USUÁRIOS =============
+
+@api_router.get("/gestao/usuarios")
+async def get_usuarios(current_user: dict = Depends(get_current_user)):
+    """Lista todos os usuários do sistema (apenas Director/Manager)"""
+    if current_user.get('role') not in ['director', 'manager']:
+        raise HTTPException(status_code=403, detail="Acesso negado")
+    
+    usuarios = await db.users.find().to_list(None)
+    
+    # Remover _id e password_hash
+    for usuario in usuarios:
+        if '_id' in usuario:
+            del usuario['_id']
+        if 'password_hash' in usuario:
+            del usuario['password_hash']
+    
+    return usuarios
+
+class UserUpdate(BaseModel):
+    username: str
+    role: str
+    password: Optional[str] = None  # Opcional para permitir atualização sem mudar senha
+
+@api_router.post("/gestao/usuarios")
+async def create_usuario(user_data: UserRegister, current_user: dict = Depends(get_current_user)):
+    """Cria novo usuário (apenas Director/Manager)"""
+    if current_user.get('role') not in ['director', 'manager']:
+        raise HTTPException(status_code=403, detail="Acesso negado")
+    
+    # Verificar se usuário já existe
+    existing = await db.users.find_one({"username": user_data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Nome de usuário já existe")
+    
+    # Criar usuário
+    user = User(
+        username=user_data.username,
+        password_hash=hash_password(user_data.password),
+        role=user_data.role
+    )
+    
+    doc = user.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.users.insert_one(doc)
+    
+    # Remover _id e password_hash da resposta
+    if '_id' in doc:
+        del doc['_id']
+    if 'password_hash' in doc:
+        del doc['password_hash']
+    
+    return doc
+
+@api_router.put("/gestao/usuarios/{user_id}")
+async def update_usuario(user_id: str, user_data: UserUpdate, current_user: dict = Depends(get_current_user)):
+    """Atualiza usuário (apenas Director/Manager)"""
+    if current_user.get('role') not in ['director', 'manager']:
+        raise HTTPException(status_code=403, detail="Acesso negado")
+    
+    # Verificar se outro usuário já usa esse username
+    existing = await db.users.find_one({"username": user_data.username, "id": {"$ne": user_id}})
+    if existing:
+        raise HTTPException(status_code=400, detail="Nome de usuário já existe")
+    
+    # Preparar atualização
+    update_data = {
+        "username": user_data.username,
+        "role": user_data.role
+    }
+    
+    # Se senha foi fornecida, atualizar
+    if user_data.password:
+        update_data['password_hash'] = hash_password(user_data.password)
+    
+    await db.users.update_one({"id": user_id}, {"$set": update_data})
+    
+    # Buscar e retornar usuário atualizado
+    usuario = await db.users.find_one({"id": user_id})
+    if usuario:
+        if '_id' in usuario:
+            del usuario['_id']
+        if 'password_hash' in usuario:
+            del usuario['password_hash']
+    
+    return usuario
+
+@api_router.delete("/gestao/usuarios/{user_id}")
+async def delete_usuario(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta usuário (apenas Director/Manager)"""
+    if current_user.get('role') not in ['director', 'manager']:
+        raise HTTPException(status_code=403, detail="Acesso negado")
+    
+    # Não permitir deletar o próprio usuário
+    if current_user.get('id') == user_id:
+        raise HTTPException(status_code=400, detail="Não é possível deletar seu próprio usuário")
+    
+    result = await db.users.delete_one({"id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    
+    return {"message": "Usuário deletado com sucesso"}
+
 # ============= DASHBOARD =============
 
 @api_router.get("/dashboard/metrics")
