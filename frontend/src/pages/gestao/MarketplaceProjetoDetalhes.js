@@ -8,10 +8,10 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api/gestao/marketplaces`;
 
 const STATUS_OPTIONS = [
-  { value: 'Aguardando Impressão', label: 'Aguardando Impressão', color: '#94A3B8' },
-  { value: 'Sala de Impressão', label: 'Sala de Impressão', color: '#60A5FA' },
+  { value: 'Aguardando Produção', label: 'Aguardando Produção', color: '#94A3B8' },
   { value: 'Em Produção', label: 'Em Produção', color: '#F59E0B' },
-  { value: 'Expedição', label: 'Expedição', color: '#FBBF24' },
+  { value: 'Pronto', label: 'Pronto', color: '#8B5CF6' },
+  { value: 'Embalagem', label: 'Embalagem', color: '#FBBF24' },
   { value: 'Enviado', label: 'Enviado', color: '#3B82F6' },
   { value: 'Entregue', label: 'Entregue', color: '#10B981' }
 ];
