@@ -2145,12 +2145,10 @@ export default function MarketplaceProjetoDetalhes() {
                                 onChange={(e) => handleUpdatePedido(pedido.id, 'status_logistica', e.target.value)}
                                 className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-2 focus:ring-blue-500"
                               >
-                                <option value="Aguardando Envio">Aguardando Envio</option>
-                                <option value="Em Separação">Em Separação</option>
-                                <option value="Pronto para Envio">Pronto para Envio</option>
-                                <option value="Em Transporte">Em Transporte</option>
-                                <option value="Entregue">Entregue</option>
-                                <option value="Problema">Problema</option>
+                                <option value="Aguardando">Aguardando</option>
+                                <option value="Em montagem">Em montagem</option>
+                                <option value="Imprimindo">Imprimindo</option>
+                                <option value="Impresso">Impresso</option>
                               </select>
                             </td>
                           </>
