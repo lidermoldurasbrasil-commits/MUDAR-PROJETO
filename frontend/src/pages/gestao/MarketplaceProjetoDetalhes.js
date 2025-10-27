@@ -1726,7 +1726,7 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
-                      /* === SHOPEE - 17 CAMPOS === */
+                      /* === SHOPEE - 18 CAMPOS ALINHADOS === */
                       <>
                         {/* 1. ID do Pedido */}
                         <td className="px-4 py-3">
@@ -1736,14 +1736,14 @@ export default function MarketplaceProjetoDetalhes() {
                         {/* 2. Status (Sistema) - Dropdown Editável */}
                         <td className="px-4 py-3">
                           <select
-                            value={pedido.status}
+                            value={pedido.status || 'Aguardando Produção'}
                             onChange={(e) => {
                               handleStatusChange(pedido.id, e.target.value);
                               handleUpdatePedido(pedido.id, 'status', e.target.value);
                             }}
                             className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                             style={{
-                              backgroundColor: STATUS_OPTIONS.find(s => s.value === pedido.status)?.color || '#94A3B8',
+                              backgroundColor: STATUS_OPTIONS.find(s => s.value === (pedido.status || 'Aguardando Produção'))?.color || '#94A3B8',
                               color: 'white'
                             }}
                           >
@@ -1753,7 +1753,7 @@ export default function MarketplaceProjetoDetalhes() {
                           </select>
                         </td>
                         
-                        {/* 3. Status do Pedido (da planilha) - Somente Leitura */}
+                        {/* 3. Status do Pedido (da planilha) */}
                         <td className="px-4 py-3">
                           <span className="text-blue-400 text-sm">{pedido.status_pedido || '-'}</span>
                         </td>
@@ -1766,7 +1766,8 @@ export default function MarketplaceProjetoDetalhes() {
                         {/* 5. Data Prevista de Envio */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">
-                            {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
+                            {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : 
+                             pedido.prazo_entrega ? new Date(pedido.prazo_entrega).toLocaleDateString('pt-BR') : '-'}
                           </span>
                         </td>
                         
@@ -1788,14 +1789,14 @@ export default function MarketplaceProjetoDetalhes() {
                         {/* 9. Preço Original */}
                         <td className="px-4 py-3">
                           <span className="text-gray-400 text-sm">
-                            R$ {pedido.preco_original?.toFixed(2) || '0.00'}
+                            R$ {(pedido.preco_original || 0).toFixed(2)}
                           </span>
                         </td>
                         
                         {/* 10. Preço Acordado */}
                         <td className="px-4 py-3">
                           <span className="text-green-400 text-sm font-medium">
-                            R$ {pedido.preco_acordado?.toFixed(2) || '0.00'}
+                            R$ {(pedido.preco_acordado || 0).toFixed(2)}
                           </span>
                         </td>
                         
@@ -1809,14 +1810,14 @@ export default function MarketplaceProjetoDetalhes() {
                         {/* 12. Taxa de Comissão */}
                         <td className="px-4 py-3">
                           <span className="text-red-400 text-sm">
-                            R$ {pedido.valor_taxa_comissao?.toFixed(2) || '0.00'}
+                            R$ {(pedido.valor_taxa_comissao || 0).toFixed(2)}
                           </span>
                         </td>
                         
                         {/* 13. Taxa de Serviço */}
                         <td className="px-4 py-3">
                           <span className="text-orange-400 text-sm">
-                            R$ {pedido.valor_taxa_servico?.toFixed(2) || '0.00'}
+                            R$ {(pedido.valor_taxa_servico || 0).toFixed(2)}
                           </span>
                         </td>
                         
