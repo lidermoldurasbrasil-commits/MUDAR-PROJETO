@@ -1666,20 +1666,42 @@ export default function MarketplaceProjetoDetalhes() {
                           onChange={handleSelectAll}
                         />
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">
-                        {projeto?.plataforma === 'mercadolivre' ? 'N.º de Venda' : 'ID do Pedido'}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">
-                        {projeto?.plataforma === 'mercadolivre' ? 'Estado' : 'Status'}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[140px]">Status Impressão</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">SKU</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">
-                        {projeto?.plataforma === 'mercadolivre' ? 'Variação' : 'Nome Variação'}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Unidades</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Comprador</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[180px]">Forma de Entrega</th>
+                      
+                      {/* Cabeçalhos condicionais por plataforma */}
+                      {projeto?.plataforma === 'mercadolivre' ? (
+                        /* === MERCADO LIVRE - 17 CAMPOS === */
+                        <>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">N.º de Venda</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Data da Venda</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Estado</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[180px]">Descrição do Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Unidades</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">SKU</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Variação</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Forma de Entrega</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Comprador</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Receita por Produtos</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Tarifa de Venda</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Tarifas de Envio</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Cancelamentos</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Total</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[200px]">Endereço</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Cidade</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Estado</th>
+                        </>
+                      ) : (
+                        /* === SHOPEE - CAMPOS ORIGINAIS === */
+                        <>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do Pedido</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[140px]">Status Impressão</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">SKU</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome Variação</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Unidades</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Comprador</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[180px]">Forma de Entrega</th>
+                        </>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="bg-gray-800 divide-y divide-gray-700">
