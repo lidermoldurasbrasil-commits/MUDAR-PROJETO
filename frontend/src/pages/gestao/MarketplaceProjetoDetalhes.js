@@ -1716,11 +1716,8 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
-                    {/* Renderização condicional por plataforma */}
                     {projeto?.plataforma === 'mercadolivre' ? (
-                      {/* === MERCADO LIVRE - 17 CAMPOS === */}
                       <>
-                        {/* TODO: Adicionar campos ML se necessário */}
                         <td className="px-4 py-3" colSpan="17">
                           <span className="text-gray-400 text-sm">Mercado Livre - Em desenvolvimento</span>
                         </td>
