@@ -970,6 +970,15 @@ export default function MarketplaceProjetoDetalhes() {
           >
             Produção
           </button>
+          {/* Aba Financeiro apenas para Shopee */}
+          {projeto?.plataforma === 'shopee' && (
+            <button
+              onClick={() => setViewMode('financeiro')}
+              className={`px-4 py-2 rounded-lg ${viewMode === 'financeiro' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
+            >
+              Financeiro
+            </button>
+          )}
           {isAdmin && (
             <button
               onClick={() => setViewMode('kanban')}
