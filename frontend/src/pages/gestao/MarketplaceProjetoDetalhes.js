@@ -652,6 +652,16 @@ export default function MarketplaceProjetoDetalhes() {
       }
     }
     
+    // Filtro de Setor (Mercado Livre)
+    if (filtros.setor && pedido.status_producao !== filtros.setor) {
+      return false;
+    }
+    
+    // Filtro de Status de Produção (Mercado Livre)
+    if (filtros.statusProducao && pedido.status_logistica !== filtros.statusProducao) {
+      return false;
+    }
+    
     return true;
   }).sort((a, b) => {
     // Ordenação por data prevista de envio
