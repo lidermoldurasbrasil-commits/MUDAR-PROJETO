@@ -31,7 +31,8 @@ const SETOR_COLORS = {
   'Molduras': '#EC4899',       // Rosa
   'Impressão': '#F59E0B',      // Laranja
   'Expedição': '#10B981',      // Verde
-  'Embalagem': '#6366F1'       // Indigo
+  'Embalagem': '#6366F1',      // Indigo
+  'Personalizado': '#14B8A6'   // Teal
 };
 
 // Cores para Status Produção
