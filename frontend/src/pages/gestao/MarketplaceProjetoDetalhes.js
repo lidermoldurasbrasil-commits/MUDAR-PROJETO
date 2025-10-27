@@ -2080,14 +2080,15 @@ export default function MarketplaceProjetoDetalhes() {
                               <select
                                 value={pedido.status_producao || 'Espelho'}
                                 onChange={(e) => handleUpdatePedido(pedido.id, 'status_producao', e.target.value)}
-                                className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-1.5 rounded-full text-white text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer"
+                                style={{ backgroundColor: SETOR_COLORS[pedido.status_producao || 'Espelho'] }}
                               >
-                                <option value="Espelho">Espelho</option>
-                                <option value="Molduras com Vidro">Molduras com Vidro</option>
-                                <option value="Molduras">Molduras</option>
-                                <option value="Impressão">Impressão</option>
-                                <option value="Expedição">Expedição</option>
-                                <option value="Embalagem">Embalagem</option>
+                                <option value="Espelho" style={{ backgroundColor: SETOR_COLORS['Espelho'] }}>🪞 Espelho</option>
+                                <option value="Molduras com Vidro" style={{ backgroundColor: SETOR_COLORS['Molduras com Vidro'] }}>🖼️ Molduras com Vidro</option>
+                                <option value="Molduras" style={{ backgroundColor: SETOR_COLORS['Molduras'] }}>🖼️ Molduras</option>
+                                <option value="Impressão" style={{ backgroundColor: SETOR_COLORS['Impressão'] }}>🖨️ Impressão</option>
+                                <option value="Expedição" style={{ backgroundColor: SETOR_COLORS['Expedição'] }}>📦 Expedição</option>
+                                <option value="Embalagem" style={{ backgroundColor: SETOR_COLORS['Embalagem'] }}>📦 Embalagem</option>
                               </select>
                             </td>
                             
