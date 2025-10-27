@@ -4566,6 +4566,13 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
         # 17. Estado (endereço)
         'estado_endereco': estado_endereco,
         
+        # CAMPOS ADICIONAIS IMPORTANTES
+        'numero_anuncio': numero_anuncio,
+        'preco_unitario_venda': preco_unitario_venda,
+        'receita_produtos': receita_produtos,
+        'tarifa_venda_impostos': tarifa_venda,
+        'tarifas_envio': tarifa_envio,
+        
         # Outros campos
         'produto_nome': titulo,
         'status_impressao': 'Pendente',
