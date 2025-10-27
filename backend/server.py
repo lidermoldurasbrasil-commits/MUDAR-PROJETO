@@ -4453,11 +4453,11 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     def detectar_setor_por_sku(sku_texto):
         """
         Detecta automaticamente o setor baseado no SKU
-        REGRAS:
-        1. MOLDURA: MM, MB, MP, SV, A4-CV
-        2. MOLDURAS COM VIDRO: MF, MB, MP, MM, MD, CX, 50X50, 30x30, 60x90, 80x120, CV (exceto A4-CV, KIT-10-A4-CV, KIT-5-A4-CV)
-        3. ESPELHO: ESPELHO, LED, ESP
-        4. IMPRESSÃO: PD
+        REGRAS ATUALIZADAS:
+        1. IMPRESSÃO (prioridade máxima): PD
+        2. ESPELHO: ESPELHO, LED, ESP
+        3. MOLDURAS COM VIDRO (prioridade alta): MF, MD, CX, CV, dimensões, números 80/120
+        4. MOLDURAS: MM, MB, MP, SV, A4-CV (apenas se não tiver indicadores de vidro)
         5. Default: Espelho
         """
         if not sku_texto or pd.isna(sku_texto):
@@ -4465,7 +4465,7 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
         
         sku = str(sku_texto).upper().strip()
         
-        # 1. IMPRESSÃO - tem prioridade pois é mais específico
+        # 1. IMPRESSÃO - tem prioridade máxima pois é mais específico
         if 'PD' in sku:
             print(f"🖨️ SKU '{sku}' → IMPRESSÃO (contém PD)")
             return 'Impressão'
@@ -4477,39 +4477,68 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
                 print(f"🪞 SKU '{sku}' → ESPELHO (contém {palavra})")
                 return 'Espelho'
         
-        # 3. MOLDURA - verificar padrões específicos
-        # Verificar se contém A4-CV (caso específico de MOLDURA)
-        if 'A4-CV' in sku:
-            print(f"🖼️ SKU '{sku}' → MOLDURA (contém A4-CV)")
-            return 'Molduras'
-        
-        # Verificar outros padrões de MOLDURA (que não têm CV)
-        padroes_moldura = ['MM', 'MB', 'MP', 'SV']
-        for padrao in padroes_moldura:
-            if padrao in sku and 'CV' not in sku:  # Não contém CV
-                print(f"🖼️ SKU '{sku}' → MOLDURA (contém {padrao})")
-                return 'Molduras'
-        
-        # 4. MOLDURAS COM VIDRO - verificar padrões
-        # Primeiro, excluir os casos específicos que vão para MOLDURA
+        # 3. MOLDURAS COM VIDRO - PRIORIDADE ALTA (verificar ANTES de Molduras)
+        # Excluir apenas os casos específicos A4-CV
         exclusoes_cv = ['A4-CV', 'KIT-10-A4-CV', 'KIT-5-A4-CV']
         tem_exclusao = any(exc in sku for exc in exclusoes_cv)
         
-        if not tem_exclusao:
-            # Verificar padrões alfanuméricos
-            padroes_vidro = ['MF', 'MB', 'MP', 'MM', 'MD', 'CX', 'CV']
-            for padrao in padroes_vidro:
-                if padrao in sku:
-                    print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém {padrao})")
+        if tem_exclusao:
+            # Casos especiais que vão para MOLDURAS
+            print(f"🖼️ SKU '{sku}' → MOLDURAS (exceção A4-CV)")
+            return 'Molduras'
+        
+        # Verificar padrões alfanuméricos de VIDRO (prioridade alta)
+        padroes_vidro = ['MF', 'MD', 'CX', 'CV']  # Removido MB, MP, MM, SV para verificar separadamente
+        for padrao in padroes_vidro:
+            if padrao in sku:
+                print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém {padrao})")
+                return 'Molduras com Vidro'
+        
+        # Verificar números isolados que indicam dimensões (80, 120)
+        if ' 80' in sku or ' 120' in sku or sku.startswith('80') or sku.startswith('120'):
+            print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém número de dimensão)")
+            return 'Molduras com Vidro'
+        
+        # Verificar padrões de dimensões (formato: 50X50, 30x30, 80x120, etc)
+        dimensoes = ['50X50', '30X30', '60X90', '80X120', '40X50', '40X60']
+        sku_upper = sku.replace('x', 'X').replace('X', 'X')  # Normalizar x para X
+        for dim in dimensoes:
+            if dim in sku_upper:
+                print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém dimensão {dim})")
+                return 'Molduras com Vidro'
+        
+        # Verificar padrões que podem ser tanto Molduras quanto Vidro
+        # Se contém MB, MP, MM junto com indicadores de vidro, vai para Vidro
+        padroes_ambiguos = ['MB', 'MP', 'MM']
+        for padrao in padroes_ambiguos:
+            if padrao in sku:
+                # Se tem outros indicadores de vidro junto, vai para Molduras com Vidro
+                if any(ind in sku for ind in ['CX', 'MD', 'MF', 'CV', 'X50', 'X30', 'X60', 'X80', 'X120']):
+                    print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém {padrao} + indicadores de vidro)")
                     return 'Molduras com Vidro'
-            
-            # Verificar padrões de dimensões (formato: 50X50, 30x30, etc)
-            dimensoes = ['50X50', '30X30', '60X90', '80X120']
-            sku_upper = sku.replace('x', 'X')  # Normalizar x para X
-            for dim in dimensoes:
-                if dim in sku_upper:
-                    print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém dimensão {dim})")
+        
+        # 4. MOLDURAS - apenas padrões específicos SEM indicadores de vidro
+        # SV e A4-CV específicos para molduras
+        padroes_moldura = ['SV']
+        for padrao in padroes_moldura:
+            if padrao in sku:
+                # Verificar se NÃO tem indicadores de vidro
+                if not any(ind in sku for ind in ['CX', 'MD', 'MF', 'CV', 'X50', 'X30', 'X60', 'X80', 'X120']):
+                    print(f"🖼️ SKU '{sku}' → MOLDURAS (contém {padrao} sem vidro)")
+                    return 'Molduras'
+                else:
+                    # Tem SV mas também tem indicadores de vidro
+                    print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém {padrao} + indicadores de vidro)")
                     return 'Molduras com Vidro'
+        
+        # Verificar MM, MB, MP sem outros indicadores
+        padroes_moldura_simples = ['MM', 'MB', 'MP']
+        for padrao in padroes_moldura_simples:
+            if padrao in sku and 'CV' not in sku:
+                # Se não tem CV nem dimensões, vai para Molduras
+                if not any(ind in sku for ind in ['CX', 'MD', 'MF', 'X50', 'X30', 'X60', 'X80', 'X120']):
+                    print(f"🖼️ SKU '{sku}' → MOLDURAS (contém {padrao} sem vidro)")
+                    return 'Molduras'
         
         # 5. Padrão se não encontrou nenhuma correspondência
         print(f"⭐ SKU '{sku}' → ESPELHO (padrão)")
