@@ -1727,14 +1727,9 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
-                      /* === SHOPEE - 18 CAMPOS ALINHADOS === */
+                      /* === SHOPEE - 2 STATUS SISTEMA + 17 CAMPOS PLANILHA === */
                       <>
-                        {/* 1. ID do Pedido */}
-                        <td className="px-4 py-3">
-                          <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
-                        </td>
-                        
-                        {/* 2. Status (Sistema) - Dropdown Editável */}
+                        {/* STATUS DO SISTEMA 1 - Status Geral */}
                         <td className="px-4 py-3">
                           <select
                             value={pedido.status || 'Aguardando Produção'}
@@ -1754,17 +1749,39 @@ export default function MarketplaceProjetoDetalhes() {
                           </select>
                         </td>
                         
-                        {/* 3. Status do Pedido (da planilha) */}
+                        {/* STATUS DO SISTEMA 2 - Status Impressão */}
+                        <td className="px-4 py-3">
+                          <select
+                            value={pedido.status_impressao || 'Aguardando Impressão'}
+                            onChange={(e) => handleUpdatePedido(pedido.id, 'status_impressao', e.target.value)}
+                            className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                            style={{
+                              backgroundColor: STATUS_IMPRESSAO_OPTIONS.find(s => s.value === (pedido.status_impressao || 'Aguardando Impressão'))?.color || '#94A3B8',
+                              color: 'white'
+                            }}
+                          >
+                            {statusImpressaoOptions.map(s => (
+                              <option key={s.value} value={s.value}>{s.label}</option>
+                            ))}
+                          </select>
+                        </td>
+                        
+                        {/* 1. ID do pedido */}
+                        <td className="px-4 py-3">
+                          <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
+                        </td>
+                        
+                        {/* 2. Status do pedido (da planilha) */}
                         <td className="px-4 py-3">
                           <span className="text-blue-400 text-sm">{pedido.status_pedido || '-'}</span>
                         </td>
                         
-                        {/* 4. Opção de Envio */}
+                        {/* 3. Opção de envio */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
                         </td>
                         
-                        {/* 5. Data Prevista de Envio */}
+                        {/* 4. Data prevista de envio */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">
                             {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : 
@@ -1772,77 +1789,77 @@ export default function MarketplaceProjetoDetalhes() {
                           </span>
                         </td>
                         
-                        {/* 6. Número de Referência SKU */}
+                        {/* 5. Número de referência SKU */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.numero_referencia_sku || pedido.sku || '-'}</span>
                         </td>
                         
-                        {/* 7. Quantidade */}
+                        {/* 6. Quantidade */}
                         <td className="px-4 py-3">
                           <span className="text-white font-medium text-center block">{pedido.quantidade || 1}</span>
                         </td>
                         
-                        {/* 8. Nome da Variação */}
+                        {/* 7. Nome da variação */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
                         </td>
                         
-                        {/* 9. Preço Original */}
+                        {/* 8. Preço original */}
                         <td className="px-4 py-3">
                           <span className="text-gray-400 text-sm">
                             R$ {(pedido.preco_original || 0).toFixed(2)}
                           </span>
                         </td>
                         
-                        {/* 10. Preço Acordado */}
+                        {/* 9. Preço acordado */}
                         <td className="px-4 py-3">
                           <span className="text-green-400 text-sm font-medium">
                             R$ {(pedido.preco_acordado || 0).toFixed(2)}
                           </span>
                         </td>
                         
-                        {/* 11. Valor Total */}
+                        {/* 10. Valor Total */}
                         <td className="px-4 py-3">
                           <span className="text-green-400 text-sm font-bold">
                             R$ {(pedido.valor_total_pedido || pedido.valor_total || 0).toFixed(2)}
                           </span>
                         </td>
                         
-                        {/* 12. Taxa de Comissão */}
+                        {/* 11. Taxa de comissão */}
                         <td className="px-4 py-3">
                           <span className="text-red-400 text-sm">
                             R$ {(pedido.valor_taxa_comissao || 0).toFixed(2)}
                           </span>
                         </td>
                         
-                        {/* 13. Taxa de Serviço */}
+                        {/* 12. Taxa de serviço */}
                         <td className="px-4 py-3">
                           <span className="text-orange-400 text-sm">
                             R$ {(pedido.valor_taxa_servico || 0).toFixed(2)}
                           </span>
                         </td>
                         
-                        {/* 14. Nome de Usuário (comprador) */}
+                        {/* 13. Nome de usuário (comprador) */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.nome_usuario_comprador || '-'}</span>
                         </td>
                         
-                        {/* 15. Nome do Destinatário */}
+                        {/* 14. Nome do destinatário */}
                         <td className="px-4 py-3">
                           <span className="text-white text-sm">{pedido.cliente_nome || '-'}</span>
                         </td>
                         
-                        {/* 16. Endereço de Entrega */}
+                        {/* 15. Endereço de entrega */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-xs">{pedido.endereco_entrega || pedido.endereco || '-'}</span>
                         </td>
                         
-                        {/* 17. Cidade */}
+                        {/* 16. Cidade */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.cidade || '-'}</span>
                         </td>
                         
-                        {/* 18. UF */}
+                        {/* 17. UF */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.uf || pedido.estado_endereco || '-'}</span>
                         </td>
