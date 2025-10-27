@@ -2417,8 +2417,19 @@ export default function MarketplaceProjetoDetalhes() {
               
               <div>
                 <p className="text-sm text-gray-400 mb-4">
-                  Faça upload da planilha de pedidos exportada do {projeto?.nome}. 
-                  Formatos aceitos: Excel (.xlsx, .xls) ou CSV (.csv)
+                  {uploadFormato === 'shopee' ? (
+                    <>
+                      Faça upload da planilha de pedidos exportada do <span className="text-orange-400 font-semibold">Shopee</span>. 
+                      A planilha deve conter <span className="text-white font-semibold">17 campos completos</span> com todas as informações do pedido.
+                    </>
+                  ) : (
+                    <>
+                      Faça upload da planilha de pedidos exportada do <span className="text-yellow-400 font-semibold">Mercado Livre</span>. 
+                      O cabeçalho da planilha começa na <span className="text-white font-semibold">linha 6</span>.
+                    </>
+                  )}
+                  <br />
+                  <span className="text-gray-500 text-xs">Formatos aceitos: Excel (.xlsx, .xls) ou CSV (.csv)</span>
                 </p>
                 
                 <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
