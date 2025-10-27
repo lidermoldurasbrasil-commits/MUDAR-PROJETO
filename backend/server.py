@@ -1801,6 +1801,15 @@ class PedidoMarketplace(BaseModel):
     cidade: str = ""  # Cidade
     estado_endereco: str = ""  # Estado (do endereço)
     
+    # Campos específicos Shopee
+    status_pedido: str = ""  # Status do pedido original da planilha
+    numero_referencia_sku: str = ""  # Número de referência SKU
+    preco_original: float = 0  # Preço Original
+    valor_total_pedido: float = 0  # Valor total do pedido
+    nome_usuario_comprador: str = ""  # Nome de usuário (comprador)
+    endereco_entrega: str = ""  # Endereço de entrega completo
+    uf: str = ""  # UF (estado)
+    
     # Status e Fluxo
     status: str = "Aguardando Produção"  # Aguardando Produção, Em Produção, Pronto, Embalagem, Enviado, Entregue
     status_cor: str = "#94A3B8"  # Cor do badge de status
