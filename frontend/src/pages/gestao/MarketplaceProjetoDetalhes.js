@@ -1087,7 +1087,7 @@ export default function MarketplaceProjetoDetalhes() {
                       <>
                         {/* 1. N.º de Venda */}
                         <td className="px-4 py-3">
-                          <span className="text-white text-sm">{pedido.numero_pedido || '-'}</span>
+                          <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
                         </td>
                         
                         {/* 2. Data da Venda */}
