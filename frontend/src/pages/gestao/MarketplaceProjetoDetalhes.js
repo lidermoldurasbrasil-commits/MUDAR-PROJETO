@@ -2441,36 +2441,56 @@ export default function MarketplaceProjetoDetalhes() {
                 </div>
               </div>
 
-              <div className="bg-gray-900 rounded-lg p-4">
+              <div className="bg-gray-900 rounded-lg p-4 max-h-96 overflow-y-auto">
                 <h4 className="text-sm font-medium text-white mb-2">Colunas esperadas na planilha:</h4>
                 {uploadFormato === 'shopee' ? (
                   <ul className="text-sm text-gray-400 space-y-1">
-                    <li>• ID do Pedido (obrigatório)</li>
-                    <li>• Número de Referência SKU</li>
-                    <li>• Nome da Variação</li>
-                    <li>• Nome do Produto</li>
-                    <li>• Quantidade</li>
-                    <li>• Preço Acordado</li>
-                    <li>• Taxa de Comissão</li>
-                    <li>• Taxa de Serviço</li>
+                    <li>• <span className="text-red-400">ID do Pedido (obrigatório)</span></li>
+                    <li>• Status do Pedido</li>
                     <li>• Opção de Envio</li>
                     <li>• Data Prevista de Envio</li>
+                    <li>• Número de Referência SKU</li>
+                    <li>• Quantidade</li>
+                    <li>• Nome da Variação</li>
+                    <li>• Preço Original</li>
+                    <li>• Preço Acordado</li>
+                    <li>• Valor Total</li>
+                    <li>• Taxa de Comissão</li>
+                    <li>• Taxa de Serviço</li>
+                    <li>• Nome de Usuário (Comprador)</li>
+                    <li>• Nome do Destinatário</li>
+                    <li>• Endereço de Entrega</li>
+                    <li>• Cidade</li>
+                    <li>• UF</li>
                   </ul>
                 ) : (
                   <ul className="text-sm text-gray-400 space-y-1">
-                    <li>• N.º de venda (obrigatório)</li>
+                    <li>• <span className="text-red-400">N.º de Venda (obrigatório)</span></li>
+                    <li>• Data da Venda</li>
                     <li>• Estado</li>
+                    <li>• Descrição do Status</li>
                     <li>• Unidades</li>
-                    <li>• SKU</li>
-                    <li>• Variação</li>
-                    <li>• Comprador</li>
-                    <li>• Forma de entrega</li>
-                    <li>• Receita por produtos (BRL)</li>
-                    <li>• Tarifa de venda e impostos (BRL)</li>
-                    <li>• Tarifas de envio (BRL)</li>
+                    <li>• Receita por Produtos (BRL)</li>
+                    <li>• Tarifa de Venda e Impostos (BRL)</li>
+                    <li>• Tarifas de Envio (BRL)</li>
+                    <li>• Cancelamentos e Reembolsos (BRL)</li>
                     <li>• Total (BRL)</li>
+                    <li>• SKU</li>
+                    <li>• # de Anúncio</li>
+                    <li>• Variação</li>
+                    <li>• Preço Unitário de Venda do Anúncio (BRL)</li>
+                    <li>• Comprador</li>
+                    <li>• Endereço</li>
+                    <li>• Cidade</li>
+                    <li>• Estado (Endereço)</li>
+                    <li>• Forma de Entrega</li>
                   </ul>
                 )}
+                <p className="text-xs text-gray-500 mt-3 italic">
+                  {uploadFormato === 'shopee' 
+                    ? '📌 A planilha deve conter todos os 17 campos acima para importação completa.'
+                    : '📌 A planilha deve conter os campos acima. O cabeçalho começa na linha 6.'}
+                </p>
               </div>
             </div>
 
