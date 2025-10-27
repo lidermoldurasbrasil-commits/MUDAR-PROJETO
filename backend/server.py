@@ -4511,8 +4511,8 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
                 return 'Molduras com Vidro'
         
         # Verificar padrões que podem ser tanto Molduras quanto Vidro
-        # Se contém MB, MP, MM junto com indicadores de vidro, vai para Vidro
-        padroes_ambiguos = ['MB', 'MP', 'MM']
+        # MB e MP podem ir para Vidro se tiverem indicadores
+        padroes_ambiguos = ['MB', 'MP']  # Removido MM - MM vai SEMPRE para Molduras
         for padrao in padroes_ambiguos:
             if padrao in sku:
                 # Se tem outros indicadores de vidro junto, vai para Molduras com Vidro
@@ -4520,8 +4520,13 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
                     print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém {padrao} + indicadores de vidro)")
                     return 'Molduras com Vidro'
         
-        # 4. MOLDURAS - apenas padrões específicos SEM indicadores de vidro
-        # SV e A4-CV específicos para molduras
+        # 4. MOLDURAS - padrões que vão SEMPRE para Molduras
+        # MM vai SEMPRE para Molduras, independente de outros indicadores
+        if 'MM' in sku:
+            print(f"🖼️ SKU '{sku}' → MOLDURAS (contém MM - prioridade Molduras)")
+            return 'Molduras'
+        
+        # SV específico para molduras
         padroes_moldura = ['SV']
         for padrao in padroes_moldura:
             if padrao in sku:
@@ -4534,8 +4539,8 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
                     print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém {padrao} + indicadores de vidro)")
                     return 'Molduras com Vidro'
         
-        # Verificar MM, MB, MP sem outros indicadores
-        padroes_moldura_simples = ['MM', 'MB', 'MP']
+        # Verificar MB, MP sem outros indicadores (já verificado acima se tem indicadores)
+        padroes_moldura_simples = ['MB', 'MP']  # Removido MM
         for padrao in padroes_moldura_simples:
             if padrao in sku and 'CV' not in sku:
                 # Se não tem CV nem dimensões, vai para Molduras
