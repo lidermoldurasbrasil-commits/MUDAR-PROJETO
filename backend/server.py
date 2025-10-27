@@ -4503,8 +4503,20 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     # 16. Cidade
     cidade = get_string_value('Cidade')
     # 17. Estado (endereço) - usar outra coluna de estado se houver duplicata
-    estado_endereco = cidade  # Assumindo que o estado está junto
+    # Buscar na coluna Estado duplicada (a segunda coluna Estado é para endereço)
+    colunas = list(row.index)
+    estado_colunas = [col for col in colunas if col == 'Estado']
+    if len(estado_colunas) >= 2:
+        # Segunda coluna Estado é o estado do endereço
+        estado_endereco = str(row.iloc[colunas.index(estado_colunas[1])]) if not pd.isna(row.iloc[colunas.index(estado_colunas[1])]) else ''
+    else:
+        estado_endereco = cidade
     
+    # CAMPOS ADICIONAIS IMPORTANTES
+    # # de anúncio
+    numero_anuncio = get_string_value('# de anúncio')
+    # Preço unitário de venda do anúncio (BRL)
+    preco_unitario_venda = get_float_value('Preço unitário de venda do anúncio (BRL)')
     # Título do anúncio
     titulo = get_string_value('Título do anúncio')
     
