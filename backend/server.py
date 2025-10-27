@@ -1800,6 +1800,11 @@ class PedidoMarketplace(BaseModel):
     endereco: str = ""  # Endereço completo
     cidade: str = ""  # Cidade
     estado_endereco: str = ""  # Estado (do endereço)
+    numero_anuncio: str = ""  # # de anúncio
+    preco_unitario_venda: float = 0  # Preço unitário de venda do anúncio (BRL)
+    receita_produtos: float = 0  # Receita por produtos (BRL)
+    tarifa_venda_impostos: float = 0  # Tarifa de venda e impostos (BRL)
+    tarifas_envio: float = 0  # Tarifas de envio (BRL)
     
     # Campos específicos Shopee
     status_pedido: str = ""  # Status do pedido original da planilha
