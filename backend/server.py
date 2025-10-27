@@ -4410,18 +4410,6 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         pedido_data['valor_liquido'] = 0
     
     return pedido_data
-    
-    # Calcular taxas percentuais
-    if preco_acordado > 0:
-        if taxa_comissao_valor > 0:
-            pedido_data['taxa_comissao'] = (taxa_comissao_valor / preco_acordado) * 100
-        if taxa_servico_valor > 0:
-            pedido_data['taxa_servico'] = (taxa_servico_valor / preco_acordado) * 100
-        pedido_data['valor_liquido'] = preco_acordado - taxa_comissao_valor - taxa_servico_valor
-    else:
-        pedido_data['valor_liquido'] = 0
-    
-    return pedido_data
 
 
 def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
