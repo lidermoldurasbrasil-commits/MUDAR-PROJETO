@@ -2162,14 +2162,15 @@ export default function MarketplaceProjetoDetalhes() {
                             
                             <td className="px-4 py-3">
                               <select
-                                value={pedido.status_logistica || 'Aguardando Envio'}
+                                value={pedido.status_logistica || 'Aguardando'}
                                 onChange={(e) => handleUpdatePedido(pedido.id, 'status_logistica', e.target.value)}
-                                className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-1.5 rounded-full text-white text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer"
+                                style={{ backgroundColor: STATUS_PRODUCAO_COLORS[pedido.status_logistica || 'Aguardando'] }}
                               >
-                                <option value="Aguardando">Aguardando</option>
-                                <option value="Em montagem">Em montagem</option>
-                                <option value="Imprimindo">Imprimindo</option>
-                                <option value="Impresso">Impresso</option>
+                                <option value="Aguardando" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Aguardando'] }}>⏳ Aguardando</option>
+                                <option value="Em montagem" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Em montagem'] }}>🔧 Em montagem</option>
+                                <option value="Imprimindo" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Imprimindo'] }}>🖨️ Imprimindo</option>
+                                <option value="Impresso" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Impresso'] }}>✅ Impresso</option>
                               </select>
                             </td>
                           </>
