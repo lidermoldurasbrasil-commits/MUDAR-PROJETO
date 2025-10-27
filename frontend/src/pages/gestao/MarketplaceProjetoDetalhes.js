@@ -1641,7 +1641,7 @@ export default function MarketplaceProjetoDetalhes() {
               <div className="space-y-3">
                 {pedidosPorStatus[statusOption.value]?.map(pedido => (
                   <div
-                    key={pedido.id}
+                    key={`kanban-pedido-${pedido.id}`}
                     className="bg-gray-900 rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer border-l-4"
                     style={{ borderLeftColor: statusOption.color }}
                   >
