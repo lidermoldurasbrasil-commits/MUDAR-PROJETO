@@ -1733,94 +1733,116 @@ export default function MarketplaceProjetoDetalhes() {
                           <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
                         </td>
                         
-                        {/* 2. Status do Pedido */}
+                        {/* 2. Status (Sistema) - Dropdown Editável */}
                         <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.status_pedido || '-'}</span>
+                          <select
+                            value={pedido.status}
+                            onChange={(e) => {
+                              handleStatusChange(pedido.id, e.target.value);
+                              handleUpdatePedido(pedido.id, 'status', e.target.value);
+                            }}
+                            className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                            style={{
+                              backgroundColor: STATUS_OPTIONS.find(s => s.value === pedido.status)?.color || '#94A3B8',
+                              color: 'white'
+                            }}
+                          >
+                            {statusOptions.map(s => (
+                              <option key={s.value} value={s.value}>{s.label}</option>
+                            ))}
+                          </select>
                         </td>
                         
-                        {/* 3. Opção de Envio */}
+                        {/* 3. Status do Pedido (da planilha) - Somente Leitura */}
+                        <td className="px-4 py-3">
+                          <span className="text-blue-400 text-sm">{pedido.status_pedido || '-'}</span>
+                        </td>
+                        
+                        {/* 4. Opção de Envio */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
                         </td>
                         
-                        {/* 4. Data Prevista de Envio */}
+                        {/* 5. Data Prevista de Envio */}
                         <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}</span>
+                          <span className="text-gray-300 text-sm">
+                            {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
+                          </span>
                         </td>
                         
-                        {/* 5. Número de Referência SKU */}
+                        {/* 6. Número de Referência SKU */}
                         <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.numero_referencia_sku || '-'}</span>
+                          <span className="text-gray-300 text-sm">{pedido.numero_referencia_sku || pedido.sku || '-'}</span>
                         </td>
                         
-                        {/* 6. Quantidade */}
+                        {/* 7. Quantidade */}
                         <td className="px-4 py-3">
                           <span className="text-white font-medium text-center block">{pedido.quantidade || 1}</span>
                         </td>
                         
-                        {/* 7. Nome da Variação */}
+                        {/* 8. Nome da Variação */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
                         </td>
                         
-                        {/* 8. Preço Original */}
+                        {/* 9. Preço Original */}
                         <td className="px-4 py-3">
                           <span className="text-gray-400 text-sm">
                             R$ {pedido.preco_original?.toFixed(2) || '0.00'}
                           </span>
                         </td>
                         
-                        {/* 9. Preço Acordado */}
+                        {/* 10. Preço Acordado */}
                         <td className="px-4 py-3">
                           <span className="text-green-400 text-sm font-medium">
                             R$ {pedido.preco_acordado?.toFixed(2) || '0.00'}
                           </span>
                         </td>
                         
-                        {/* 10. Valor Total */}
+                        {/* 11. Valor Total */}
                         <td className="px-4 py-3">
                           <span className="text-green-400 text-sm font-bold">
-                            R$ {pedido.valor_total_pedido?.toFixed(2) || pedido.valor_total?.toFixed(2) || '0.00'}
+                            R$ {(pedido.valor_total_pedido || pedido.valor_total || 0).toFixed(2)}
                           </span>
                         </td>
                         
-                        {/* 11. Taxa de Comissão */}
+                        {/* 12. Taxa de Comissão */}
                         <td className="px-4 py-3">
                           <span className="text-red-400 text-sm">
                             R$ {pedido.valor_taxa_comissao?.toFixed(2) || '0.00'}
                           </span>
                         </td>
                         
-                        {/* 12. Taxa de Serviço */}
+                        {/* 13. Taxa de Serviço */}
                         <td className="px-4 py-3">
                           <span className="text-orange-400 text-sm">
                             R$ {pedido.valor_taxa_servico?.toFixed(2) || '0.00'}
                           </span>
                         </td>
                         
-                        {/* 13. Nome de Usuário (comprador) */}
+                        {/* 14. Nome de Usuário (comprador) */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.nome_usuario_comprador || '-'}</span>
                         </td>
                         
-                        {/* 14. Nome do Destinatário */}
+                        {/* 15. Nome do Destinatário */}
                         <td className="px-4 py-3">
                           <span className="text-white text-sm">{pedido.cliente_nome || '-'}</span>
                         </td>
                         
-                        {/* 15. Endereço de Entrega */}
+                        {/* 16. Endereço de Entrega */}
                         <td className="px-4 py-3">
-                          <span className="text-gray-300 text-xs">{pedido.endereco_entrega || '-'}</span>
+                          <span className="text-gray-300 text-xs">{pedido.endereco_entrega || pedido.endereco || '-'}</span>
                         </td>
                         
-                        {/* 16. Cidade */}
+                        {/* 17. Cidade */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.cidade || '-'}</span>
                         </td>
                         
-                        {/* 17. UF */}
+                        {/* 18. UF */}
                         <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.uf || '-'}</span>
+                          <span className="text-gray-300 text-sm">{pedido.uf || pedido.estado_endereco || '-'}</span>
                         </td>
                       </>
                     )}
