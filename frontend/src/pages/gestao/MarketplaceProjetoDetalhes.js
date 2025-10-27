@@ -1718,6 +1718,18 @@ export default function MarketplaceProjetoDetalhes() {
                         </td>
                         
                         <td className="px-4 py-3">
+                          <select
+                            value={pedido.status_producao || 'Aguardando Produção'}
+                            onChange={(e) => handleUpdatePedido(pedido.id, 'status_producao', e.target.value)}
+                            className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          >
+                            {statusOptions.map(s => (
+                              <option key={s.nome} value={s.nome}>{s.nome}</option>
+                            ))}
+                          </select>
+                        </td>
+                        
+                        <td className="px-4 py-3">
                           <span className="text-white font-medium text-center block">{pedido.quantidade || 1}</span>
                         </td>
                         
@@ -1735,6 +1747,21 @@ export default function MarketplaceProjetoDetalhes() {
                         
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
+                        </td>
+                        
+                        <td className="px-4 py-3">
+                          <select
+                            value={pedido.status_logistica || 'Aguardando Envio'}
+                            onChange={(e) => handleUpdatePedido(pedido.id, 'status_logistica', e.target.value)}
+                            className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="Aguardando Envio">Aguardando Envio</option>
+                            <option value="Em Separação">Em Separação</option>
+                            <option value="Pronto para Envio">Pronto para Envio</option>
+                            <option value="Em Transporte">Em Transporte</option>
+                            <option value="Entregue">Entregue</option>
+                            <option value="Problema">Problema</option>
+                          </select>
                         </td>
                         
                         <td className="px-4 py-3">
