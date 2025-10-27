@@ -1725,51 +1725,14 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
-                      /* === SHOPEE - 2 STATUS SISTEMA + 17 CAMPOS PLANILHA === */
+                      /* === SHOPEE - 17 CAMPOS DA PLANILHA === */
                       <>
-                        {/* STATUS DO SISTEMA 1 - Status Geral */}
-                        <td className="px-4 py-3">
-                          <select
-                            value={pedido.status || 'Aguardando Produção'}
-                            onChange={(e) => {
-                              handleStatusChange(pedido.id, e.target.value);
-                              handleUpdatePedido(pedido.id, 'status', e.target.value);
-                            }}
-                            className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                            style={{
-                              backgroundColor: STATUS_OPTIONS.find(s => s.value === (pedido.status || 'Aguardando Produção'))?.color || '#94A3B8',
-                              color: 'white'
-                            }}
-                          >
-                            {statusOptions.map(s => (
-                              <option key={s.value} value={s.value}>{s.label}</option>
-                            ))}
-                          </select>
-                        </td>
-                        
-                        {/* STATUS DO SISTEMA 2 - Status Impressão */}
-                        <td className="px-4 py-3">
-                          <select
-                            value={pedido.status_impressao || 'Aguardando Impressão'}
-                            onChange={(e) => handleUpdatePedido(pedido.id, 'status_impressao', e.target.value)}
-                            className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                            style={{
-                              backgroundColor: STATUS_IMPRESSAO_OPTIONS.find(s => s.value === (pedido.status_impressao || 'Aguardando Impressão'))?.color || '#94A3B8',
-                              color: 'white'
-                            }}
-                          >
-                            {statusImpressaoOptions.map(s => (
-                              <option key={s.value} value={s.value}>{s.label}</option>
-                            ))}
-                          </select>
-                        </td>
-                        
                         {/* 1. ID do pedido */}
                         <td className="px-4 py-3">
                           <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
                         </td>
                         
-                        {/* 2. Status do pedido (da planilha) */}
+                        {/* 2. Status do pedido */}
                         <td className="px-4 py-3">
                           <span className="text-blue-400 text-sm">{pedido.status_pedido || '-'}</span>
                         </td>
