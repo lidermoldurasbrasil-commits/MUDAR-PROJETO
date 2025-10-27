@@ -1699,25 +1699,14 @@ export default function MarketplaceProjetoDetalhes() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Estado</th>
                         </>
                       ) : (
-                        {/* === SHOPEE - 17 CAMPOS EXATOS DA PLANILHA === */}
+                        {/* === SHOPEE PRODUÇÃO - 6 CAMPOS OPERACIONAIS === */}
                         <>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do pedido</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status do pedido</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Opção de envio</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[140px]">Data prevista de envio</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Número de referência SKU</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome da variação</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Preço original</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Preço acordado</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Valor Total</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Taxa de comissão</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Taxa de serviço</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[180px]">Nome de usuário (comprador)</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome do destinatário</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[200px]">Endereço de entrega</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Cidade</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">UF</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
                         </>
                       )}
                     </tr>
