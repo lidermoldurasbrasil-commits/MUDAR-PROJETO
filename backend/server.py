@@ -4216,68 +4216,143 @@ async def create_pedidos_bulk(pedidos: list[PedidoMarketplace], current_user: di
 # ============= FUNÇÕES DE PROCESSAMENTO DE PLANILHAS =============
 
 def processar_linha_shopee(row, projeto_id, projeto, current_user):
-    """Processa uma linha da planilha Shopee"""
+    """Processa uma linha da planilha Shopee - TODOS OS 17 CAMPOS"""
     import pandas as pd
     
-    # Obter ID do pedido
-    numero_pedido = str(row.get('ID do pedido', ''))
+    # Helper para pegar valores com fallback
+    def get_value(col, default=''):
+        val = row.get(col, default)
+        if pd.isna(val):
+            return default
+        return str(val)
     
+    def get_float(col, default=0.0):
+        val = row.get(col, default)
+        if pd.isna(val):
+            return default
+        try:
+            return float(val)
+        except:
+            return default
+    
+    # 1. ID do pedido
+    numero_pedido = get_value('ID do pedido')
     if not numero_pedido:
         return None
     
-    # Mapear colunas da planilha Shopee para o modelo
+    # 2. Status do pedido
+    status_pedido = get_value('Status do pedido')
+    
+    # 3. Opção de envio
+    opcao_envio = get_value('Opção de envio')
+    
+    # 4. Data prevista de envio
+    data_prevista = None
+    try:
+        data_prevista_raw = row.get('Data prevista de envio')
+        if data_prevista_raw and not pd.isna(data_prevista_raw):
+            data_prevista = pd.to_datetime(data_prevista_raw).isoformat()
+    except:
+        pass
+    
+    # 5. Número de referência SKU
+    numero_referencia_sku = get_value('Número de referência SKU')
+    
+    # 6. Quantidade
+    quantidade = 1
+    try:
+        qtd = row.get('Quantidade', 1)
+        if not pd.isna(qtd):
+            quantidade = int(float(qtd))
+    except:
+        quantidade = 1
+    
+    # 7. Nome da variação
+    nome_variacao = get_value('Nome da variação')
+    
+    # 8. Preço Original
+    preco_original = get_float('Preço Original')
+    
+    # 9. Preço acordado
+    preco_acordado = get_float('Preço acordado')
+    
+    # 10. Valor total
+    valor_total = get_float('Valor total')
+    
+    # 11. Taxa de comissão
+    taxa_comissao_valor = get_float('Taxa de comissão')
+    
+    # 12. Taxa de serviço
+    taxa_servico_valor = get_float('Taxa de serviço')
+    
+    # 13. Nome de usuário (comprador)
+    nome_usuario = get_value('Nome de usuário (comprador)')
+    
+    # 14. Nome do destinatário
+    nome_destinatario = get_value('Nome do destinatário')
+    
+    # 15. Endereço de entrega
+    endereco_entrega = get_value('Endereço de entrega')
+    
+    # 16. Cidade
+    cidade = get_value('Cidade')
+    
+    # 17. UF
+    uf = get_value('UF')
+    
+    # Identificar tipo de envio
+    tipo_envio = 'Outro'
+    if 'shopee xpress' in opcao_envio.lower():
+        tipo_envio = 'Coleta'
+    elif 'retirada pelo comprador' in opcao_envio.lower():
+        tipo_envio = 'Coleta'
+    elif 'shopee entrega direta' in opcao_envio.lower():
+        tipo_envio = 'Flex Shopee'
+    
+    # Montar objeto completo
     pedido_data = {
         'id': str(uuid.uuid4()),
         'projeto_id': projeto_id,
         'plataforma': projeto['plataforma'],
         
-        # Dados do pedido
-        'numero_pedido': str(row.get('ID do pedido', '')),
-        'numero_referencia_sku': str(row.get('Número de referência SKU', row.get('Nº de referência do SKU principal', ''))),
-        'sku': str(row.get('Número de referência SKU', '')),
-        'nome_variacao': str(row.get('Nome da variação', '')),
-        'produto_nome': str(row.get('Nome do Produto', '')),
+        # 17 campos da planilha
+        'numero_pedido': numero_pedido,  # 1
+        'status_pedido': status_pedido,  # 2
+        'opcao_envio': opcao_envio,  # 3
+        'data_prevista_envio': data_prevista,  # 4
+        'numero_referencia_sku': numero_referencia_sku,  # 5
+        'quantidade': quantidade,  # 6
+        'nome_variacao': nome_variacao,  # 7
+        'preco_original': preco_original,  # 8
+        'preco_acordado': preco_acordado,  # 9
+        'valor_total_pedido': valor_total,  # 10
+        'valor_taxa_comissao': taxa_comissao_valor,  # 11
+        'valor_taxa_servico': taxa_servico_valor,  # 12
+        'nome_usuario_comprador': nome_usuario,  # 13
+        'cliente_nome': nome_destinatario,  # 14
+        'endereco_entrega': endereco_entrega,  # 15
+        'cidade': cidade,  # 16
+        'uf': uf,  # 17
         
-        # Cliente
-        'cliente_nome': str(row.get('Nome do destinatário', row.get('Nome de usuário (comprador)', ''))),
-        'cliente_contato': str(row.get('Telefone', '')),
-        
-        # Valores
-        'quantidade': int(row.get('Quantidade', 1)),
-        'preco_acordado': float(row.get('Preço acordado', 0)),
-        'valor_unitario': float(row.get('Preço original', row.get('Preço acordado', 0))),
-        'valor_total': float(row.get('Total global', row.get('Cartão de Crédito', 0))),
-        
-        # Taxas - Extraindo os valores corretos da planilha
-        'taxa_comissao': 0,  # Será calculado como percentual
-        'taxa_servico': 0,   # Será calculado como percentual
-        'valor_taxa_comissao': float(row.get('Taxa de comissão', 0)),
-        'valor_taxa_servico': float(row.get('Taxa de serviço', 0)),
-        
-        # Envio
-        'opcao_envio': str(row.get('Opção de envio', '')),
+        # Campos adicionais
+        'sku': numero_referencia_sku,
+        'produto_nome': get_value('Nome do Produto'),
+        'cliente_contato': get_value('Telefone'),
+        'valor_unitario': preco_acordado,
+        'valor_total': valor_total,
+        'taxa_comissao': 0,
+        'taxa_servico': 0,
+        'tipo_envio': tipo_envio,
         'status': 'Aguardando Produção',
+        'status_impressao': 'Pendente',
         
         # Metadata
         'loja_id': projeto.get('loja_id', 'fabrica'),
         'created_by': current_user.get('username', ''),
         'created_at': datetime.now(timezone.utc).isoformat(),
         'updated_at': datetime.now(timezone.utc).isoformat(),
-        'prazo_entrega': (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+        'prazo_entrega': data_prevista or (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
     }
-    
-    # Identificar tipo de envio baseado na "Forma de Entrega" (Opção de envio)
-    forma_entrega = str(row.get('Forma de Entrega', row.get('Opção de envio', '')))
-    if pd.isna(forma_entrega):
-        forma_entrega = ''
-    
-    print(f"DEBUG SHOPEE - forma_entrega encontrada: '{forma_entrega}'")
-    
-    tipo_envio = 'Outro'
-    
-    # Regras de identificação de tipo de envio Shopee
-    if 'shopee xpress' in forma_entrega.lower():
-        tipo_envio = 'Coleta'
     elif 'retirada pelo comprador' in forma_entrega.lower():
         tipo_envio = 'Coleta'
     elif 'shopee entrega direta' in forma_entrega.lower():
