@@ -2012,102 +2012,170 @@ export default function MarketplaceProjetoDetalhes() {
                           />
                         </td>
                         
-                        {/* 1. ID do pedido */}
-                        <td className="px-4 py-3">
-                          <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
-                        </td>
-                        
-                        {/* 2. Status do pedido */}
-                        <td className="px-4 py-3">
-                          <span className="text-blue-400 text-sm">{pedido.status_pedido || '-'}</span>
-                        </td>
-                        
-                        {/* 3. Opção de envio */}
-                        <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
-                        </td>
-                        
-                        {/* 4. Data prevista de envio */}
-                        <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">
-                            {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
-                          </span>
-                        </td>
-                        
-                        {/* 5. Número de referência SKU */}
-                        <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.numero_referencia_sku || pedido.sku || '-'}</span>
-                        </td>
-                        
-                        {/* 6. Quantidade */}
-                        <td className="px-4 py-3">
-                          <span className="text-white font-medium text-center block">{pedido.quantidade || 0}</span>
-                        </td>
-                        
-                        {/* 7. Nome da variação */}
-                        <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
-                        </td>
-                        
-                        {/* 8. Preço original */}
-                        <td className="px-4 py-3">
-                          <span className="text-gray-400 text-sm">
-                            R$ {(pedido.preco_original || 0).toFixed(2)}
-                          </span>
-                        </td>
-                        
-                        {/* 9. Preço acordado */}
-                        <td className="px-4 py-3">
-                          <span className="text-green-400 text-sm font-medium">
-                            R$ {(pedido.preco_acordado || 0).toFixed(2)}
-                          </span>
-                        </td>
-                        
-                        {/* 10. Valor Total */}
-                        <td className="px-4 py-3">
-                          <span className="text-green-400 text-sm font-bold">
-                            R$ {(pedido.valor_total_pedido || pedido.valor_total || 0).toFixed(2)}
-                          </span>
-                        </td>
-                        
-                        {/* 11. Taxa de comissão */}
-                        <td className="px-4 py-3">
-                          <span className="text-red-400 text-sm">
-                            R$ {(pedido.valor_taxa_comissao || 0).toFixed(2)}
-                          </span>
-                        </td>
-                        
-                        {/* 12. Taxa de serviço */}
-                        <td className="px-4 py-3">
-                          <span className="text-orange-400 text-sm">
-                            R$ {(pedido.valor_taxa_servico || 0).toFixed(2)}
-                          </span>
-                        </td>
-                        
-                        {/* 13. Nome de usuário (comprador) */}
-                        <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.nome_usuario_comprador || '-'}</span>
-                        </td>
-                        
-                        {/* 14. Nome do destinatário */}
-                        <td className="px-4 py-3">
-                          <span className="text-white text-sm">{pedido.cliente_nome || '-'}</span>
-                        </td>
-                        
-                        {/* 15. Endereço de entrega */}
-                        <td className="px-4 py-3">
-                          <span className="text-gray-300 text-xs">{pedido.endereco_entrega || pedido.endereco || '-'}</span>
-                        </td>
-                        
-                        {/* 16. Cidade */}
-                        <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.cidade || '-'}</span>
-                        </td>
-                        
-                        {/* 17. UF */}
-                        <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.uf || pedido.estado_endereco || '-'}</span>
-                        </td>
+                        {/* Renderização condicional por plataforma */}
+                        {projeto?.plataforma === 'mercadolivre' ? (
+                          <>
+                            {/* MERCADO LIVRE - 16 CAMPOS FINANCEIROS */}
+                            <td className="px-4 py-3">
+                              <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.estado || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-white font-medium text-center block">{pedido.quantidade || 1}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-green-400 text-sm font-medium">
+                                R$ {(pedido.receita_produtos || pedido.preco_acordado || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-red-400 text-sm">
+                                R$ {(pedido.tarifa_venda_impostos || pedido.valor_taxa_comissao || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-orange-400 text-sm">
+                                R$ {(pedido.tarifas_envio || pedido.valor_taxa_servico || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-red-400 text-sm">
+                                R$ {(pedido.cancelamentos_reembolsos || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-green-400 text-sm font-bold">
+                                R$ {(pedido.valor_total || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.sku || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.numero_anuncio || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-400 text-sm">
+                                R$ {(pedido.preco_unitario_venda || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-white text-sm">{pedido.cliente_nome || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.cidade || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.estado_endereco || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            {/* SHOPEE - 17 CAMPOS FINANCEIROS */}
+                            <td className="px-4 py-3">
+                              <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-blue-400 text-sm">{pedido.status_pedido || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">
+                                {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.numero_referencia_sku || pedido.sku || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-white font-medium text-center block">{pedido.quantidade || 0}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-400 text-sm">
+                                R$ {(pedido.preco_original || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-green-400 text-sm font-medium">
+                                R$ {(pedido.preco_acordado || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-green-400 text-sm font-bold">
+                                R$ {(pedido.valor_total_pedido || pedido.valor_total || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-red-400 text-sm">
+                                R$ {(pedido.valor_taxa_comissao || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-orange-400 text-sm">
+                                R$ {(pedido.valor_taxa_servico || 0).toFixed(2)}
+                              </span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.nome_usuario_comprador || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-white text-sm">{pedido.cliente_nome || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-xs">{pedido.endereco_entrega || pedido.endereco || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.cidade || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <span className="text-gray-300 text-sm">{pedido.uf || pedido.estado_endereco || '-'}</span>
+                            </td>
+                          </>
+                        )}
                       </tr>
                     ))}
                   </tbody>
