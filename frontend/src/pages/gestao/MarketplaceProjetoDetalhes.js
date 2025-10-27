@@ -1690,7 +1690,7 @@ export default function MarketplaceProjetoDetalhes() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Estado</th>
                         </>
                       ) : (
-                        /* === SHOPEE - 17 CAMPOS EXATOS DA PLANILHA === */
+                        {/* === SHOPEE - 17 CAMPOS EXATOS DA PLANILHA === */}
                         <>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do pedido</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status do pedido</th>
