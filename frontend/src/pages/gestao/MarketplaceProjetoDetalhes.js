@@ -1929,8 +1929,8 @@ export default function MarketplaceProjetoDetalhes() {
         </div>
       )}
 
-      {/* Financeiro View - Apenas para Shopee com todos os 17 campos */}
-      {viewMode === 'financeiro' && projeto?.plataforma === 'shopee' && (
+      {/* Financeiro View - Para Shopee e Mercado Livre com todos os campos */}
+      {viewMode === 'financeiro' && (projeto?.plataforma === 'shopee' || projeto?.plataforma === 'mercadolivre') && (
         <div className="space-y-6">
           {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
             <div key={`grupo-${grupo}`} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
