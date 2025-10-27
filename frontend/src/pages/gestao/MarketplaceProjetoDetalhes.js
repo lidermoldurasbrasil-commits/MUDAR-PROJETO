@@ -1923,6 +1923,171 @@ export default function MarketplaceProjetoDetalhes() {
           )}
         </div>
       )}
+
+      {/* Financeiro View - Apenas para Shopee com todos os 17 campos */}
+      {viewMode === 'financeiro' && projeto?.plataforma === 'shopee' && (
+        <div className="space-y-6">
+          {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
+            <div key={`grupo-${grupo}`} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+              {agruparPor && (
+                <div className="bg-gray-900 px-6 py-3 border-b border-gray-700">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    {agruparPor === 'sku' && '🏷️'}
+                    {agruparPor === 'status' && '🔵'}
+                    {grupo} 
+                    <span className="text-sm text-gray-400">({pedidosDoGrupo.length} pedidos)</span>
+                  </h3>
+                </div>
+              )}
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gray-900 border-b border-gray-700">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
+                        <input 
+                          type="checkbox" 
+                          className="rounded cursor-pointer" 
+                          checked={selectAll}
+                          onChange={handleSelectAll}
+                        />
+                      </th>
+                      {/* Todos os 17 campos da planilha Shopee */}
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do Pedido</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status do Pedido</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Opção de Envio</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[140px]">Data Prevista Envio</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Número Referência SKU</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome da Variação</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Preço Original</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Preço Acordado</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Valor Total Pedido</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Taxa Comissão</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Taxa Serviço</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome Comprador</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome Destinatário</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[200px]">Endereço Entrega</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Cidade</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">UF</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-gray-800 divide-y divide-gray-700">
+                    {pedidosDoGrupo.map((pedido) => (
+                      <tr key={`pedido-${pedido.id}`} className="hover:bg-gray-700/30 group">
+                        <td className="px-4 py-3">
+                          <input 
+                            type="checkbox" 
+                            className="rounded cursor-pointer" 
+                            checked={selectedPedidos.includes(pedido.id)}
+                            onChange={() => handleSelectPedido(pedido.id)}
+                          />
+                        </td>
+                        
+                        {/* 1. ID do pedido */}
+                        <td className="px-4 py-3">
+                          <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
+                        </td>
+                        
+                        {/* 2. Status do pedido */}
+                        <td className="px-4 py-3">
+                          <span className="text-blue-400 text-sm">{pedido.status_pedido || '-'}</span>
+                        </td>
+                        
+                        {/* 3. Opção de envio */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
+                        </td>
+                        
+                        {/* 4. Data prevista de envio */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">
+                            {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
+                          </span>
+                        </td>
+                        
+                        {/* 5. Número de referência SKU */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.numero_referencia_sku || pedido.sku || '-'}</span>
+                        </td>
+                        
+                        {/* 6. Quantidade */}
+                        <td className="px-4 py-3">
+                          <span className="text-white font-medium text-center block">{pedido.quantidade || 0}</span>
+                        </td>
+                        
+                        {/* 7. Nome da variação */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
+                        </td>
+                        
+                        {/* 8. Preço original */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-400 text-sm">
+                            R$ {(pedido.preco_original || 0).toFixed(2)}
+                          </span>
+                        </td>
+                        
+                        {/* 9. Preço acordado */}
+                        <td className="px-4 py-3">
+                          <span className="text-green-400 text-sm font-medium">
+                            R$ {(pedido.preco_acordado || 0).toFixed(2)}
+                          </span>
+                        </td>
+                        
+                        {/* 10. Valor Total */}
+                        <td className="px-4 py-3">
+                          <span className="text-green-400 text-sm font-bold">
+                            R$ {(pedido.valor_total_pedido || pedido.valor_total || 0).toFixed(2)}
+                          </span>
+                        </td>
+                        
+                        {/* 11. Taxa de comissão */}
+                        <td className="px-4 py-3">
+                          <span className="text-red-400 text-sm">
+                            R$ {(pedido.valor_taxa_comissao || 0).toFixed(2)}
+                          </span>
+                        </td>
+                        
+                        {/* 12. Taxa de serviço */}
+                        <td className="px-4 py-3">
+                          <span className="text-orange-400 text-sm">
+                            R$ {(pedido.valor_taxa_servico || 0).toFixed(2)}
+                          </span>
+                        </td>
+                        
+                        {/* 13. Nome de usuário (comprador) */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.nome_usuario_comprador || '-'}</span>
+                        </td>
+                        
+                        {/* 14. Nome do destinatário */}
+                        <td className="px-4 py-3">
+                          <span className="text-white text-sm">{pedido.cliente_nome || '-'}</span>
+                        </td>
+                        
+                        {/* 15. Endereço de entrega */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-xs">{pedido.endereco_entrega || pedido.endereco || '-'}</span>
+                        </td>
+                        
+                        {/* 16. Cidade */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.cidade || '-'}</span>
+                        </td>
+                        
+                        {/* 17. UF */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.uf || pedido.estado_endereco || '-'}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       
       {/* Modal de Adicionar Pedido */}
       {showAddModal && (
