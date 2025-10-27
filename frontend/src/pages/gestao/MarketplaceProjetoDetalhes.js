@@ -1081,6 +1081,123 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
+                    {/* RENDERIZAÇÃO CONDICIONAL POR PLATAFORMA */}
+                    {projeto?.plataforma === 'mercadolivre' ? (
+                      /* ===== MERCADO LIVRE - 17 CAMPOS ===== */
+                      <>
+                        {/* 1. N.º de Venda */}
+                        <td className="px-4 py-3">
+                          <span className="text-white text-sm">{pedido.numero_pedido || '-'}</span>
+                        </td>
+                        
+                        {/* 2. Data da Venda */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.data_venda || '-'}</span>
+                        </td>
+                        
+                        {/* 3. Estado */}
+                        <td className="px-4 py-3">
+                          <select
+                            value={pedido.status}
+                            onChange={(e) => {
+                              handleStatusChange(pedido.id, e.target.value);
+                              handleUpdatePedido(pedido.id, 'status', e.target.value);
+                            }}
+                            className="px-3 py-1.5 text-xs rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                            style={{
+                              backgroundColor: STATUS_OPTIONS.find(s => s.value === pedido.status)?.color || '#94A3B8',
+                              color: 'white'
+                            }}
+                          >
+                            {statusOptions.map(s => (
+                              <option key={s.value} value={s.value}>{s.label}</option>
+                            ))}
+                          </select>
+                        </td>
+                        
+                        {/* 4. Descrição do Status */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-xs">{pedido.descricao_status || '-'}</span>
+                        </td>
+                        
+                        {/* 5. Unidades */}
+                        <td className="px-4 py-3">
+                          <span className="text-white text-sm text-center block">{pedido.quantidade || 1}</span>
+                        </td>
+                        
+                        {/* 6. SKU */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.sku || '-'}</span>
+                        </td>
+                        
+                        {/* 7. Variação */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
+                        </td>
+                        
+                        {/* 8. Forma de Entrega */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
+                        </td>
+                        
+                        {/* 9. Comprador */}
+                        <td className="px-4 py-3">
+                          <span className="text-white text-sm">{pedido.cliente_nome || '-'}</span>
+                        </td>
+                        
+                        {/* 10. Receita por Produtos */}
+                        <td className="px-4 py-3">
+                          <span className="text-green-400 text-sm">
+                            R$ {pedido.preco_acordado?.toFixed(2) || '0.00'}
+                          </span>
+                        </td>
+                        
+                        {/* 11. Tarifa de Venda e Impostos */}
+                        <td className="px-4 py-3">
+                          <span className="text-red-400 text-sm">
+                            R$ {pedido.valor_taxa_comissao?.toFixed(2) || '0.00'}
+                          </span>
+                        </td>
+                        
+                        {/* 12. Tarifas de Envio */}
+                        <td className="px-4 py-3">
+                          <span className="text-orange-400 text-sm">
+                            R$ {pedido.valor_taxa_servico?.toFixed(2) || '0.00'}
+                          </span>
+                        </td>
+                        
+                        {/* 13. Cancelamentos e Reembolsos */}
+                        <td className="px-4 py-3">
+                          <span className="text-red-400 text-sm">
+                            R$ {pedido.cancelamentos_reembolsos?.toFixed(2) || '0.00'}
+                          </span>
+                        </td>
+                        
+                        {/* 14. Total */}
+                        <td className="px-4 py-3">
+                          <span className="text-green-400 text-sm font-medium">
+                            R$ {pedido.valor_total?.toFixed(2) || '0.00'}
+                          </span>
+                        </td>
+                        
+                        {/* 15. Endereço */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-xs">{pedido.endereco || '-'}</span>
+                        </td>
+                        
+                        {/* 16. Cidade */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.cidade || '-'}</span>
+                        </td>
+                        
+                        {/* 17. Estado */}
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.estado_endereco || '-'}</span>
+                        </td>
+                      </>
+                    ) : (
+                      /* ===== SHOPEE - CAMPOS ORIGINAIS ===== */
+                      <>
                     {/* ID do Pedido - Editável */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
