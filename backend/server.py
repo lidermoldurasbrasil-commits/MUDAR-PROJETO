@@ -1820,6 +1820,10 @@ class PedidoMarketplace(BaseModel):
     status_cor: str = "#94A3B8"  # Cor do badge de status
     status_impressao: str = "Aguardando Impressão"  # Aguardando Impressão, Imprimindo, Impresso
     
+    # Status Personalizados para Mercado Livre (controle interno)
+    status_producao: str = "Aguardando Produção"  # Status editável 1 - entre Estado e Unidades
+    status_logistica: str = "Aguardando Envio"  # Status editável 2 - depois de Forma de Entrega
+    
     # Datas
     data_pedido: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     data_impressao: Optional[datetime] = None
