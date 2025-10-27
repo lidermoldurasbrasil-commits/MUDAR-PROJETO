@@ -1725,7 +1725,7 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
-                      /* === SHOPEE - 17 CAMPOS DA PLANILHA === */
+                      /* === SHOPEE - 17 CAMPOS EXATOS === */
                       <>
                         {/* 1. ID do pedido */}
                         <td className="px-4 py-3">
@@ -1745,8 +1745,7 @@ export default function MarketplaceProjetoDetalhes() {
                         {/* 4. Data prevista de envio */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">
-                            {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : 
-                             pedido.prazo_entrega ? new Date(pedido.prazo_entrega).toLocaleDateString('pt-BR') : '-'}
+                            {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
                           </span>
                         </td>
                         
@@ -1757,7 +1756,7 @@ export default function MarketplaceProjetoDetalhes() {
                         
                         {/* 6. Quantidade */}
                         <td className="px-4 py-3">
-                          <span className="text-white font-medium text-center block">{pedido.quantidade || 1}</span>
+                          <span className="text-white font-medium text-center block">{pedido.quantidade || 0}</span>
                         </td>
                         
                         {/* 7. Nome da variação */}
