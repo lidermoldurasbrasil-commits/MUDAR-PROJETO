@@ -1707,8 +1707,36 @@ export default function MarketplaceProjetoDetalhes() {
                     
                     {projeto?.plataforma === 'mercadolivre' ? (
                       <>
-                        <td className="px-4 py-3" colSpan="17">
-                          <span className="text-gray-400 text-sm">Mercado Livre - Em desenvolvimento</span>
+                        <td className="px-4 py-3">
+                          <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
+                        </td>
+                        
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.estado || '-'}</span>
+                        </td>
+                        
+                        <td className="px-4 py-3">
+                          <span className="text-white font-medium text-center block">{pedido.quantidade || 1}</span>
+                        </td>
+                        
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.sku || '-'}</span>
+                        </td>
+                        
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
+                        </td>
+                        
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.numero_anuncio || '-'}</span>
+                        </td>
+                        
+                        <td className="px-4 py-3">
+                          <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
+                        </td>
+                        
+                        <td className="px-4 py-3">
+                          <span className="text-white text-sm">{pedido.cliente_nome || '-'}</span>
                         </td>
                       </>
                     ) : (
