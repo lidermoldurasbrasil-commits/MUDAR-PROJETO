@@ -1821,8 +1821,8 @@ class PedidoMarketplace(BaseModel):
     status_impressao: str = "Aguardando Impressão"  # Aguardando Impressão, Imprimindo, Impresso
     
     # Status Personalizados para Mercado Livre (controle interno)
-    status_producao: str = "Aguardando Produção"  # Status editável 1 - entre Estado e Unidades
-    status_logistica: str = "Aguardando Envio"  # Status editável 2 - depois de Forma de Entrega
+    status_producao: str = "Espelho"  # Setor responsável - Espelho, Molduras com Vidro, Molduras, Impressão, Expedição, Embalagem
+    status_logistica: str = "Aguardando"  # Status de produção - Aguardando, Em montagem, Imprimindo, Impresso
     
     # Datas
     data_pedido: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
