@@ -1669,7 +1669,7 @@ export default function MarketplaceProjetoDetalhes() {
                       
                       {/* Cabeçalhos condicionais por plataforma */}
                       {projeto?.plataforma === 'mercadolivre' ? (
-                        /* === MERCADO LIVRE - 17 CAMPOS === */
+                        {/* === MERCADO LIVRE - 17 CAMPOS === */}
                         <>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">N.º de Venda</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Data da Venda</th>
