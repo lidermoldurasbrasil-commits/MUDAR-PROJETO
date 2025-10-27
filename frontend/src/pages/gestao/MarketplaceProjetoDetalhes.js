@@ -1122,7 +1122,7 @@ export default function MarketplaceProjetoDetalhes() {
                         
                         {/* 5. Unidades */}
                         <td className="px-4 py-3">
-                          <span className="text-white text-sm text-center block">{pedido.quantidade || 1}</span>
+                          <span className="text-white font-medium text-center block">{pedido.quantidade || 1}</span>
                         </td>
                         
                         {/* 6. SKU */}
