@@ -4445,8 +4445,21 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
             return default
         return str(val)
     
-    # Identificar tipo de envio
-    forma_entrega = get_string_value('Forma de entrega')
+    # Identificar tipo de envio - tentar múltiplas variações do nome da coluna
+    forma_entrega = ''
+    for col_name in ['Forma de entrega', 'forma de entrega', 'Forma De Entrega', 'FORMA DE ENTREGA']:
+        if col_name in row.index:
+            forma_entrega = get_string_value(col_name)
+            if forma_entrega:
+                break
+    
+    # Se ainda estiver vazio, tentar colunas que contenham "entrega"
+    if not forma_entrega:
+        for col in row.index:
+            if 'entrega' in col.lower() and 'forma' in col.lower():
+                forma_entrega = get_string_value(col)
+                if forma_entrega:
+                    break
     
     tipo_envio = 'Outro'
     if 'flex' in forma_entrega.lower() or 'full' in forma_entrega.lower():
