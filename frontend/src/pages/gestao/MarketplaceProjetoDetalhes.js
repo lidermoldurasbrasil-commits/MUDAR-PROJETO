@@ -2046,13 +2046,25 @@ export default function MarketplaceProjetoDetalhes() {
                         {/* Renderização condicional por plataforma */}
                         {projeto?.plataforma === 'mercadolivre' ? (
                           <>
-                            {/* MERCADO LIVRE - 16 CAMPOS FINANCEIROS */}
+                            {/* MERCADO LIVRE - 18 CAMPOS FINANCEIROS (16 + 2 status) */}
                             <td className="px-4 py-3">
                               <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
                             </td>
                             
                             <td className="px-4 py-3">
                               <span className="text-gray-300 text-sm">{pedido.estado || '-'}</span>
+                            </td>
+                            
+                            <td className="px-4 py-3">
+                              <select
+                                value={pedido.status_producao || 'Aguardando Produção'}
+                                onChange={(e) => handleUpdatePedido(pedido.id, 'status_producao', e.target.value)}
+                                className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-2 focus:ring-blue-500"
+                              >
+                                {statusOptions.map(s => (
+                                  <option key={s.nome} value={s.nome}>{s.nome}</option>
+                                ))}
+                              </select>
                             </td>
                             
                             <td className="px-4 py-3">
