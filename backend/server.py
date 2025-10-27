@@ -4589,8 +4589,8 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
         'tarifas_envio': tarifa_envio,
         
         # Status personalizados para controle interno (NÃO vêm da planilha)
-        'status_producao': 'Aguardando Produção',
-        'status_logistica': 'Aguardando Envio',
+        'status_producao': 'Espelho',  # Setor inicial
+        'status_logistica': 'Aguardando',  # Status inicial
         
         # Outros campos
         'produto_nome': titulo,
