@@ -847,6 +847,114 @@ export default function MarketplaceProjetoDetalhes() {
         </div>
       </div>
 
+      {/* Métricas Detalhadas - Mercado Livre */}
+      {projeto?.plataforma === 'mercadolivre' && pedidos.length > 0 && (
+        <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-700">
+          <h2 className="text-xl font-bold text-white mb-4">📊 Métricas de Produção e Envio</h2>
+          
+          {/* Métricas por Setor */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-300 mb-3">Distribuição por Setor</h3>
+            <div className="grid grid-cols-4 gap-4">
+              {[
+                { nome: 'Espelho', emoji: '🪞', cor: '#3B82F6' },
+                { nome: 'Molduras com Vidro', emoji: '🖼️', cor: '#8B5CF6' },
+                { nome: 'Molduras', emoji: '🖼️', cor: '#EC4899' },
+                { nome: 'Impressão', emoji: '🖨️', cor: '#F59E0B' },
+                { nome: 'Expedição', emoji: '🧾', cor: '#10B981' },
+                { nome: 'Embalagem', emoji: '📦', cor: '#6366F1' },
+                { nome: 'Personalizado', emoji: '⭐', cor: '#14B8A6' }
+              ].map(setor => {
+                const count = pedidos.filter(p => p.status_producao === setor.nome).length;
+                const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
+                return (
+                  <div key={setor.nome} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{setor.emoji}</span>
+                      <span className="text-2xl font-bold" style={{ color: setor.cor }}>{count}</span>
+                    </div>
+                    <p className="text-sm text-gray-400">{setor.nome}</p>
+                    <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="h-2 rounded-full" 
+                        style={{ width: `${percentage}%`, backgroundColor: setor.cor }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Métricas por Status de Produção */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-300 mb-3">Status de Produção</h3>
+            <div className="grid grid-cols-4 gap-4">
+              {[
+                { nome: 'Aguardando', emoji: '⏳', cor: '#94A3B8' },
+                { nome: 'Em montagem', emoji: '🔧', cor: '#F59E0B' },
+                { nome: 'Imprimindo', emoji: '🖨️', cor: '#3B82F6' },
+                { nome: 'Impresso', emoji: '✅', cor: '#10B981' }
+              ].map(status => {
+                const count = pedidos.filter(p => p.status_logistica === status.nome).length;
+                const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
+                return (
+                  <div key={status.nome} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{status.emoji}</span>
+                      <span className="text-2xl font-bold" style={{ color: status.cor }}>{count}</span>
+                    </div>
+                    <p className="text-sm text-gray-400">{status.nome}</p>
+                    <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="h-2 rounded-full" 
+                        style={{ width: `${percentage}%`, backgroundColor: status.cor }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Métricas por Tipo de Envio */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-300 mb-3">Análise de Envios</h3>
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { tipo: 'Correios e pontos de envio', emoji: '📮', cor: '#3B82F6', keywords: ['correios', 'correio'] },
+                { tipo: 'Mercado Envios Flex', emoji: '📦', cor: '#F59E0B', keywords: ['flex'] },
+                { tipo: 'Full - Mercado Envios Completo', emoji: '🚚', cor: '#10B981', keywords: ['full', 'completo'] }
+              ].map(envio => {
+                const count = pedidos.filter(p => {
+                  const opcao = (p.opcao_envio || '').toLowerCase();
+                  return envio.keywords.some(keyword => opcao.includes(keyword));
+                }).length;
+                const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
+                return (
+                  <div key={envio.tipo} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{envio.emoji}</span>
+                      <span className="text-2xl font-bold" style={{ color: envio.cor }}>{count}</span>
+                    </div>
+                    <p className="text-sm text-gray-400">{envio.tipo}</p>
+                    <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="h-2 rounded-full" 
+                        style={{ width: `${percentage}%`, backgroundColor: envio.cor }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{percentage}% do total</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filtros */}
       {showFilters && (
         <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-700">
