@@ -1719,13 +1719,16 @@ export default function MarketplaceProjetoDetalhes() {
                         
                         <td className="px-4 py-3">
                           <select
-                            value={pedido.status_producao || 'Aguardando Produção'}
+                            value={pedido.status_producao || 'Espelho'}
                             onChange={(e) => handleUpdatePedido(pedido.id, 'status_producao', e.target.value)}
                             className="w-full px-2 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm focus:ring-2 focus:ring-blue-500"
                           >
-                            {statusOptions.map(s => (
-                              <option key={s.nome} value={s.nome}>{s.nome}</option>
-                            ))}
+                            <option value="Espelho">Espelho</option>
+                            <option value="Molduras com Vidro">Molduras com Vidro</option>
+                            <option value="Molduras">Molduras</option>
+                            <option value="Impressão">Impressão</option>
+                            <option value="Expedição">Expedição</option>
+                            <option value="Embalagem">Embalagem</option>
                           </select>
                         </td>
                         
