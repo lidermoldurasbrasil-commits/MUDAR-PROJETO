@@ -1103,7 +1103,7 @@ export default function MarketplaceProjetoDetalhes() {
                               handleStatusChange(pedido.id, e.target.value);
                               handleUpdatePedido(pedido.id, 'status', e.target.value);
                             }}
-                            className="px-3 py-1.5 text-xs rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                            className="px-3 py-1.5 text-sm rounded font-medium border-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                             style={{
                               backgroundColor: STATUS_OPTIONS.find(s => s.value === pedido.status)?.color || '#94A3B8',
                               color: 'white'
