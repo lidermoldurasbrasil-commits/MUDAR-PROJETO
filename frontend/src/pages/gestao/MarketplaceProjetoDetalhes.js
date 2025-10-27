@@ -1991,6 +1991,7 @@ export default function MarketplaceProjetoDetalhes() {
                         <>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">N.º de Venda</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Estado</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Status Produção</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Unidades</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Receita por Produtos (BRL)</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Tarifa de Venda e Impostos (BRL)</th>
@@ -2005,6 +2006,7 @@ export default function MarketplaceProjetoDetalhes() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Cidade</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Estado</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Forma de Entrega</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Status Logística</th>
                         </>
                       ) : (
                         <>
