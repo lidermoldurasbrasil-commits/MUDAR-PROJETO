@@ -1083,7 +1083,7 @@ export default function MarketplaceProjetoDetalhes() {
                     
                     {/* RENDERIZAÇÃO CONDICIONAL POR PLATAFORMA */}
                     {projeto?.plataforma === 'mercadolivre' ? (
-                      /* ===== MERCADO LIVRE - 17 CAMPOS ===== */
+                      {/* ===== MERCADO LIVRE - 17 CAMPOS ===== */}
                       <>
                         {/* 1. N.º de Venda */}
                         <td className="px-4 py-3">
