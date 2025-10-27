@@ -1723,9 +1723,7 @@ export default function MarketplaceProjetoDetalhes() {
                         </td>
                       </>
                     ) : (
-                      {/* === SHOPEE PRODUÇÃO - APENAS 6 CAMPOS OPERACIONAIS === */}
                       <>
-                        {/* 1. ID do pedido */}
                         <td className="px-4 py-3">
                           <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
                         </td>
