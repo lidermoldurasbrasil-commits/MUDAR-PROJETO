@@ -4294,20 +4294,37 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
     return pedido_data
 
 def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
-    """Processa uma linha da planilha Mercado Livre"""
+    """Processa uma linha da planilha Mercado Livre COM TODOS OS CAMPOS"""
     import pandas as pd
-    
-    # DEBUG: Mostrar colunas disponíveis na primeira vez
-    print(f"DEBUG ML - Colunas disponíveis: {list(row.keys())[:10]}")  # Primeiras 10 colunas
     
     # Obter número da venda - A primeira coluna é "N.º de venda"
     numero_pedido = str(row.get('N.º de venda', ''))
     
-    print(f"DEBUG ML - numero_pedido extraído: '{numero_pedido}', tipo: {type(row.get('N.º de venda'))}")
+    print(f"DEBUG ML - numero_pedido extraído: '{numero_pedido}'")
     
     if not numero_pedido or numero_pedido == 'nan' or pd.isna(row.get('N.º de venda')):
         print(f"DEBUG ML - Linha ignorada: numero_pedido inválido")
         return None
+    
+    # Helper function para converter valores monetários
+    def get_float_value(coluna):
+        val = row.get(coluna, 0)
+        if pd.isna(val):
+            return 0.0
+        if isinstance(val, (int, float)):
+            return float(val)
+        # Tentar converter string
+        try:
+            return float(str(val).replace(',', '.'))
+        except:
+            return 0.0
+    
+    # Helper function para pegar string com fallback
+    def get_string_value(coluna, default=''):
+        val = row.get(coluna, default)
+        if pd.isna(val):
+            return default
+        return str(val)
     
     # Identificar tipo de envio - A coluna é "Forma de entrega" (última seção)
     # Preciso pegar da linha duplicada ou correta
