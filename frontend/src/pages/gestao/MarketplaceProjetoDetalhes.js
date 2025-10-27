@@ -1147,7 +1147,7 @@ export default function MarketplaceProjetoDetalhes() {
                         
                         {/* 10. Receita por Produtos */}
                         <td className="px-4 py-3">
-                          <span className="text-green-400 text-sm">
+                          <span className="text-green-400 text-sm font-medium">
                             R$ {pedido.preco_acordado?.toFixed(2) || '0.00'}
                           </span>
                         </td>
