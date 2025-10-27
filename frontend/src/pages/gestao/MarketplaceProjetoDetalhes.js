@@ -1706,7 +1706,7 @@ export default function MarketplaceProjetoDetalhes() {
                 </thead>
                 <tbody className="bg-gray-800 divide-y divide-gray-700">
                   {pedidosFiltrados.map(pedido => (
-                    <tr key={pedido.id} className={pedido.atrasado ? 'bg-red-900/20' : 'hover:bg-gray-700/50'}>
+                    <tr key={`relatorio-pedido-${pedido.id}`} className={pedido.atrasado ? 'bg-red-900/20' : 'hover:bg-gray-700/50'}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                         {pedido.numero_pedido}
                       </td>
