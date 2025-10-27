@@ -1037,7 +1037,7 @@ export default function MarketplaceProjetoDetalhes() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[100px]">Estado</th>
                         </>
                       ) : (
-                        /* Colunas para SHOPEE */
+                        {/* Colunas para SHOPEE */}
                         <>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">ID do Pedido</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[120px]">Status</th>
