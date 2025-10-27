@@ -4449,6 +4449,72 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
             return default
         return str(val)
     
+    # Função de detecção automática de setor baseado no SKU
+    def detectar_setor_por_sku(sku_texto):
+        """
+        Detecta automaticamente o setor baseado no SKU
+        REGRAS:
+        1. MOLDURA: MM, MB, MP, SV, A4-CV
+        2. MOLDURAS COM VIDRO: MF, MB, MP, MM, MD, CX, 50X50, 30x30, 60x90, 80x120, CV (exceto A4-CV, KIT-10-A4-CV, KIT-5-A4-CV)
+        3. ESPELHO: ESPELHO, LED, ESP
+        4. IMPRESSÃO: PD
+        5. Default: Espelho
+        """
+        if not sku_texto or pd.isna(sku_texto):
+            return 'Espelho'  # Padrão
+        
+        sku = str(sku_texto).upper().strip()
+        
+        # 1. IMPRESSÃO - tem prioridade pois é mais específico
+        if 'PD' in sku:
+            print(f"🖨️ SKU '{sku}' → IMPRESSÃO (contém PD)")
+            return 'Impressão'
+        
+        # 2. ESPELHO - palavras-chave específicas
+        palavras_espelho = ['ESPELHO', 'LED', 'ESP']
+        for palavra in palavras_espelho:
+            if palavra in sku:
+                print(f"🪞 SKU '{sku}' → ESPELHO (contém {palavra})")
+                return 'Espelho'
+        
+        # 3. MOLDURA - verificar padrões específicos
+        # Verificar se contém A4-CV (caso específico de MOLDURA)
+        if 'A4-CV' in sku:
+            print(f"🖼️ SKU '{sku}' → MOLDURA (contém A4-CV)")
+            return 'Molduras'
+        
+        # Verificar outros padrões de MOLDURA (que não têm CV)
+        padroes_moldura = ['MM', 'MB', 'MP', 'SV']
+        for padrao in padroes_moldura:
+            if padrao in sku and 'CV' not in sku:  # Não contém CV
+                print(f"🖼️ SKU '{sku}' → MOLDURA (contém {padrao})")
+                return 'Molduras'
+        
+        # 4. MOLDURAS COM VIDRO - verificar padrões
+        # Primeiro, excluir os casos específicos que vão para MOLDURA
+        exclusoes_cv = ['A4-CV', 'KIT-10-A4-CV', 'KIT-5-A4-CV']
+        tem_exclusao = any(exc in sku for exc in exclusoes_cv)
+        
+        if not tem_exclusao:
+            # Verificar padrões alfanuméricos
+            padroes_vidro = ['MF', 'MB', 'MP', 'MM', 'MD', 'CX', 'CV']
+            for padrao in padroes_vidro:
+                if padrao in sku:
+                    print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém {padrao})")
+                    return 'Molduras com Vidro'
+            
+            # Verificar padrões de dimensões (formato: 50X50, 30x30, etc)
+            dimensoes = ['50X50', '30X30', '60X90', '80X120']
+            sku_upper = sku.replace('x', 'X')  # Normalizar x para X
+            for dim in dimensoes:
+                if dim in sku_upper:
+                    print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém dimensão {dim})")
+                    return 'Molduras com Vidro'
+        
+        # 5. Padrão se não encontrou nenhuma correspondência
+        print(f"⭐ SKU '{sku}' → ESPELHO (padrão)")
+        return 'Espelho'
+    
     # Identificar tipo de envio - tentar múltiplas variações do nome da coluna
     forma_entrega = ''
     for col_name in ['Forma de entrega', 'forma de entrega', 'Forma De Entrega', 'FORMA DE ENTREGA']:
