@@ -4353,38 +4353,19 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         'updated_at': datetime.now(timezone.utc).isoformat(),
         'prazo_entrega': data_prevista or (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
     }
-    elif 'retirada pelo comprador' in forma_entrega.lower():
-        tipo_envio = 'Coleta'
-    elif 'shopee entrega direta' in forma_entrega.lower():
-        tipo_envio = 'Flex Shopee'
     
-    print(f"DEBUG SHOPEE - tipo_envio identificado: '{tipo_envio}'")
-    
-    # Adicionar tipo_envio ao pedido_data
-    pedido_data['tipo_envio'] = tipo_envio
-    
-    # Processar data prevista de envio
-    if 'Data prevista de envio' in row and pd.notna(row['Data prevista de envio']):
-        try:
-            pedido_data['data_prevista_envio'] = pd.to_datetime(row['Data prevista de envio']).isoformat()
-            pedido_data['prazo_entrega'] = pd.to_datetime(row['Data prevista de envio']).isoformat()
-        except:
-            pass
-    
-    # Calcular taxas como percentual se houver valor
-    if pedido_data['preco_acordado'] > 0:
-        if pedido_data['valor_taxa_comissao'] > 0:
-            pedido_data['taxa_comissao'] = (pedido_data['valor_taxa_comissao'] / pedido_data['preco_acordado']) * 100
-        
-        if pedido_data['valor_taxa_servico'] > 0:
-            pedido_data['taxa_servico'] = (pedido_data['valor_taxa_servico'] / pedido_data['preco_acordado']) * 100
-        
-        # Calcular valor líquido
-        pedido_data['valor_liquido'] = pedido_data['preco_acordado'] - pedido_data['valor_taxa_comissao'] - pedido_data['valor_taxa_servico']
+    # Calcular taxas percentuais
+    if preco_acordado > 0:
+        if taxa_comissao_valor > 0:
+            pedido_data['taxa_comissao'] = (taxa_comissao_valor / preco_acordado) * 100
+        if taxa_servico_valor > 0:
+            pedido_data['taxa_servico'] = (taxa_servico_valor / preco_acordado) * 100
+        pedido_data['valor_liquido'] = preco_acordado - taxa_comissao_valor - taxa_servico_valor
     else:
         pedido_data['valor_liquido'] = 0
     
     return pedido_data
+
 
 def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     """Processa uma linha da planilha Mercado Livre COM TODOS OS CAMPOS"""
