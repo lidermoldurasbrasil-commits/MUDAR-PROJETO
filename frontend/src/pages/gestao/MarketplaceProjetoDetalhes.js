@@ -2089,8 +2089,9 @@ export default function MarketplaceProjetoDetalhes() {
                                 <option value="Molduras com Vidro" style={{ backgroundColor: SETOR_COLORS['Molduras com Vidro'] }}>🖼️ Molduras com Vidro</option>
                                 <option value="Molduras" style={{ backgroundColor: SETOR_COLORS['Molduras'] }}>🖼️ Molduras</option>
                                 <option value="Impressão" style={{ backgroundColor: SETOR_COLORS['Impressão'] }}>🖨️ Impressão</option>
-                                <option value="Expedição" style={{ backgroundColor: SETOR_COLORS['Expedição'] }}>📦 Expedição</option>
+                                <option value="Expedição" style={{ backgroundColor: SETOR_COLORS['Expedição'] }}>🧾 Expedição</option>
                                 <option value="Embalagem" style={{ backgroundColor: SETOR_COLORS['Embalagem'] }}>📦 Embalagem</option>
+                                <option value="Personalizado" style={{ backgroundColor: SETOR_COLORS['Personalizado'] }}>⭐ Personalizado</option>
                               </select>
                             </td>
                             
