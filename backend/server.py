@@ -4488,6 +4488,9 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
             return 'Molduras'
         
         # Verificar padrões alfanuméricos de VIDRO (prioridade alta)
+        # IMPORTANTE: CX tem prioridade - mesmo que tenha SV junto, vai para Vidro
+        # Exemplos: "SV-CX-123" → Molduras com Vidro (CX detectado primeiro)
+        #           "CX" → Molduras com Vidro
         padroes_vidro = ['MF', 'MD', 'CX', 'CV']  # Removido MB, MP, MM, SV para verificar separadamente
         for padrao in padroes_vidro:
             if padrao in sku:
