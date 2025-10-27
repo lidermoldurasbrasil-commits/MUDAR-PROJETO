@@ -4587,8 +4587,8 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     # 1. N.º de venda - já temos
     # 2. Data da venda
     data_venda = get_string_value('Data da venda')
-    # 3. Estado
-    estado = get_string_value('Estado', 'Aguardando Produção')
+    # 3. Estado (status do pedido da planilha)
+    estado = get_string_value('Estado')  # Estado real da planilha (ex: Pago, Enviado, etc)
     # 4. Descrição do Status
     descricao_status = get_string_value('Descrição do status')
     # 5. Unidades
