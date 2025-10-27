@@ -1175,7 +1175,7 @@ export default function MarketplaceProjetoDetalhes() {
                         
                         {/* 14. Total */}
                         <td className="px-4 py-3">
-                          <span className="text-green-400 text-sm font-medium">
+                          <span className="text-green-400 text-sm font-bold">
                             R$ {pedido.valor_total?.toFixed(2) || '0.00'}
                           </span>
                         </td>
