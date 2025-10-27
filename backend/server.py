@@ -1791,6 +1791,15 @@ class PedidoMarketplace(BaseModel):
     # Envio
     opcao_envio: str = ""  # Opção de envio (Ex: Normal, Expresso, etc)
     data_prevista_envio: Optional[datetime] = None  # Data prevista de envio
+    tipo_envio: str = ""  # Tipo de envio identificado (Flex, Coleta, Correios, etc)
+    
+    # Campos específicos Mercado Livre
+    data_venda: str = ""  # Data da venda (formato da planilha)
+    descricao_status: str = ""  # Descrição detalhada do status
+    cancelamentos_reembolsos: float = 0  # Cancelamentos e reembolsos (BRL)
+    endereco: str = ""  # Endereço completo
+    cidade: str = ""  # Cidade
+    estado_endereco: str = ""  # Estado (do endereço)
     
     # Status e Fluxo
     status: str = "Aguardando Produção"  # Aguardando Produção, Em Produção, Pronto, Embalagem, Enviado, Entregue
