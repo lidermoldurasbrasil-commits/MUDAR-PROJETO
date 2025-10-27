@@ -1196,7 +1196,7 @@ export default function MarketplaceProjetoDetalhes() {
                         </td>
                       </>
                     ) : (
-                      /* ===== SHOPEE - CAMPOS ORIGINAIS ===== */
+                      {/* ===== SHOPEE - CAMPOS ORIGINAIS ===== */}
                       <>
                     {/* ID do Pedido - Editável */}
                     <td className="px-4 py-3">
