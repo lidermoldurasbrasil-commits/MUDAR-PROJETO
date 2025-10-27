@@ -4326,15 +4326,11 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
             return default
         return str(val)
     
-    # Identificar tipo de envio - A coluna é "Forma de entrega" (última seção)
-    # Preciso pegar da linha duplicada ou correta
-    forma_entrega = str(row.get('Forma de entrega', ''))
-    if pd.isna(forma_entrega) or forma_entrega == 'nan':
-        forma_entrega = ''
+    # Identificar tipo de envio
+    forma_entrega = get_string_value('Forma de entrega')
     
     tipo_envio = 'Outro'
-    
-    if 'flex' in forma_entrega.lower():
+    if 'flex' in forma_entrega.lower() or 'full' in forma_entrega.lower():
         tipo_envio = 'Mercado Envios Flex'
     elif 'correios' in forma_entrega.lower():
         tipo_envio = 'Correios e pontos de envio'
@@ -4343,91 +4339,97 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     elif 'agência' in forma_entrega.lower() or 'agencia' in forma_entrega.lower():
         tipo_envio = 'Agência Mercado Livre'
     
-    # Obter outros campos
-    estado = str(row.get('Estado', ''))
-    if pd.isna(estado):
-        estado = 'Aguardando Produção'
-    
-    # SKU
-    sku = str(row.get('SKU', ''))
-    if pd.isna(sku):
-        sku = ''
-    
-    # Variação
-    variacao = str(row.get('Variação', ''))
-    if pd.isna(variacao):
-        variacao = ''
-    
-    # Comprador
-    comprador = str(row.get('Comprador', ''))
-    if pd.isna(comprador):
-        comprador = ''
-    
-    # Título do anúncio
-    titulo = str(row.get('Título do anúncio', ''))
-    if pd.isna(titulo):
-        titulo = ''
-    
-    # Valores monetários - precisam ser tratados cuidadosamente
-    def get_float_value(coluna):
-        val = row.get(coluna, 0)
-        if pd.isna(val):
-            return 0.0
-        if isinstance(val, (int, float)):
-            return float(val)
-        # Tentar converter string
-        try:
-            return float(str(val).replace(',', '.'))
-        except:
-            return 0.0
-    
-    # Unidades - pode estar em formato estranho
-    unidades = row.get('Unidades', 1)
+    # CAMPOS MERCADO LIVRE COMPLETOS
+    # 1. N.º de venda - já temos
+    # 2. Data da venda
+    data_venda = get_string_value('Data da venda')
+    # 3. Estado
+    estado = get_string_value('Estado', 'Aguardando Produção')
+    # 4. Descrição do Status
+    descricao_status = get_string_value('Descrição do status')
+    # 5. Unidades
+    unidades = 1
     try:
-        if pd.isna(unidades):
-            unidades = 1
-        else:
-            unidades = int(float(unidades))
+        unidades_val = row.get('Unidades', 1)
+        if not pd.isna(unidades_val):
+            unidades = int(float(unidades_val))
     except:
         unidades = 1
-    
-    receita = get_float_value('Receita por produtos (BRL)')
+    # 6. SKU
+    sku = get_string_value('SKU')
+    # 7. Variação
+    variacao = get_string_value('Variação')
+    # 8. Forma de entrega - já temos
+    # 9. Comprador
+    comprador = get_string_value('Comprador')
+    # 10. Receita por produtos (BRL)
+    receita_produtos = get_float_value('Receita por produtos (BRL)')
+    # 11. Tarifa de venda e impostos (BRL)
     tarifa_venda = abs(get_float_value('Tarifa de venda e impostos (BRL)'))
+    # 12. Tarifas de envio (BRL)
     tarifa_envio = abs(get_float_value('Tarifas de envio (BRL)'))
+    # 13. Cancelamentos e reembolsos (BRL)
+    cancelamentos = get_float_value('Cancelamentos e reembolsos (BRL)')
+    # 14. Total (BRL)
     total = get_float_value('Total (BRL)')
+    # 15. Endereço
+    endereco = get_string_value('Endereço')
+    # 16. Cidade
+    cidade = get_string_value('Cidade')
+    # 17. Estado (endereço) - usar outra coluna de estado se houver duplicata
+    estado_endereco = cidade  # Assumindo que o estado está junto
     
-    # Mapear colunas da planilha Mercado Livre
+    # Título do anúncio
+    titulo = get_string_value('Título do anúncio')
+    
+    # Mapear para o modelo PedidoMarketplace
     pedido_data = {
         'id': str(uuid.uuid4()),
         'projeto_id': projeto_id,
         'plataforma': projeto['plataforma'],
         
-        # Dados do pedido
+        # 1. N.º de venda
         'numero_pedido': numero_pedido,
-        'sku': sku,
-        'nome_variacao': variacao,
-        'produto_nome': titulo,
-        
-        # Cliente
-        'cliente_nome': comprador,
-        'cliente_contato': '',
-        
-        # Valores
+        # 2. Data da venda
+        'data_venda': data_venda,
+        # 3. Estado
+        'status': estado,
+        # 4. Descrição do Status
+        'descricao_status': descricao_status,
+        # 5. Unidades
         'quantidade': unidades,
-        'preco_acordado': receita,
-        'valor_unitario': receita,
-        'valor_total': total,
-        
-        # Taxas - Mercado Livre
-        'taxa_comissao': 0,
-        'taxa_servico': 0,
-        'valor_taxa_comissao': tarifa_venda,
-        'valor_taxa_servico': tarifa_envio,
-        
-        # Envio - COM TIPO DE ENVIO IDENTIFICADO
+        # 6. SKU
+        'sku': sku,
+        # 7. Variação
+        'nome_variacao': variacao,
+        # 8. Forma de entrega
         'opcao_envio': forma_entrega,
         'tipo_envio': tipo_envio,
-        'status': estado,
+        # 9. Comprador
+        'cliente_nome': comprador,
+        'cliente_contato': '',
+        # 10. Receita por produtos
+        'preco_acordado': receita_produtos,
+        'valor_unitario': receita_produtos,
+        # 11. Tarifa de venda e impostos
+        'valor_taxa_comissao': tarifa_venda,
+        'taxa_comissao': 0,
+        # 12. Tarifas de envio
+        'valor_taxa_servico': tarifa_envio,
+        'taxa_servico': 0,
+        # 13. Cancelamentos e reembolsos
+        'cancelamentos_reembolsos': cancelamentos,
+        # 14. Total
+        'valor_total': total,
+        # 15. Endereço
+        'endereco': endereco,
+        # 16. Cidade
+        'cidade': cidade,
+        # 17. Estado (endereço)
+        'estado_endereco': estado_endereco,
+        
+        # Outros campos
+        'produto_nome': titulo,
         'status_impressao': 'Pendente',
         
         # Metadata
