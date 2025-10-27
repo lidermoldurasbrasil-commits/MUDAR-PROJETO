@@ -4216,7 +4216,7 @@ async def create_pedidos_bulk(pedidos: list[PedidoMarketplace], current_user: di
 # ============= FUNÇÕES DE PROCESSAMENTO DE PLANILHAS =============
 
 def processar_linha_shopee(row, projeto_id, projeto, current_user):
-    """Processa uma linha da planilha Shopee - TODOS OS 17 CAMPOS"""
+    """Processa uma linha da planilha Shopee - COM NOMES EXATOS DAS COLUNAS"""
     import pandas as pd
     
     # Helper para pegar valores com fallback
@@ -4234,6 +4234,8 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
             return float(val)
         except:
             return default
+    
+    # MAPEAMENTO EXATO DAS COLUNAS DA PLANILHA SHOPEE
     
     # 1. ID do pedido
     numero_pedido = get_value('ID do pedido')
@@ -4270,14 +4272,14 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
     # 7. Nome da variação
     nome_variacao = get_value('Nome da variação')
     
-    # 8. Preço Original
-    preco_original = get_float('Preço Original')
+    # 8. Preço original (usar coluna exata)
+    preco_original = get_float('Preço original')
     
     # 9. Preço acordado
     preco_acordado = get_float('Preço acordado')
     
     # 10. Valor total
-    valor_total = get_float('Valor total')
+    valor_total = get_float('Valor Total')
     
     # 11. Taxa de comissão
     taxa_comissao_valor = get_float('Taxa de comissão')
@@ -4294,11 +4296,16 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
     # 15. Endereço de entrega
     endereco_entrega = get_value('Endereço de entrega')
     
-    # 16. Cidade
+    # 16. Cidade (primeira ocorrência - índice 50)
     cidade = get_value('Cidade')
     
     # 17. UF
     uf = get_value('UF')
+    
+    # Campos adicionais úteis
+    produto_nome = get_value('Nome do Produto')
+    telefone = get_value('Telefone')
+    bairro = get_value('Bairro')
     
     # Identificar tipo de envio
     tipo_envio = 'Outro'
@@ -4309,13 +4316,13 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
     elif 'shopee entrega direta' in opcao_envio.lower():
         tipo_envio = 'Flex Shopee'
     
-    # Montar objeto completo
+    # Montar objeto completo com TODOS OS CAMPOS
     pedido_data = {
         'id': str(uuid.uuid4()),
         'projeto_id': projeto_id,
         'plataforma': projeto['plataforma'],
         
-        # 17 campos da planilha
+        # 17 campos principais da planilha
         'numero_pedido': numero_pedido,  # 1
         'status_pedido': status_pedido,  # 2
         'opcao_envio': opcao_envio,  # 3
@@ -4334,10 +4341,11 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         'cidade': cidade,  # 16
         'uf': uf,  # 17
         
-        # Campos adicionais
+        # Campos adicionais para compatibilidade
         'sku': numero_referencia_sku,
-        'produto_nome': get_value('Nome do Produto'),
-        'cliente_contato': get_value('Telefone'),
+        'produto_nome': produto_nome,
+        'cliente_contato': telefone,
+        'endereco': f"{endereco_entrega}, {bairro}, {cidade}/{uf}" if endereco_entrega else '',
         'valor_unitario': preco_acordado,
         'valor_total': valor_total,
         'taxa_comissao': 0,
@@ -4353,6 +4361,18 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         'updated_at': datetime.now(timezone.utc).isoformat(),
         'prazo_entrega': data_prevista or (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
     }
+    
+    # Calcular taxas percentuais
+    if preco_acordado > 0:
+        if taxa_comissao_valor > 0:
+            pedido_data['taxa_comissao'] = (taxa_comissao_valor / preco_acordado) * 100
+        if taxa_servico_valor > 0:
+            pedido_data['taxa_servico'] = (taxa_servico_valor / preco_acordado) * 100
+        pedido_data['valor_liquido'] = preco_acordado - taxa_comissao_valor - taxa_servico_valor
+    else:
+        pedido_data['valor_liquido'] = 0
+    
+    return pedido_data
     
     # Calcular taxas percentuais
     if preco_acordado > 0:
