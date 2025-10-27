@@ -1716,6 +1716,8 @@ export default function MarketplaceProjetoDetalhes() {
                       />
                     </td>
                     
+                      /* === SHOPEE - CAMPOS ORIGINAIS === */
+                      <>
                     {/* ID do Pedido / N.º de Venda */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
@@ -1787,6 +1789,8 @@ export default function MarketplaceProjetoDetalhes() {
                     <td className="px-4 py-3">
                       <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
                     </td>
+                      </>
+                    )}
                   </tr>
                 ))}
               </tbody>
