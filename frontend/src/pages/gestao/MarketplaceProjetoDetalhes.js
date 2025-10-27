@@ -1201,9 +1201,7 @@ export default function MarketplaceProjetoDetalhes() {
                         </td>
                       </>
                     ) : (
-                      {/* ===== SHOPEE - CAMPOS ORIGINAIS ===== */}
                       <>
-                    {/* ID do Pedido - Editável */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white transition-opacity">
