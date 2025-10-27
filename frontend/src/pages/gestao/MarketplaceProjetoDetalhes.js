@@ -994,6 +994,41 @@ export default function MarketplaceProjetoDetalhes() {
                 className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
+            {projeto?.plataforma === 'mercadolivre' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">🏭 Setor</label>
+                  <select
+                    value={filtros.setor || ''}
+                    onChange={(e) => setFiltros({ ...filtros, setor: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg"
+                  >
+                    <option value="">Todos</option>
+                    <option value="Espelho">🪞 Espelho</option>
+                    <option value="Molduras com Vidro">🖼️ Molduras com Vidro</option>
+                    <option value="Molduras">🖼️ Molduras</option>
+                    <option value="Impressão">🖨️ Impressão</option>
+                    <option value="Expedição">🧾 Expedição</option>
+                    <option value="Embalagem">📦 Embalagem</option>
+                    <option value="Personalizado">⭐ Personalizado</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">⚙️ Status Produção</label>
+                  <select
+                    value={filtros.statusProducao || ''}
+                    onChange={(e) => setFiltros({ ...filtros, statusProducao: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg"
+                  >
+                    <option value="">Todos</option>
+                    <option value="Aguardando">⏳ Aguardando</option>
+                    <option value="Em montagem">🔧 Em montagem</option>
+                    <option value="Imprimindo">🖨️ Imprimindo</option>
+                    <option value="Impresso">✅ Impresso</option>
+                  </select>
+                </div>
+              </>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">🔽 Ordenar por Data</label>
               <select
