@@ -24,6 +24,24 @@ const STATUS_IMPRESSAO_OPTIONS = [
 
 const PRIORIDADE_OPTIONS = ['Baixa', 'Normal', 'Alta', 'Urgente'];
 
+// Cores para Setor
+const SETOR_COLORS = {
+  'Espelho': '#3B82F6',        // Azul
+  'Molduras com Vidro': '#8B5CF6', // Roxo
+  'Molduras': '#EC4899',       // Rosa
+  'Impressão': '#F59E0B',      // Laranja
+  'Expedição': '#10B981',      // Verde
+  'Embalagem': '#6366F1'       // Indigo
+};
+
+// Cores para Status Produção
+const STATUS_PRODUCAO_COLORS = {
+  'Aguardando': '#94A3B8',     // Cinza
+  'Em montagem': '#F59E0B',    // Laranja
+  'Imprimindo': '#3B82F6',     // Azul
+  'Impresso': '#10B981'        // Verde
+};
+
 export default function MarketplaceProjetoDetalhes() {
   const { projetoId } = useParams();
   const navigate = useNavigate();
