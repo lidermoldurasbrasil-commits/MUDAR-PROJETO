@@ -1351,6 +1351,8 @@ export default function MarketplaceProjetoDetalhes() {
                         className="bg-transparent text-gray-300 text-sm border-none focus:outline-none focus:bg-gray-700 rounded px-2 py-1 w-full"
                       />
                     </td>
+                      </>
+                    )}
                   </tr>
                 ))}
                 
