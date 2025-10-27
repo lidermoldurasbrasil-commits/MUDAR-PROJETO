@@ -4451,6 +4451,7 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
         if col_name in row.index:
             forma_entrega = get_string_value(col_name)
             if forma_entrega:
+                print(f"✅ Forma de entrega encontrada na coluna '{col_name}': {forma_entrega}")
                 break
     
     # Se ainda estiver vazio, tentar colunas que contenham "entrega"
@@ -4459,7 +4460,11 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
             if 'entrega' in col.lower() and 'forma' in col.lower():
                 forma_entrega = get_string_value(col)
                 if forma_entrega:
+                    print(f"✅ Forma de entrega encontrada na coluna '{col}': {forma_entrega}")
                     break
+    
+    if not forma_entrega:
+        print(f"⚠️ AVISO: Forma de entrega não encontrada. Colunas disponíveis: {list(row.index)}")
     
     tipo_envio = 'Outro'
     if 'flex' in forma_entrega.lower() or 'full' in forma_entrega.lower():
