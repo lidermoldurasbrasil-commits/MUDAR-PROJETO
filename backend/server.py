@@ -4216,22 +4216,34 @@ async def create_pedidos_bulk(pedidos: list[PedidoMarketplace], current_user: di
 # ============= FUNÇÕES DE PROCESSAMENTO DE PLANILHAS =============
 
 def processar_linha_shopee(row, projeto_id, projeto, current_user):
-    """Processa uma linha da planilha Shopee - COM NOMES EXATOS DAS COLUNAS"""
+    """Processa uma linha da planilha Shopee - COM LOGS DE DEBUG"""
     import pandas as pd
+    
+    # DEBUG: Mostrar todas as colunas e seus valores
+    print("=" * 80)
+    print("DEBUG SHOPEE - LINHA COMPLETA:")
+    for col, val in row.items():
+        if not pd.isna(val):
+            print(f"  '{col}': '{val}'")
+    print("=" * 80)
     
     # Helper para pegar valores com fallback
     def get_value(col, default=''):
         val = row.get(col, default)
         if pd.isna(val):
             return default
-        return str(val)
+        result = str(val)
+        print(f"DEBUG - get_value('{col}'): '{result}'")
+        return result
     
     def get_float(col, default=0.0):
         val = row.get(col, default)
         if pd.isna(val):
             return default
         try:
-            return float(val)
+            result = float(val)
+            print(f"DEBUG - get_float('{col}'): {result}")
+            return result
         except:
             return default
     
@@ -4254,8 +4266,9 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         data_prevista_raw = row.get('Data prevista de envio')
         if data_prevista_raw and not pd.isna(data_prevista_raw):
             data_prevista = pd.to_datetime(data_prevista_raw).isoformat()
-    except:
-        pass
+            print(f"DEBUG - Data prevista: {data_prevista}")
+    except Exception as e:
+        print(f"DEBUG - Erro ao processar data: {e}")
     
     # 5. Número de referência SKU
     numero_referencia_sku = get_value('Número de referência SKU')
@@ -4266,13 +4279,14 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         qtd = row.get('Quantidade', 1)
         if not pd.isna(qtd):
             quantidade = int(float(qtd))
+            print(f"DEBUG - Quantidade: {quantidade}")
     except:
         quantidade = 1
     
     # 7. Nome da variação
     nome_variacao = get_value('Nome da variação')
     
-    # 8. Preço original (usar coluna exata)
+    # 8. Preço original
     preco_original = get_float('Preço original')
     
     # 9. Preço acordado
@@ -4296,7 +4310,7 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
     # 15. Endereço de entrega
     endereco_entrega = get_value('Endereço de entrega')
     
-    # 16. Cidade (primeira ocorrência - índice 50)
+    # 16. Cidade
     cidade = get_value('Cidade')
     
     # 17. UF
@@ -4306,6 +4320,24 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
     produto_nome = get_value('Nome do Produto')
     telefone = get_value('Telefone')
     bairro = get_value('Bairro')
+    
+    print(f"\nDEBUG - RESUMO DO PEDIDO:")
+    print(f"  ID: {numero_pedido}")
+    print(f"  Status: {status_pedido}")
+    print(f"  Opção Envio: {opcao_envio}")
+    print(f"  SKU: {numero_referencia_sku}")
+    print(f"  Quantidade: {quantidade}")
+    print(f"  Variação: {nome_variacao}")
+    print(f"  Preço Original: {preco_original}")
+    print(f"  Preço Acordado: {preco_acordado}")
+    print(f"  Valor Total: {valor_total}")
+    print(f"  Taxa Comissão: {taxa_comissao_valor}")
+    print(f"  Taxa Serviço: {taxa_servico_valor}")
+    print(f"  Nome Usuário: {nome_usuario}")
+    print(f"  Destinatário: {nome_destinatario}")
+    print(f"  Cidade: {cidade}")
+    print(f"  UF: {uf}")
+    print("=" * 80)
     
     # Identificar tipo de envio
     tipo_envio = 'Outro'
