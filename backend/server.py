@@ -4304,11 +4304,18 @@ def detectar_setor_por_sku(sku_texto):
     for padrao in padroes_ambiguos:
         if padrao in sku:
             # Se tem outros indicadores de vidro junto, vai para Molduras com Vidro
-            if any(ind in sku for ind in ['CX', 'MD', 'MF', 'CV', 'X50', 'X30', 'X60', 'X80', 'X120']):
+            if any(ind in sku for ind in ['CX', 'MD', 'MF', 'CV', 'VIDRO', 'X50', 'X30', 'X60', 'X80', 'X120']):
                 print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém {padrao} + indicadores de vidro)")
                 return 'Molduras com Vidro'
     
     # 4. MOLDURAS - padrões que vão SEMPRE para Molduras
+    # Verificar palavra MOLDURA no texto (sem indicadores de vidro)
+    if 'MOLDURA' in sku:
+        # Verificar se NÃO tem indicadores de vidro
+        if not any(ind in sku for ind in ['VIDRO', 'CX', 'MD', 'MF', 'CV']):
+            print(f"🖼️ SKU '{sku}' → MOLDURAS (contém palavra MOLDURA sem vidro)")
+            return 'Molduras'
+    
     # MM vai SEMPRE para Molduras, independente de outros indicadores
     if 'MM' in sku:
         print(f"🖼️ SKU '{sku}' → MOLDURAS (contém MM - prioridade Molduras)")
@@ -4319,7 +4326,7 @@ def detectar_setor_por_sku(sku_texto):
     for padrao in padroes_moldura:
         if padrao in sku:
             # Verificar se NÃO tem indicadores de vidro
-            if not any(ind in sku for ind in ['CX', 'MD', 'MF', 'CV', 'X50', 'X30', 'X60', 'X80', 'X120']):
+            if not any(ind in sku for ind in ['CX', 'MD', 'MF', 'CV', 'VIDRO', 'X50', 'X30', 'X60', 'X80', 'X120']):
                 print(f"🖼️ SKU '{sku}' → MOLDURAS (contém {padrao} sem vidro)")
                 return 'Molduras'
             else:
@@ -4332,7 +4339,7 @@ def detectar_setor_por_sku(sku_texto):
     for padrao in padroes_moldura_simples:
         if padrao in sku and 'CV' not in sku:
             # Se não tem CV nem dimensões, vai para Molduras
-            if not any(ind in sku for ind in ['CX', 'MD', 'MF', 'X50', 'X30', 'X60', 'X80', 'X120']):
+            if not any(ind in sku for ind in ['CX', 'MD', 'MF', 'VIDRO', 'X50', 'X30', 'X60', 'X80', 'X120']):
                 print(f"🖼️ SKU '{sku}' → MOLDURAS (contém {padrao} sem vidro)")
                 return 'Molduras'
     
