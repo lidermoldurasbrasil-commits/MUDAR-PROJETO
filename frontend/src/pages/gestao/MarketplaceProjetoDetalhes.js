@@ -200,16 +200,135 @@ export default function MarketplaceProjetoDetalhes() {
     fetchStatusCustomizados();
   }, [projetoId, filtros]);
 
-  // Polling para atualização em tempo real a cada 5 segundos
+  // ⚡ TEMPO REAL - Atualização de referência sempre que pedidos mudarem
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      // Buscar dados sem mostrar loading
-      fetchDados(false); // false = não mostra spinner
+    pedidosRef.current = pedidos;
+  }, [pedidos]);
+
+  // ⚡ TEMPO REAL - Polling inteligente com detecção de mudanças
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      try {
+        setIsRefreshing(true);
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        
+        // Buscar pedidos atualizados
+        let url = `${API}/pedidos?projeto_id=${projetoId}`;
+        if (filtros.status) url += `&status=${filtros.status}`;
+        if (filtros.atrasado !== null) url += `&atrasado=${filtros.atrasado}`;
+        
+        const response = await axios.get(url, { headers });
+        const novosPedidos = response.data || [];
+        
+        // Detectar mudanças comparando com estado anterior
+        const pedidosAnteriores = pedidosRef.current;
+        const mudancasDetectadas = [];
+        
+        novosPedidos.forEach(novoPedido => {
+          const pedidoAntigo = pedidosAnteriores.find(p => p.id === novoPedido.id);
+          
+          if (pedidoAntigo) {
+            // Verificar mudanças em campos importantes
+            if (pedidoAntigo.status !== novoPedido.status) {
+              mudancasDetectadas.push({
+                id: novoPedido.id,
+                numero_pedido: novoPedido.numero_pedido,
+                tipo: 'status',
+                de: pedidoAntigo.status,
+                para: novoPedido.status
+              });
+            }
+            if (pedidoAntigo.status_producao !== novoPedido.status_producao) {
+              mudancasDetectadas.push({
+                id: novoPedido.id,
+                numero_pedido: novoPedido.numero_pedido,
+                tipo: 'setor',
+                de: pedidoAntigo.status_producao,
+                para: novoPedido.status_producao
+              });
+            }
+            if (pedidoAntigo.status_impressao !== novoPedido.status_impressao) {
+              mudancasDetectadas.push({
+                id: novoPedido.id,
+                numero_pedido: novoPedido.numero_pedido,
+                tipo: 'impressao',
+                de: pedidoAntigo.status_impressao,
+                para: novoPedido.status_impressao
+              });
+            }
+          }
+        });
+        
+        // Detectar novos pedidos
+        const novosIds = novosPedidos.map(p => p.id);
+        const antigosIds = pedidosAnteriores.map(p => p.id);
+        const pedidosNovos = novosPedidos.filter(p => !antigosIds.includes(p.id));
+        
+        // Atualizar estado
+        setPedidos(novosPedidos);
+        setLastUpdate(new Date());
+        
+        // Mostrar notificações apenas se houver mudanças
+        if (mudancasDetectadas.length > 0) {
+          setHasNewUpdates(true);
+          
+          // Agrupar mudanças por pedido
+          const mudancasPorPedido = {};
+          mudancasDetectadas.forEach(m => {
+            if (!mudancasPorPedido[m.numero_pedido]) {
+              mudancasPorPedido[m.numero_pedido] = [];
+            }
+            mudancasPorPedido[m.numero_pedido].push(m);
+          });
+          
+          // Notificar mudanças (máximo 3 notificações para não poluir)
+          Object.entries(mudancasPorPedido).slice(0, 3).forEach(([numeroPedido, mudancas]) => {
+            const descricoes = mudancas.map(m => {
+              if (m.tipo === 'status') return `Status: ${m.para}`;
+              if (m.tipo === 'setor') return `Setor: ${m.para}`;
+              if (m.tipo === 'impressao') return `Impressão: ${m.para}`;
+              return '';
+            }).filter(Boolean).join(', ');
+            
+            toast.info(`🔄 Pedido ${numeroPedido} atualizado: ${descricoes}`, {
+              duration: 4000
+            });
+          });
+          
+          if (Object.keys(mudancasPorPedido).length > 3) {
+            toast.info(`📊 +${Object.keys(mudancasPorPedido).length - 3} pedidos também foram atualizados`, {
+              duration: 3000
+            });
+          }
+          
+          // Limpar flag após 3 segundos
+          setTimeout(() => setHasNewUpdates(false), 3000);
+        }
+        
+        // Notificar novos pedidos
+        if (pedidosNovos.length > 0) {
+          toast.success(`✨ ${pedidosNovos.length} novo(s) pedido(s) adicionado(s)!`, {
+            duration: 4000
+          });
+        }
+        
+      } catch (error) {
+        console.error('Erro no polling:', error);
+      } finally {
+        setIsRefreshing(false);
+      }
     }, 5000); // 5 segundos
+    
+    pollingInterval.current = intervalId;
 
     // Limpar interval ao desmontar
-    return () => clearInterval(intervalId);
-  }, [projetoId]);
+    return () => {
+      if (pollingInterval.current) {
+        clearInterval(pollingInterval.current);
+      }
+    };
+  }, [projetoId, filtros]);
 
   const fetchStatusCustomizados = async () => {
     try {
