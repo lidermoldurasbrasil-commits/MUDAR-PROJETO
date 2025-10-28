@@ -150,6 +150,33 @@ export default function MarketplacesCentral() {
     setShowEditModal(true);
   };
 
+  const handleDeleteProjeto = async (e, projeto) => {
+    e.stopPropagation(); // Impede navegação ao clicar na lixeira
+    
+    // Confirmar antes de deletar
+    const confirmacao = window.confirm(
+      `Tem certeza que deseja deletar o projeto "${projeto.nome}"?\n\n` +
+      `⚠️ ATENÇÃO: Todos os pedidos deste projeto também serão deletados!\n\n` +
+      `Esta ação não pode ser desfeita.`
+    );
+    
+    if (!confirmacao) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(
+        `${API}/projetos/${projeto.id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success(`Projeto "${projeto.nome}" deletado com sucesso!`);
+      fetchDados(); // Recarregar lista de projetos
+    } catch (error) {
+      console.error('Erro ao deletar projeto:', error);
+      toast.error('Erro ao deletar projeto: ' + (error.response?.data?.detail || error.message));
+    }
+  };
+
   const handleEditHorarios = (e, projeto) => {
     e.stopPropagation();
     setProjetoHorarios(projeto);
