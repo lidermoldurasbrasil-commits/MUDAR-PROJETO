@@ -814,7 +814,7 @@ export default function MarketplaceProjetoDetalhes() {
       return grupos;
     }
     
-    return { 'Todos': pedidosFiltrados };
+    return { 'Todos': listaPedidos };
   };
 
   // Agrupar pedidos por status para o Kanban
