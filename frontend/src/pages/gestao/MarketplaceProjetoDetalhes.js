@@ -1130,6 +1130,24 @@ export default function MarketplaceProjetoDetalhes() {
               <div>
                 <h1 className="text-3xl font-bold text-white">{projeto.nome}</h1>
                 <p className="text-sm text-gray-400">{projeto.descricao}</p>
+                
+                {/* ⚡ Indicador de Tempo Real */}
+                <div className="flex items-center gap-2 mt-2">
+                  <div className={`flex items-center gap-1 text-xs ${hasNewUpdates ? 'text-green-400' : 'text-gray-500'}`}>
+                    <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <span>
+                      {isRefreshing ? 'Atualizando...' : `Atualizado há ${Math.floor((new Date() - lastUpdate) / 1000)}s`}
+                    </span>
+                  </div>
+                  {hasNewUpdates && (
+                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full animate-pulse">
+                      ✨ Novidades
+                    </span>
+                  )}
+                  <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full">
+                    🔄 Tempo Real Ativo
+                  </span>
+                </div>
               </div>
             </div>
           </div>
