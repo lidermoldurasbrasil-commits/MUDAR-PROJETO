@@ -65,6 +65,9 @@ export default function MarketplaceProjetoDetalhes() {
   // Verificar se usuário é admin (director ou manager)
   const isAdmin = user?.role === 'director' || user?.role === 'manager';
   
+  // Verificar se usuário pode ver aba Financeiro (apenas director e manager)
+  const canViewFinanceiro = user?.role === 'director' || user?.role === 'manager';
+  
   const [projeto, setProjeto] = useState(null);
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
