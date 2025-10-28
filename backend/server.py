@@ -4940,7 +4940,8 @@ async def analisar_sku_com_ia(
     data: dict,
     current_user: dict = Depends(get_current_user)
 ):
-    """Analisa um SKU usando IA e retorna sugestão de setor com nível de confiança"""
+    """Analisa um SKU usando IA e retorna sugestão de setor com nível de confiança
+    APRENDE com reclassificações manuais anteriores"""
     from emergentintegrations.llm.chat import LlmChat, UserMessage
     import asyncio
     
@@ -4950,6 +4951,39 @@ async def analisar_sku_com_ia(
         raise HTTPException(status_code=400, detail="SKU não fornecido")
     
     try:
+        # PASSO 1: VERIFICAR HISTÓRICO DE FEEDBACK (Aprendizado)
+        # Buscar se este SKU exato já foi reclassificado manualmente
+        feedback_exato = await db.sku_feedback.find_one(
+            {"sku": sku},
+            sort=[("created_at", -1)]  # Mais recente primeiro
+        )
+        
+        if feedback_exato:
+            # SKU já foi reclassificado manualmente - usar essa classificação!
+            return {
+                "sku": sku,
+                "setor_sugerido": feedback_exato['setor_correto'],
+                "confianca": 100,  # Confiança máxima pois veio de classificação manual
+                "razao": f"✅ Aprendizado: Este SKU foi classificado manualmente como '{feedback_exato['setor_correto']}' anteriormente",
+                "fonte": "feedback_manual",
+                "success": True
+            }
+        
+        # PASSO 2: BUSCAR FEEDBACKS SIMILARES (SKUs parecidos)
+        # Buscar SKUs que começam com as primeiras palavras-chave
+        sku_parts = sku.upper().split('-')[0] if '-' in sku else sku.upper().split()[0] if ' ' in sku else sku.upper()[:10]
+        feedbacks_similares = await db.sku_feedback.find({
+            "sku": {"$regex": f"^{sku_parts}", "$options": "i"}
+        }).limit(5).to_list(None)
+        
+        # Construir contexto de aprendizado para a IA
+        contexto_aprendizado = ""
+        if feedbacks_similares:
+            contexto_aprendizado = "\n\nEXEMPLOS DE CLASSIFICAÇÕES ANTERIORES (use como referência):\n"
+            for fb in feedbacks_similares:
+                contexto_aprendizado += f"- SKU '{fb['sku']}' foi classificado como '{fb['setor_correto']}'\n"
+        
+        # PASSO 3: USAR IA COM CONTEXTO DE APRENDIZADO
         # Buscar chave da API
         api_key = os.environ.get('EMERGENT_LLM_KEY')
         if not api_key:
@@ -4959,8 +4993,8 @@ async def analisar_sku_com_ia(
         chat = LlmChat(
             api_key=api_key,
             session_id=f"sku-analysis-{uuid.uuid4()}",
-            system_message="""Você é um especialista em classificação de produtos para uma fábrica de molduras e espelhos.
-            
+            system_message=f"""Você é um especialista em classificação de produtos para uma fábrica de molduras e espelhos.
+
 Analise o SKU fornecido e classifique em um dos seguintes setores:
 1. Espelho - produtos que são espelhos ou contêm espelho
 2. Molduras com Vidro - molduras que incluem vidro/acrílico
@@ -4970,12 +5004,14 @@ Analise o SKU fornecido e classifique em um dos seguintes setores:
 6. Embalagem - produtos que precisam apenas de embalagem
 7. Personalizado - produtos customizados ou que não se encaixam nas categorias
 
+{contexto_aprendizado}
+
 Responda APENAS em formato JSON:
-{
+{{
   "setor": "nome do setor",
   "confianca": numero de 0 a 100,
   "razao": "breve explicação da classificação"
-}"""
+}}"""
         ).with_model("openai", "gpt-4o-mini")
         
         # Criar mensagem do usuário
@@ -4998,11 +5034,18 @@ Responda APENAS em formato JSON:
             
             analise = json.loads(response_text)
             
+            # Adicionar indicador de aprendizado se usou feedbacks similares
+            razao_final = analise.get("razao", "Análise baseada em IA")
+            if feedbacks_similares:
+                razao_final = f"🎓 IA com Aprendizado: {razao_final}"
+            
             return {
                 "sku": sku,
                 "setor_sugerido": analise.get("setor", "Personalizado"),
-                "confianca": analise.get("confianca", 50),
-                "razao": analise.get("razao", "Análise baseada em IA"),
+                "confianca": min(analise.get("confianca", 50) + (10 if feedbacks_similares else 0), 95),  # Aumenta confiança se tem exemplos
+                "razao": razao_final,
+                "fonte": "ia_com_aprendizado" if feedbacks_similares else "ia",
+                "exemplos_usados": len(feedbacks_similares),
                 "success": True
             }
         except json.JSONDecodeError:
@@ -5012,6 +5055,7 @@ Responda APENAS em formato JSON:
                 "setor_sugerido": "Personalizado",
                 "confianca": 50,
                 "razao": f"IA: {response[:100]}",
+                "fonte": "ia",
                 "success": True
             }
             
@@ -5024,8 +5068,51 @@ Responda APENAS em formato JSON:
             "setor_sugerido": setor_fallback,
             "confianca": 70,
             "razao": "Classificação baseada em regras (IA indisponível)",
+            "fonte": "regras",
             "success": True
         }
+
+@api_router.post("/gestao/marketplaces/pedidos/registrar-feedback-sku")
+async def registrar_feedback_sku(
+    data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Registra feedback de reclassificação manual de SKU para aprendizado da IA"""
+    try:
+        sku = data.get('sku', '')
+        setor_original = data.get('setor_original', '')
+        setor_correto = data.get('setor_correto', '')
+        pedido_id = data.get('pedido_id', '')
+        
+        if not sku or not setor_correto:
+            raise HTTPException(status_code=400, detail="SKU e setor_correto são obrigatórios")
+        
+        # Criar registro de feedback
+        feedback = {
+            "id": str(uuid.uuid4()),
+            "sku": sku,
+            "setor_original": setor_original,
+            "setor_correto": setor_correto,
+            "usuario": current_user.get('username', 'unknown'),
+            "pedido_id": pedido_id,
+            "confianca": 100,  # Feedback manual tem confiança máxima
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Salvar no banco
+        await db.sku_feedback.insert_one(feedback)
+        
+        print(f"✅ Feedback registrado: SKU '{sku}' → '{setor_correto}' (por {current_user.get('username')})")
+        
+        return {
+            "success": True,
+            "message": "Feedback registrado com sucesso! A IA aprenderá com esta classificação.",
+            "feedback_id": feedback['id']
+        }
+        
+    except Exception as e:
+        print(f"Erro ao registrar feedback: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao registrar feedback: {str(e)}")
 
 # VENDAS MARKETPLACE
 @api_router.get("/gestao/marketplaces/vendas")
