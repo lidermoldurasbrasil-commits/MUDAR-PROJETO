@@ -433,6 +433,18 @@ frontend:
           agent: "testing"
           comment: "✅ ENDPOINTS DE PEDIDOS TESTADOS COM SUCESSO TOTAL! Executado teste completo conforme solicitação: 1) GET /api/gestao/marketplaces/pedidos?projeto_id={id} ✅ - Retorna pedidos corretamente, filtros funcionam (ex: status_producao=Molduras) ✅ 2) PUT /api/gestao/marketplaces/pedidos/{id} ✅ - Atualização status_producao (setor) funcionando ✅ - Atualização status_logistica (status produção) funcionando ✅ - Atualização status geral funcionando ✅ 3) Verificação que atualizações são salvas ✅. Todos endpoints funcionando perfeitamente, atualizações persistidas no banco!"
 
+  - task: "Endpoint de Projetos Marketplace - Autenticação e Acesso"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ ENDPOINT DE PROJETOS MARKETPLACE TESTADO COM SUCESSO TOTAL! Executado teste completo conforme solicitação específica da revisão: 1) Login diretor (diretor/123) ✅ - Token JWT gerado corretamente, role 'director' verificado ✅ 2) GET /api/gestao/marketplaces/projetos com token diretor ✅ - Status 200 OK, retorna array com 2 projetos ✅ - Projeto Shopee presente (id: shopee-projeto) ✅ - Projeto Mercado Livre presente (id: mercadolivre-projeto) ✅ 3) Login usuário produção (espelho/123) ✅ - Token JWT gerado corretamente, role 'production' verificado ✅ 4) GET /api/gestao/marketplaces/projetos com token produção ✅ - Status 200 OK, retorna mesmos 2 projetos ✅ - Usuários production conseguem acessar projetos ✅ - Usuários director conseguem acessar projetos ✅. TODAS AS VALIDAÇÕES APROVADAS: Login retorna access_token e user, endpoint retorna status 200, array com 2+ projetos, ambos projetos presentes, ambos tipos de usuário conseguem acessar. Taxa de sucesso: 100% (4/4 testes). Sistema de projetos marketplace 100% funcional!"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
