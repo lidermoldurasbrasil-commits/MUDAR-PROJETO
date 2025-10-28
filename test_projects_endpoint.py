@@ -92,7 +92,7 @@ class ProjectsEndpointTester:
         # Test 2: Get projects with director token
         print("\n📋 Test 2: Get projects with director token")
         
-        success_projects_director, projects_response = self.run_test(
+        success_projects_director, projects_response = self.run_api_test(
             "Get Projects (Director)",
             "GET",
             "gestao/marketplaces/projetos",
