@@ -37,6 +37,7 @@ export default function Layout({ user, onLogout }) {
         { path: '/marketplace/purchases', icon: ShoppingCart, label: 'Compras', testId: 'nav-purchases' },
         { path: '/marketplace/accounts-payable', icon: DollarSign, label: 'Contas a Pagar', testId: 'nav-accounts-payable' },
         { path: '/marketplace/sales', icon: TrendingUp, label: 'Vendas', testId: 'nav-sales' },
+        { path: '/marketplace/integrator', icon: Plug, label: 'Integrador', testId: 'nav-integrator' },
         { path: '/marketplace/cost-center', icon: Calculator, label: 'Centro de Custos', testId: 'nav-cost-center' },
         { path: '/marketplace/breakeven', icon: TrendingUp, label: 'Ponto de Equilíbrio', testId: 'nav-breakeven' },
       ] : [])
