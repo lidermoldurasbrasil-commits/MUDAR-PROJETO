@@ -1367,12 +1367,14 @@ export default function MarketplaceProjetoDetalhes() {
               Kanban
             </button>
           )}
-          <button
-            onClick={() => setViewMode('list')}
-            className={`px-4 py-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
-          >
-            Lista
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-4 py-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
+            >
+              Lista
+            </button>
+          )}
         </div>
       </div>
 
