@@ -4622,10 +4622,196 @@ class BusinessManagementSystemTester:
             self.log_test("Sector Detection Fix - OVERALL", False, f"{failed_count}/{total_count} cases failed")
             return False
 
+    def test_projects_endpoint_authentication(self):
+        """Test projects endpoint with director and production user authentication"""
+        print("\n🔐 TESTING PROJECTS ENDPOINT AUTHENTICATION...")
+        
+        # Test 1: Login with director
+        print("\n📋 Test 1: Login with director (diretor/123)")
+        director_login_data = {
+            "username": "diretor",
+            "password": "123"
+        }
+        
+        success_director, director_response = self.run_test(
+            "Director Login",
+            "POST",
+            "auth/login",
+            200,
+            data=director_login_data
+        )
+        
+        if not success_director:
+            print("❌ CRITICAL: Director login failed")
+            self.log_test("Projects Endpoint Test", False, "Director login failed")
+            return False
+        
+        # Capture director access token
+        director_token = director_response.get('access_token')
+        director_user = director_response.get('user', {})
+        
+        if not director_token:
+            print("❌ CRITICAL: No access_token in director login response")
+            self.log_test("Projects Endpoint Test", False, "No director access_token")
+            return False
+        
+        print(f"✅ Director login successful")
+        print(f"   Username: {director_user.get('username')}")
+        print(f"   Role: {director_user.get('role')}")
+        print(f"   Access Token: {director_token[:20]}...")
+        
+        # Test 2: Get projects with director token
+        print("\n📋 Test 2: Get projects with director token")
+        
+        # Temporarily set director token
+        original_token = self.token
+        self.token = director_token
+        
+        success_projects_director, projects_response = self.run_test(
+            "Get Projects (Director)",
+            "GET",
+            "gestao/marketplaces/projetos",
+            200
+        )
+        
+        if not success_projects_director:
+            print("❌ CRITICAL: Failed to get projects with director token")
+            self.log_test("Projects Endpoint - Director Access", False, "Failed to get projects")
+            return False
+        
+        # Validate projects response
+        if not isinstance(projects_response, list):
+            print("❌ CRITICAL: Projects response is not a list")
+            self.log_test("Projects Endpoint - Response Format", False, "Response not a list")
+            return False
+        
+        print(f"✅ Projects retrieved successfully: {len(projects_response)} projects found")
+        
+        # Check for expected projects (Shopee and Mercado Livre)
+        project_names = [p.get('nome', '') for p in projects_response]
+        shopee_found = any('shopee' in name.lower() for name in project_names)
+        mercadolivre_found = any('mercado' in name.lower() for name in project_names)
+        
+        print(f"   Project names: {project_names}")
+        print(f"   Shopee project found: {shopee_found}")
+        print(f"   Mercado Livre project found: {mercadolivre_found}")
+        
+        # Validate specific projects
+        validation_results = []
+        
+        if len(projects_response) >= 2:
+            print("✅ At least 2 projects returned")
+            validation_results.append(True)
+        else:
+            print(f"❌ Expected at least 2 projects, got {len(projects_response)}")
+            validation_results.append(False)
+        
+        if shopee_found:
+            print("✅ Shopee project found")
+            validation_results.append(True)
+        else:
+            print("❌ Shopee project not found")
+            validation_results.append(False)
+        
+        if mercadolivre_found:
+            print("✅ Mercado Livre project found")
+            validation_results.append(True)
+        else:
+            print("❌ Mercado Livre project not found")
+            validation_results.append(False)
+        
+        # Test 3: Login with production user (espelho)
+        print("\n📋 Test 3: Login with production user (espelho/123)")
+        production_login_data = {
+            "username": "espelho",
+            "password": "123"
+        }
+        
+        success_production, production_response = self.run_test(
+            "Production User Login",
+            "POST",
+            "auth/login",
+            200,
+            data=production_login_data
+        )
+        
+        if not success_production:
+            print("❌ CRITICAL: Production user login failed")
+            self.log_test("Projects Endpoint - Production Login", False, "Production login failed")
+            return False
+        
+        # Capture production access token
+        production_token = production_response.get('access_token')
+        production_user = production_response.get('user', {})
+        
+        if not production_token:
+            print("❌ CRITICAL: No access_token in production login response")
+            self.log_test("Projects Endpoint - Production Token", False, "No production access_token")
+            return False
+        
+        print(f"✅ Production user login successful")
+        print(f"   Username: {production_user.get('username')}")
+        print(f"   Role: {production_user.get('role')}")
+        print(f"   Access Token: {production_token[:20]}...")
+        
+        # Test 4: Get projects with production token
+        print("\n📋 Test 4: Get projects with production user token")
+        
+        # Set production token
+        self.token = production_token
+        
+        success_projects_production, projects_response_prod = self.run_test(
+            "Get Projects (Production)",
+            "GET",
+            "gestao/marketplaces/projetos",
+            200
+        )
+        
+        if not success_projects_production:
+            print("❌ CRITICAL: Failed to get projects with production token")
+            self.log_test("Projects Endpoint - Production Access", False, "Failed to get projects with production user")
+            return False
+        
+        # Validate production user can access same projects
+        if not isinstance(projects_response_prod, list):
+            print("❌ CRITICAL: Projects response for production user is not a list")
+            self.log_test("Projects Endpoint - Production Response Format", False, "Response not a list")
+            return False
+        
+        print(f"✅ Projects retrieved successfully by production user: {len(projects_response_prod)} projects found")
+        
+        # Check if production user gets same projects as director
+        if len(projects_response_prod) == len(projects_response):
+            print("✅ Production user gets same number of projects as director")
+            validation_results.append(True)
+        else:
+            print(f"❌ Production user gets {len(projects_response_prod)} projects, director gets {len(projects_response)}")
+            validation_results.append(False)
+        
+        # Restore original token
+        self.token = original_token
+        
+        # Overall validation
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ ALL PROJECTS ENDPOINT AUTHENTICATION TESTS PASSED!")
+            self.log_test("Projects Endpoint Authentication - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ PROJECTS ENDPOINT AUTHENTICATION FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("Projects Endpoint Authentication - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
         print(f"Testing against: {self.base_url}")
+        
+        # PRIORITY: Test projects endpoint authentication (CURRENT REQUEST)
+        print("\n🚨 RUNNING PROJECTS ENDPOINT AUTHENTICATION TEST (CURRENT REQUEST)...")
+        self.test_projects_endpoint_authentication()
         
         # PRIORITY: Test production users login first (as requested in review)
         print("\n🚨 RUNNING PRODUCTION USERS LOGIN TEST (REVIEW REQUEST)...")
