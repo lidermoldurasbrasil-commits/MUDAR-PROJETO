@@ -5346,6 +5346,193 @@ async def registrar_feedback_sku(
         print(f"Erro ao registrar feedback: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro ao registrar feedback: {str(e)}")
 
+# ============= MARKETPLACE INTEGRATOR ENDPOINTS =============
+
+from marketplace_integrator import (
+    MercadoLivreIntegrator,
+    ShopeeIntegrator,
+    save_or_update_order,
+    save_or_update_order_items,
+    save_or_update_payments,
+    save_or_update_shipments
+)
+
+@api_router.get("/integrator/mercadolivre/authorize")
+async def ml_authorize(current_user: dict = Depends(get_current_user)):
+    """Inicia processo de autorização OAuth2 + PKCE com Mercado Livre"""
+    try:
+        integrator = MercadoLivreIntegrator()
+        auth_data = await integrator.get_authorization_url()
+        
+        return {
+            "authorization_url": auth_data['url'],
+            "message": "Redirecione o usuário para authorization_url para autorizar"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar URL de autorização: {str(e)}")
+
+@api_router.get("/integrator/mercadolivre/callback")
+async def ml_callback(code: str, state: str = ""):
+    """Callback OAuth2 - recebe código de autorização"""
+    try:
+        # Buscar code_verifier salvo anteriormente
+        pkce_session = await db.ml_pkce_sessions.find_one(
+            sort=[("created_at", -1)]
+        )
+        
+        if not pkce_session:
+            raise HTTPException(status_code=400, detail="Sessão PKCE não encontrada")
+        
+        code_verifier = pkce_session['code_verifier']
+        
+        # Trocar código por token
+        integrator = MercadoLivreIntegrator()
+        token_data = await integrator.exchange_code_for_token(code, code_verifier)
+        
+        # Limpar sessão PKCE
+        await db.ml_pkce_sessions.delete_many({})
+        
+        return {
+            "success": True,
+            "message": "✅ Autorização concluída com sucesso!",
+            "user_id": token_data.get('user_id'),
+            "expires_in": token_data.get('expires_in')
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro no callback: {str(e)}")
+
+@api_router.post("/integrator/mercadolivre/sync")
+async def ml_sync(
+    days_back: int = 7,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Sincroniza pedidos do Mercado Livre
+    
+    Args:
+        days_back: Quantos dias para trás buscar (padrão: 7)
+    """
+    try:
+        integrator = MercadoLivreIntegrator()
+        
+        # Data de início
+        date_from = datetime.now(timezone.utc) - timedelta(days=days_back)
+        
+        # Buscar pedidos
+        print(f"🔄 Buscando pedidos Mercado Livre desde {date_from}")
+        ml_orders = await integrator.fetch_orders_since(date_from)
+        
+        orders_processed = 0
+        orders_updated = 0
+        orders_created = 0
+        
+        for ml_order in ml_orders:
+            try:
+                # Mapear para formato interno
+                internal_order = integrator.map_to_internal_order(ml_order)
+                
+                # Verificar se já existe
+                existing = await db.orders.find_one({
+                    'marketplace_order_id': internal_order['marketplace_order_id']
+                })
+                
+                # Salvar/atualizar pedido
+                internal_order_id = await save_or_update_order(internal_order)
+                
+                if existing:
+                    orders_updated += 1
+                else:
+                    orders_created += 1
+                
+                # Mapear e salvar itens
+                items = integrator.map_to_internal_items(ml_order, internal_order_id)
+                await save_or_update_order_items(items)
+                
+                # TODO: Mapear e salvar payments e shipments
+                
+                orders_processed += 1
+                
+            except Exception as e:
+                print(f"❌ Erro ao processar pedido {ml_order.get('id')}: {e}")
+                continue
+        
+        return {
+            "success": True,
+            "message": f"✅ Sincronização concluída",
+            "total_orders": len(ml_orders),
+            "orders_processed": orders_processed,
+            "orders_created": orders_created,
+            "orders_updated": orders_updated
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro na sincronização: {str(e)}")
+
+@api_router.get("/integrator/orders")
+async def get_integrated_orders(
+    marketplace: str = None,
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """Lista pedidos integrados"""
+    try:
+        query = {}
+        if marketplace:
+            query['marketplace'] = marketplace.upper()
+        
+        orders = await db.orders.find(query).sort("created_at_marketplace", -1).limit(limit).to_list(None)
+        
+        # Para cada pedido, buscar itens
+        for order in orders:
+            items = await db.order_items.find({
+                'internal_order_id': order['internal_order_id']
+            }).to_list(None)
+            order['items'] = items
+        
+        return {
+            "success": True,
+            "total": len(orders),
+            "orders": orders
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao listar pedidos: {str(e)}")
+
+@api_router.get("/integrator/status")
+async def integrator_status(current_user: dict = Depends(get_current_user)):
+    """Verifica status das integrações"""
+    try:
+        # Mercado Livre
+        ml_creds = await db.marketplace_credentials.find_one({'marketplace': 'MERCADO_LIVRE'})
+        ml_status = {
+            'authenticated': bool(ml_creds and ml_creds.get('access_token')),
+            'user_id': ml_creds.get('user_id') if ml_creds else None,
+            'token_expires_at': ml_creds.get('token_expires_at') if ml_creds else None
+        }
+        
+        # Shopee
+        shopee_creds = await db.marketplace_credentials.find_one({'marketplace': 'SHOPEE'})
+        shopee_status = {
+            'authenticated': bool(shopee_creds and shopee_creds.get('access_token')),
+            'shop_id': shopee_creds.get('shop_id') if shopee_creds else None
+        }
+        
+        # Estatísticas
+        total_orders = await db.orders.count_documents({})
+        ml_orders = await db.orders.count_documents({'marketplace': 'MERCADO_LIVRE'})
+        shopee_orders = await db.orders.count_documents({'marketplace': 'SHOPEE'})
+        
+        return {
+            "mercado_livre": ml_status,
+            "shopee": shopee_status,
+            "statistics": {
+                "total_orders": total_orders,
+                "mercado_livre_orders": ml_orders,
+                "shopee_orders": shopee_orders
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao verificar status: {str(e)}")
+
 # VENDAS MARKETPLACE
 @api_router.get("/gestao/marketplaces/vendas")
 async def get_vendas_marketplace(
