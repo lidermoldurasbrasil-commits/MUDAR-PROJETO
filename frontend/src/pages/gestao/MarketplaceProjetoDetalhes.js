@@ -1886,7 +1886,7 @@ export default function MarketplaceProjetoDetalhes() {
                         </td>
                         
                         <td className="px-4 py-3">
-                          <span className="text-gray-300 text-sm">{pedido.estado || '-'}</span>
+                          <span className="text-gray-300 text-sm">{pedido.status || '-'}</span>
                         </td>
                         
                         <td className="px-4 py-3">
