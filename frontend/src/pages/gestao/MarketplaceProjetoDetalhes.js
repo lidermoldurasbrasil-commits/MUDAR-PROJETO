@@ -880,15 +880,13 @@ export default function MarketplaceProjetoDetalhes() {
             </button>
             {selectedPedidos.length > 0 && (
               <>
-                {isAdmin && (
-                  <button
-                    onClick={handleDeleteSelected}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                  >
-                    <X className="w-5 h-5" />
-                    Deletar {selectedPedidos.length}
-                  </button>
-                )}
+                <button
+                  onClick={handleDeleteSelected}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  <X className="w-5 h-5" />
+                  Deletar {selectedPedidos.length}
+                </button>
                 
                 {/* Dropdown para Status Geral */}
                 <div className="relative">
