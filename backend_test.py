@@ -3856,6 +3856,332 @@ class BusinessManagementSystemTester:
             self.log_test("Mercado Livre Orders Verification", False, f"Missing orders: {missing}")
             return False
 
+    def test_shopee_upload_functionality(self):
+        """Test Shopee planilha upload functionality as requested in review"""
+        print("\n🛍️ TESTING SHOPEE PLANILHA UPLOAD FUNCTIONALITY...")
+        print("📋 Testing complete flow: Login → Project → Excel → Upload → Verify")
+        
+        # Step 1: Get or create a Shopee marketplace project
+        print("\n📋 Step 1: Getting or creating Shopee marketplace project...")
+        
+        # First, try to get existing Shopee projects
+        success_get, projects_response = self.run_test(
+            "Get Marketplace Projects",
+            "GET",
+            "gestao/marketplaces/projetos",
+            200
+        )
+        
+        shopee_project_id = None
+        if success_get and isinstance(projects_response, list):
+            # Look for existing Shopee project
+            for project in projects_response:
+                if project.get('plataforma', '').lower() in ['shopee', 'Shopee']:
+                    shopee_project_id = project.get('id')
+                    print(f"✅ Found existing Shopee project with ID: {shopee_project_id}")
+                    break
+        
+        # If no Shopee project found, create one
+        if not shopee_project_id:
+            print("📋 Creating new Shopee project...")
+            shopee_project_data = {
+                "nome": "Shopee Test Project",
+                "plataforma": "Shopee",
+                "descricao": "Test project for Shopee upload functionality",
+                "icone": "🛍️",
+                "cor_primaria": "#FF6B00",
+                "status_ativo": True,
+                "loja_id": "fabrica"
+            }
+            
+            success_create, create_response = self.run_test(
+                "Create Shopee Project",
+                "POST",
+                "gestao/marketplaces/projetos",
+                200,
+                data=shopee_project_data
+            )
+            
+            if success_create and 'id' in create_response:
+                shopee_project_id = create_response['id']
+                print(f"✅ Created new Shopee project with ID: {shopee_project_id}")
+            else:
+                print("❌ CRITICAL: Failed to create Shopee project")
+                self.log_test("Shopee Upload - Project Creation", False, "Failed to create project")
+                return False
+        
+        # Step 2: Create test Excel file with Shopee format
+        print("\n📋 Step 2: Creating test Excel file with Shopee format...")
+        
+        try:
+            import pandas as pd
+            import tempfile
+            import os
+            from datetime import datetime, timedelta
+            
+            # Create test data with required Shopee columns and different shipping options
+            test_data = {
+                'ID do pedido': ['TEST001SHOPEE', 'TEST002SHOPEE', 'TEST003SHOPEE', 'TEST004SHOPEE'],
+                'Número de referência SKU': ['KIT-TEST-40x60-SHOPEE', 'QUADRO-TEST-50x70', 'MOLDURA-TEST-30x40', 'POSTER-TEST-A4'],
+                'Nome da variação': ['Kit Quadro Personalizado 40x60cm', 'Quadro Decorativo 50x70cm', 'Moldura Premium 30x40cm', 'Poster A4 Premium'],
+                'Quantidade': [1, 2, 1, 3],
+                'Preço acordado': [89.90, 149.90, 45.50, 29.90],
+                'Taxa de comissão': [8.99, 14.99, 4.55, 2.99],
+                'Taxa de serviço': [4.50, 7.50, 2.28, 1.50],
+                'Opção de envio': ['Shopee Xpress', 'Retirada pelo Comprador', 'Shopee Entrega Direta', 'Shopee Xpress'],
+                'Data prevista de envio': [
+                    (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d'),
+                    (datetime.now() + timedelta(days=5)).strftime('%Y-%m-%d'),
+                    (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d'),
+                    (datetime.now() + timedelta(days=4)).strftime('%Y-%m-%d')
+                ],
+                'Status do pedido': ['Aguardando Envio', 'Aguardando Envio', 'Aguardando Envio', 'Aguardando Envio'],
+                'Nome de usuário (comprador)': ['cliente_teste1', 'cliente_teste2', 'cliente_teste3', 'cliente_teste4'],
+                'Nome do destinatário': ['João Silva', 'Maria Santos', 'Pedro Costa', 'Ana Oliveira'],
+                'Endereço de entrega': ['Rua das Flores, 123', 'Av. Principal, 456', 'Rua do Comércio, 789', 'Rua Nova, 321'],
+                'Cidade': ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba'],
+                'UF': ['SP', 'RJ', 'MG', 'PR'],
+                'Nome do Produto': ['Kit Quadro', 'Quadro Decorativo', 'Moldura', 'Poster'],
+                'Telefone': ['11999999999', '21888888888', '31777777777', '41666666666']
+            }
+            
+            # Create DataFrame
+            df = pd.DataFrame(test_data)
+            
+            # Create temporary Excel file
+            with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp_file:
+                excel_path = tmp_file.name
+                df.to_excel(excel_path, index=False)
+                
+            print(f"✅ Created test Excel file with {len(df)} orders")
+            print(f"   File path: {excel_path}")
+            print(f"   File size: {os.path.getsize(excel_path)} bytes")
+            
+            # Print sample data for verification
+            print("📊 Sample test data:")
+            for i, row in df.head(2).iterrows():
+                print(f"   Order {i+1}: {row['ID do pedido']} - {row['Nome da variação']} - R${row['Preço acordado']} - {row['Opção de envio']}")
+            
+        except Exception as e:
+            print(f"❌ CRITICAL: Failed to create test Excel file: {e}")
+            self.log_test("Shopee Upload - Excel Creation", False, f"Excel creation failed: {e}")
+            return False
+        
+        # Step 3: Upload the file via multipart/form-data
+        print("\n📋 Step 3: Uploading Excel file to Shopee endpoint...")
+        
+        try:
+            import requests
+            
+            # Prepare multipart upload
+            url = f"{self.api_url}/gestao/marketplaces/pedidos/upload-planilha"
+            params = {
+                'projeto_id': shopee_project_id,
+                'formato': 'shopee'
+            }
+            
+            headers = {}
+            if self.token:
+                headers['Authorization'] = f'Bearer {self.token}'
+            
+            # Open and upload file
+            with open(excel_path, 'rb') as file:
+                files = {'file': ('test_shopee_orders.xlsx', file, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+                
+                response = requests.post(url, params=params, files=files, headers=headers)
+                
+            print(f"📤 Upload response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                upload_response = response.json()
+                print("✅ Upload successful!")
+                print(f"   Response: {upload_response}")
+                self.log_test("Shopee Upload - File Upload", True)
+            else:
+                print(f"❌ Upload failed with status {response.status_code}")
+                try:
+                    error_detail = response.json()
+                    print(f"   Error details: {error_detail}")
+                except:
+                    print(f"   Error text: {response.text}")
+                self.log_test("Shopee Upload - File Upload", False, f"Upload failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ CRITICAL: Upload request failed: {e}")
+            self.log_test("Shopee Upload - Upload Request", False, f"Upload request failed: {e}")
+            return False
+        finally:
+            # Clean up temporary file
+            try:
+                os.unlink(excel_path)
+                print("🧹 Cleaned up temporary Excel file")
+            except:
+                pass
+        
+        # Step 4: Verify response shows successful import
+        print("\n📋 Step 4: Verifying upload response...")
+        validation_results = []
+        
+        # Check response structure
+        required_fields = ['message', 'total_importados', 'total_linhas']
+        for field in required_fields:
+            if field in upload_response:
+                print(f"✅ Response contains '{field}': {upload_response[field]}")
+                validation_results.append(True)
+            else:
+                print(f"❌ Response missing '{field}'")
+                validation_results.append(False)
+                self.log_test(f"Shopee Upload - Response {field}", False, f"Missing {field}")
+        
+        # Check import count
+        total_imported = upload_response.get('total_importados', 0)
+        expected_count = 4  # We created 4 test orders
+        
+        if total_imported == expected_count:
+            print(f"✅ Correct number of orders imported: {total_imported}")
+            validation_results.append(True)
+            self.log_test("Shopee Upload - Import Count", True)
+        else:
+            print(f"❌ Expected {expected_count} orders, got {total_imported}")
+            validation_results.append(False)
+            self.log_test("Shopee Upload - Import Count", False, f"Expected {expected_count}, got {total_imported}")
+        
+        # Step 5: Verify orders were saved in database
+        print("\n📋 Step 5: Verifying orders were saved in database...")
+        
+        success_get_orders, orders_response = self.run_test(
+            "Get Marketplace Orders",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={shopee_project_id}",
+            200
+        )
+        
+        if success_get_orders and isinstance(orders_response, list):
+            # Look for our test orders
+            test_orders_found = []
+            for order in orders_response:
+                if order.get('numero_pedido', '').startswith('TEST') and 'SHOPEE' in order.get('numero_pedido', ''):
+                    test_orders_found.append(order)
+            
+            print(f"✅ Found {len(test_orders_found)} test orders in database")
+            
+            if len(test_orders_found) >= expected_count:
+                validation_results.append(True)
+                self.log_test("Shopee Upload - Database Persistence", True)
+            else:
+                validation_results.append(False)
+                self.log_test("Shopee Upload - Database Persistence", False, f"Expected {expected_count}, found {len(test_orders_found)}")
+            
+            # Step 6: Verify field mapping and tipo_envio identification
+            print("\n📋 Step 6: Verifying field mapping and tipo_envio identification...")
+            
+            if test_orders_found:
+                sample_order = test_orders_found[0]
+                print(f"📊 Sample order verification:")
+                print(f"   ID: {sample_order.get('numero_pedido')}")
+                print(f"   SKU: {sample_order.get('sku')} / {sample_order.get('numero_referencia_sku')}")
+                print(f"   Product: {sample_order.get('nome_variacao')}")
+                print(f"   Quantity: {sample_order.get('quantidade')}")
+                print(f"   Price: R${sample_order.get('preco_acordado')}")
+                print(f"   Commission: R${sample_order.get('valor_taxa_comissao')}")
+                print(f"   Service: R${sample_order.get('valor_taxa_servico')}")
+                print(f"   Shipping Option: {sample_order.get('opcao_envio')}")
+                print(f"   Shipping Type: {sample_order.get('tipo_envio')}")
+                print(f"   Delivery Date: {sample_order.get('data_prevista_envio')}")
+                
+                # Verify required fields are populated
+                required_order_fields = ['numero_pedido', 'sku', 'nome_variacao', 'quantidade', 'preco_acordado', 'opcao_envio']
+                field_validation = []
+                
+                for field in required_order_fields:
+                    value = sample_order.get(field)
+                    if value is not None and value != '':
+                        print(f"✅ Field '{field}' populated: {value}")
+                        field_validation.append(True)
+                    else:
+                        print(f"❌ Field '{field}' missing or empty")
+                        field_validation.append(False)
+                        self.log_test(f"Shopee Upload - Field {field}", False, "Field missing or empty")
+                
+                if all(field_validation):
+                    validation_results.append(True)
+                    self.log_test("Shopee Upload - Field Mapping", True)
+                else:
+                    validation_results.append(False)
+                    self.log_test("Shopee Upload - Field Mapping", False, "Some fields missing")
+                
+                # Verify tipo_envio mapping
+                shipping_mappings = {
+                    'Shopee Xpress': 'Coleta',
+                    'Retirada pelo Comprador': 'Coleta', 
+                    'Shopee Entrega Direta': 'Flex Shopee'
+                }
+                
+                tipo_envio_validation = []
+                for order in test_orders_found:
+                    opcao_envio = order.get('opcao_envio', '')
+                    tipo_envio = order.get('tipo_envio', '')
+                    expected_tipo = shipping_mappings.get(opcao_envio, opcao_envio)
+                    
+                    if tipo_envio == expected_tipo:
+                        print(f"✅ Shipping mapping correct: '{opcao_envio}' → '{tipo_envio}'")
+                        tipo_envio_validation.append(True)
+                    else:
+                        print(f"❌ Shipping mapping incorrect: '{opcao_envio}' → '{tipo_envio}' (expected '{expected_tipo}')")
+                        tipo_envio_validation.append(False)
+                        self.log_test(f"Shopee Upload - Shipping Mapping {opcao_envio}", False, f"Got {tipo_envio}, expected {expected_tipo}")
+                
+                if all(tipo_envio_validation):
+                    validation_results.append(True)
+                    self.log_test("Shopee Upload - Shipping Type Mapping", True)
+                else:
+                    validation_results.append(False)
+                    self.log_test("Shopee Upload - Shipping Type Mapping", False, "Some mappings incorrect")
+                
+                # Verify calculations (valor_liquido)
+                calc_validation = []
+                for order in test_orders_found:
+                    preco = order.get('preco_acordado', 0)
+                    comissao = order.get('valor_taxa_comissao', 0)
+                    servico = order.get('valor_taxa_servico', 0)
+                    liquido = order.get('valor_liquido', 0)
+                    expected_liquido = preco - comissao - servico
+                    
+                    if abs(liquido - expected_liquido) < 0.01:  # Allow small floating point differences
+                        print(f"✅ Calculation correct: R${preco} - R${comissao} - R${servico} = R${liquido}")
+                        calc_validation.append(True)
+                    else:
+                        print(f"❌ Calculation incorrect: R${preco} - R${comissao} - R${servico} = R${liquido} (expected R${expected_liquido})")
+                        calc_validation.append(False)
+                        self.log_test(f"Shopee Upload - Calculation {order.get('numero_pedido')}", False, f"Got {liquido}, expected {expected_liquido}")
+                
+                if all(calc_validation):
+                    validation_results.append(True)
+                    self.log_test("Shopee Upload - Value Calculations", True)
+                else:
+                    validation_results.append(False)
+                    self.log_test("Shopee Upload - Value Calculations", False, "Some calculations incorrect")
+            
+        else:
+            print("❌ Failed to retrieve marketplace orders")
+            validation_results.append(False)
+            self.log_test("Shopee Upload - Order Retrieval", False, "Failed to get orders")
+        
+        # Overall result
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ ALL SHOPEE UPLOAD FUNCTIONALITY TESTS PASSED!")
+            print("🎉 Shopee planilha upload is working correctly after frontend fix")
+            self.log_test("Shopee Upload Functionality - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ SHOPEE UPLOAD FUNCTIONALITY FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("Shopee Upload Functionality - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
