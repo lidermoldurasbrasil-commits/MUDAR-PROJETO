@@ -340,6 +340,24 @@ frontend:
           agent: "testing"
           comment: "✅ SHOPEE UPLOAD FUNCTIONALITY TESTADO COM SUCESSO TOTAL! Executado teste completo conforme solicitação da revisão: 1) Login realizado ✅ 2) Projeto Shopee encontrado/criado ✅ 3) Planilha Excel criada com formato Shopee correto (4 pedidos de teste com diferentes opções de envio) ✅ 4) Upload realizado com sucesso via multipart/form-data ✅ 5) Response validado: '4 pedidos importados com sucesso' ✅ 6) Pedidos verificados no banco de dados (4 encontrados) ✅ 7) Mapeamento de campos validado: numero_pedido, sku, nome_variacao, quantidade, preco_acordado, valor_taxa_comissao, valor_taxa_servico, opcao_envio, data_prevista_envio ✅ 8) Tipo_envio corretamente identificado: 'Shopee Xpress'→'Coleta', 'Retirada pelo Comprador'→'Coleta', 'Shopee Entrega Direta'→'Flex Shopee' ✅ 9) Cálculos validados: valor_liquido = preco_acordado - taxas ✅ 10) Pedidos linkados ao projeto correto ✅. CORRIGIDO durante teste: função detectar_setor_por_sku movida para escopo global. Sistema Shopee upload 100% funcional após correção do frontend!"
 
+  - task: "Correção da função de detecção automática de setor para SKU específico"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Usuário reportou problema específico: SKU 'Moldura Preta,33X45 cm' estava sendo classificado incorretamente como 'Espelho' quando deveria ser 'Molduras'. Solicitada correção da função detectar_setor_por_sku()."
+        - working: "unknown"
+          agent: "main"
+          comment: "Implementadas correções na função detectar_setor_por_sku(): 1) Adicionada detecção da palavra 'MOLDURA' no texto do SKU ✅ 2) Melhorada detecção de dimensões usando regex para capturar formatos como '33X45', '33x45', '33 X 45', etc. ✅ 3) Lógica: Se tem palavra 'MOLDURA' + dimensões mas SEM indicadores de vidro (VIDRO, CX, MD, MF, CV) → vai para 'Molduras' simples ✅ 4) Casos especiais tratados: 'Moldura com Vidro' → 'Molduras com Vidro' ✅. Pronto para teste específico."
+        - working: true
+          agent: "testing"
+          comment: "✅ CORREÇÃO DA DETECÇÃO DE SETOR TESTADA COM SUCESSO TOTAL! Executado teste específico conforme solicitação do usuário: 1) Criado projeto Shopee de teste ✅ 2) Planilha Excel criada com 4 casos de teste específicos ✅ 3) Upload realizado com sucesso (4 pedidos importados) ✅ 4) VALIDAÇÕES CRÍTICAS APROVADAS: ✅ 'Moldura Preta,33X45 cm' → 'Molduras' (NÃO Espelho) - CORREÇÃO CRÍTICA VALIDADA! ✅ 'Moldura Branca,40x60 cm' → 'Molduras' ✅ 'Moldura com Vidro,50x70 cm' → 'Molduras com Vidro' ✅ 'Moldura,20X30' → 'Molduras' ✅. Todos os 4 casos de teste passaram (4/4). A correção para o caso específico reportado pelo usuário está funcionando perfeitamente. Campo status_producao salvo corretamente no banco de dados. Sistema de detecção automática de setor 100% funcional!"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
