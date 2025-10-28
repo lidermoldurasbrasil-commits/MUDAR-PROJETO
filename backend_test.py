@@ -4545,6 +4545,10 @@ class BusinessManagementSystemTester:
         print("🚀 Starting Business Management System API Tests...")
         print(f"Testing against: {self.base_url}")
         
+        # PRIORITY: Test production users login first (as requested in review)
+        print("\n🚨 RUNNING PRODUCTION USERS LOGIN TEST (REVIEW REQUEST)...")
+        self.test_production_users_login()
+        
         # Authentication is required for all other tests
         if not self.test_authentication():
             return False
