@@ -4573,15 +4573,8 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
     if not forma_entrega:
         print(f"⚠️ AVISO: Forma de entrega não encontrada. Colunas disponíveis: {list(row.index)}")
     
-    tipo_envio = 'Outro'
-    if 'flex' in forma_entrega.lower() or 'full' in forma_entrega.lower():
-        tipo_envio = 'Mercado Envios Flex'
-    elif 'correios' in forma_entrega.lower():
-        tipo_envio = 'Correios e pontos de envio'
-    elif 'coleta' in forma_entrega.lower():
-        tipo_envio = 'Coleta'
-    elif 'agência' in forma_entrega.lower() or 'agencia' in forma_entrega.lower():
-        tipo_envio = 'Agência Mercado Livre'
+    # NÃO TRADUZIR - manter valor original da planilha
+    tipo_envio = forma_entrega  # Usar o valor exato da planilha
     
     # CAMPOS MERCADO LIVRE COMPLETOS
     # 1. N.º de venda - já temos
