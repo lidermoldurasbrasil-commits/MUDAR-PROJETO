@@ -21,7 +21,9 @@ export default function Login({ onLogin }) {
       const data = isRegister ? { username, password, role } : { username, password };
       
       const response = await axios.post(`${API}${endpoint}`, data);
-      onLogin(response.data.token, response.data.user);
+      // Backend retorna access_token agora, não token
+      const token = response.data.access_token || response.data.token;
+      onLogin(token, response.data.user);
       toast.success(isRegister ? 'Conta criada!' : 'Bem-vindo de volta!');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Falha na autenticação');
