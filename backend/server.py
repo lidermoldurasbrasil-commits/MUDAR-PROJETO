@@ -4348,14 +4348,8 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
     print(f"  UF: {uf}")
     print("=" * 80)
     
-    # Identificar tipo de envio
-    tipo_envio = 'Outro'
-    if 'shopee xpress' in opcao_envio.lower():
-        tipo_envio = 'Coleta'
-    elif 'retirada pelo comprador' in opcao_envio.lower():
-        tipo_envio = 'Coleta'
-    elif 'shopee entrega direta' in opcao_envio.lower():
-        tipo_envio = 'Flex Shopee'
+    # NÃO TRADUZIR - manter valor original da planilha
+    tipo_envio = opcao_envio  # Usar o valor exato da planilha
     
     # Montar objeto completo com TODOS OS CAMPOS
     pedido_data = {
