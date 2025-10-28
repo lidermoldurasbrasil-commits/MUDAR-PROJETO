@@ -2765,7 +2765,7 @@ export default function MarketplaceProjetoDetalhes() {
               {/* Seletor de Formato */}
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  Formato da Planilha
+                  Loja / Plataforma
                 </label>
                 <select
                   value={uploadFormato}
@@ -2776,7 +2776,8 @@ export default function MarketplaceProjetoDetalhes() {
                   <option value="mercadolivre">Mercado Livre</option>
                 </select>
                 <p className="text-xs text-gray-400 mt-1">
-                  Selecione o marketplace de origem da planilha
+                  {projeto?.plataforma === 'shopee' && '⚠️ Este projeto é Shopee - selecione "Shopee"'}
+                  {projeto?.plataforma === 'mercadolivre' && '⚠️ Este projeto é Mercado Livre - selecione "Mercado Livre"'}
                 </p>
               </div>
               
