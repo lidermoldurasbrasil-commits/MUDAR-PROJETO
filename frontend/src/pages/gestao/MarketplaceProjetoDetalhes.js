@@ -914,6 +914,42 @@ export default function MarketplaceProjetoDetalhes() {
 
   // Função de filtragem de pedidos
   const pedidosFiltrados = pedidos.filter(pedido => {
+    // 🔍 BUSCA UNIVERSAL - ID pedido, Nº venda, Nome cliente, SKU, Tipo envio
+    if (filtros.busca) {
+      const termoBusca = filtros.busca.toLowerCase();
+      const idPedido = (pedido.numero_pedido || '').toLowerCase();
+      const nVenda = (pedido.n_venda || pedido.id_venda || '').toLowerCase();
+      const nomeCliente = (pedido.cliente_nome || '').toLowerCase();
+      const sku = (pedido.sku || pedido.numero_referencia_sku || '').toLowerCase();
+      const tipoEnvio = (pedido.tipo_envio || pedido.opcao_envio || '').toLowerCase();
+      
+      const encontrou = 
+        idPedido.includes(termoBusca) ||
+        nVenda.includes(termoBusca) ||
+        nomeCliente.includes(termoBusca) ||
+        sku.includes(termoBusca) ||
+        tipoEnvio.includes(termoBusca);
+      
+      if (!encontrou) {
+        return false;
+      }
+    }
+    
+    // Filtro de Setor
+    if (filtros.setor && pedido.status_producao !== filtros.setor) {
+      return false;
+    }
+    
+    // Filtro de Status Produção
+    if (filtros.status_producao && pedido.status_logistica !== filtros.status_producao) {
+      return false;
+    }
+    
+    // Filtro de Status Montagem
+    if (filtros.status_montagem && pedido.status_montagem !== filtros.status_montagem) {
+      return false;
+    }
+    
     // Filtro de Status
     if (filtros.status && pedido.status !== filtros.status) {
       return false;
