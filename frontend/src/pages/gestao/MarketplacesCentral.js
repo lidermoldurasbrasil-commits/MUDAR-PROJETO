@@ -80,6 +80,8 @@ export default function MarketplacesCentral() {
 
   const podeEditarMensagem = user?.role === 'director' || user?.role === 'manager';
   const podeEditarHorarios = user?.role === 'director' || user?.role === 'manager';
+  const isProduction = user?.role === 'production';
+  const canViewFinanceiro = user?.role === 'director' || user?.role === 'manager';
 
   useEffect(() => {
     fetchDados();
