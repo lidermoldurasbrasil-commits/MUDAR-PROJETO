@@ -4196,6 +4196,10 @@ class BusinessManagementSystemTester:
         self.test_marketplace_shopee_tipo_envio()
         self.test_marketplace_mercadolivre_debug()
         
+        # PRIORITY: Test Shopee Upload Functionality (REVIEW REQUEST)
+        print("\n🚨 RUNNING SHOPEE UPLOAD FUNCTIONALITY TEST (REVIEW REQUEST)...")
+        self.test_shopee_upload_functionality()
+        
         # PRIORITY: Test user's specific order creation request
         print("\n🚨 RUNNING USER REQUESTED ORDER CREATION TEST...")
         self.test_user_requested_order_creation()
