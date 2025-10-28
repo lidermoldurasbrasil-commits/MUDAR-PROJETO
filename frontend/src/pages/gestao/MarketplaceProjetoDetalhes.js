@@ -2411,6 +2411,100 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
           </div>
           
+          {/* 🔍 FILTROS PRINCIPAIS + BUSCA UNIVERSAL */}
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Busca Universal */}
+              <div className="md:col-span-3">
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  🔍 Busca Universal
+                </label>
+                <input
+                  type="text"
+                  placeholder="Buscar por ID pedido, Nº venda, Nome cliente, SKU, Tipo envio..."
+                  value={filtros.busca || ''}
+                  onChange={(e) => setFiltros({...filtros, busca: e.target.value})}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {filtros.busca && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    Encontrados: {pedidosFiltrados.length} pedidos
+                  </p>
+                )}
+              </div>
+              
+              {/* Filtro por Setor */}
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Filtrar por Setor
+                </label>
+                <select
+                  value={filtros.setor || ''}
+                  onChange={(e) => setFiltros({...filtros, setor: e.target.value})}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Todos os Setores</option>
+                  <option value="Espelho">🪞 Espelho</option>
+                  <option value="Molduras com Vidro">🖼️ Molduras com Vidro</option>
+                  <option value="Molduras">🖼️ Molduras</option>
+                  <option value="Impressão">🖨️ Impressão</option>
+                  <option value="Expedição">📦 Expedição</option>
+                  <option value="Embalagem">📦 Embalagem</option>
+                  <option value="Personalizado">⚙️ Personalizado</option>
+                </select>
+              </div>
+              
+              {/* Filtro por Status Produção */}
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Status Produção
+                </label>
+                <select
+                  value={filtros.status_producao || ''}
+                  onChange={(e) => setFiltros({...filtros, status_producao: e.target.value})}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Todos os Status</option>
+                  <option value="Aguardando">⏳ Aguardando</option>
+                  <option value="Em montagem">🔧 Em montagem</option>
+                  <option value="Imprimindo">🖨️ Imprimindo</option>
+                  <option value="Impresso">✅ Impresso</option>
+                  <option value="Aguardando Envio">📦 Aguardando Envio</option>
+                  <option value="Enviado">🚚 Enviado</option>
+                </select>
+              </div>
+              
+              {/* Filtro por Status Montagem */}
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Status Montagem
+                </label>
+                <select
+                  value={filtros.status_montagem || ''}
+                  onChange={(e) => setFiltros({...filtros, status_montagem: e.target.value})}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Todos os Status</option>
+                  <option value="Aguardando Montagem">⏳ Aguardando Montagem</option>
+                  <option value="Em Montagem">🔧 Em Montagem</option>
+                  <option value="Finalizado">✨ Finalizado</option>
+                </select>
+              </div>
+            </div>
+            
+            {/* Botão Limpar Filtros */}
+            {(filtros.busca || filtros.setor || filtros.status_producao || filtros.status_montagem) && (
+              <div className="mt-3 flex justify-end">
+                <button
+                  onClick={() => setFiltros({busca: '', setor: '', status_producao: '', status_montagem: ''})}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
+                >
+                  🗑️ Limpar Filtros
+                </button>
+              </div>
+            )}
+          </div>
+          
           {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
             <div key={`grupo-${grupo}`} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
               {agruparPor && (
