@@ -1878,6 +1878,212 @@ class MensagemDoDia(BaseModel):
     created_by: str = ""
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# ============= MARKETPLACE INTEGRATOR MODELS =============
+
+class MarketplaceCredentials(BaseModel):
+    """Credenciais de autenticação dos marketplaces"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    marketplace: str  # "MERCADO_LIVRE" ou "SHOPEE"
+    user_id: str = ""  # ID do vendedor no marketplace
+    shop_id: str = ""  # ID da loja (Shopee)
+    access_token: str = ""
+    refresh_token: str = ""
+    token_expires_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Order(BaseModel):
+    """Entidade padronizada de Pedido - compatível com todos marketplaces"""
+    model_config = ConfigDict(extra="ignore")
+    
+    # Identificação
+    internal_order_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    marketplace: str  # "MERCADO_LIVRE", "SHOPEE"
+    marketplace_order_id: str  # ID do pedido no marketplace
+    order_number_display: str = ""  # Número visível para cliente
+    
+    # Status
+    status_general: str = ""  # paid / ready_to_ship / shipped / delivered / cancelled / returned
+    status_payment: str = ""  # approved / pending / refunded / chargeback
+    status_fulfillment: str = ""  # to_ship / in_transit / completed / cancelled
+    
+    # Datas importantes
+    created_at_marketplace: Optional[datetime] = None
+    paid_at: Optional[datetime] = None
+    ready_to_ship_at: Optional[datetime] = None
+    shipped_at: Optional[datetime] = None
+    delivered_at: Optional[datetime] = None
+    cancelled_at: Optional[datetime] = None
+    last_updated_at: Optional[datetime] = None
+    
+    # Comprador
+    buyer_id_marketplace: str = ""
+    buyer_username: str = ""
+    buyer_full_name: str = ""
+    buyer_phone: str = ""
+    buyer_email: str = ""
+    
+    # Endereço de entrega
+    ship_to_name: str = ""
+    ship_to_phone: str = ""
+    ship_to_document: str = ""  # CPF/CNPJ
+    ship_to_zipcode: str = ""
+    ship_to_street: str = ""
+    ship_to_number: str = ""
+    ship_to_complement: str = ""
+    ship_to_district: str = ""
+    ship_to_city: str = ""
+    ship_to_state: str = ""
+    ship_to_country: str = ""
+    
+    # Financeiro do pedido
+    currency: str = "BRL"
+    subtotal_items: float = 0.0
+    discount_seller: float = 0.0
+    discount_platform: float = 0.0
+    shipping_cost_charged: float = 0.0  # Frete cobrado do comprador
+    shipping_cost_real: float = 0.0  # Custo real do frete para vendedor
+    total_amount_buyer: float = 0.0  # Total pago pelo comprador
+    tax_platform_fee: float = 0.0  # Comissão da plataforma
+    tax_payment_fee: float = 0.0  # Taxa de pagamento/parcelamento
+    other_fees: float = 0.0
+    total_payout_seller: float = 0.0  # Valor líquido para vendedor
+    installments_qty: int = 1
+    installments_value: float = 0.0
+    
+    # Logística principal
+    shipment_id_marketplace: str = ""
+    shipping_status: str = ""
+    shipping_method: str = ""  # Mercado Envios, Shopee Express, Correios
+    shipping_sla_ship_by: Optional[datetime] = None  # Prazo limite para postar
+    shipping_estimated_delivery: Optional[datetime] = None
+    tracking_number: str = ""
+    tracking_carrier: str = ""
+    
+    # Fiscal
+    invoice_number: str = ""
+    invoice_series: str = ""
+    invoice_key: str = ""
+    invoice_issue_date: Optional[datetime] = None
+    invoice_total_value: float = 0.0
+    
+    # Pós-venda
+    cancel_reason: str = ""
+    return_status: str = ""
+    return_reason: str = ""
+    
+    # Integração interna
+    production_status: str = ""  # CORTE / MONTAGEM / EXPEDIÇÃO / ENTREGUE
+    project_board_id: str = ""
+    seller_internal_notes: str = ""
+    marketplace_notes: str = ""  # Mensagens do comprador
+    
+    # Auditoria
+    inserted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class OrderItem(BaseModel):
+    """Item do pedido - compatível com todos marketplaces"""
+    model_config = ConfigDict(extra="ignore")
+    
+    internal_order_item_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    internal_order_id: str  # FK -> Order
+    marketplace_order_id: str
+    marketplace_item_id: str  # ID do item/anúncio
+    marketplace_variation_id: str = ""  # ID da variação
+    
+    seller_sku: str = ""  # SKU interno
+    product_title: str = ""
+    variation_name: str = ""  # Ex: "Cor: Branco / Tamanho: 50x70"
+    
+    quantity: int = 1
+    unit_price: float = 0.0
+    original_unit_price: float = 0.0
+    total_price_item: float = 0.0
+    currency: str = "BRL"
+    
+    discount_item_seller: float = 0.0
+    discount_item_platform: float = 0.0
+    freight_allocation_item: float = 0.0  # Rateio do frete
+    
+    # Dimensões
+    weight_kg: float = 0.0
+    height_cm: float = 0.0
+    width_cm: float = 0.0
+    length_cm: float = 0.0
+    
+    seller_internal_notes: str = ""
+    
+    inserted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Payment(BaseModel):
+    """Pagamento do pedido"""
+    model_config = ConfigDict(extra="ignore")
+    
+    internal_payment_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    internal_order_id: str  # FK -> Order
+    marketplace_payment_id: str = ""
+    
+    method: str = ""  # cartão, pix, boleto
+    status: str = ""  # approved, pending, refunded
+    installment_qty: int = 1
+    installment_value: float = 0.0
+    transaction_amount: float = 0.0
+    total_paid_amount: float = 0.0
+    currency: str = "BRL"
+    
+    paid_at: Optional[datetime] = None
+    
+    fee_platform: float = 0.0  # Comissão marketplace
+    fee_payment_gateway: float = 0.0  # Taxa parcelamento/gateway
+    refunded_amount: float = 0.0
+    
+    inserted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Shipment(BaseModel):
+    """Envio/Logística do pedido"""
+    model_config = ConfigDict(extra="ignore")
+    
+    internal_shipment_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    internal_order_id: str  # FK -> Order
+    marketplace_shipment_id: str = ""
+    
+    tracking_number: str = ""
+    carrier_name: str = ""
+    logistics_channel_id: str = ""
+    status: str = ""  # ready_to_ship, shipped, delivered, lost, returned
+    
+    ship_by_deadline: Optional[datetime] = None
+    shipped_at: Optional[datetime] = None
+    delivered_at: Optional[datetime] = None
+    estimated_delivery_start: Optional[datetime] = None
+    estimated_delivery_end: Optional[datetime] = None
+    
+    # Endereço destino
+    receiver_name: str = ""
+    receiver_phone: str = ""
+    receiver_street: str = ""
+    receiver_number: str = ""
+    receiver_complement: str = ""
+    receiver_district: str = ""
+    receiver_city: str = ""
+    receiver_state: str = ""
+    receiver_zipcode: str = ""
+    receiver_country: str = ""
+    
+    # Dimensões do pacote
+    weight_total_kg: float = 0.0
+    package_height_cm: float = 0.0
+    package_width_cm: float = 0.0
+    package_length_cm: float = 0.0
+    
+    inserted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # Contador para número de ordem
 async def get_next_numero_ordem():
     """Gera o próximo número de ordem sequencial"""
