@@ -629,6 +629,8 @@ export default function MarketplaceProjetoDetalhes() {
       setSelectAll(false);
       setBatchStatusValue('');
       setBatchImpressaoValue('');
+      setBatchSetorValue('');
+      setBatchStatusProducaoValue('');
       
       fetchDados();
     } catch (error) {
