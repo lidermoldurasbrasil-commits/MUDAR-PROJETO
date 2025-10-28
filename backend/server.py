@@ -4314,18 +4314,12 @@ def detectar_setor_por_sku(sku_texto):
                 print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém {padrao} + indicadores de vidro)")
                 return 'Molduras com Vidro'
     
-    # 4. MOLDURAS - padrões que vão SEMPRE para Molduras
     # Verificar palavra MOLDURA no texto (sem indicadores de vidro)
     if 'MOLDURA' in sku:
         # Verificar se NÃO tem indicadores de vidro
         if not any(ind in sku for ind in ['VIDRO', 'CX', 'MD', 'MF', 'CV']):
             print(f"🖼️ SKU '{sku}' → MOLDURAS (contém palavra MOLDURA sem vidro)")
             return 'Molduras'
-    
-    # MM vai SEMPRE para Molduras, independente de outros indicadores
-    if 'MM' in sku:
-        print(f"🖼️ SKU '{sku}' → MOLDURAS (contém MM - prioridade Molduras)")
-        return 'Molduras'
     
     # SV específico para molduras
     padroes_moldura = ['SV']
