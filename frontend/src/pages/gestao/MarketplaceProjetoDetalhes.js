@@ -74,7 +74,9 @@ export default function MarketplaceProjetoDetalhes() {
     sku: '', 
     prazoEnvio: '',
     dataInicio: '',
-    dataFim: ''
+    dataFim: '',
+    setor: '',  // Filtro de Setor (Espelho, Molduras, etc.)
+    statusProducao: ''  // Filtro de Status Produção (Aguardando, Em montagem, etc.)
   });
   const [showFilters, setShowFilters] = useState(false);
   const [editingPedido, setEditingPedido] = useState(null);
