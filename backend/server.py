@@ -4389,6 +4389,11 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         'status': 'Aguardando Produção',
         'status_impressao': 'Pendente',
         
+        # Status personalizados para Shopee (controle interno - mesmos do ML)
+        # AUTOMAÇÃO: Detectar setor automaticamente baseado no SKU
+        'status_producao': detectar_setor_por_sku(numero_referencia_sku),  # Setor detectado automaticamente
+        'status_logistica': 'Aguardando',  # Status inicial
+        
         # Metadata
         'loja_id': projeto.get('loja_id', 'fabrica'),
         'created_by': current_user.get('username', ''),
