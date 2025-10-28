@@ -60,7 +60,7 @@ export default function Layout({ user, onLogout }) {
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`} data-testid="sidebar">
         <div className="sidebar-header">
-          <h2>MFG Manager</h2>
+          <h2>Líder HUB</h2>
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="sidebar-toggle">
             <Menu size={20} />
           </button>
