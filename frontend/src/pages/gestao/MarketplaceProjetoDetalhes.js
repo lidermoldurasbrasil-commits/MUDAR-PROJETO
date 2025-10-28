@@ -965,6 +965,56 @@ export default function MarketplaceProjetoDetalhes() {
                     ))}
                   </select>
                 </div>
+
+                {/* Dropdown para Setor (status_producao) */}
+                {(projeto?.plataforma === 'shopee' || projeto?.plataforma === 'mercadolivre') && (
+                  <div className="relative">
+                    <select
+                      value={batchSetorValue || ''}
+                      onChange={(e) => {
+                        const valor = e.target.value;
+                        if (valor) {
+                          setBatchSetorValue(valor);
+                          handleUpdateStatusBatch('status_producao', valor);
+                        }
+                      }}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
+                    >
+                      <option value="">Mudar Setor ({selectedPedidos.length})</option>
+                      <option value="Espelho">🪞 Espelho</option>
+                      <option value="Molduras com Vidro">🖼️ Molduras com Vidro</option>
+                      <option value="Molduras">🖼️ Molduras</option>
+                      <option value="Impressão">🖨️ Impressão</option>
+                      <option value="Expedição">📦 Expedição</option>
+                      <option value="Embalagem">📦 Embalagem</option>
+                      <option value="Personalizado">✨ Personalizado</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Dropdown para Status Produção (status_logistica) */}
+                {(projeto?.plataforma === 'shopee' || projeto?.plataforma === 'mercadolivre') && (
+                  <div className="relative">
+                    <select
+                      value={batchStatusProducaoValue || ''}
+                      onChange={(e) => {
+                        const valor = e.target.value;
+                        if (valor) {
+                          setBatchStatusProducaoValue(valor);
+                          handleUpdateStatusBatch('status_logistica', valor);
+                        }
+                      }}
+                      className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 cursor-pointer"
+                    >
+                      <option value="">Mudar Status Prod ({selectedPedidos.length})</option>
+                      <option value="Aguardando">⏳ Aguardando</option>
+                      <option value="Em montagem">🔧 Em montagem</option>
+                      <option value="Imprimindo">🖨️ Imprimindo</option>
+                      <option value="Impresso">✅ Impresso</option>
+                      <option value="Concluído">✅ Concluído</option>
+                    </select>
+                  </div>
+                )}
               </>
             )}
             <button
