@@ -931,35 +931,60 @@ export default function MarketplaceProjetoDetalhes() {
 
           {/* Métricas por Tipo de Envio */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-300 mb-3">Análise de Envios</h3>
+            <h3 className="text-lg font-semibold text-gray-300 mb-3">Análise de Envios (Formas de Entrega)</h3>
             <div className="grid grid-cols-3 gap-4">
-              {[
-                { tipo: 'Correios e pontos de envio', emoji: '📮', cor: '#3B82F6', keywords: ['correios', 'correio'] },
-                { tipo: 'Mercado Envios Flex', emoji: '📦', cor: '#F59E0B', keywords: ['flex'] },
-                { tipo: 'Full - Mercado Envios Completo', emoji: '🚚', cor: '#10B981', keywords: ['full', 'completo'] }
-              ].map(envio => {
-                const count = pedidos.filter(p => {
-                  const opcao = (p.opcao_envio || '').toLowerCase();
-                  return envio.keywords.some(keyword => opcao.includes(keyword));
-                }).length;
-                const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
-                return (
-                  <div key={envio.tipo} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">{envio.emoji}</span>
-                      <span className="text-2xl font-bold" style={{ color: envio.cor }}>{count}</span>
+              {(() => {
+                // Agrupar por forma de entrega real da planilha
+                const enviosMap = {};
+                pedidos.forEach(p => {
+                  const opcao = p.opcao_envio || p.tipo_envio || 'Sem informação';
+                  if (!enviosMap[opcao]) {
+                    enviosMap[opcao] = 0;
+                  }
+                  enviosMap[opcao]++;
+                });
+                
+                // Converter em array e ordenar por quantidade
+                const enviosArray = Object.entries(enviosMap)
+                  .map(([tipo, count]) => ({ tipo, count }))
+                  .sort((a, b) => b.count - a.count)
+                  .slice(0, 6); // Mostrar top 6
+                
+                // Definir emojis baseado em keywords
+                const getEmoji = (tipo) => {
+                  const tipoLower = tipo.toLowerCase();
+                  if (tipoLower.includes('correio')) return '📮';
+                  if (tipoLower.includes('flex')) return '📦';
+                  if (tipoLower.includes('full') || tipoLower.includes('completo')) return '🚚';
+                  if (tipoLower.includes('coleta')) return '🏪';
+                  if (tipoLower.includes('agência') || tipoLower.includes('agencia')) return '🏢';
+                  return '📦';
+                };
+                
+                // Cores alternadas
+                const cores = ['#3B82F6', '#F59E0B', '#10B981', '#8B5CF6', '#EC4899', '#6366F1'];
+                
+                return enviosArray.map((envio, index) => {
+                  const percentage = pedidos.length > 0 ? ((envio.count / pedidos.length) * 100).toFixed(1) : 0;
+                  const cor = cores[index % cores.length];
+                  return (
+                    <div key={envio.tipo} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl">{getEmoji(envio.tipo)}</span>
+                        <span className="text-2xl font-bold" style={{ color: cor }}>{envio.count}</span>
+                      </div>
+                      <p className="text-sm text-gray-400 truncate" title={envio.tipo}>{envio.tipo}</p>
+                      <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full" 
+                          style={{ width: `${percentage}%`, backgroundColor: cor }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{percentage}% do total</p>
                     </div>
-                    <p className="text-sm text-gray-400">{envio.tipo}</p>
-                    <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full" 
-                        style={{ width: `${percentage}%`, backgroundColor: envio.cor }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{percentage}% do total</p>
-                  </div>
-                );
-              })}
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
