@@ -165,6 +165,13 @@ export default function MarketplaceProjetoDetalhes() {
   const pedidosRef = useRef(pedidos); // Referência para comparar mudanças
   const pollingInterval = useRef(null);
   
+  // 📊 MENUS RECOLHÍVEIS - States para controlar expansão das seções de métricas
+  const [expandedSections, setExpandedSections] = useState({
+    distribuicaoSetor: true,
+    statusProducao: true,
+    statusMontagem: true
+  });
+  
   const [novaLinhaInline, setNovaLinhaInline] = useState({
     numero_pedido: '',
     produto_nome: '',
