@@ -201,6 +201,15 @@ export default function MarketplaceProjetoDetalhes() {
   };
 
   const handleUploadPlanilha = () => {
+    // Detectar automaticamente a plataforma do projeto
+    if (projeto?.plataforma) {
+      const plat = projeto.plataforma.toLowerCase();
+      if (plat === 'shopee') {
+        setUploadFormato('shopee');
+      } else if (plat === 'mercado livre' || plat === 'mercadolivre') {
+        setUploadFormato('mercadolivre');
+      }
+    }
     setShowUploadModal(true);
   };
 
