@@ -240,7 +240,16 @@ export default function MarketplaceProjetoDetalhes() {
     try {
       setUploadProgress(true);
       
-      // Limpar estado ANTES de fazer upload para evitar conflitos
+      // Fechar modal IMEDIATAMENTE para evitar conflitos de renderização
+      setShowUploadModal(false);
+      
+      // Colocar em modo loading ANTES de limpar estado
+      setLoading(true);
+      
+      // Aguardar um pouco para garantir que modal fechou
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Limpar TUDO
       setPedidos([]);
       setSelectedPedidos([]);
       setSelectAll(false);
@@ -265,8 +274,7 @@ export default function MarketplaceProjetoDetalhes() {
       // Processar resposta
       const data = response.data;
       
-      // Fechar modal e limpar arquivos
-      setShowUploadModal(false);
+      // Limpar arquivos
       setUploadFile(null);
       setUploadFormato('shopee');
       
@@ -279,22 +287,25 @@ export default function MarketplaceProjetoDetalhes() {
         });
       }
       
-      // Aguardar um tempo maior para garantir que o React finalize a renderização
-      setTimeout(() => {
-        fetchDados();
-      }, 500);
+      // Aguardar mais tempo para garantir que React processou tudo
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Buscar novos dados
+      await fetchDados();
       
     } catch (error) {
       console.error('Erro ao fazer upload:', error);
       toast.error(error.response?.data?.detail || 'Erro ao processar planilha');
       
-      // Em caso de erro, também limpar estado
+      // Em caso de erro, também limpar e recarregar
       setPedidos([]);
       setSelectedPedidos([]);
       setSelectAll(false);
+      await fetchDados();
       
     } finally {
       setUploadProgress(false);
+      setLoading(false);
     }
   };
 
