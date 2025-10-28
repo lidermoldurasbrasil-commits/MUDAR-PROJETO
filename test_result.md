@@ -323,7 +323,7 @@ frontend:
     implemented: true
     working: "unknown"
     file: "/app/frontend/src/pages/gestao/MarketplaceProjetoDetalhes.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: true
     status_history:
@@ -336,6 +336,12 @@ frontend:
         - working: "unknown"
           agent: "main"
           comment: "CORRIGIDO: Implementada detecção automática da plataforma no modal de upload. Modificada função handleUploadPlanilha() para verificar projeto.plataforma e automaticamente setar uploadFormato ('shopee' ou 'mercadolivre') quando modal abre. Detecta tanto 'Shopee' quanto 'Mercado Livre'/'mercadolivre'. Pronto para teste."
+        - working: false
+          agent: "user"
+          comment: "Usuário enviou vídeo mostrando erro ao importar planilha Shopee: 'Falha ao executar insertBefore no Node'. Erro de runtime JavaScript (NotFoundError) durante renderização após upload. Upload no backend funciona (200 OK) mas frontend falha ao renderizar os pedidos importados."
+        - working: "unknown"
+          agent: "main"
+          comment: "CORRIGIDO: Identificado problema de conflito de keys do React durante re-renderização após upload. Melhorada função handleConfirmarUpload(): 1) Fecha modal e limpa estado ANTES de processar resposta ✅ 2) Limpa completamente arrays de pedidos (setPedidos([]), setSelectedPedidos([]), setSelectAll(false)) ✅ 3) Aumentado timeout de 100ms para 200ms para garantir limpeza completa do estado ✅ 4) Reordenadas operações para evitar conflitos de keys durante transição. Problema insertBefore deve estar resolvido. Pronto para teste."
 
   - task: "Filtros de Setor e Status Produção (Frontend)"
     implemented: true
