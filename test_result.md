@@ -391,6 +391,42 @@ frontend:
           agent: "testing"
           comment: "✅ CORREÇÃO DA DETECÇÃO DE SETOR TESTADA COM SUCESSO TOTAL! Executado teste específico conforme solicitação do usuário: 1) Criado projeto Shopee de teste ✅ 2) Planilha Excel criada com 4 casos de teste específicos ✅ 3) Upload realizado com sucesso (4 pedidos importados) ✅ 4) VALIDAÇÕES CRÍTICAS APROVADAS: ✅ 'Moldura Preta,33X45 cm' → 'Molduras' (NÃO Espelho) - CORREÇÃO CRÍTICA VALIDADA! ✅ 'Moldura Branca,40x60 cm' → 'Molduras' ✅ 'Moldura com Vidro,50x70 cm' → 'Molduras com Vidro' ✅ 'Moldura,20X30' → 'Molduras' ✅. Todos os 4 casos de teste passaram (4/4). A correção para o caso específico reportado pelo usuário está funcionando perfeitamente. Campo status_producao salvo corretamente no banco de dados. Sistema de detecção automática de setor 100% funcional!"
 
+  - task: "Sistema de Autenticação e Permissões de Produção"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ SISTEMA DE AUTENTICAÇÃO E PERMISSÕES TESTADO COM SUCESSO TOTAL! Executado teste completo conforme solicitação da revisão: 1) Login diretor (diretor/123) ✅ - Token gerado corretamente, role 'director' verificado ✅ 2) Login setores produção: espelho, molduras-vidro, molduras, impressao, expedicao, embalagem (todos com senha 123) ✅ - Todos tokens gerados corretamente, role 'production' verificado para todos ✅ 3) Verificação de roles: director vs production funcionando perfeitamente ✅. Sistema de autenticação 100% operacional para produção!"
+
+  - task: "Importação Shopee - Detecção Automática e Mapeamento"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ IMPORTAÇÃO SHOPEE TESTADA COM SUCESSO TOTAL! Executado teste completo conforme critérios de sucesso: 1) Projeto Shopee criado ✅ 2) Upload planilha formato Shopee (4 pedidos teste) ✅ 3) DETECÇÃO AUTOMÁTICA DE SETOR POR SKU: 'Moldura Preta,33X45 cm'→'Molduras', 'KIT-PD-40x60'→'Impressão', 'ESPELHO-REDONDO'→'Espelho', 'MF-BRANCA-CV'→'Molduras com Vidro' ✅ 4) TIPO DE ENVIO: 'Shopee Xpress'→'Coleta', 'Shopee Entrega Direta'→'Flex Shopee', 'Retirada pelo Comprador'→'Coleta' ✅ 5) CAMPOS MAPEADOS: ID pedido, SKU, nome variação, quantidade, preço acordado, taxas comissão/serviço, opção envio, data prevista ✅ 6) STATUS: status_producao preenchido com setor correto, status_logistica='Aguardando' por padrão ✅. Import Shopee funcionando 100%!"
+
+  - task: "Endpoints de Pedidos Marketplace - GET e PUT"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ ENDPOINTS DE PEDIDOS TESTADOS COM SUCESSO TOTAL! Executado teste completo conforme solicitação: 1) GET /api/gestao/marketplaces/pedidos?projeto_id={id} ✅ - Retorna pedidos corretamente, filtros funcionam (ex: status_producao=Molduras) ✅ 2) PUT /api/gestao/marketplaces/pedidos/{id} ✅ - Atualização status_producao (setor) funcionando ✅ - Atualização status_logistica (status produção) funcionando ✅ - Atualização status geral funcionando ✅ 3) Verificação que atualizações são salvas ✅. Todos endpoints funcionando perfeitamente, atualizações persistidas no banco!"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
