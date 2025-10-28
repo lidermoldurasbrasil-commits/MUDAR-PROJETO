@@ -4184,6 +4184,222 @@ class BusinessManagementSystemTester:
         
         return all_valid
 
+    def test_sector_detection_fix(self):
+        """Test the specific sector detection fix for 'Moldura Preta,33X45 cm' case"""
+        print("\n🔍 TESTING SECTOR DETECTION FIX...")
+        print("📋 Testing the specific case: 'Moldura Preta,33X45 cm' should be 'Molduras' (NOT Espelho)")
+        
+        # Step 1: Login
+        if not self.test_authentication():
+            return False
+        
+        # Step 2: Create or find Shopee project
+        print("\n📋 Step 2: Creating/Finding Shopee project for sector detection test...")
+        projeto_data = {
+            "nome": "Projeto Teste Setor",
+            "plataforma": "Shopee",
+            "loja_id": "fabrica",
+            "ativo": True
+        }
+        
+        success_projeto, projeto_response = self.run_test(
+            "Create/Find Sector Test Project",
+            "POST",
+            "gestao/marketplaces/projetos",
+            200,
+            data=projeto_data
+        )
+        
+        if not success_projeto or 'id' not in projeto_response:
+            print("❌ Failed to create/find sector test project")
+            return False
+        
+        projeto_id = projeto_response['id']
+        print(f"✅ Sector test project ID: {projeto_id}")
+        
+        # Step 3: Create test Excel file with specific SKUs for sector detection
+        print("\n📋 Step 3: Creating test Excel file with sector detection cases...")
+        
+        # Test cases as specified in the review request
+        test_cases = [
+            {
+                'sku': 'Moldura Preta,33X45 cm',
+                'expected_sector': 'Molduras',
+                'description': 'Original reported case - should be Molduras'
+            },
+            {
+                'sku': 'Moldura Branca,40x60 cm', 
+                'expected_sector': 'Molduras',
+                'description': 'Similar case with lowercase x'
+            },
+            {
+                'sku': 'Moldura com Vidro,50x70 cm',
+                'expected_sector': 'Molduras com Vidro', 
+                'description': 'Frame with glass - should be Molduras com Vidro'
+            },
+            {
+                'sku': 'Moldura,20X30',
+                'expected_sector': 'Molduras',
+                'description': 'Simple frame with dimensions'
+            }
+        ]
+        
+        excel_data = {
+            'ID do pedido': [f'SECTOR{i+1:03d}' for i in range(len(test_cases))],
+            'Número de referência SKU': [case['sku'] for case in test_cases],
+            'Nome da variação': [case['description'] for case in test_cases],
+            'Quantidade': [1] * len(test_cases),
+            'Preço acordado': [100.0] * len(test_cases),
+            'Taxa de comissão': [18.0] * len(test_cases),
+            'Taxa de serviço': [7.38] * len(test_cases),
+            'Opção de envio': ['Shopee Xpress'] * len(test_cases),
+            'Data prevista de envio': ['2024-12-01'] * len(test_cases)
+        }
+        
+        # Create temporary Excel file
+        import pandas as pd
+        import tempfile
+        import os
+        
+        df = pd.DataFrame(excel_data)
+        
+        with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp_file:
+            df.to_excel(tmp_file.name, index=False)
+            excel_file_path = tmp_file.name
+        
+        print(f"✅ Sector test Excel file created with {len(test_cases)} test cases")
+        
+        # Step 4: Upload the Excel file and capture logs
+        print("\n📋 Step 4: Uploading Excel file and testing sector detection...")
+        
+        try:
+            with open(excel_file_path, 'rb') as f:
+                files = {'file': ('test_sector_detection.xlsx', f, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+                
+                upload_url = f"{self.api_url}/gestao/marketplaces/pedidos/upload-planilha"
+                params = {'projeto_id': projeto_id, 'formato': 'shopee'}
+                headers = {'Authorization': f'Bearer {self.token}'}
+                
+                response = requests.post(upload_url, files=files, params=params, headers=headers)
+                
+                if response.status_code == 200:
+                    upload_response = response.json()
+                    print(f"✅ Upload successful: {upload_response.get('message', 'Success')}")
+                    self.log_test("Sector Detection - File Upload", True)
+                else:
+                    print(f"❌ Upload failed: {response.status_code} - {response.text}")
+                    self.log_test("Sector Detection - File Upload", False, f"Status {response.status_code}")
+                    return False
+        
+        except Exception as e:
+            print(f"❌ Upload exception: {str(e)}")
+            self.log_test("Sector Detection - File Upload", False, f"Exception: {str(e)}")
+            return False
+        
+        finally:
+            # Clean up temporary file
+            try:
+                os.unlink(excel_file_path)
+            except:
+                pass
+        
+        # Step 5: Verify sector detection results
+        print("\n📋 Step 5: Verifying sector detection results...")
+        success_get, orders_response = self.run_test(
+            "Get Sector Test Orders",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={projeto_id}",
+            200
+        )
+        
+        if not success_get or not isinstance(orders_response, list):
+            print("❌ Failed to retrieve sector test orders")
+            self.log_test("Sector Detection - Order Retrieval", False, "Failed to get orders")
+            return False
+        
+        # Find our uploaded test orders
+        uploaded_orders = [order for order in orders_response if order.get('numero_pedido', '').startswith('SECTOR')]
+        
+        if len(uploaded_orders) != len(test_cases):
+            print(f"❌ Expected {len(test_cases)} orders, found {len(uploaded_orders)}")
+            self.log_test("Sector Detection - Order Count", False, f"Expected {len(test_cases)}, got {len(uploaded_orders)}")
+            return False
+        
+        print(f"✅ Found {len(uploaded_orders)} sector test orders")
+        
+        # Step 6: Validate each sector detection result
+        print("\n📋 Step 6: Validating sector detection for each test case...")
+        
+        validation_results = []
+        
+        for i, test_case in enumerate(test_cases):
+            sku = test_case['sku']
+            expected_sector = test_case['expected_sector']
+            description = test_case['description']
+            
+            # Find the corresponding order
+            matching_order = None
+            for order in uploaded_orders:
+                if order.get('sku') == sku:
+                    matching_order = order
+                    break
+            
+            if not matching_order:
+                print(f"❌ Test Case {i+1}: Order not found for SKU '{sku}'")
+                validation_results.append(False)
+                self.log_test(f"Sector Detection - Case {i+1} Order Found", False, f"Order not found for SKU '{sku}'")
+                continue
+            
+            # Check if status_setor field exists and has correct value
+            actual_sector = matching_order.get('status_setor', 'NOT_FOUND')
+            
+            print(f"\n🔍 Test Case {i+1}: {description}")
+            print(f"   SKU: '{sku}'")
+            print(f"   Expected Sector: '{expected_sector}'")
+            print(f"   Actual Sector: '{actual_sector}'")
+            
+            if actual_sector == expected_sector:
+                print(f"   ✅ CORRECT: Sector detection working properly")
+                validation_results.append(True)
+                self.log_test(f"Sector Detection - Case {i+1} ({sku})", True)
+                
+                # Special validation for the original reported case
+                if sku == 'Moldura Preta,33X45 cm':
+                    print(f"   🎯 CRITICAL FIX VALIDATED: Original case now correctly classified as 'Molduras'")
+                    self.log_test("Sector Detection - CRITICAL FIX VALIDATION", True)
+                    
+            else:
+                print(f"   ❌ INCORRECT: Expected '{expected_sector}', got '{actual_sector}'")
+                validation_results.append(False)
+                self.log_test(f"Sector Detection - Case {i+1} ({sku})", False, f"Expected '{expected_sector}', got '{actual_sector}'")
+                
+                # Special validation for the original reported case
+                if sku == 'Moldura Preta,33X45 cm':
+                    if actual_sector == 'Espelho':
+                        print(f"   🚨 CRITICAL: Original bug still exists - still classifying as 'Espelho'")
+                        self.log_test("Sector Detection - CRITICAL FIX VALIDATION", False, "Still classifying as Espelho")
+                    else:
+                        print(f"   ⚠️ PARTIAL: Not Espelho anymore, but wrong sector '{actual_sector}'")
+                        self.log_test("Sector Detection - CRITICAL FIX VALIDATION", False, f"Wrong sector: {actual_sector}")
+        
+        # Step 7: Overall validation result
+        print(f"\n📋 Step 7: Overall sector detection validation...")
+        
+        passed_count = sum(validation_results)
+        total_count = len(validation_results)
+        
+        if passed_count == total_count:
+            print(f"✅ ALL SECTOR DETECTION TESTS PASSED! ({passed_count}/{total_count})")
+            print("✅ The fix for 'Moldura Preta,33X45 cm' → 'Molduras' is working correctly")
+            self.log_test("Sector Detection Fix - OVERALL", True)
+            return True
+        else:
+            failed_count = total_count - passed_count
+            print(f"❌ SECTOR DETECTION TESTS FAILED: {failed_count}/{total_count} cases failed")
+            print("❌ The sector detection fix needs further investigation")
+            self.log_test("Sector Detection Fix - OVERALL", False, f"{failed_count}/{total_count} cases failed")
+            return False
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Business Management System API Tests...")
