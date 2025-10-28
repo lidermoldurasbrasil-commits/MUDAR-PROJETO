@@ -8,6 +8,20 @@ import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Toolti
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api/gestao/marketplaces`;
 
+// Frases motivacionais para o banner de boas-vindas
+const frasesDoDia = [
+  "Hoje é um ótimo dia para superar metas! 🚀",
+  "Cada pedido processado é um cliente satisfeito! 😊",
+  "Sua dedicação faz a diferença na operação! 💪",
+  "Vamos transformar mais um dia em sucesso! ⭐",
+  "A excelência está nos detalhes do seu trabalho! 🎯",
+  "Juntos, fazemos a máquina funcionar perfeitamente! ⚙️",
+  "Sua eficiência impulsiona todo o time! 🏆",
+  "Cada processo otimizado é um passo à frente! 📈",
+  "Você é peça fundamental desta operação! 🔧",
+  "Vamos fazer deste dia ainda mais produtivo! 💼"
+];
+
 // Componente de Timer para countdown
 function CountdownTimer({ targetTime, label, tipo }) {
   const [timeLeft, setTimeLeft] = useState('');
