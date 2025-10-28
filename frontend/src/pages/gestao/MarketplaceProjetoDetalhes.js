@@ -781,13 +781,18 @@ export default function MarketplaceProjetoDetalhes() {
 
   // Função de agrupamento
   const pedidosAgrupados = () => {
+    // Decidir qual lista de pedidos usar baseado no viewMode
+    const listaPedidos = viewMode === 'pedidos-antigos' ? pedidosAntigos : 
+                         (viewMode === 'producao' || viewMode === 'financeiro') ? pedidosAtuais : 
+                         pedidosFiltrados;
+    
     if (!agruparPor) {
-      return { 'Todos': pedidosFiltrados };
+      return { 'Todos': listaPedidos };
     }
     
     if (agruparPor === 'sku') {
       const grupos = {};
-      pedidosFiltrados.forEach(pedido => {
+      listaPedidos.forEach(pedido => {
         const chave = pedido.sku || 'Sem SKU';
         if (!grupos[chave]) {
           grupos[chave] = [];
@@ -799,7 +804,7 @@ export default function MarketplaceProjetoDetalhes() {
     
     if (agruparPor === 'status') {
       const grupos = {};
-      pedidosFiltrados.forEach(pedido => {
+      listaPedidos.forEach(pedido => {
         const chave = pedido.status || 'Sem Status';
         if (!grupos[chave]) {
           grupos[chave] = [];
