@@ -1977,31 +1977,57 @@ export default function MarketplaceProjetoDetalhes() {
                           <span className="text-white font-medium">{pedido.numero_pedido || '-'}</span>
                         </td>
                         
-                        {/* 2. Opção de envio */}
+                        <td className="px-4 py-3">
+                          <select
+                            value={pedido.status_producao || 'Espelho'}
+                            onChange={(e) => handleUpdatePedido(pedido.id, 'status_producao', e.target.value)}
+                            className="w-full px-3 py-1.5 rounded-full text-white text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer"
+                            style={{ backgroundColor: SETOR_COLORS[pedido.status_producao || 'Espelho'] }}
+                          >
+                            <option value="Espelho" style={{ backgroundColor: SETOR_COLORS['Espelho'] }}>🪞 Espelho</option>
+                            <option value="Molduras com Vidro" style={{ backgroundColor: SETOR_COLORS['Molduras com Vidro'] }}>🖼️ Molduras com Vidro</option>
+                            <option value="Molduras" style={{ backgroundColor: SETOR_COLORS['Molduras'] }}>🖼️ Molduras</option>
+                            <option value="Impressão" style={{ backgroundColor: SETOR_COLORS['Impressão'] }}>🖨️ Impressão</option>
+                            <option value="Expedição" style={{ backgroundColor: SETOR_COLORS['Expedição'] }}>🧾 Expedição</option>
+                            <option value="Embalagem" style={{ backgroundColor: SETOR_COLORS['Embalagem'] }}>📦 Embalagem</option>
+                            <option value="Personalizado" style={{ backgroundColor: SETOR_COLORS['Personalizado'] }}>⭐ Personalizado</option>
+                          </select>
+                        </td>
+                        
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
                         </td>
                         
-                        {/* 3. Data prevista de envio */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">
                             {pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : '-'}
                           </span>
                         </td>
                         
-                        {/* 4. Número de referência SKU */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.numero_referencia_sku || pedido.sku || '-'}</span>
                         </td>
                         
-                        {/* 5. Nome da variação */}
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
                         </td>
                         
-                        {/* 6. Quantidade */}
                         <td className="px-4 py-3">
                           <span className="text-white font-medium text-center block">{pedido.quantidade || 0}</span>
+                        </td>
+                        
+                        <td className="px-4 py-3">
+                          <select
+                            value={pedido.status_logistica || 'Aguardando'}
+                            onChange={(e) => handleUpdatePedido(pedido.id, 'status_logistica', e.target.value)}
+                            className="w-full px-3 py-1.5 rounded-full text-white text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer"
+                            style={{ backgroundColor: STATUS_PRODUCAO_COLORS[pedido.status_logistica || 'Aguardando'] }}
+                          >
+                            <option value="Aguardando" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Aguardando'] }}>⏳ Aguardando</option>
+                            <option value="Em montagem" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Em montagem'] }}>🔧 Em montagem</option>
+                            <option value="Imprimindo" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Imprimindo'] }}>🖨️ Imprimindo</option>
+                            <option value="Impresso" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Impresso'] }}>✅ Impresso</option>
+                          </select>
                         </td>
                       </>
                     )}
