@@ -770,10 +770,13 @@ export default function MarketplaceProjetoDetalhes() {
     
     // Filtro de Setor (campo status_producao no backend)
     if (filtros.setor) {
-      console.log('🔍 Filtro Setor:', filtros.setor, 'Pedido status_producao:', pedido.status_producao);
+      console.log('🔍 Filtro Setor ATIVO:', filtros.setor);
+      console.log('   Pedido ID:', pedido.id, 'SKU:', pedido.sku, 'status_producao:', pedido.status_producao);
       if (pedido.status_producao !== filtros.setor) {
+        console.log('   ❌ Pedido REMOVIDO - não corresponde ao filtro');
         return false;
       }
+      console.log('   ✅ Pedido MANTIDO - corresponde ao filtro');
     }
     
     // Filtro de Status de Produção (campo status_logistica no backend)
