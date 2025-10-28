@@ -2569,6 +2569,34 @@ export default function MarketplaceProjetoDetalhes() {
                           <span className="text-gray-300 text-sm">{pedido.sku || '-'}</span>
                         </td>
                         
+                        {/* ⚙️ Status Montagem - NOVO */}
+                        <td className="px-4 py-3">
+                          <select
+                            value={pedido.status_montagem || 'Aguardando Montagem'}
+                            onChange={(e) => handleUpdatePedido(pedido.id, 'status_montagem', e.target.value)}
+                            className={`w-full px-3 py-2 rounded-lg text-white text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer transition-all ${
+                              pedido.status_montagem === 'Finalizado' ? 'animate-pulse shadow-lg shadow-green-500/50' : ''
+                            }`}
+                            style={{ 
+                              backgroundColor: 
+                                pedido.status_montagem === 'Finalizado' ? '#10B981' : 
+                                pedido.status_montagem === 'Em Montagem' ? '#F59E0B' : 
+                                '#6B7280'
+                            }}
+                          >
+                            <option value="Aguardando Montagem" style={{ backgroundColor: '#6B7280' }}>⏳ Aguardando Montagem</option>
+                            <option value="Em Montagem" style={{ backgroundColor: '#F59E0B' }}>🔧 Em Montagem</option>
+                            <option value="Finalizado" style={{ backgroundColor: '#10B981' }}>✨ Finalizado</option>
+                          </select>
+                          {pedido.status_montagem === 'Finalizado' && (
+                            <div className="mt-1 flex items-center justify-center gap-1">
+                              <span className="text-green-400 text-xs animate-bounce">🎉</span>
+                              <span className="text-green-400 text-xs font-medium">Pronto!</span>
+                              <span className="text-green-400 text-xs animate-bounce" style={{ animationDelay: '0.2s' }}>✨</span>
+                            </div>
+                          )}
+                        </td>
+                        
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.nome_variacao || '-'}</span>
                         </td>
