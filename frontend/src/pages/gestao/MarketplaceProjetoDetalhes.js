@@ -68,6 +68,44 @@ export default function MarketplaceProjetoDetalhes() {
   // Verificar se usuário pode ver aba Financeiro (apenas director e manager)
   const canViewFinanceiro = user?.role === 'director' || user?.role === 'manager';
   
+  // Mensagens de boas-vindas personalizadas por colaborador
+  const getMensagemBoasVindas = () => {
+    const nome = user?.nome || user?.username;
+    
+    // Mensagens específicas para cada colaborador
+    const mensagensPersonalizadas = {
+      'Thalita': {
+        saudacao: `Bem-vinda, Thalita! 📦`,
+        mensagem: 'Cada envio é uma conquista! Você garante que nossos produtos cheguem com segurança e no prazo! 🚀'
+      },
+      'Alex': {
+        saudacao: `Bem-vindo, Alex! 🪞`,
+        mensagem: 'Sua expertise em espelhos ilumina nossos projetos! Cada peça é um reflexo de excelência! ✨'
+      },
+      'Luiz': {
+        saudacao: `Bem-vindo, Luiz! 🖼️`,
+        mensagem: 'Suas molduras são obras de arte! Continue transformando cada projeto em algo especial! 🎨'
+      },
+      'Ronaldo': {
+        saudacao: `Bem-vindo, Ronaldo! 🖼️💎`,
+        mensagem: 'Molduras com vidro são sua marca! Qualidade e proteção em cada detalhe! 🌟'
+      },
+      'Ludmila': {
+        saudacao: `Bem-vinda, Ludmila! 📦`,
+        mensagem: 'A embalagem perfeita é seu talento! Você cuida de cada detalhe até o cliente! 💝'
+      },
+      'Camila': {
+        saudacao: `Bem-vinda, Camila! 🖨️`,
+        mensagem: 'Suas impressões dão vida aos nossos projetos! Continue trazendo cor e qualidade! 🎨'
+      }
+    };
+
+    return mensagensPersonalizadas[nome] || {
+      saudacao: `Bem-vindo(a), ${nome}! 👋`,
+      mensagem: 'Seu trabalho é essencial para nossa equipe! Juntos fazemos a diferença! 💪'
+    };
+  };
+  
   // Gerar frase motivacional do dia
   const frasesDoDia = [
     "Excelência não é um ato, é um hábito. Continue fazendo um ótimo trabalho!",
