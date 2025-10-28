@@ -661,12 +661,12 @@ export default function MarketplaceProjetoDetalhes() {
       }
     }
     
-    // Filtro de Setor (Mercado Livre)
+    // Filtro de Setor (campo status_producao no backend)
     if (filtros.setor && pedido.status_producao !== filtros.setor) {
       return false;
     }
     
-    // Filtro de Status de Produção (Mercado Livre)
+    // Filtro de Status de Produção (campo status_logistica no backend)
     if (filtros.statusProducao && pedido.status_logistica !== filtros.statusProducao) {
       return false;
     }
