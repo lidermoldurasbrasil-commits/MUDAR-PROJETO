@@ -103,8 +103,21 @@ export default function Layout({ user, onLogout }) {
           </div>
           <div className="header-right">
             <div className="user-info" data-testid="user-info">
-              <span className="user-name">{user.username}</span>
-              <span className="user-role">{user.role}</span>
+              {isProduction ? (
+                <>
+                  <div className="user-welcome">
+                    <span className="user-name">Olá, {user.nome || user.username}! 👋</span>
+                    <span className="user-message">
+                      {frasesDoDia[new Date().getDate() % frasesDoDia.length]}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <span className="user-name">{user.nome || user.username}</span>
+                  <span className="user-role">{user.role === 'director' ? 'Diretor' : user.role}</span>
+                </>
+              )}
             </div>
             <button onClick={onLogout} className="btn-logout" data-testid="logout-button">
               <LogOut size={18} />
