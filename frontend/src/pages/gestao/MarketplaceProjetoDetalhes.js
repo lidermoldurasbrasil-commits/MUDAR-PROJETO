@@ -154,6 +154,8 @@ export default function MarketplaceProjetoDetalhes() {
   const [batchImpressaoValue, setBatchImpressaoValue] = useState('');
   const [batchSetorValue, setBatchSetorValue] = useState('');
   const [batchStatusProducaoValue, setBatchStatusProducaoValue] = useState('');
+  const [aiAnalysis, setAiAnalysis] = useState({}); // Armazena análises de IA por pedido ID
+  const [analyzingAI, setAnalyzingAI] = useState({}); // Rastreia quais pedidos estão sendo analisados
   const [novaLinhaInline, setNovaLinhaInline] = useState({
     numero_pedido: '',
     produto_nome: '',
