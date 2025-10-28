@@ -137,7 +137,7 @@ export default function MarketplaceIntegrator() {
                   <pre className="bg-gray-800 p-2 rounded mt-1 text-xs overflow-x-auto">
 {`ML_CLIENT_ID=seu_app_id_aqui
 ML_CLIENT_SECRET=seu_client_secret_aqui
-ML_REDIRECT_URI=https://marcos-mfg.preview.emergentagent.com/api/integrator/mercadolivre/callback`}
+ML_REDIRECT_URI=https://shopeeml-sync.preview.emergentagent.com/api/integrator/mercadolivre/callback`}
                   </pre>
                 </li>
                 <li>Reinicie o backend: <code className="bg-gray-700 px-1 py-0.5 rounded">sudo supervisorctl restart backend</code></li>

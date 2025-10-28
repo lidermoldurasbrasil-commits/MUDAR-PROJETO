@@ -20,7 +20,7 @@ Se você vê esse erro ao clicar em "Autorizar Mercado Livre", significa que as 
    - **Nome**: Marcos MFG Integrador (ou qualquer nome)
    - **Descrição curta**: Sistema de integração de pedidos
    - **Categoria**: Gerenciamento de vendas
-   - **Redirect URI**: `https://marcos-mfg.preview.emergentagent.com/api/integrator/mercadolivre/callback`
+   - **Redirect URI**: `https://shopeeml-sync.preview.emergentagent.com/api/integrator/mercadolivre/callback`
 
 **c) Copie as Credenciais:**
 Após criar, você verá:
@@ -43,7 +43,7 @@ nano /app/backend/.env
 # Mercado Livre Integration
 ML_CLIENT_ID=seu_app_id_aqui_copiar_do_portal
 ML_CLIENT_SECRET=seu_client_secret_aqui_copiar_do_portal
-ML_REDIRECT_URI=https://marcos-mfg.preview.emergentagent.com/api/integrator/mercadolivre/callback
+ML_REDIRECT_URI=https://shopeeml-sync.preview.emergentagent.com/api/integrator/mercadolivre/callback
 ```
 
 **c) Salvar e sair:**
@@ -107,12 +107,12 @@ grep "ML_CLIENT_ID" /app/backend/.env
 ### Teste 2: Testar Endpoint
 ```bash
 # Fazer login
-TOKEN=$(curl -s -X POST "https://marcos-mfg.preview.emergentagent.com/api/auth/login" \
+TOKEN=$(curl -s -X POST "https://shopeeml-sync.preview.emergentagent.com/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"username":"diretor","password":"123"}' | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4)
 
 # Testar autorização
-curl -X GET "https://marcos-mfg.preview.emergentagent.com/api/integrator/mercadolivre/authorize" \
+curl -X GET "https://shopeeml-sync.preview.emergentagent.com/api/integrator/mercadolivre/authorize" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -156,7 +156,7 @@ cat /app/backend/.env
 **Causa:** URL no portal ML diferente do configurado
 **Solução:** No portal ML, edite o aplicativo e configure exatamente:
 ```
-https://marcos-mfg.preview.emergentagent.com/api/integrator/mercadolivre/callback
+https://shopeeml-sync.preview.emergentagent.com/api/integrator/mercadolivre/callback
 ```
 
 ### Erro: "Token expirou"
@@ -178,7 +178,7 @@ JWT_SECRET=seu_secret_key_aqui
 # Mercado Livre Integration
 ML_CLIENT_ID=1234567890123456
 ML_CLIENT_SECRET=abcdefghijklmnopqrstuvwxyz123456
-ML_REDIRECT_URI=https://marcos-mfg.preview.emergentagent.com/api/integrator/mercadolivre/callback
+ML_REDIRECT_URI=https://shopeeml-sync.preview.emergentagent.com/api/integrator/mercadolivre/callback
 
 # Shopee Integration (futuro)
 # SHOPEE_PARTNER_ID=
