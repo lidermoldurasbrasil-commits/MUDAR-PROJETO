@@ -761,6 +761,24 @@ export default function MarketplaceProjetoDetalhes() {
     }
   });
 
+  // Separar pedidos atuais e antigos (baseado na data prevista de envio)
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  
+  const pedidosAtuais = pedidosFiltrados.filter(pedido => {
+    if (!pedido.data_prevista_envio) return true; // Se não tem data, considera atual
+    const dataPrevista = new Date(pedido.data_prevista_envio);
+    dataPrevista.setHours(0, 0, 0, 0);
+    return dataPrevista >= hoje; // Hoje e dias futuros
+  });
+  
+  const pedidosAntigos = pedidosFiltrados.filter(pedido => {
+    if (!pedido.data_prevista_envio) return false; // Se não tem data, não é antigo
+    const dataPrevista = new Date(pedido.data_prevista_envio);
+    dataPrevista.setHours(0, 0, 0, 0);
+    return dataPrevista < hoje; // Dias anteriores
+  });
+
   // Função de agrupamento
   const pedidosAgrupados = () => {
     if (!agruparPor) {
