@@ -20,7 +20,7 @@ class ProjectsEndpointTester:
         else:
             print(f"❌ {name} - {details}")
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
+    def run_api_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
         url = f"{self.api_url}/{endpoint}"
         test_headers = {'Content-Type': 'application/json'}
