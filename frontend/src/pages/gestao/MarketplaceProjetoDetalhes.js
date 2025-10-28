@@ -1725,110 +1725,157 @@ export default function MarketplaceProjetoDetalhes() {
           
           {/* Métricas por Setor */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-300 mb-3">Distribuição por Setor</h3>
-            <div className="grid grid-cols-4 gap-4">
-              {[
-                { nome: 'Espelho', emoji: '🪞', cor: '#3B82F6' },
-                { nome: 'Molduras com Vidro', emoji: '🖼️', cor: '#8B5CF6' },
-                { nome: 'Molduras', emoji: '🖼️', cor: '#EC4899' },
-                { nome: 'Impressão', emoji: '🖨️', cor: '#F59E0B' },
-                { nome: 'Expedição', emoji: '🧾', cor: '#10B981' },
-                { nome: 'Embalagem', emoji: '📦', cor: '#6366F1' },
-                { nome: 'Personalizado', emoji: '⭐', cor: '#14B8A6' }
-              ].map(setor => {
-                const count = pedidos.filter(p => p.status_producao === setor.nome).length;
-                const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
-                return (
-                  <div key={setor.nome} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">{setor.emoji}</span>
-                      <span className="text-2xl font-bold" style={{ color: setor.cor }}>{count}</span>
-                    </div>
-                    <p className="text-sm text-gray-400">{setor.nome}</p>
-                    <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full" 
-                        style={{ width: `${percentage}%`, backgroundColor: setor.cor }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
-                  </div>
-                );
-              })}
+            <div 
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-700 p-2 rounded-lg transition-colors"
+              onClick={() => toggleSection('distribuicaoSetor')}
+            >
+              <h3 className="text-lg font-semibold text-gray-300">Distribuição por Setor</h3>
+              {expandedSections.distribuicaoSetor ? (
+                <ChevronUp className="text-gray-400" size={20} />
+              ) : (
+                <ChevronDown className="text-gray-400" size={20} />
+              )}
             </div>
+            
+            {expandedSections.distribuicaoSetor && (
+              <div className="grid grid-cols-4 gap-4 mt-3">
+                {[
+                  { nome: 'Espelho', emoji: '🪞', cor: '#3B82F6' },
+                  { nome: 'Molduras com Vidro', emoji: '🖼️', cor: '#8B5CF6' },
+                  { nome: 'Molduras', emoji: '🖼️', cor: '#EC4899' },
+                  { nome: 'Impressão', emoji: '🖨️', cor: '#F59E0B' },
+                  { nome: 'Expedição', emoji: '🧾', cor: '#10B981' },
+                  { nome: 'Embalagem', emoji: '📦', cor: '#6366F1' },
+                  { nome: 'Personalizado', emoji: '⭐', cor: '#14B8A6' }
+                ].map(setor => {
+                  const count = pedidos.filter(p => p.status_producao === setor.nome).length;
+                  const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
+                  return (
+                    <div key={setor.nome} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl">{setor.emoji}</span>
+                        <span className="text-2xl font-bold" style={{ color: setor.cor }}>{count}</span>
+                      </div>
+                      <p className="text-sm text-gray-400">{setor.nome}</p>
+                      <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full" 
+                          style={{ width: `${percentage}%`, backgroundColor: setor.cor }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
+                      {count > 0 && (
+                        <button
+                          onClick={() => gerarPDFSetor(setor.nome)}
+                          className="mt-2 w-full text-xs bg-indigo-600 hover:bg-indigo-700 text-white py-1 px-2 rounded transition-colors"
+                        >
+                          📄 Gerar PDF
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Métricas por Status de Produção */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-300 mb-3">Status de Produção</h3>
-            <div className="grid grid-cols-4 gap-4">
-              {[
-                { nome: 'Aguardando', emoji: '⏳', cor: '#94A3B8' },
-                { nome: 'Em montagem', emoji: '🔧', cor: '#F59E0B' },
-                { nome: 'Imprimindo', emoji: '🖨️', cor: '#3B82F6' },
-                { nome: 'Impresso', emoji: '✅', cor: '#10B981' }
-              ].map(status => {
-                const count = pedidos.filter(p => p.status_logistica === status.nome).length;
-                const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
-                return (
-                  <div key={status.nome} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">{status.emoji}</span>
-                      <span className="text-2xl font-bold" style={{ color: status.cor }}>{count}</span>
-                    </div>
-                    <p className="text-sm text-gray-400">{status.nome}</p>
-                    <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full" 
-                        style={{ width: `${percentage}%`, backgroundColor: status.cor }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
-                  </div>
-                );
-              })}
+            <div 
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-700 p-2 rounded-lg transition-colors"
+              onClick={() => toggleSection('statusProducao')}
+            >
+              <h3 className="text-lg font-semibold text-gray-300">Status de Produção</h3>
+              {expandedSections.statusProducao ? (
+                <ChevronUp className="text-gray-400" size={20} />
+              ) : (
+                <ChevronDown className="text-gray-400" size={20} />
+              )}
             </div>
+            
+            {expandedSections.statusProducao && (
+              <div className="grid grid-cols-4 gap-4 mt-3">
+                {[
+                  { nome: 'Aguardando', emoji: '⏳', cor: '#94A3B8' },
+                  { nome: 'Em montagem', emoji: '🔧', cor: '#F59E0B' },
+                  { nome: 'Imprimindo', emoji: '🖨️', cor: '#3B82F6' },
+                  { nome: 'Impresso', emoji: '✅', cor: '#10B981' }
+                ].map(status => {
+                  const count = pedidos.filter(p => p.status_logistica === status.nome).length;
+                  const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
+                  return (
+                    <div key={status.nome} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl">{status.emoji}</span>
+                        <span className="text-2xl font-bold" style={{ color: status.cor }}>{count}</span>
+                      </div>
+                      <p className="text-sm text-gray-400">{status.nome}</p>
+                      <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full" 
+                          style={{ width: `${percentage}%`, backgroundColor: status.cor }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* ⚙️ NOVO: Métricas por Status Montagem - Shopee */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-300 mb-3">⚙️ Status de Montagem</h3>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { nome: 'Aguardando Montagem', emoji: '⏳', cor: '#6B7280' },
-                { nome: 'Em Montagem', emoji: '🔧', cor: '#F59E0B' },
-                { nome: 'Finalizado', emoji: '✨', cor: '#10B981' }
-              ].map(status => {
-                const count = pedidos.filter(p => p.status_montagem === status.nome).length;
-                const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
-                return (
-                  <div 
-                    key={status.nome} 
-                    className={`bg-gray-900 rounded-lg p-4 border border-gray-700 ${
-                      status.nome === 'Finalizado' ? 'ring-2 ring-green-500 ring-opacity-50' : ''
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">{status.emoji}</span>
-                      <span className="text-2xl font-bold" style={{ color: status.cor }}>{count}</span>
-                    </div>
-                    <p className="text-sm text-gray-400">{status.nome}</p>
-                    <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full transition-all duration-500" 
-                        style={{ width: `${percentage}%`, backgroundColor: status.cor }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
-                    {status.nome === 'Finalizado' && count > 0 && (
-                      <div className="mt-2 text-xs text-green-400 font-medium animate-pulse">
-                        🎉 {count} concluído{count > 1 ? 's' : ''}!
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+            <div 
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-700 p-2 rounded-lg transition-colors"
+              onClick={() => toggleSection('statusMontagem')}
+            >
+              <h3 className="text-lg font-semibold text-gray-300">⚙️ Status de Montagem</h3>
+              {expandedSections.statusMontagem ? (
+                <ChevronUp className="text-gray-400" size={20} />
+              ) : (
+                <ChevronDown className="text-gray-400" size={20} />
+              )}
             </div>
+            
+            {expandedSections.statusMontagem && (
+              <div className="grid grid-cols-3 gap-4 mt-3">
+                {[
+                  { nome: 'Aguardando Montagem', emoji: '⏳', cor: '#6B7280' },
+                  { nome: 'Em Montagem', emoji: '🔧', cor: '#F59E0B' },
+                  { nome: 'Finalizado', emoji: '✨', cor: '#10B981' }
+                ].map(status => {
+                  const count = pedidos.filter(p => p.status_montagem === status.nome).length;
+                  const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
+                  return (
+                    <div 
+                      key={status.nome} 
+                      className={`bg-gray-900 rounded-lg p-4 border border-gray-700 ${
+                        status.nome === 'Finalizado' ? 'ring-2 ring-green-500 ring-opacity-50' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl">{status.emoji}</span>
+                        <span className="text-2xl font-bold" style={{ color: status.cor }}>{count}</span>
+                      </div>
+                      <p className="text-sm text-gray-400">{status.nome}</p>
+                      <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full transition-all duration-500" 
+                          style={{ width: `${percentage}%`, backgroundColor: status.cor }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
+                      {status.nome === 'Finalizado' && count > 0 && (
+                        <div className="mt-2 text-xs text-green-400 font-medium animate-pulse">
+                          🎉 {count} concluído{count > 1 ? 's' : ''}!
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
