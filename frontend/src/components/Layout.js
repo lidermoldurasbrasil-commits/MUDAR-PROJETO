@@ -7,30 +7,38 @@ export default function Layout({ user, onLogout }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  // Verificar se usuário é production
+  const isProduction = user?.role === 'production';
+  const isAdmin = user?.role === 'director' || user?.role === 'manager';
+
   const navItems = [
-    { path: '/', icon: Home, label: 'Painel do Diretor', testId: 'nav-dashboard' },
+    // Painel do Diretor - apenas para admin
+    ...(!isProduction ? [{ path: '/', icon: Home, label: 'Painel do Diretor', testId: 'nav-dashboard' }] : []),
     
     // === MARKETPLACE ===
     { section: 'Marketplace', items: [
       { path: '/marketplace/production', icon: Package, label: 'Produção', testId: 'nav-marketplace-production' },
-      { path: '/marketplace/returns', icon: RefreshCcw, label: 'Devoluções', testId: 'nav-returns' },
-      { path: '/marketplace/marketing', icon: Megaphone, label: 'Marketing', testId: 'nav-marketing' },
-      { path: '/marketplace/purchases', icon: ShoppingCart, label: 'Compras', testId: 'nav-purchases' },
-      { path: '/marketplace/accounts-payable', icon: DollarSign, label: 'Contas a Pagar', testId: 'nav-accounts-payable' },
-      { path: '/marketplace/sales', icon: TrendingUp, label: 'Vendas', testId: 'nav-sales' },
-      { path: '/marketplace/cost-center', icon: Calculator, label: 'Centro de Custos', testId: 'nav-cost-center' },
-      { path: '/marketplace/breakeven', icon: TrendingUp, label: 'Ponto de Equilíbrio', testId: 'nav-breakeven' },
+      // Itens abaixo apenas para admin
+      ...(!isProduction ? [
+        { path: '/marketplace/returns', icon: RefreshCcw, label: 'Devoluções', testId: 'nav-returns' },
+        { path: '/marketplace/marketing', icon: Megaphone, label: 'Marketing', testId: 'nav-marketing' },
+        { path: '/marketplace/purchases', icon: ShoppingCart, label: 'Compras', testId: 'nav-purchases' },
+        { path: '/marketplace/accounts-payable', icon: DollarSign, label: 'Contas a Pagar', testId: 'nav-accounts-payable' },
+        { path: '/marketplace/sales', icon: TrendingUp, label: 'Vendas', testId: 'nav-sales' },
+        { path: '/marketplace/cost-center', icon: Calculator, label: 'Centro de Custos', testId: 'nav-cost-center' },
+        { path: '/marketplace/breakeven', icon: TrendingUp, label: 'Ponto de Equilíbrio', testId: 'nav-breakeven' },
+      ] : [])
     ]},
     
-    // === FÁBRICA E LOJAS ===
-    { section: 'Fábrica & Lojas', items: [
+    // === FÁBRICA E LOJAS === - apenas para admin
+    ...(!isProduction ? [{ section: 'Fábrica & Lojas', items: [
       { path: '/factory', icon: Factory, label: 'Fábrica', testId: 'nav-factory' },
       { path: '/store/1', icon: Store, label: 'Loja 1', testId: 'nav-store-1' },
       { path: '/store/2', icon: Store, label: 'Loja 2', testId: 'nav-store-2' },
       { path: '/store/3', icon: Store, label: 'Loja 3', testId: 'nav-store-3' },
       { path: '/complaints', icon: AlertCircle, label: 'Reclamações', testId: 'nav-complaints' },
       { path: '/crm', icon: Users, label: 'CRM / Leads', testId: 'nav-crm' },
-    ]},
+    ]}] : []),
   ];
 
   return (
