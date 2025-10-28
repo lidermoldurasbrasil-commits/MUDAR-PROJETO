@@ -4344,8 +4344,8 @@ def detectar_setor_por_sku(sku_texto):
                 return 'Molduras'
     
     # 5. Padrão se não encontrou nenhuma correspondência
-    print(f"⭐ SKU '{sku}' → ESPELHO (padrão)")
-    return 'Espelho'
+    print(f"⭐ SKU '{sku}' → PERSONALIZADO (padrão)")
+    return 'Personalizado'
 
 def processar_linha_shopee(row, projeto_id, projeto, current_user):
     """Processa uma linha da planilha Shopee - COM LOGS DE DEBUG"""
