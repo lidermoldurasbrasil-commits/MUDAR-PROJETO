@@ -678,13 +678,19 @@ export default function MarketplaceProjetoDetalhes() {
     }
     
     // Filtro de Setor (campo status_producao no backend)
-    if (filtros.setor && pedido.status_producao !== filtros.setor) {
-      return false;
+    if (filtros.setor) {
+      console.log('🔍 Filtro Setor:', filtros.setor, 'Pedido status_producao:', pedido.status_producao);
+      if (pedido.status_producao !== filtros.setor) {
+        return false;
+      }
     }
     
     // Filtro de Status de Produção (campo status_logistica no backend)
-    if (filtros.statusProducao && pedido.status_logistica !== filtros.statusProducao) {
-      return false;
+    if (filtros.statusProducao) {
+      console.log('🔍 Filtro StatusProducao:', filtros.statusProducao, 'Pedido status_logistica:', pedido.status_logistica);
+      if (pedido.status_logistica !== filtros.statusProducao) {
+        return false;
+      }
     }
     
     return true;
