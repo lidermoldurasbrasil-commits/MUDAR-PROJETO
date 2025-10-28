@@ -330,16 +330,18 @@ export default function MarketplacesCentral() {
         </div>
       </div>
 
-      {/* Valor Produzido Hoje */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-lg shadow-lg p-6 mb-6 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm opacity-90">💰 Valor Produzido Hoje</p>
-            <p className="text-3xl font-bold">{formatCurrency(indicadores.valor_produzido_hoje)}</p>
+      {/* Valor Produzido Hoje - APENAS para admin */}
+      {canViewFinanceiro && (
+        <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-lg shadow-lg p-6 mb-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-90">💰 Valor Produzido Hoje</p>
+              <p className="text-3xl font-bold">{formatCurrency(indicadores.valor_produzido_hoje)}</p>
+            </div>
+            <DollarSign className="w-12 h-12 opacity-80" />
           </div>
-          <DollarSign className="w-12 h-12 opacity-80" />
         </div>
-      </div>
+      )}
 
       {/* Seção de Projetos - ESTILO GRID DE CARDS ESCURO */}
       <div className="mb-6">
