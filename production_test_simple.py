@@ -89,30 +89,27 @@ class ProductionSystemTester:
             return False, {}
 
     def setup_test_users(self):
-        """Create required test users"""
+        """Create required test users or login if they exist"""
         print("\n🔧 Setting up test users...")
         
-        # First, create a director user to manage other users
-        director_data = {
-            "username": "diretor",
-            "password": "123",
-            "role": "director"
-        }
-        
-        success_director, director_response = self.run_test(
-            "Create Director User",
+        # Try to login with existing director user first
+        success_login, login_response = self.run_test(
+            "Login Existing Director",
             "POST",
-            "auth/register",
+            "auth/login",
             200,
-            data=director_data
+            data={
+                "username": "diretor",
+                "password": "123"
+            }
         )
         
-        if success_director and 'token' in director_response:
-            self.token = director_response['token']
-            self.user_data = director_response['user']
-            print(f"✅ Director user created and authenticated")
+        if success_login and 'token' in login_response:
+            self.token = login_response['token']
+            self.user_data = login_response['user']
+            print(f"✅ Director user logged in successfully")
             
-            # Create production sector users
+            # Try to create production sector users (they may already exist)
             production_users = [
                 ("espelho", "production"),
                 ("molduras-vidro", "production"),
@@ -139,11 +136,36 @@ class ProductionSystemTester:
                 
                 if success_user:
                     self.created_items['users'].append(username)
+                    print(f"✅ Created {username} user")
+                else:
+                    # User might already exist, that's OK
+                    print(f"ℹ️ {username} user may already exist")
             
             return True
         else:
-            print("❌ Failed to create director user")
-            return False
+            # Try to create director user if login failed
+            director_data = {
+                "username": "diretor",
+                "password": "123",
+                "role": "director"
+            }
+            
+            success_director, director_response = self.run_test(
+                "Create Director User",
+                "POST",
+                "auth/register",
+                200,
+                data=director_data
+            )
+            
+            if success_director and 'token' in director_response:
+                self.token = director_response['token']
+                self.user_data = director_response['user']
+                print(f"✅ Director user created and authenticated")
+                return True
+            else:
+                print("❌ Failed to create or login director user")
+                return False
 
     def test_authentication_and_permissions(self):
         """Test authentication with director and production sector users"""
