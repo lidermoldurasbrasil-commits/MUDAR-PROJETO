@@ -2458,6 +2458,7 @@ export default function MarketplaceProjetoDetalhes() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Opção de envio</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[140px]">Data prevista de envio</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Número de referência SKU</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[180px]">⚙️ Status Montagem</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Nome da variação</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[80px]">Quantidade</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase min-w-[150px]">Status Produção</th>
