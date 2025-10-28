@@ -1940,8 +1940,26 @@ export default function MarketplaceProjetoDetalhes() {
   )}
 
       {/* Produção View - Visão Simplificada sem Preços */}
-      {viewMode === 'producao' && (
+      {(viewMode === 'producao' || viewMode === 'pedidos-antigos') && (
         <div className="space-y-6">
+          {/* Banner informativo para Pedidos Antigos */}
+          {viewMode === 'pedidos-antigos' && (
+            <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">📦</span>
+                <div>
+                  <h3 className="text-lg font-semibold text-yellow-400">Pedidos Antigos</h3>
+                  <p className="text-sm text-gray-300">
+                    Mostrando pedidos com data prevista de envio anterior a hoje ({hoje.toLocaleDateString('pt-BR')})
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Total: {pedidosAntigos.length} pedidos antigos
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Filtros de Tipo de Envio */}
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <div className="flex items-center gap-3 flex-wrap">
