@@ -4230,11 +4230,12 @@ def detectar_setor_por_sku(sku_texto):
     REGRAS ATUALIZADAS:
     1. IMPRESSÃO (prioridade máxima): PD
     2. ESPELHO: ESPELHO, LED, ESP
-    3. MOLDURAS COM VIDRO (prioridade alta): MF, MD, CX, CV, dimensões, números 80/120
-    4. MOLDURAS: MM, MB, MP, SV, A4-CV (apenas se não tiver indicadores de vidro)
+    3. MOLDURAS COM VIDRO (prioridade alta): MF, MD, CX, CV, VIDRO, dimensões, números 80/120
+    4. MOLDURAS: MM, MB, MP, SV, MOLDURA, A4-CV (apenas se não tiver indicadores de vidro)
     5. Default: Espelho
     """
     import pandas as pd
+    import re
     
     if not sku_texto or pd.isna(sku_texto):
         return 'Espelho'  # Padrão
@@ -4246,7 +4247,7 @@ def detectar_setor_por_sku(sku_texto):
         print(f"🖨️ SKU '{sku}' → IMPRESSÃO (contém PD)")
         return 'Impressão'
     
-    # 2. ESPELHO - palavras-chave específicas
+    # 2. ESPELHO - palavras-chave específicas (verificar ANTES de moldura)
     palavras_espelho = ['ESPELHO', 'LED', 'ESP']
     for palavra in palavras_espelho:
         if palavra in sku:
