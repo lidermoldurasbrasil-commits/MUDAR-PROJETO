@@ -323,13 +323,19 @@ frontend:
     implemented: true
     working: "unknown"
     file: "/app/frontend/src/pages/gestao/MarketplaceProjetoDetalhes.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
         - working: "unknown"
           agent: "main"
           comment: "Implementado modal de upload de planilha na página de detalhes do projeto marketplace. Features: 1) Botão 'Upload Planilha' com ícone ✅ 2) Modal com área de drag-and-drop para arquivo ✅ 3) Validação de tipo de arquivo (.xlsx, .xls, .csv) ✅ 4) Exibição de colunas esperadas na planilha ✅ 5) Upload via FormData para endpoint /api/gestao/marketplaces/pedidos/upload-planilha ✅ 6) Loading state durante upload ✅ 7) Toast de sucesso/erro ✅ 8) Refresh automático da lista de pedidos após upload ✅. Pronto para teste e2e com planilha real."
+        - working: false
+          agent: "user"
+          comment: "Usuário reportou: 'Não está importando a planilha shopee no projeto shopee'. Problema com 'Loja' name/information durante upload. Modal não está detectando corretamente a plataforma do projeto."
+        - working: "unknown"
+          agent: "main"
+          comment: "CORRIGIDO: Implementada detecção automática da plataforma no modal de upload. Modificada função handleUploadPlanilha() para verificar projeto.plataforma e automaticamente setar uploadFormato ('shopee' ou 'mercadolivre') quando modal abre. Detecta tanto 'Shopee' quanto 'Mercado Livre'/'mercadolivre'. Pronto para teste."
 
 metadata:
   created_by: "main_agent"
