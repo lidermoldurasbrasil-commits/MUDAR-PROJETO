@@ -25,7 +25,13 @@ export default function MarketplaceIntegrator() {
       setStatus(response.data);
     } catch (error) {
       console.error('Erro ao buscar status:', error);
-      toast.error('Erro ao buscar status das integrações');
+      
+      // Se não conseguir buscar, mostrar status default
+      setStatus({
+        mercado_livre: { authenticated: false, user_id: null, token_expires_at: null },
+        shopee: { authenticated: false, shop_id: null },
+        statistics: { total_orders: 0, mercado_livre_orders: 0, shopee_orders: 0 }
+      });
     } finally {
       setLoading(false);
     }
