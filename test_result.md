@@ -402,6 +402,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "✅ SISTEMA DE AUTENTICAÇÃO E PERMISSÕES TESTADO COM SUCESSO TOTAL! Executado teste completo conforme solicitação da revisão: 1) Login diretor (diretor/123) ✅ - Token gerado corretamente, role 'director' verificado ✅ 2) Login setores produção: espelho, molduras-vidro, molduras, impressao, expedicao, embalagem (todos com senha 123) ✅ - Todos tokens gerados corretamente, role 'production' verificado para todos ✅ 3) Verificação de roles: director vs production funcionando perfeitamente ✅. Sistema de autenticação 100% operacional para produção!"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTE DE LOGIN DOS USUÁRIOS DE PRODUÇÃO EXECUTADO COM SUCESSO TOTAL! Testados todos os 7 usuários conforme solicitação específica da revisão: 1) espelho/123 ✅ - Status 200, token JWT retornado, username correto, role 'production' ✅ 2) molduras-vidro/123 ✅ - Status 200, token JWT retornado, username correto, role 'production' ✅ 3) molduras/123 ✅ - Status 200, token JWT retornado, username correto, role 'production' ✅ 4) impressao/123 ✅ - Status 200, token JWT retornado, username correto, role 'production' ✅ 5) expedicao/123 ✅ - Status 200, token JWT retornado, username correto, role 'production' ✅ 6) embalagem/123 ✅ - Status 200, token JWT retornado, username correto, role 'production' ✅ 7) diretor/123 ✅ - Status 200, token JWT retornado, username correto, role 'director' ✅. TODOS OS CRITÉRIOS DE SUCESSO ATENDIDOS: Status 200 OK, Token JWT retornado, dados do usuário corretos (username, role), roles corretas (production/director). Taxa de sucesso: 100% (36/36 testes). Sistema de autenticação funcionando perfeitamente para todos os usuários de produção!"
 
   - task: "Importação Shopee - Detecção Automática e Mapeamento"
     implemented: true
