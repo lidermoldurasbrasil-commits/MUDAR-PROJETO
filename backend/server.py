@@ -3899,7 +3899,7 @@ async def get_projetos_marketplace(current_user: dict = Depends(get_current_user
         projetos_iniciais = [
             {
                 "id": str(uuid.uuid4()),
-                "nome": "Shopee Brasil",
+                "nome": "Shopee - Diamonds",
                 "plataforma": "shopee",
                 "descricao": "Controle de produção e pedidos integrados à Shopee",
                 "icone": "🛍️",
