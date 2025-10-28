@@ -88,7 +88,13 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={
-          user ? <Navigate to="/" /> : <Login onLogin={handleLogin} />
+          user ? (
+            user.role === 'production' ? 
+            <Navigate to="/marketplace/production" /> : 
+            <Navigate to="/" />
+          ) : (
+            <Login onLogin={handleLogin} />
+          )
         } />
         
         {user ? (
