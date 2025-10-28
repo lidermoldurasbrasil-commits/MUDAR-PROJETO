@@ -179,7 +179,7 @@ class ProjectsEndpointTester:
         # Test 4: Get projects with production token
         print("\n📋 Test 4: Get projects with production user token")
         
-        success_projects_production, projects_response_prod = self.run_test(
+        success_projects_production, projects_response_prod = self.run_api_test(
             "Get Projects (Production)",
             "GET",
             "gestao/marketplaces/projetos",
