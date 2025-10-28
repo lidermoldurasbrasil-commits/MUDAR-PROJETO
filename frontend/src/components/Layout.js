@@ -274,10 +274,25 @@ export default function Layout({ user, onLogout }) {
           align-items: flex-end;
         }
 
+        .user-welcome {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          max-width: 300px;
+        }
+
         .user-name {
           font-weight: 600;
           color: #2d3748;
           font-size: 14px;
+        }
+
+        .user-message {
+          font-size: 11px;
+          color: #667eea;
+          font-style: italic;
+          margin-top: 2px;
+          text-align: right;
         }
 
         .user-role {
