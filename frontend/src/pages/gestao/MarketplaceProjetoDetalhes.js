@@ -193,9 +193,13 @@ export default function MarketplaceProjetoDetalhes() {
       setPedidos(pedidosRes.data || []);
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
-      toast.error('Erro ao carregar dados do projeto');
+      if (showLoading) {
+        toast.error('Erro ao carregar dados do projeto');
+      }
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
