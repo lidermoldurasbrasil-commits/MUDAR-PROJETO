@@ -4274,8 +4274,8 @@ class BusinessManagementSystemTester:
 def main():
     tester = BusinessManagementSystemTester()
     
-    # Run only the Marketplace Spreadsheet Upload test as requested
-    print("🚀 Starting Marketplace Spreadsheet Upload Test...")
+    # Run only the Shopee Upload Functionality test as requested in review
+    print("🚀 Starting Shopee Upload Functionality Test...")
     print(f"🌐 Testing against: {tester.base_url}")
     
     # Authentication is required
@@ -4283,8 +4283,8 @@ def main():
         print("❌ Authentication failed - stopping tests")
         return 1
     
-    # Run only the Marketplace Spreadsheet Upload test
-    success = tester.test_marketplace_spreadsheet_upload()
+    # Run only the Shopee Upload Functionality test
+    success = tester.test_shopee_upload_functionality()
     
     # Print final results
     all_passed = tester.print_summary()
