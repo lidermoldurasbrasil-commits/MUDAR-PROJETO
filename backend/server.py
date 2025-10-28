@@ -4816,6 +4816,7 @@ async def upload_planilha_pedidos(
         
         pedidos_criados = []
         pedidos_duplicados = []
+        pedidos_corrigidos_ia = []  # Contador de pedidos corrigidos por aprendizado
         
         # Processar cada linha da planilha baseado no formato
         for index, row in df.iterrows():
@@ -4829,6 +4830,27 @@ async def upload_planilha_pedidos(
                 
                 if not pedido_data:
                     continue
+                
+                # 🎓 APRENDIZADO AUTOMÁTICO: Verificar se SKU tem feedback e corrigir setor
+                sku = pedido_data.get('sku') or pedido_data.get('numero_referencia_sku', '')
+                if sku:
+                    feedback = await db.sku_feedback.find_one(
+                        {"sku": sku},
+                        sort=[("created_at", -1)]  # Mais recente
+                    )
+                    
+                    if feedback:
+                        setor_original = pedido_data.get('status_producao', '')
+                        setor_aprendido = feedback['setor_correto']
+                        
+                        if setor_original != setor_aprendido:
+                            pedido_data['status_producao'] = setor_aprendido
+                            pedidos_corrigidos_ia.append({
+                                'sku': sku,
+                                'setor_original': setor_original,
+                                'setor_corrigido': setor_aprendido
+                            })
+                            print(f"🎓 IA corrigiu automaticamente: SKU '{sku}' de '{setor_original}' → '{setor_aprendido}'")
                 
                 # Verificar se já existe pedido com esse numero_pedido no mesmo projeto
                 pedido_existente = await db.pedidos_marketplace.find_one({
@@ -4856,14 +4878,18 @@ async def upload_planilha_pedidos(
         mensagem = f"{len(pedidos_criados)} pedidos importados com sucesso"
         if pedidos_duplicados:
             mensagem += f". {len(pedidos_duplicados)} pedidos duplicados foram ignorados"
+        if pedidos_corrigidos_ia:
+            mensagem += f". 🎓 {len(pedidos_corrigidos_ia)} pedidos corrigidos automaticamente pela IA"
         
         return {
             "message": mensagem,
             "total_importados": len(pedidos_criados),
             "total_duplicados": len(pedidos_duplicados),
+            "total_corrigidos_ia": len(pedidos_corrigidos_ia),
             "total_linhas": len(df),
             "erros": len(df) - len(pedidos_criados) - len(pedidos_duplicados),
-            "pedidos_duplicados": pedidos_duplicados[:10] if pedidos_duplicados else []  # Primeiros 10 para referência
+            "pedidos_duplicados": pedidos_duplicados[:10] if pedidos_duplicados else [],
+            "pedidos_corrigidos_ia": pedidos_corrigidos_ia[:10] if pedidos_corrigidos_ia else []
         }
         
     except Exception as e:
