@@ -409,22 +409,6 @@ export default function MarketplacesCentral() {
                       <p className="text-xs text-gray-400">{projeto.descricao}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={(e) => handleEditProjeto(e, projeto)}
-                      className="p-2 text-gray-400 hover:text-blue-400 hover:bg-gray-700 rounded-lg transition-colors"
-                      title="Editar projeto"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={(e) => handleDeleteProjeto(e, projeto)}
-                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-700 rounded-lg transition-colors"
-                      title="Deletar projeto"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
                 </div>
 
                 {/* Badge Recomendado (se houver) */}
