@@ -4060,10 +4060,10 @@ class BusinessManagementSystemTester:
         )
         
         if success_get_orders and isinstance(orders_response, list):
-            # Look for our test orders
+            # Look for our test orders (with current timestamp)
             test_orders_found = []
             for order in orders_response:
-                if order.get('numero_pedido', '').startswith('TEST') and 'SHOPEE' in order.get('numero_pedido', ''):
+                if order.get('numero_pedido', '').startswith(f'TEST') and f'SHOPEE{timestamp}' in order.get('numero_pedido', ''):
                     test_orders_found.append(order)
             
             print(f"✅ Found {len(test_orders_found)} test orders in database")
