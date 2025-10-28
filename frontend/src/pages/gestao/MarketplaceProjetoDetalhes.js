@@ -200,6 +200,16 @@ export default function MarketplaceProjetoDetalhes() {
     fetchStatusCustomizados();
   }, [projetoId, filtros]);
 
+  // ⚡ TEMPO REAL - Atualizar contador de tempo a cada segundo
+  useEffect(() => {
+    const timer = setInterval(() => {
+      // Forçar re-render para atualizar o contador "há X segundos"
+      setLastUpdate(prev => prev);
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+
   // ⚡ TEMPO REAL - Atualização de referência sempre que pedidos mudarem
   useEffect(() => {
     pedidosRef.current = pedidos;
