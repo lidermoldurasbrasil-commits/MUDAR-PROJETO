@@ -920,6 +920,125 @@ export default function MarketplaceProjetoDetalhes() {
     }
   };
 
+  // 📄 GERAÇÃO DE PDF POR SETOR
+  const gerarPDFSetor = async (nomeSetor) => {
+    try {
+      // Importar jsPDF e autoTable dinamicamente
+      const { default: jsPDF } = await import('jspdf');
+      await import('jspdf-autotable');
+      
+      // Filtrar pedidos do setor
+      const pedidosDoSetor = pedidos.filter(p => p.status_producao === nomeSetor);
+      
+      if (pedidosDoSetor.length === 0) {
+        toast.error(`Nenhum pedido encontrado para o setor ${nomeSetor}`);
+        return;
+      }
+      
+      const doc = new jsPDF('l', 'mm', 'a4'); // Landscape para mais espaço
+      
+      // CABEÇALHO
+      doc.setFontSize(20);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Lider Hub', 20, 20);
+      
+      doc.setFontSize(14);
+      doc.text(`Ordem de Produção - Setor: ${nomeSetor}`, 20, 28);
+      
+      doc.setFontSize(10);
+      doc.text(`Data de Geração: ${new Date().toLocaleDateString('pt-BR')}`, 20, 35);
+      doc.text(`Total de Pedidos: ${pedidosDoSetor.length}`, 20, 40);
+      
+      // TABELA COM PEDIDOS
+      const tableData = pedidosDoSetor.map(p => [
+        p.numero_pedido || '-',
+        p.n_venda || p.id_venda || '-',
+        p.sku || p.numero_referencia_sku || '-',
+        p.nome_variacao || '-',
+        p.cliente_nome || '-',
+        p.quantidade || '-',
+        p.data_prevista_envio ? new Date(p.data_prevista_envio).toLocaleDateString('pt-BR') : '-',
+        p.status_logistica || '-',
+        p.status_montagem || '-'
+      ]);
+      
+      doc.autoTable({
+        startY: 45,
+        head: [['ID Pedido', 'Nº Venda', 'SKU', 'Variação', 'Cliente', 'Qtd', 'Data Prevista', 'Status Produção', 'Status Montagem']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [79, 70, 229], textColor: 255, fontSize: 9 },
+        bodyStyles: { fontSize: 8 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { left: 20, right: 20 }
+      });
+      
+      // SEÇÃO: ORDEM DE SERVIÇO INDIVIDUAL
+      let yPosition = doc.lastAutoTable.finalY + 15;
+      
+      doc.setFontSize(12);
+      doc.setTextColor(79, 70, 229);
+      doc.text('Ordem de Serviço Individual', 20, yPosition);
+      
+      yPosition += 8;
+      
+      pedidosDoSetor.forEach((pedido, index) => {
+        // Verificar se precisa de nova página
+        if (yPosition > 180) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${index + 1}. Pedido: ${pedido.numero_pedido || 'N/A'} | SKU: ${pedido.sku || pedido.numero_referencia_sku || 'N/A'}`, 25, yPosition);
+        yPosition += 5;
+        doc.setFontSize(8);
+        doc.text(`   Cliente: ${pedido.cliente_nome || 'N/A'} | Qtd: ${pedido.quantidade || 'N/A'} | Entrega: ${pedido.data_prevista_envio ? new Date(pedido.data_prevista_envio).toLocaleDateString('pt-BR') : 'N/A'}`, 25, yPosition);
+        yPosition += 5;
+        doc.text(`   Status Produção: ${pedido.status_logistica || 'N/A'} | Status Montagem: ${pedido.status_montagem || 'N/A'}`, 25, yPosition);
+        yPosition += 8;
+      });
+      
+      // TOTAIS DO SETOR
+      if (yPosition > 250) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      yPosition += 10;
+      doc.setFontSize(12);
+      doc.setTextColor(79, 70, 229);
+      doc.text('Resumo do Setor', 20, yPosition);
+      
+      yPosition += 8;
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      
+      const totalPedidos = pedidosDoSetor.length;
+      const totalQuantidade = pedidosDoSetor.reduce((sum, p) => sum + (parseInt(p.quantidade) || 0), 0);
+      const aguardando = pedidosDoSetor.filter(p => p.status_logistica === 'Aguardando').length;
+      const emMontagem = pedidosDoSetor.filter(p => p.status_logistica === 'Em montagem').length;
+      const imprimindo = pedidosDoSetor.filter(p => p.status_logistica === 'Imprimindo').length;
+      const impresso = pedidosDoSetor.filter(p => p.status_logistica === 'Impresso').length;
+      
+      doc.text(`Total de Pedidos: ${totalPedidos}`, 25, yPosition);
+      yPosition += 6;
+      doc.text(`Total de Peças: ${totalQuantidade}`, 25, yPosition);
+      yPosition += 6;
+      doc.text(`Aguardando: ${aguardando} | Em Montagem: ${emMontagem} | Imprimindo: ${imprimindo} | Impresso: ${impresso}`, 25, yPosition);
+      
+      // Salvar PDF
+      const nomeArquivo = `ordem_producao_${nomeSetor.replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(nomeArquivo);
+      
+      toast.success(`PDF gerado com sucesso: ${nomeArquivo}`);
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast.error('Erro ao gerar PDF do setor');
+    }
+  };
+
   // Função de filtragem de pedidos
   const pedidosFiltrados = pedidos.filter(pedido => {
     // 🔍 BUSCA UNIVERSAL - ID pedido, Nº venda, Nome cliente, SKU, Tipo envio
