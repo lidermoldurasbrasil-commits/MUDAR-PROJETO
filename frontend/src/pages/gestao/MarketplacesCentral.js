@@ -318,6 +318,23 @@ export default function MarketplacesCentral() {
         </div>
       </div>
 
+      {/* Banner de Boas-Vindas - Apenas para usuários production */}
+      {isProduction && (
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-6 mb-6 border border-blue-500">
+          <div className="flex items-center gap-4">
+            <div className="text-5xl">👋</div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">
+                Bem-vindo(a), {user?.nome || 'Operador'}!
+              </h2>
+              <p className="text-blue-100 mt-1">
+                {frasesDoDia[new Date().getDate() % frasesDoDia.length]}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Cards de Indicadores */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <div className="bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-700">
