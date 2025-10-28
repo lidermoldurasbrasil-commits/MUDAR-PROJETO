@@ -149,6 +149,7 @@ export default function MarketplaceProjetoDetalhes() {
   const [selectAll, setSelectAll] = useState(false);
   const [ordenacaoData, setOrdenacaoData] = useState('asc'); // 'asc' = próxima primeiro, 'desc' = distante primeiro
   const [agruparPor, setAgruparPor] = useState(''); // '', 'sku', 'status'
+  const [ordenarPor, setOrdenarPor] = useState('mais_proxima'); // 'mais_proxima', 'mais_antiga'
   const [filtroTipoEnvio, setFiltroTipoEnvio] = useState('todos'); // 'todos', 'flex', 'correios_pontos', 'coleta'
   const [batchStatusValue, setBatchStatusValue] = useState('');
   const [batchImpressaoValue, setBatchImpressaoValue] = useState('');
