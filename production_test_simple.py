@@ -483,27 +483,25 @@ class ProductionSystemTester:
             print("❌ No order ID found for testing")
             return False
         
-        # Test status_producao update
-        update_data = {
-            "status_producao": "Em montagem"
-        }
+        # Test status_producao update - use full order data
+        update_data1 = test_order.copy()
+        update_data1['status_producao'] = "Em montagem"
         
         success_update1, update_response1 = self.run_test(
             "Update Order Status Producao",
             "PUT",
             f"gestao/marketplaces/pedidos/{order_id}",
             200,
-            data=update_data
+            data=update_data1
         )
         
         if success_update1:
             print("✅ status_producao updated successfully")
             self.log_test("Update Status Producao", True)
         
-        # Test status_logistica update
-        update_data2 = {
-            "status_logistica": "Em produção"
-        }
+        # Test status_logistica update - use full order data
+        update_data2 = test_order.copy()
+        update_data2['status_logistica'] = "Em produção"
         
         success_update2, update_response2 = self.run_test(
             "Update Order Status Logistica",
@@ -517,10 +515,9 @@ class ProductionSystemTester:
             print("✅ status_logistica updated successfully")
             self.log_test("Update Status Logistica", True)
         
-        # Test general status update
-        update_data3 = {
-            "status": "Processando"
-        }
+        # Test general status update - use full order data
+        update_data3 = test_order.copy()
+        update_data3['status'] = "Processando"
         
         success_update3, update_response3 = self.run_test(
             "Update Order General Status",
