@@ -151,7 +151,7 @@ class ProjectsEndpointTester:
             "password": "123"
         }
         
-        success_production, production_response = self.run_test(
+        success_production, production_response = self.run_api_test(
             "Production User Login",
             "POST",
             "auth/login",
