@@ -4126,9 +4126,17 @@ async def update_horarios_postagem(
 
 @api_router.delete("/gestao/marketplaces/projetos/{projeto_id}")
 async def delete_projeto_marketplace(projeto_id: str, current_user: dict = Depends(get_current_user)):
-    """Deleta um projeto de marketplace"""
+    """Deleta um projeto de marketplace e todos os seus pedidos"""
+    # Deletar todos os pedidos do projeto
+    pedidos_deletados = await db.pedidos_marketplace.delete_many({"projeto_id": projeto_id})
+    
+    # Deletar o projeto
     await db.projetos_marketplace.delete_one({"id": projeto_id})
-    return {"message": "Projeto excluído com sucesso"}
+    
+    return {
+        "message": "Projeto excluído com sucesso",
+        "pedidos_deletados": pedidos_deletados.deleted_count
+    }
 
 # PEDIDOS MARKETPLACE
 @api_router.get("/gestao/marketplaces/pedidos")
