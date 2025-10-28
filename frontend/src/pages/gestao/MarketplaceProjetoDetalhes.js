@@ -1435,6 +1435,47 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
           </div>
 
+          {/* ⚙️ NOVO: Métricas por Status Montagem */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-300 mb-3">⚙️ Status de Montagem</h3>
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { nome: 'Aguardando Montagem', emoji: '⏳', cor: '#6B7280' },
+                { nome: 'Em Montagem', emoji: '🔧', cor: '#F59E0B' },
+                { nome: 'Finalizado', emoji: '✨', cor: '#10B981' }
+              ].map(status => {
+                const count = pedidos.filter(p => p.status_montagem === status.nome).length;
+                const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
+                return (
+                  <div 
+                    key={status.nome} 
+                    className={`bg-gray-900 rounded-lg p-4 border border-gray-700 ${
+                      status.nome === 'Finalizado' ? 'ring-2 ring-green-500 ring-opacity-50' : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{status.emoji}</span>
+                      <span className="text-2xl font-bold" style={{ color: status.cor }}>{count}</span>
+                    </div>
+                    <p className="text-sm text-gray-400">{status.nome}</p>
+                    <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="h-2 rounded-full transition-all duration-500" 
+                        style={{ width: `${percentage}%`, backgroundColor: status.cor }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
+                    {status.nome === 'Finalizado' && count > 0 && (
+                      <div className="mt-2 text-xs text-green-400 font-medium animate-pulse">
+                        🎉 {count} concluído{count > 1 ? 's' : ''}!
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Métricas por Tipo de Envio */}
           <div>
             <h3 className="text-lg font-semibold text-gray-300 mb-3">Análise de Envios (Formas de Entrega)</h3>
