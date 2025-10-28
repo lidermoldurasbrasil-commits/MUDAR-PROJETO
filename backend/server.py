@@ -4254,7 +4254,7 @@ def detectar_setor_por_sku(sku_texto):
             print(f"🪞 SKU '{sku}' → ESPELHO (contém {palavra})")
             return 'Espelho'
     
-    # 3. MOLDURAS COM VIDRO - PRIORIDADE ALTA (verificar ANTES de Molduras)
+    # 3. MOLDURAS COM VIDRO - PRIORIDADE ALTA (verificar ANTES de Molduras simples)
     # Excluir apenas os casos específicos A4-CV
     exclusoes_cv = ['A4-CV', 'KIT-10-A4-CV', 'KIT-5-A4-CV']
     tem_exclusao = any(exc in sku for exc in exclusoes_cv)
@@ -4263,6 +4263,11 @@ def detectar_setor_por_sku(sku_texto):
         # Casos especiais que vão para MOLDURAS
         print(f"🖼️ SKU '{sku}' → MOLDURAS (exceção A4-CV)")
         return 'Molduras'
+    
+    # Verificar se tem palavra VIDRO explícita
+    if 'VIDRO' in sku:
+        print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém VIDRO)")
+        return 'Molduras com Vidro'
     
     # Verificar padrões alfanuméricos de VIDRO (prioridade alta)
     # IMPORTANTE: CX tem prioridade - mesmo que tenha SV junto, vai para Vidro
@@ -4279,12 +4284,18 @@ def detectar_setor_por_sku(sku_texto):
         print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém número de dimensão)")
         return 'Molduras com Vidro'
     
-    # Verificar padrões de dimensões (formato: 50X50, 30x30, 80x120, etc)
-    dimensoes = ['50X50', '30X30', '60X90', '80X120', '40X50', '40X60']
-    sku_upper = sku.replace('x', 'X').replace('X', 'X')  # Normalizar x para X
-    for dim in dimensoes:
-        if dim in sku_upper:
-            print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém dimensão {dim})")
+    # Verificar padrões de dimensões usando regex (formato: 50X50, 30x30, 80x120, 33X45, etc)
+    # Padrão: NN x NN ou NNxNN (com ou sem espaços, x minúsculo ou maiúsculo)
+    padrao_dimensao = re.search(r'\d{2,3}\s*[xX×]\s*\d{2,3}', sku)
+    if padrao_dimensao:
+        dimensao_encontrada = padrao_dimensao.group()
+        # Se tem dimensão mas também tem palavra MOLDURA sem VIDRO, vai para Molduras simples
+        # Caso contrário, vai para Molduras com Vidro (comportamento padrão para dimensões)
+        if 'MOLDURA' in sku and 'VIDRO' not in sku and not any(p in sku for p in ['MF', 'MD', 'CX', 'CV']):
+            print(f"🖼️ SKU '{sku}' → MOLDURAS (contém MOLDURA + dimensão {dimensao_encontrada} sem vidro)")
+            return 'Molduras'
+        else:
+            print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém dimensão {dimensao_encontrada})")
             return 'Molduras com Vidro'
     
     # Verificar padrões que podem ser tanto Molduras quanto Vidro
