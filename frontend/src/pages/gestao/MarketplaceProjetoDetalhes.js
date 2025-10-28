@@ -1560,34 +1560,47 @@ export default function MarketplaceProjetoDetalhes() {
 
           {/* Métricas por Status de Produção */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-300 mb-3">Status de Produção</h3>
-            <div className="grid grid-cols-4 gap-4">
-              {[
-                { nome: 'Aguardando', emoji: '⏳', cor: '#94A3B8' },
-                { nome: 'Em montagem', emoji: '🔧', cor: '#F59E0B' },
-                { nome: 'Imprimindo', emoji: '🖨️', cor: '#3B82F6' },
-                { nome: 'Impresso', emoji: '✅', cor: '#10B981' }
-              ].map(status => {
-                const count = pedidos.filter(p => p.status_logistica === status.nome).length;
-                const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
-                return (
-                  <div key={status.nome} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">{status.emoji}</span>
-                      <span className="text-2xl font-bold" style={{ color: status.cor }}>{count}</span>
-                    </div>
-                    <p className="text-sm text-gray-400">{status.nome}</p>
-                    <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full" 
-                        style={{ width: `${percentage}%`, backgroundColor: status.cor }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
-                  </div>
-                );
-              })}
+            <div 
+              className="flex items-center justify-between cursor-pointer hover:bg-gray-700 p-2 rounded-lg transition-colors"
+              onClick={() => toggleSection('statusProducao')}
+            >
+              <h3 className="text-lg font-semibold text-gray-300">Status de Produção</h3>
+              {expandedSections.statusProducao ? (
+                <ChevronUp className="text-gray-400" size={20} />
+              ) : (
+                <ChevronDown className="text-gray-400" size={20} />
+              )}
             </div>
+            
+            {expandedSections.statusProducao && (
+              <div className="grid grid-cols-4 gap-4 mt-3">
+                {[
+                  { nome: 'Aguardando', emoji: '⏳', cor: '#94A3B8' },
+                  { nome: 'Em montagem', emoji: '🔧', cor: '#F59E0B' },
+                  { nome: 'Imprimindo', emoji: '🖨️', cor: '#3B82F6' },
+                  { nome: 'Impresso', emoji: '✅', cor: '#10B981' }
+                ].map(status => {
+                  const count = pedidos.filter(p => p.status_logistica === status.nome).length;
+                  const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
+                  return (
+                    <div key={status.nome} className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl">{status.emoji}</span>
+                        <span className="text-2xl font-bold" style={{ color: status.cor }}>{count}</span>
+                      </div>
+                      <p className="text-sm text-gray-400">{status.nome}</p>
+                      <div className="mt-2 w-full bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full" 
+                          style={{ width: `${percentage}%`, backgroundColor: status.cor }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{percentage}%</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* ⚙️ NOVO: Métricas por Status Montagem */}
