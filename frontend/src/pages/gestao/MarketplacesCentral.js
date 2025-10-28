@@ -363,10 +363,10 @@ export default function MarketplacesCentral() {
             <div className="text-5xl">👋</div>
             <div>
               <h2 className="text-2xl font-bold text-white">
-                Bem-vindo(a), {user?.nome || 'Operador'}!
+                {getMensagemBoasVindas().saudacao}
               </h2>
               <p className="text-blue-100 mt-1">
-                {frasesDoDia[new Date().getDate() % frasesDoDia.length]}
+                {getMensagemBoasVindas().mensagem}
               </p>
             </div>
           </div>
