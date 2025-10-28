@@ -939,6 +939,23 @@ export default function MarketplaceProjetoDetalhes() {
           </div>
         </div>
 
+        {/* Banner de Boas-Vindas - Apenas para usuários production */}
+        {user?.role === 'production' && (
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-6 mt-4 border border-blue-500">
+            <div className="flex items-center gap-4">
+              <div className="text-5xl">👋</div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">
+                  Bem-vindo(a), {user?.nome || 'Operador'}!
+                </h2>
+                <p className="text-blue-100 mt-1">
+                  {getFraseAleatoria()}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Indicadores Rápidos */}
         <div className="grid grid-cols-4 gap-4 mt-4">
           <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
