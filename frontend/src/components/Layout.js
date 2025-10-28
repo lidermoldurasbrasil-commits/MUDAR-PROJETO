@@ -3,6 +3,18 @@ import { Menu, Home, Package, RefreshCcw, Megaphone, ShoppingCart, FileText, Dol
 import { Toaster } from 'sonner';
 import { useState } from 'react';
 
+// Frases motivacionais que mudam por dia
+const frasesDoDia = [
+  "Excelência em cada detalhe! 🌟",
+  "Seu trabalho faz a diferença! 💪",
+  "Juntos somos mais fortes! 🤝",
+  "Qualidade é nosso compromisso! ✨",
+  "Vamos superar as metas hoje! 🎯",
+  "Cada pedido é uma conquista! 🏆",
+  "Foco e determinação! 🚀",
+  "Produzindo excelência! ⭐"
+];
+
 export default function Layout({ user, onLogout }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
