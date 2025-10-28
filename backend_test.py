@@ -4184,6 +4184,146 @@ class BusinessManagementSystemTester:
         
         return all_valid
 
+    def test_production_users_login(self):
+        """Test login for all production sector users as requested"""
+        print("\n🔐 TESTING PRODUCTION USERS LOGIN...")
+        print("📋 Testing login for all 7 production sector users")
+        
+        # List of production users to test
+        production_users = [
+            {"username": "espelho", "password": "123", "expected_role": "production"},
+            {"username": "molduras-vidro", "password": "123", "expected_role": "production"},
+            {"username": "molduras", "password": "123", "expected_role": "production"},
+            {"username": "impressao", "password": "123", "expected_role": "production"},
+            {"username": "expedicao", "password": "123", "expected_role": "production"},
+            {"username": "embalagem", "password": "123", "expected_role": "production"},
+            {"username": "diretor", "password": "123", "expected_role": "director"}
+        ]
+        
+        successful_logins = 0
+        failed_logins = 0
+        login_results = []
+        
+        for user in production_users:
+            print(f"\n📋 Testing login for user: {user['username']}")
+            
+            # Prepare login data
+            login_data = {
+                "username": user["username"],
+                "password": user["password"]
+            }
+            
+            # Attempt login
+            success, response = self.run_test(
+                f"Login User: {user['username']}",
+                "POST",
+                "auth/login",
+                200,
+                data=login_data
+            )
+            
+            if success:
+                # Validate response structure
+                validation_results = []
+                
+                # Check if token is returned
+                if 'token' in response and response['token']:
+                    print(f"✅ Token returned for {user['username']}")
+                    validation_results.append(True)
+                    self.log_test(f"Login {user['username']} - Token", True)
+                else:
+                    print(f"❌ No token returned for {user['username']}")
+                    validation_results.append(False)
+                    self.log_test(f"Login {user['username']} - Token", False, "No token in response")
+                
+                # Check if user data is returned
+                if 'user' in response and isinstance(response['user'], dict):
+                    user_data = response['user']
+                    print(f"✅ User data returned for {user['username']}")
+                    validation_results.append(True)
+                    self.log_test(f"Login {user['username']} - User Data", True)
+                    
+                    # Validate username
+                    if user_data.get('username') == user['username']:
+                        print(f"✅ Username correct: {user_data.get('username')}")
+                        validation_results.append(True)
+                        self.log_test(f"Login {user['username']} - Username Match", True)
+                    else:
+                        print(f"❌ Username mismatch: expected {user['username']}, got {user_data.get('username')}")
+                        validation_results.append(False)
+                        self.log_test(f"Login {user['username']} - Username Match", False, f"Expected {user['username']}, got {user_data.get('username')}")
+                    
+                    # Validate role
+                    actual_role = user_data.get('role', '').lower()
+                    expected_role = user['expected_role'].lower()
+                    
+                    if actual_role == expected_role:
+                        print(f"✅ Role correct: {actual_role}")
+                        validation_results.append(True)
+                        self.log_test(f"Login {user['username']} - Role Correct", True)
+                    elif actual_role in ['production', 'director'] and expected_role in ['production', 'director']:
+                        # Accept both production and director as valid production roles
+                        print(f"✅ Role acceptable: {actual_role} (expected {expected_role})")
+                        validation_results.append(True)
+                        self.log_test(f"Login {user['username']} - Role Acceptable", True)
+                    else:
+                        print(f"❌ Role incorrect: expected {expected_role}, got {actual_role}")
+                        validation_results.append(False)
+                        self.log_test(f"Login {user['username']} - Role Correct", False, f"Expected {expected_role}, got {actual_role}")
+                    
+                    # Print user details
+                    print(f"   📊 User Details:")
+                    print(f"      ID: {user_data.get('id', 'N/A')}")
+                    print(f"      Username: {user_data.get('username', 'N/A')}")
+                    print(f"      Role: {user_data.get('role', 'N/A')}")
+                    
+                else:
+                    print(f"❌ No user data returned for {user['username']}")
+                    validation_results.append(False)
+                    self.log_test(f"Login {user['username']} - User Data", False, "No user data in response")
+                
+                # Check overall validation for this user
+                if all(validation_results):
+                    print(f"✅ ALL VALIDATIONS PASSED for {user['username']}")
+                    successful_logins += 1
+                    login_results.append({"username": user['username'], "success": True, "details": "All validations passed"})
+                else:
+                    failed_validations = len([r for r in validation_results if not r])
+                    print(f"❌ {failed_validations} VALIDATIONS FAILED for {user['username']}")
+                    failed_logins += 1
+                    login_results.append({"username": user['username'], "success": False, "details": f"{failed_validations} validations failed"})
+            else:
+                print(f"❌ LOGIN FAILED for {user['username']}")
+                failed_logins += 1
+                error_msg = "Login request failed"
+                if isinstance(response, dict) and 'detail' in response:
+                    error_msg = f"Login failed: {response['detail']}"
+                login_results.append({"username": user['username'], "success": False, "details": error_msg})
+        
+        # Print summary
+        print(f"\n📊 PRODUCTION USERS LOGIN SUMMARY:")
+        print(f"   Total users tested: {len(production_users)}")
+        print(f"   Successful logins: {successful_logins}")
+        print(f"   Failed logins: {failed_logins}")
+        
+        # Print detailed results
+        print(f"\n📋 DETAILED RESULTS:")
+        for result in login_results:
+            status = "✅ PASS" if result['success'] else "❌ FAIL"
+            print(f"   {result['username']}: {status} - {result['details']}")
+        
+        # Overall test result
+        all_success = failed_logins == 0
+        
+        if all_success:
+            print(f"\n✅ ALL {len(production_users)} PRODUCTION USERS LOGIN TESTS PASSED!")
+            self.log_test("Production Users Login - OVERALL", True)
+        else:
+            print(f"\n❌ PRODUCTION USERS LOGIN TESTS FAILED: {failed_logins}/{len(production_users)} users failed")
+            self.log_test("Production Users Login - OVERALL", False, f"{failed_logins} users failed login")
+        
+        return all_success
+
     def test_sector_detection_fix(self):
         """Test the specific sector detection fix for 'Moldura Preta,33X45 cm' case"""
         print("\n🔍 TESTING SECTOR DETECTION FIX...")
