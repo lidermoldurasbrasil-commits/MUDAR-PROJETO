@@ -4269,6 +4269,12 @@ def detectar_setor_por_sku(sku_texto):
         print(f"🖼️ SKU '{sku}' → MOLDURAS COM VIDRO (contém VIDRO)")
         return 'Molduras com Vidro'
     
+    # 4. MOLDURAS - MM vai SEMPRE para Molduras (VERIFICAR ANTES DE DIMENSÕES)
+    # IMPORTANTE: MM tem prioridade absoluta para Molduras, mesmo que tenha dimensões
+    if 'MM' in sku:
+        print(f"🖼️ SKU '{sku}' → MOLDURAS (contém MM - prioridade Molduras)")
+        return 'Molduras'
+    
     # Verificar padrões alfanuméricos de VIDRO (prioridade alta)
     # IMPORTANTE: CX tem prioridade - mesmo que tenha SV junto, vai para Vidro
     # Exemplos: "SV-CX-123" → Molduras com Vidro (CX detectado primeiro)
