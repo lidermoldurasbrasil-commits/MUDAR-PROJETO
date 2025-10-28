@@ -121,6 +121,32 @@ export default function MarketplaceIntegrator() {
           <p className="text-gray-400">
             Centralize e sincronize automaticamente todos os pedidos do Mercado Livre e Shopee
           </p>
+          
+          {/* Alerta de Configuração */}
+          {(!status?.mercado_livre?.authenticated && !status?.shopee?.authenticated) && (
+            <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+              <p className="text-blue-400 text-sm mb-2">
+                <strong>ℹ️ Primeira vez usando o Integrador?</strong>
+              </p>
+              <p className="text-gray-300 text-sm mb-2">
+                Para começar, você precisa configurar as credenciais dos marketplaces no backend:
+              </p>
+              <ol className="text-gray-300 text-sm list-decimal list-inside space-y-1 ml-2">
+                <li>Obtenha as credenciais em: <a href="https://developers.mercadolibre.com.br" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">Mercado Livre Developers</a></li>
+                <li>Adicione no arquivo <code className="bg-gray-700 px-1 py-0.5 rounded">/app/backend/.env</code>:
+                  <pre className="bg-gray-800 p-2 rounded mt-1 text-xs overflow-x-auto">
+{`ML_CLIENT_ID=seu_app_id_aqui
+ML_CLIENT_SECRET=seu_client_secret_aqui
+ML_REDIRECT_URI=https://marcos-mfg.preview.emergentagent.com/api/integrator/mercadolivre/callback`}
+                  </pre>
+                </li>
+                <li>Reinicie o backend: <code className="bg-gray-700 px-1 py-0.5 rounded">sudo supervisorctl restart backend</code></li>
+              </ol>
+              <p className="text-gray-400 text-xs mt-2">
+                📖 Documentação completa: <code className="bg-gray-700 px-1 py-0.5 rounded">/app/MARKETPLACE_INTEGRATOR_DOCS.md</code>
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Status Cards */}
