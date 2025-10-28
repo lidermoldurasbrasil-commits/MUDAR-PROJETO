@@ -152,6 +152,8 @@ export default function MarketplaceProjetoDetalhes() {
   const [filtroTipoEnvio, setFiltroTipoEnvio] = useState('todos'); // 'todos', 'flex', 'correios_pontos', 'coleta'
   const [batchStatusValue, setBatchStatusValue] = useState('');
   const [batchImpressaoValue, setBatchImpressaoValue] = useState('');
+  const [batchSetorValue, setBatchSetorValue] = useState('');
+  const [batchStatusProducaoValue, setBatchStatusProducaoValue] = useState('');
   const [novaLinhaInline, setNovaLinhaInline] = useState({
     numero_pedido: '',
     produto_nome: '',
