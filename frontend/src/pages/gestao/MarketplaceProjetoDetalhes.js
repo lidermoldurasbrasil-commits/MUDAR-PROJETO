@@ -2447,60 +2447,78 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
           </div>
           
-          {/* 🔍 FILTROS PRINCIPAIS + BUSCA UNIVERSAL */}
+          {/* 🔍 FILTROS COMPLETOS - LAYOUT HORIZONTAL */}
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Busca Universal */}
-              <div className="md:col-span-3">
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  🔍 Busca Universal
-                </label>
-                <input
-                  type="text"
-                  placeholder="Buscar por ID pedido, Nº venda, Nome cliente, SKU, Tipo envio..."
-                  value={filtros.busca || ''}
-                  onChange={(e) => setFiltros({...filtros, busca: e.target.value})}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {filtros.busca && (
-                  <p className="text-xs text-gray-400 mt-1">
-                    Encontrados: {pedidosFiltrados.length} pedidos
-                  </p>
-                )}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+              {/* Status */}
+              <div>
+                <select
+                  value={filtros.status || ''}
+                  onChange={(e) => setFiltros({...filtros, status: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Status: Todos</option>
+                  <option value="Pendente">⏳ Pendente</option>
+                  <option value="Em Produção">🔧 Em Produção</option>
+                  <option value="Concluído">✅ Concluído</option>
+                  <option value="Enviado">📦 Enviado</option>
+                  <option value="Entregue">🎉 Entregue</option>
+                  <option value="Cancelado">❌ Cancelado</option>
+                </select>
               </div>
               
-              {/* Filtro por Setor */}
+              {/* Situação (Atrasado) */}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Filtrar por Setor
-                </label>
+                <select
+                  value={filtros.atrasado === null ? '' : filtros.atrasado ? 'atrasado' : 'em_dia'}
+                  onChange={(e) => setFiltros({
+                    ...filtros, 
+                    atrasado: e.target.value === '' ? null : e.target.value === 'atrasado'
+                  })}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Situação: Todos</option>
+                  <option value="em_dia">✅ Em Dia</option>
+                  <option value="atrasado">⚠️ Atrasados</option>
+                </select>
+              </div>
+              
+              {/* SKU */}
+              <div>
+                <input
+                  type="text"
+                  placeholder="Pesquisar por SKU..."
+                  value={filtros.sku || ''}
+                  onChange={(e) => setFiltros({...filtros, sku: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              {/* Setor */}
+              <div>
                 <select
                   value={filtros.setor || ''}
                   onChange={(e) => setFiltros({...filtros, setor: e.target.value})}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Todos os Setores</option>
+                  <option value="">🏭 Setor: Todos</option>
                   <option value="Espelho">🪞 Espelho</option>
-                  <option value="Molduras com Vidro">🖼️ Molduras com Vidro</option>
+                  <option value="Molduras com Vidro">🖼️ Molduras c/ Vidro</option>
                   <option value="Molduras">🖼️ Molduras</option>
                   <option value="Impressão">🖨️ Impressão</option>
                   <option value="Expedição">📦 Expedição</option>
                   <option value="Embalagem">📦 Embalagem</option>
-                  <option value="Personalizado">⚙️ Personalizado</option>
                 </select>
               </div>
               
-              {/* Filtro por Status Produção */}
+              {/* Status Produção */}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Status Produção
-                </label>
                 <select
                   value={filtros.status_producao || ''}
                   onChange={(e) => setFiltros({...filtros, status_producao: e.target.value})}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Todos os Status</option>
+                  <option value="">⚙️ Status Prod: Todos</option>
                   <option value="Aguardando">⏳ Aguardando</option>
                   <option value="Em montagem">🔧 Em montagem</option>
                   <option value="Imprimindo">🖨️ Imprimindo</option>
@@ -2510,33 +2528,88 @@ export default function MarketplaceProjetoDetalhes() {
                 </select>
               </div>
               
-              {/* Filtro por Status Montagem */}
+              {/* Ordenar por Data */}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Status Montagem
-                </label>
+                <select
+                  value={ordenarPor}
+                  onChange={(e) => setOrdenarPor(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="mais_proxima">📅 Mais Próxima Primeiro</option>
+                  <option value="mais_antiga">📅 Mais Antiga Primeiro</option>
+                </select>
+              </div>
+              
+              {/* Agrupar por */}
+              <div>
+                <select
+                  value={agruparPor}
+                  onChange={(e) => setAgruparPor(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">📊 Sem Agrupamento</option>
+                  <option value="sku">🏷️ Agrupar por SKU</option>
+                  <option value="status">🔵 Agrupar por Status</option>
+                </select>
+              </div>
+              
+              {/* Prazo de Envio */}
+              <div>
+                <select
+                  value={filtros.prazoEnvio || ''}
+                  onChange={(e) => setFiltros({...filtros, prazoEnvio: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">📦 Prazo: Todos</option>
+                  <option value="hoje">🚨 Hoje</option>
+                  <option value="amanha">⏰ Amanhã</option>
+                  <option value="semana">📅 Esta Semana</option>
+                </select>
+              </div>
+            </div>
+            
+            {/* Segunda linha: Status Montagem + Busca Universal + Limpar Filtros */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+              {/* Status Montagem */}
+              <div>
                 <select
                   value={filtros.status_montagem || ''}
                   onChange={(e) => setFiltros({...filtros, status_montagem: e.target.value})}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Todos os Status</option>
+                  <option value="">⚙️ Status Montagem: Todos</option>
                   <option value="Aguardando Montagem">⏳ Aguardando Montagem</option>
                   <option value="Em Montagem">🔧 Em Montagem</option>
                   <option value="Finalizado">✨ Finalizado</option>
                 </select>
               </div>
+              
+              {/* Busca Universal */}
+              <div className="md:col-span-2 flex gap-3">
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar por ID pedido, Nº venda, Nome cliente, Tipo envio..."
+                  value={filtros.busca || ''}
+                  onChange={(e) => setFiltros({...filtros, busca: e.target.value})}
+                  className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                
+                {/* Limpar Filtros */}
+                {(filtros.busca || filtros.status || filtros.setor || filtros.status_producao || filtros.status_montagem || filtros.sku || filtros.prazoEnvio) && (
+                  <button
+                    onClick={() => setFiltros({busca: '', status: '', setor: '', status_producao: '', status_montagem: '', sku: '', prazoEnvio: ''})}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors whitespace-nowrap"
+                  >
+                    🗑️ Limpar Filtros
+                  </button>
+                )}
+              </div>
             </div>
             
-            {/* Botão Limpar Filtros */}
-            {(filtros.busca || filtros.setor || filtros.status_producao || filtros.status_montagem) && (
-              <div className="mt-3 flex justify-end">
-                <button
-                  onClick={() => setFiltros({busca: '', setor: '', status_producao: '', status_montagem: ''})}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
-                >
-                  🗑️ Limpar Filtros
-                </button>
+            {/* Contador de resultados */}
+            {(filtros.busca || filtros.status || filtros.setor || filtros.status_producao || filtros.status_montagem) && (
+              <div className="mt-2 text-sm text-gray-400">
+                Encontrados: <span className="text-blue-400 font-medium">{pedidosFiltrados.length}</span> pedidos
               </div>
             )}
           </div>
