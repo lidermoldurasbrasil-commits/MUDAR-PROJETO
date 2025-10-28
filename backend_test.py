@@ -4722,17 +4722,12 @@ class BusinessManagementSystemTester:
 def main():
     tester = BusinessManagementSystemTester()
     
-    # Run only the Shopee Upload Functionality test as requested in review
-    print("🚀 Starting Shopee Upload Functionality Test...")
+    # Run the Production Users Login test as requested in review
+    print("🚀 Starting Production Users Login Test...")
     print(f"🌐 Testing against: {tester.base_url}")
     
-    # Authentication is required
-    if not tester.test_authentication():
-        print("❌ Authentication failed - stopping tests")
-        return 1
-    
-    # Run only the Shopee Upload Functionality test
-    success = tester.test_shopee_upload_functionality()
+    # Run the production users login test (no authentication needed as this IS the authentication test)
+    success = tester.test_production_users_login()
     
     # Print final results
     all_passed = tester.print_summary()
