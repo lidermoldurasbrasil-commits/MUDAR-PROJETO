@@ -445,15 +445,27 @@ frontend:
           agent: "testing"
           comment: "✅ ENDPOINT DE PROJETOS MARKETPLACE TESTADO COM SUCESSO TOTAL! Executado teste completo conforme solicitação específica da revisão: 1) Login diretor (diretor/123) ✅ - Token JWT gerado corretamente, role 'director' verificado ✅ 2) GET /api/gestao/marketplaces/projetos com token diretor ✅ - Status 200 OK, retorna array com 2 projetos ✅ - Projeto Shopee presente (id: shopee-projeto) ✅ - Projeto Mercado Livre presente (id: mercadolivre-projeto) ✅ 3) Login usuário produção (espelho/123) ✅ - Token JWT gerado corretamente, role 'production' verificado ✅ 4) GET /api/gestao/marketplaces/projetos com token produção ✅ - Status 200 OK, retorna mesmos 2 projetos ✅ - Usuários production conseguem acessar projetos ✅ - Usuários director conseguem acessar projetos ✅. TODAS AS VALIDAÇÕES APROVADAS: Login retorna access_token e user, endpoint retorna status 200, array com 2+ projetos, ambos projetos presentes, ambos tipos de usuário conseguem acessar. Taxa de sucesso: 100% (4/4 testes). Sistema de projetos marketplace 100% funcional!"
 
+  - task: "AI SKU Classification Frontend Integration"
+    implemented: true
+    working: "unknown"
+    file: "/app/frontend/src/pages/gestao/MarketplaceProjetoDetalhes.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "unknown"
+          agent: "main"
+          comment: "Implementado frontend completo de classificação de SKU com IA: 1) Adicionada coluna '🤖 Sugestão IA' nas tabelas de Produção (Shopee e Mercado Livre) ✅ 2) Botão 'Reclassificar' para análise individual de pedidos ✅ 3) Estados de gerenciamento (aiAnalysis, analyzingAI) ✅ 4) Funções handleAnalisarSKU() e handleAplicarSugestaoIA() ✅ 5) UI completa: loading spinner durante análise, display de sugestão com badge colorido do setor, percentual de confiança, texto de razão, botões 'Aplicar' e 'Ignorar' ✅ 6) Integração com endpoint backend POST /api/gestao/marketplaces/pedidos/analisar-sku ✅. Pronto para teste frontend completo."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Projects endpoint authentication testing completed successfully"
+    - "AI SKU Classification Frontend Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
