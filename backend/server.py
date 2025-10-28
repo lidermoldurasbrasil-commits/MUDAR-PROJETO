@@ -1855,6 +1855,19 @@ class PedidoMarketplace(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str = ""
 
+class SKUFeedback(BaseModel):
+    """Feedback de classificação de SKU - Sistema de Aprendizado"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sku: str  # SKU que foi reclassificado
+    setor_original: str  # Setor que estava antes da reclassificação
+    setor_correto: str  # Setor para o qual foi reclassificado manualmente
+    usuario: str  # Usuário que fez a reclassificação
+    pedido_id: str = ""  # ID do pedido relacionado (opcional)
+    confianca: int = 100  # Confiança baseada em reclassificações manuais
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class MensagemDoDia(BaseModel):
     """Mensagem motivacional do dia"""
     model_config = ConfigDict(extra="ignore")
