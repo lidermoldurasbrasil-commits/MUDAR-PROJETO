@@ -4350,8 +4350,8 @@ class BusinessManagementSystemTester:
                 self.log_test(f"Sector Detection - Case {i+1} Order Found", False, f"Order not found for SKU '{sku}'")
                 continue
             
-            # Check if status_setor field exists and has correct value
-            actual_sector = matching_order.get('status_setor', 'NOT_FOUND')
+            # Check if status_producao field exists and has correct value
+            actual_sector = matching_order.get('status_producao', 'NOT_FOUND')
             
             print(f"\n🔍 Test Case {i+1}: {description}")
             print(f"   SKU: '{sku}'")
