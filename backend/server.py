@@ -1832,6 +1832,7 @@ class PedidoMarketplace(BaseModel):
     # Status Personalizados para Mercado Livre (controle interno)
     status_producao: str = "Espelho"  # Setor responsável - Espelho, Molduras com Vidro, Molduras, Impressão, Expedição, Embalagem
     status_logistica: str = "Aguardando"  # Status de produção - Aguardando, Em montagem, Imprimindo, Impresso
+    status_montagem: str = "Aguardando Montagem"  # Status de montagem - Aguardando Montagem, Em Montagem, Finalizado
     
     # Datas
     data_pedido: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
