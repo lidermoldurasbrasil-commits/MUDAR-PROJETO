@@ -4760,6 +4760,7 @@ def processar_linha_shopee(row, projeto_id, projeto, current_user):
         # AUTOMAÇÃO: Detectar setor automaticamente baseado no SKU
         'status_producao': detectar_setor_por_sku(numero_referencia_sku),  # Setor detectado automaticamente
         'status_logistica': 'Aguardando',  # Status inicial
+        'status_montagem': 'Aguardando Montagem',  # Status inicial de montagem
         
         # Metadata
         'loja_id': projeto.get('loja_id', 'fabrica'),
