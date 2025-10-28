@@ -323,8 +323,8 @@ frontend:
     implemented: true
     working: "unknown"
     file: "/app/frontend/src/pages/gestao/MarketplaceProjetoDetalhes.js"
-    stuck_count: 3
-    priority: "high"
+    stuck_count: 4
+    priority: "critical"
     needs_retesting: true
     status_history:
         - working: "unknown"
@@ -341,13 +341,19 @@ frontend:
           comment: "Usuário enviou vídeo mostrando erro ao importar planilha Shopee: 'Falha ao executar insertBefore no Node'. Erro de runtime JavaScript (NotFoundError) durante renderização após upload. Upload no backend funciona (200 OK) mas frontend falha ao renderizar os pedidos importados."
         - working: "unknown"
           agent: "main"
-          comment: "CORRIGIDO: Identificado problema de conflito de keys do React durante re-renderização após upload. Melhorada função handleConfirmarUpload(): 1) Fecha modal e limpa estado ANTES de processar resposta ✅ 2) Limpa completamente arrays de pedidos (setPedidos([]), setSelectedPedidos([]), setSelectAll(false)) ✅ 3) Aumentado timeout de 100ms para 200ms para garantir limpeza completa do estado ✅ 4) Reordenadas operações para evitar conflitos de keys durante transição. Problema insertBefore deve estar resolvido. Pronto para teste."
+          comment: "CORREÇÃO 1: Identificado problema de conflito de keys do React durante re-renderização após upload. Melhorada função handleConfirmarUpload(): 1) Fecha modal e limpa estado ANTES de processar resposta ✅ 2) Limpa completamente arrays de pedidos (setPedidos([]), setSelectedPedidos([]), setSelectAll(false)) ✅ 3) Aumentado timeout de 100ms para 200ms ✅."
         - working: false
           agent: "user"
-          comment: "Usuário enviou SEGUNDO vídeo mostrando MESMO erro 'insertBefore' ainda acontecendo. Arquivo: '20250927_10250927.xlsx'. Erro persiste após primeira correção, indicando problema mais profundo na lógica de re-renderização ou timing de atualização do estado React."
+          comment: "Usuário reportou PERSISTÊNCIA do erro insertBefore após primeira correção."
         - working: "unknown"
           agent: "main"
-          comment: "CORREÇÃO APRIMORADA: Implementada solução mais robusta para erro insertBefore recorrente: 1) Limpa estado ANTES de fazer upload (não depois) - setPedidos([]), setSelectedPedidos([]), setSelectAll(false), setAgruparPor('') ✅ 2) Aumentado timeout de 200ms para 500ms para garantir React complete ciclo de renderização ✅ 3) Adicionado limpeza de estado também no catch (em caso de erro) ✅ 4) Reordenada sequência: limpar → upload → processar → fechar modal → aguardar → buscar dados. Timing aprimorado deve resolver conflitos de DOM. Pronto para teste."
+          comment: "CORREÇÃO 2: Solução aprimorada - limpa estado ANTES do upload (não depois), timeout aumentado para 500ms, tratamento de erro melhorado."
+        - working: false
+          agent: "user"
+          comment: "Usuário reportou NOVAMENTE erro insertBefore: 'Falha ao executar insertBefore em Node: O nó antes do qual o novo nó deve ser inserido não é filho deste nó'. Erro persiste após múltiplas correções. Stack trace aponta para commitPlacement e recursivelyTraverseMutationEffects."
+        - working: "unknown"
+          agent: "main"
+          comment: "CORREÇÃO 3 - ABORDAGEM DRÁSTICA: Implementada solução com loading state completo: 1) Fecha modal IMEDIATAMENTE ✅ 2) Ativa setLoading(true) para esconder TODA a lista durante processamento ✅ 3) Usa async/await ao invés de setTimeout para melhor controle de fluxo ✅ 4) Aguarda 100ms após fechar modal ✅ 5) Limpa estado ✅ 6) Faz upload ✅ 7) Aguarda 300ms ✅ 8) Busca dados com await fetchDados() ✅ 9) Desativa loading. Abordagem evita conflitos de renderização mantendo tela em loading durante TODA a operação. Pronto para teste."
 
   - task: "Filtros de Setor e Status Produção (Frontend)"
     implemented: true
