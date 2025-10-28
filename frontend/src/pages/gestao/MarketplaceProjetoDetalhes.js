@@ -1222,7 +1222,7 @@ export default function MarketplaceProjetoDetalhes() {
             <div className={`flex items-end ${filtros.prazoEnvio !== 'personalizado' ? 'md:col-span-2' : ''}`}>
               <button
                 onClick={() => {
-                  setFiltros({ status: '', atrasado: null, sku: '', prazoEnvio: '', dataInicio: '', dataFim: '' });
+                  setFiltros({ status: '', atrasado: null, sku: '', prazoEnvio: '', dataInicio: '', dataFim: '', setor: '', statusProducao: '' });
                   setOrdenacaoData('asc');
                   setAgruparPor('');
                 }}
