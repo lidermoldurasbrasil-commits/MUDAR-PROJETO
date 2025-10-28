@@ -156,6 +156,14 @@ export default function MarketplaceProjetoDetalhes() {
   const [batchStatusProducaoValue, setBatchStatusProducaoValue] = useState('');
   const [aiAnalysis, setAiAnalysis] = useState({}); // Armazena análises de IA por pedido ID
   const [analyzingAI, setAnalyzingAI] = useState({}); // Rastreia quais pedidos estão sendo analisados
+  
+  // ⚡ TEMPO REAL - States
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasNewUpdates, setHasNewUpdates] = useState(false);
+  const pedidosRef = useRef(pedidos); // Referência para comparar mudanças
+  const pollingInterval = useRef(null);
+  
   const [novaLinhaInline, setNovaLinhaInline] = useState({
     numero_pedido: '',
     produto_nome: '',
