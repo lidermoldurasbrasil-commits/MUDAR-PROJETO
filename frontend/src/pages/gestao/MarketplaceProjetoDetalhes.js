@@ -239,6 +239,13 @@ export default function MarketplaceProjetoDetalhes() {
     
     try {
       setUploadProgress(true);
+      
+      // Limpar estado ANTES de fazer upload para evitar conflitos
+      setPedidos([]);
+      setSelectedPedidos([]);
+      setSelectAll(false);
+      setAgruparPor('');
+      
       const token = localStorage.getItem('token');
       
       const formData = new FormData();
@@ -255,18 +262,15 @@ export default function MarketplaceProjetoDetalhes() {
         }
       );
       
-      // Fechar modal e limpar estado ANTES de processar resposta
+      // Processar resposta
+      const data = response.data;
+      
+      // Fechar modal e limpar arquivos
       setShowUploadModal(false);
       setUploadFile(null);
-      setUploadFormato('shopee'); // Resetar para padrão
+      setUploadFormato('shopee');
       
-      // Limpar completamente o estado de pedidos para evitar conflitos de keys
-      setPedidos([]);
-      setSelectedPedidos([]);
-      setSelectAll(false);
-      
-      // Mensagem de sucesso com info sobre duplicados
-      const data = response.data;
+      // Mostrar mensagens de sucesso
       toast.success(data.message);
       
       if (data.total_duplicados > 0) {
@@ -275,13 +279,20 @@ export default function MarketplaceProjetoDetalhes() {
         });
       }
       
-      // Aguardar um pouco antes de recarregar dados para garantir que o estado foi limpo
+      // Aguardar um tempo maior para garantir que o React finalize a renderização
       setTimeout(() => {
         fetchDados();
-      }, 200);
+      }, 500);
+      
     } catch (error) {
       console.error('Erro ao fazer upload:', error);
       toast.error(error.response?.data?.detail || 'Erro ao processar planilha');
+      
+      // Em caso de erro, também limpar estado
+      setPedidos([]);
+      setSelectedPedidos([]);
+      setSelectAll(false);
+      
     } finally {
       setUploadProgress(false);
     }
