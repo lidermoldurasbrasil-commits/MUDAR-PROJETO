@@ -920,6 +920,14 @@ export default function MarketplaceProjetoDetalhes() {
     }
   };
 
+  // 📊 TOGGLE SECTIONS - Expandir/Recolher seções de métricas
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   // 📄 GERAÇÃO DE PDF POR SETOR
   const gerarPDFSetor = async (nomeSetor) => {
     try {
