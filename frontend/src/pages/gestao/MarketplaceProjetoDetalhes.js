@@ -682,6 +682,74 @@ export default function MarketplaceProjetoDetalhes() {
     return colors[prioridade] || 'bg-gray-100 text-gray-800';
   };
 
+  // Função para analisar SKU com IA
+  const handleAnalisarSKU = async (pedido) => {
+    const sku = pedido.numero_referencia_sku || pedido.sku;
+    
+    if (!sku) {
+      toast.error('SKU não encontrado para análise');
+      return;
+    }
+
+    // Marcar como analisando
+    setAnalyzingAI(prev => ({ ...prev, [pedido.id]: true }));
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${API}/pedidos/analisar-sku`,
+        { sku: sku },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Armazenar análise
+      setAiAnalysis(prev => ({
+        ...prev,
+        [pedido.id]: {
+          setor_sugerido: response.data.setor_sugerido,
+          confianca: response.data.confianca,
+          razao: response.data.razao
+        }
+      }));
+
+      toast.success(`Análise concluída! Confiança: ${response.data.confianca}%`);
+    } catch (error) {
+      console.error('Erro ao analisar SKU:', error);
+      toast.error('Erro ao analisar SKU com IA');
+    } finally {
+      // Remover estado de análise
+      setAnalyzingAI(prev => {
+        const newState = { ...prev };
+        delete newState[pedido.id];
+        return newState;
+      });
+    }
+  };
+
+  // Aplicar sugestão da IA
+  const handleAplicarSugestaoIA = async (pedido) => {
+    const analise = aiAnalysis[pedido.id];
+    if (!analise) {
+      toast.error('Nenhuma análise disponível');
+      return;
+    }
+
+    try {
+      await handleUpdatePedido(pedido.id, 'status_producao', analise.setor_sugerido);
+      toast.success(`Setor atualizado para: ${analise.setor_sugerido}`);
+      
+      // Limpar análise após aplicar
+      setAiAnalysis(prev => {
+        const newState = { ...prev };
+        delete newState[pedido.id];
+        return newState;
+      });
+    } catch (error) {
+      console.error('Erro ao aplicar sugestão:', error);
+      toast.error('Erro ao aplicar sugestão');
+    }
+  };
+
   // Função de filtragem de pedidos
   const pedidosFiltrados = pedidos.filter(pedido => {
     // Filtro de Status
