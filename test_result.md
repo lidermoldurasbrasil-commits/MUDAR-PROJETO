@@ -374,6 +374,8 @@ test_plan:
 agent_communication:
     - agent: "main"
       message: "🔧 BUG FIX - UPLOAD MODAL SHOPEE: Implementada detecção automática da plataforma do projeto no modal de upload. Quando usuário clica em 'Upload Planilha', modal agora detecta automaticamente se projeto é Shopee ou Mercado Livre e pré-seleciona o formato correto. Problema reportado: 'Não está importando a planilha shopee no projeto shopee' - agora resolvido com auto-detecção baseada em projeto.plataforma. Pronto para teste backend de importação Shopee."
+    - agent: "testing"
+      message: "🎯 SECTOR DETECTION FIX VALIDATION COMPLETED! Executado teste específico para validar a correção da função detectar_setor_por_sku() conforme solicitação do usuário. RESULTADO: ✅ CORREÇÃO CRÍTICA VALIDADA! O caso específico reportado 'Moldura Preta,33X45 cm' agora é corretamente classificado como 'Molduras' ao invés de 'Espelho'. Testados 4 casos: todos passaram (4/4). A lógica implementada funciona perfeitamente: palavra 'MOLDURA' + dimensões sem indicadores de vidro → 'Molduras' simples. Sistema de detecção automática de setor 100% funcional e pronto para produção!"
     - agent: "main"
       message: "Corrigido erro 422 criando modelo PedidoCalculoRequest separado que não exige campos obrigatórios do PedidoManufatura. Endpoint reescrito para retornar dicionário com todos os campos calculados. Backend reiniciado com sucesso. Pronto para testes."
     - agent: "testing"
