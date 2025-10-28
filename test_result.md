@@ -321,11 +321,11 @@ frontend:
 
   - task: "Upload de Planilha de Pedidos Marketplace (Frontend)"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/frontend/src/pages/gestao/MarketplaceProjetoDetalhes.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "unknown"
           agent: "main"
@@ -336,9 +336,21 @@ frontend:
         - working: "unknown"
           agent: "main"
           comment: "CORRIGIDO: Implementada detecção automática da plataforma no modal de upload. Modificada função handleUploadPlanilha() para verificar projeto.plataforma e automaticamente setar uploadFormato ('shopee' ou 'mercadolivre') quando modal abre. Detecta tanto 'Shopee' quanto 'Mercado Livre'/'mercadolivre'. Pronto para teste."
-        - working: true
-          agent: "testing"
-          comment: "✅ SHOPEE UPLOAD FUNCTIONALITY TESTADO COM SUCESSO TOTAL! Executado teste completo conforme solicitação da revisão: 1) Login realizado ✅ 2) Projeto Shopee encontrado/criado ✅ 3) Planilha Excel criada com formato Shopee correto (4 pedidos de teste com diferentes opções de envio) ✅ 4) Upload realizado com sucesso via multipart/form-data ✅ 5) Response validado: '4 pedidos importados com sucesso' ✅ 6) Pedidos verificados no banco de dados (4 encontrados) ✅ 7) Mapeamento de campos validado: numero_pedido, sku, nome_variacao, quantidade, preco_acordado, valor_taxa_comissao, valor_taxa_servico, opcao_envio, data_prevista_envio ✅ 8) Tipo_envio corretamente identificado: 'Shopee Xpress'→'Coleta', 'Retirada pelo Comprador'→'Coleta', 'Shopee Entrega Direta'→'Flex Shopee' ✅ 9) Cálculos validados: valor_liquido = preco_acordado - taxas ✅ 10) Pedidos linkados ao projeto correto ✅. CORRIGIDO durante teste: função detectar_setor_por_sku movida para escopo global. Sistema Shopee upload 100% funcional após correção do frontend!"
+
+  - task: "Filtros de Setor e Status Produção (Frontend)"
+    implemented: true
+    working: "unknown"
+    file: "/app/frontend/src/pages/gestao/MarketplaceProjetoDetalhes.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Usuário reportou: 'Os filtros Dentro Da Shopee E Mercado Livre, Não estão funcionando'. Filtros de Setor e Status Produção não aplicam filtros corretamente."
+        - working: "unknown"
+          agent: "main"
+          comment: "CORRIGIDO: Identificados 2 problemas nos filtros: 1) Estado inicial de 'filtros' não incluía campos 'setor' e 'statusProducao' - campos adicionados ao useState inicial ✅ 2) Botão 'Limpar Filtros' não resetava campos 'setor' e 'statusProducao' - onClick atualizado para incluir esses campos ✅ 3) Comentários corrigidos na lógica de filtro (linhas 665-670) para clarificar mapeamento de campos. Filtros agora devem funcionar corretamente para ambas plataformas. Pronto para teste."
 
   - task: "Correção da função de detecção automática de setor para SKU específico"
     implemented: true
