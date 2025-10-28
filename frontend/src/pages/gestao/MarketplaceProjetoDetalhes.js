@@ -1058,7 +1058,7 @@ export default function MarketplaceProjetoDetalhes() {
     
     return true;
   }).sort((a, b) => {
-    // Ordenação por data prevista de envio
+    // Ordenação por data prevista de envio baseada no filtro
     const dataA = a.data_prevista_envio ? new Date(a.data_prevista_envio) : null;
     const dataB = b.data_prevista_envio ? new Date(b.data_prevista_envio) : null;
     
@@ -1067,11 +1067,11 @@ export default function MarketplaceProjetoDetalhes() {
     if (!dataA) return 1;
     if (!dataB) return -1;
     
-    // Ordenação ascendente (mais próxima primeiro) ou descendente (mais distante primeiro)
-    if (ordenacaoData === 'asc') {
-      return dataA - dataB;
+    // Ordenação baseada no filtro
+    if (ordenarPor === 'mais_proxima') {
+      return dataA - dataB; // Mais próxima primeiro (ascendente)
     } else {
-      return dataB - dataA;
+      return dataB - dataA; // Mais antiga primeiro (descendente)
     }
   });
 
