@@ -68,6 +68,24 @@ export default function MarketplaceProjetoDetalhes() {
   // Verificar se usuário pode ver aba Financeiro (apenas director e manager)
   const canViewFinanceiro = user?.role === 'director' || user?.role === 'manager';
   
+  // Gerar frase motivacional do dia
+  const frasesDoDia = [
+    "Excelência não é um ato, é um hábito. Continue fazendo um ótimo trabalho!",
+    "Cada peça que você produz leva qualidade e dedicação. Parabéns pelo seu trabalho!",
+    "Seu trabalho faz a diferença. Obrigado por sua dedicação!",
+    "Qualidade é resultado de esforço e atenção. Continue assim!",
+    "Juntos construímos excelência. Seu trabalho é fundamental!",
+    "Cada dia é uma oportunidade de fazer melhor. Bom trabalho!",
+    "Orgulhe-se do que você faz. Seu trabalho tem valor!",
+    "A perfeição está nos detalhes. Continue atento(a)!"
+  ];
+  
+  const getFraseAleatoria = () => {
+    const hoje = new Date();
+    const dia = hoje.getDate();
+    return frasesDoDia[dia % frasesDoDia.length];
+  };
+  
   const [projeto, setProjeto] = useState(null);
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
