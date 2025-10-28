@@ -97,6 +97,44 @@ export default function MarketplacesCentral() {
   const isProduction = user?.role === 'production';
   const canViewFinanceiro = user?.role === 'director' || user?.role === 'manager';
 
+  // Mensagens de boas-vindas personalizadas por colaborador
+  const getMensagemBoasVindas = () => {
+    const nome = user?.nome || user?.username;
+    
+    // Mensagens específicas para cada colaborador
+    const mensagensPersonalizadas = {
+      'Thalita': {
+        saudacao: `Bem-vinda, Thalita! 📦`,
+        mensagem: 'Hoje temos pedidos especiais para despachar! Vamos garantir que cada envio chegue com excelência! 🚀'
+      },
+      'Alex': {
+        saudacao: `Bem-vindo, Alex! 🪞`,
+        mensagem: 'Seus espelhos refletem perfeição! Continue criando obras de arte com qualidade impecável! ✨'
+      },
+      'Luiz': {
+        saudacao: `Bem-vindo, Luiz! 🖼️`,
+        mensagem: 'Cada moldura que você produz emoldura momentos especiais! Seu trabalho é arte pura! 🎨'
+      },
+      'Ronaldo': {
+        saudacao: `Bem-vindo, Ronaldo! 🖼️💎`,
+        mensagem: 'Molduras com vidro são sua especialidade! A proteção perfeita para memórias preciosas! 🌟'
+      },
+      'Ludmila': {
+        saudacao: `Bem-vinda, Ludmila! 📦`,
+        mensagem: 'Cada embalagem é o toque final de cuidado! Você garante que tudo chegue perfeito! 💝'
+      },
+      'Camila': {
+        saudacao: `Bem-vinda, Camila! 🖨️`,
+        mensagem: 'Suas impressões transformam ideias em realidade! Continue colorindo nossos projetos! 🎨'
+      }
+    };
+
+    return mensagensPersonalizadas[nome] || {
+      saudacao: `Bem-vindo(a), ${nome}! 👋`,
+      mensagem: 'Seu trabalho faz toda a diferença na nossa equipe! Vamos juntos fazer um ótimo dia! 💪'
+    };
+  };
+
   useEffect(() => {
     fetchDados();
   }, [lojaAtual]);
