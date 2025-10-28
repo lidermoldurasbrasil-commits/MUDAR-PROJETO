@@ -64,7 +64,7 @@ class ProjectsEndpointTester:
             "password": "123"
         }
         
-        success_director, director_response = self.run_test(
+        success_director, director_response = self.run_api_test(
             "Director Login",
             "POST",
             "auth/login",
