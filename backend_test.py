@@ -4446,6 +4446,10 @@ class BusinessManagementSystemTester:
         print("\n🚨 RUNNING MARKETPLACE SPREADSHEET UPLOAD TEST...")
         self.test_marketplace_spreadsheet_upload()
         
+        # PRIORITY: Test Sector Detection Fix (REVIEW REQUEST)
+        print("\n🚨 RUNNING SECTOR DETECTION FIX TEST (REVIEW REQUEST)...")
+        self.test_sector_detection_fix()
+        
         # Run all module tests
         self.test_dashboard()
         self.test_production_board()
