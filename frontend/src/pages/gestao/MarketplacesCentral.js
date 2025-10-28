@@ -389,13 +389,6 @@ export default function MarketplacesCentral() {
               <DollarSign className="w-5 h-5" />
               Relatório de Vendas
             </button>
-            <button
-              onClick={() => toast.info('Funcionalidade de adicionar projeto será implementada na Fase 3')}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Adicionar Projeto
-            </button>
           </div>
         </div>
 
