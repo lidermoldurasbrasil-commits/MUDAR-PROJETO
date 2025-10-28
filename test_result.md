@@ -366,7 +366,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All priority marketplace tests completed successfully"
+    - "Sector detection fix validation completed successfully"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
