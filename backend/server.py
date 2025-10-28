@@ -384,8 +384,15 @@ async def login(credentials: UserLogin):
     
     token = create_token(user['id'], user['username'], user['role'])
     return TokenResponse(
-        token=token,
-        user={"id": user['id'], "username": user['username'], "role": user['role']}
+        access_token=token,
+        token_type="bearer",
+        user={
+            "id": user['id'], 
+            "username": user['username'], 
+            "nome": user.get('nome', ''),
+            "role": user['role'],
+            "ativo": user.get('ativo', True)
+        }
     )
 
 @api_router.get("/auth/me")
