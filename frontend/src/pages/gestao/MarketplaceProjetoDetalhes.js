@@ -171,9 +171,11 @@ export default function MarketplaceProjetoDetalhes() {
     }
   };
 
-  const fetchDados = async () => {
+  const fetchDados = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
