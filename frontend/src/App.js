@@ -120,7 +120,11 @@ function App() {
 
             {/* Sistema Antigo - Layout anterior */}
             <Route element={<Layout user={user} onLogout={handleLogout} />}>
-              <Route path="/" element={<DirectorDashboard />} />
+              <Route path="/" element={
+                user?.role === 'production' ? 
+                <Navigate to="/marketplace/production" replace /> : 
+                <DirectorDashboard />
+              } />
               
               {/* Marketplace */}
               <Route path="/marketplace/production" element={<MarketplacesCentral />} />
