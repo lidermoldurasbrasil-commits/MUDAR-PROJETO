@@ -4905,6 +4905,98 @@ async def delete_many_pedidos_marketplace(
         "deleted_count": result.deleted_count
     }
 
+@api_router.post("/gestao/marketplaces/pedidos/analisar-sku")
+async def analisar_sku_com_ia(
+    data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Analisa um SKU usando IA e retorna sugestão de setor com nível de confiança"""
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    import asyncio
+    
+    sku = data.get('sku', '')
+    
+    if not sku:
+        raise HTTPException(status_code=400, detail="SKU não fornecido")
+    
+    try:
+        # Buscar chave da API
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not api_key:
+            raise HTTPException(status_code=500, detail="Chave da API não configurada")
+        
+        # Inicializar chat com IA
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"sku-analysis-{uuid.uuid4()}",
+            system_message="""Você é um especialista em classificação de produtos para uma fábrica de molduras e espelhos.
+            
+Analise o SKU fornecido e classifique em um dos seguintes setores:
+1. Espelho - produtos que são espelhos ou contêm espelho
+2. Molduras com Vidro - molduras que incluem vidro/acrílico
+3. Molduras - molduras simples sem vidro
+4. Impressão - produtos que precisam de impressão (fotos, pôsters, etc)
+5. Expedição - produtos prontos para envio
+6. Embalagem - produtos que precisam apenas de embalagem
+7. Personalizado - produtos customizados ou que não se encaixam nas categorias
+
+Responda APENAS em formato JSON:
+{
+  "setor": "nome do setor",
+  "confianca": numero de 0 a 100,
+  "razao": "breve explicação da classificação"
+}"""
+        ).with_model("openai", "gpt-4o-mini")
+        
+        # Criar mensagem do usuário
+        user_message = UserMessage(
+            text=f"Analise este SKU e classifique o setor: {sku}"
+        )
+        
+        # Enviar mensagem e obter resposta
+        response = await chat.send_message(user_message)
+        
+        # Parse da resposta JSON
+        import json
+        try:
+            # Tentar extrair JSON da resposta
+            response_text = response.strip()
+            if response_text.startswith("```json"):
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif response_text.startswith("```"):
+                response_text = response_text.split("```")[1].split("```")[0].strip()
+            
+            analise = json.loads(response_text)
+            
+            return {
+                "sku": sku,
+                "setor_sugerido": analise.get("setor", "Personalizado"),
+                "confianca": analise.get("confianca", 50),
+                "razao": analise.get("razao", "Análise baseada em IA"),
+                "success": True
+            }
+        except json.JSONDecodeError:
+            # Se falhar o parse, usar resposta direta
+            return {
+                "sku": sku,
+                "setor_sugerido": "Personalizado",
+                "confianca": 50,
+                "razao": f"IA: {response[:100]}",
+                "success": True
+            }
+            
+    except Exception as e:
+        print(f"Erro na análise de SKU: {str(e)}")
+        # Fallback para detecção baseada em regras
+        setor_fallback = detectar_setor_por_sku(sku)
+        return {
+            "sku": sku,
+            "setor_sugerido": setor_fallback,
+            "confianca": 70,
+            "razao": "Classificação baseada em regras (IA indisponível)",
+            "success": True
+        }
+
 # VENDAS MARKETPLACE
 @api_router.get("/gestao/marketplaces/vendas")
 async def get_vendas_marketplace(
