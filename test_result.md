@@ -444,6 +444,8 @@ test_plan:
   test_priority: "high_first"
 
 agent_communication:
+    - agent: "testing"
+      message: "🎯 TESTE DE LOGIN DOS USUÁRIOS DE PRODUÇÃO CONCLUÍDO COM SUCESSO TOTAL! Executado teste específico conforme solicitação da revisão para testar login de todos os usuários dos setores de produção. RESULTADO: ✅ TODOS OS 7 USUÁRIOS TESTADOS COM SUCESSO! Endpoint POST /api/auth/login funcionando perfeitamente para: espelho/123, molduras-vidro/123, molduras/123, impressao/123, expedicao/123, embalagem/123, diretor/123. Todos retornam Status 200 OK, Token JWT válido, dados do usuário corretos (username, nome, role), roles corretas (production para setores, director para diretor). Taxa de sucesso: 100% (36/36 validações). Sistema de autenticação 100% operacional e pronto para produção!"
     - agent: "main"
       message: "🔧 BUG FIX - UPLOAD MODAL SHOPEE: Implementada detecção automática da plataforma do projeto no modal de upload. Quando usuário clica em 'Upload Planilha', modal agora detecta automaticamente se projeto é Shopee ou Mercado Livre e pré-seleciona o formato correto. Problema reportado: 'Não está importando a planilha shopee no projeto shopee' - agora resolvido com auto-detecção baseada em projeto.plataforma. Pronto para teste backend de importação Shopee."
     - agent: "testing"
