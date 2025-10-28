@@ -132,6 +132,17 @@ export default function MarketplaceProjetoDetalhes() {
     fetchStatusCustomizados();
   }, [projetoId, filtros]);
 
+  // Polling para atualização em tempo real a cada 5 segundos
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      // Buscar dados sem mostrar loading
+      fetchDados(false); // false = não mostra spinner
+    }, 5000); // 5 segundos
+
+    // Limpar interval ao desmontar
+    return () => clearInterval(intervalId);
+  }, [projetoId]);
+
   const fetchStatusCustomizados = async () => {
     try {
       const token = localStorage.getItem('token');
