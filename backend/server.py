@@ -372,7 +372,8 @@ async def register(user_data: UserRegister):
     
     token = create_token(user.id, user.username, user.role)
     return TokenResponse(
-        token=token,
+        access_token=token,
+        token_type="bearer",
         user={"id": user.id, "username": user.username, "role": user.role}
     )
 
