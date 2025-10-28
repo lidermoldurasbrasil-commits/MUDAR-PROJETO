@@ -462,6 +462,31 @@ export default function MarketplaceProjetoDetalhes() {
       // Atualizar local
       setPedidos(pedidos.map(p => p.id === pedidoId ? pedidoAtualizado : p));
       
+      // 🎓 APRENDIZADO: Se usuário mudou manualmente o setor, registrar feedback para IA aprender
+      if (campo === 'status_producao' && pedido.status_producao !== valor) {
+        const sku = pedido.numero_referencia_sku || pedido.sku;
+        if (sku) {
+          try {
+            await axios.post(
+              `${API}/pedidos/registrar-feedback-sku`,
+              {
+                sku: sku,
+                setor_original: pedido.status_producao,
+                setor_correto: valor,
+                pedido_id: pedidoId
+              },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            console.log(`✅ Feedback registrado: SKU "${sku}" → "${valor}"`);
+            // Toast sutil para não incomodar
+            toast.success('✅ IA aprendeu com sua classificação!', { duration: 2000 });
+          } catch (error) {
+            console.error('Erro ao registrar feedback:', error);
+            // Não mostrar erro ao usuário para não atrapalhar o fluxo
+          }
+        }
+      }
+      
     } catch (error) {
       console.error('Erro ao atualizar pedido:', error);
       toast.error('Erro ao atualizar pedido');
