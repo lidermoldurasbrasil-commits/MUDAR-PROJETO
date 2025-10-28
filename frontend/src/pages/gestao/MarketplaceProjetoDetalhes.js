@@ -810,6 +810,10 @@ export default function MarketplaceProjetoDetalhes() {
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   
+  console.log('📊 FILTROS ATIVOS:', filtros);
+  console.log('📦 Total de pedidos:', pedidos.length);
+  console.log('✅ Pedidos após filtros:', pedidosFiltrados.length);
+  
   const pedidosAtuais = pedidosFiltrados.filter(pedido => {
     if (!pedido.data_prevista_envio) return true; // Se não tem data, considera atual
     const dataPrevista = new Date(pedido.data_prevista_envio);
