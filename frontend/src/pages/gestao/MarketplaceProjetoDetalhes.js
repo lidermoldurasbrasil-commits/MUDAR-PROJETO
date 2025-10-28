@@ -2440,6 +2440,61 @@ export default function MarketplaceProjetoDetalhes() {
                           </select>
                         </td>
                         
+                        {/* AI Suggestion Column */}
+                        <td className="px-4 py-3">
+                          <div className="flex flex-col gap-2">
+                            {analyzingAI[pedido.id] ? (
+                              <div className="flex items-center gap-2 text-blue-400">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
+                                <span className="text-xs">Analisando...</span>
+                              </div>
+                            ) : aiAnalysis[pedido.id] ? (
+                              <div className="flex flex-col gap-1">
+                                <div className="flex items-center gap-2">
+                                  <span 
+                                    className="px-2 py-1 rounded-full text-xs font-medium text-white"
+                                    style={{ backgroundColor: SETOR_COLORS[aiAnalysis[pedido.id].setor_sugerido] || '#6366F1' }}
+                                  >
+                                    {aiAnalysis[pedido.id].setor_sugerido}
+                                  </span>
+                                  <span className="text-xs text-green-400 font-medium">
+                                    {aiAnalysis[pedido.id].confianca}%
+                                  </span>
+                                </div>
+                                <span className="text-xs text-gray-400 italic">
+                                  {aiAnalysis[pedido.id].razao}
+                                </span>
+                                <div className="flex gap-2 mt-1">
+                                  <button
+                                    onClick={() => handleAplicarSugestaoIA(pedido)}
+                                    className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
+                                  >
+                                    Aplicar
+                                  </button>
+                                  <button
+                                    onClick={() => setAiAnalysis(prev => {
+                                      const newState = { ...prev };
+                                      delete newState[pedido.id];
+                                      return newState;
+                                    })}
+                                    className="px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded transition-colors"
+                                  >
+                                    Ignorar
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => handleAnalisarSKU(pedido)}
+                                className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-full transition-colors flex items-center gap-1"
+                              >
+                                <span>🤖</span>
+                                <span>Reclassificar</span>
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                        
                         <td className="px-4 py-3">
                           <span className="text-gray-300 text-sm">{pedido.opcao_envio || '-'}</span>
                         </td>
