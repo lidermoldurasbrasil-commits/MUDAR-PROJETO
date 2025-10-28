@@ -3920,8 +3920,10 @@ class BusinessManagementSystemTester:
             from datetime import datetime, timedelta
             
             # Create test data with required Shopee columns and different shipping options
+            # Use timestamp to make order IDs unique
+            timestamp = datetime.now().strftime('%H%M%S')
             test_data = {
-                'ID do pedido': ['TEST001SHOPEE', 'TEST002SHOPEE', 'TEST003SHOPEE', 'TEST004SHOPEE'],
+                'ID do pedido': [f'TEST001SHOPEE{timestamp}', f'TEST002SHOPEE{timestamp}', f'TEST003SHOPEE{timestamp}', f'TEST004SHOPEE{timestamp}'],
                 'Número de referência SKU': ['KIT-TEST-40x60-SHOPEE', 'QUADRO-TEST-50x70', 'MOLDURA-TEST-30x40', 'POSTER-TEST-A4'],
                 'Nome da variação': ['Kit Quadro Personalizado 40x60cm', 'Quadro Decorativo 50x70cm', 'Moldura Premium 30x40cm', 'Poster A4 Premium'],
                 'Quantidade': [1, 2, 1, 3],
