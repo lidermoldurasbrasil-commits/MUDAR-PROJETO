@@ -310,17 +310,11 @@ class ProductionSystemTester:
             'file': ('shopee_test.xlsx', excel_buffer.getvalue(), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         }
         
-        upload_data = {
-            'projeto_id': project_id,
-            'formato': 'shopee'
-        }
-        
         success_upload, upload_response = self.run_test(
             "Upload Shopee Spreadsheet",
             "POST",
-            "gestao/marketplaces/pedidos/upload-planilha",
+            f"gestao/marketplaces/pedidos/upload-planilha?projeto_id={project_id}&formato=shopee",
             200,
-            data=upload_data,
             files=files
         )
         
