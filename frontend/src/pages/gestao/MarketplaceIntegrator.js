@@ -45,13 +45,19 @@ export default function MarketplaceIntegrator() {
       });
       
       if (response.data.authorization_url) {
+        // Verificar se client_id está vazio (credenciais não configuradas)
+        if (response.data.authorization_url.includes('client_id=&')) {
+          toast.error('⚠️ Credenciais do Mercado Livre não configuradas no backend (.env)');
+          return;
+        }
+        
         // Abrir URL de autorização em nova aba
         window.open(response.data.authorization_url, '_blank');
         toast.info('Autorize o aplicativo no Mercado Livre e volte aqui.');
       }
     } catch (error) {
       console.error('Erro ao iniciar autorização:', error);
-      toast.error(error.response?.data?.detail || 'Erro ao iniciar autorização');
+      toast.error(error.response?.data?.detail || 'Erro ao iniciar autorização. Verifique as credenciais no backend.');
     }
   };
 
