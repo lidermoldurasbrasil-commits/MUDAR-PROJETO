@@ -255,6 +255,16 @@ export default function MarketplaceProjetoDetalhes() {
         }
       );
       
+      // Fechar modal e limpar estado ANTES de processar resposta
+      setShowUploadModal(false);
+      setUploadFile(null);
+      setUploadFormato('shopee'); // Resetar para padrão
+      
+      // Limpar completamente o estado de pedidos para evitar conflitos de keys
+      setPedidos([]);
+      setSelectedPedidos([]);
+      setSelectAll(false);
+      
       // Mensagem de sucesso com info sobre duplicados
       const data = response.data;
       toast.success(data.message);
@@ -265,17 +275,10 @@ export default function MarketplaceProjetoDetalhes() {
         });
       }
       
-      setShowUploadModal(false);
-      setUploadFile(null);
-      setUploadFormato('shopee'); // Resetar para padrão
-      
-      // Limpar pedidos antes de recarregar para evitar conflitos de keys
-      setPedidos([]);
-      
-      // Aguardar um pouco antes de recarregar dados
+      // Aguardar um pouco antes de recarregar dados para garantir que o estado foi limpo
       setTimeout(() => {
         fetchDados();
-      }, 100);
+      }, 200);
     } catch (error) {
       console.error('Erro ao fazer upload:', error);
       toast.error(error.response?.data?.detail || 'Erro ao processar planilha');
