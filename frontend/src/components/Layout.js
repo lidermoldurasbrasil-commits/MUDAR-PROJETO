@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Menu, Home, Package, RefreshCcw, Megaphone, ShoppingCart, FileText, DollarSign, TrendingUp, Calculator, Store, AlertCircle, Users, LogOut, Factory } from 'lucide-react';
+import { Menu, Home, Package, RefreshCcw, Megaphone, ShoppingCart, FileText, DollarSign, TrendingUp, Calculator, Store, AlertCircle, Users, LogOut, Factory, Plug } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { useState } from 'react';
 
