@@ -4954,6 +4954,7 @@ def processar_linha_mercadolivre(row, projeto_id, projeto, current_user):
         # AUTOMAÇÃO: Detectar setor automaticamente baseado no SKU
         'status_producao': detectar_setor_por_sku(sku),  # Setor detectado automaticamente
         'status_logistica': 'Aguardando',  # Status inicial
+        'status_montagem': 'Aguardando Montagem',  # Status inicial de montagem
         
         # Outros campos
         'produto_nome': titulo,
