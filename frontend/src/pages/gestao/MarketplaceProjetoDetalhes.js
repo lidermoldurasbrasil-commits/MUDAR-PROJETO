@@ -2004,6 +2004,7 @@ export default function MarketplaceProjetoDetalhes() {
                     <option value="Em montagem">🔧 Em montagem</option>
                     <option value="Imprimindo">🖨️ Imprimindo</option>
                     <option value="Impresso">✅ Impresso</option>
+                    <option value="Finalizado">✨ Finalizado</option>
                   </select>
                 </div>
               </>
