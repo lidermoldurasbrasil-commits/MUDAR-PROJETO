@@ -1632,7 +1632,8 @@ export default function MarketplaceProjetoDetalhes() {
                   { nome: 'Aguardando', emoji: '⏳', cor: '#94A3B8' },
                   { nome: 'Em montagem', emoji: '🔧', cor: '#F59E0B' },
                   { nome: 'Imprimindo', emoji: '🖨️', cor: '#3B82F6' },
-                  { nome: 'Impresso', emoji: '✅', cor: '#10B981' }
+                  { nome: 'Impresso', emoji: '✅', cor: '#10B981' },
+                  { nome: 'Finalizado', emoji: '✨', cor: '#10B981' }
                 ].map(status => {
                   const count = pedidos.filter(p => p.status_logistica === status.nome).length;
                   const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
@@ -1853,7 +1854,8 @@ export default function MarketplaceProjetoDetalhes() {
                   { nome: 'Aguardando', emoji: '⏳', cor: '#94A3B8' },
                   { nome: 'Em montagem', emoji: '🔧', cor: '#F59E0B' },
                   { nome: 'Imprimindo', emoji: '🖨️', cor: '#3B82F6' },
-                  { nome: 'Impresso', emoji: '✅', cor: '#10B981' }
+                  { nome: 'Impresso', emoji: '✅', cor: '#10B981' },
+                  { nome: 'Finalizado', emoji: '✨', cor: '#10B981' }
                 ].map(status => {
                   const count = pedidos.filter(p => p.status_logistica === status.nome).length;
                   const percentage = pedidos.length > 0 ? ((count / pedidos.length) * 100).toFixed(1) : 0;
