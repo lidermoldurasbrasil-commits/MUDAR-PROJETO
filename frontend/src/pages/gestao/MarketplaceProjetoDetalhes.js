@@ -1671,7 +1671,7 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
             
             {expandedSections.statusMontagem && (
-              <div className="grid grid-cols-3 gap-4 mt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mt-3">
                 {[
                   { nome: 'Aguardando Montagem', emoji: '⏳', cor: '#6B7280' },
                   { nome: 'Em Montagem', emoji: '🔧', cor: '#F59E0B' },
@@ -1892,7 +1892,7 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
             
             {expandedSections.statusMontagem && (
-              <div className="grid grid-cols-3 gap-4 mt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mt-3">
                 {[
                   { nome: 'Aguardando Montagem', emoji: '⏳', cor: '#6B7280' },
                   { nome: 'Em Montagem', emoji: '🔧', cor: '#F59E0B' },
