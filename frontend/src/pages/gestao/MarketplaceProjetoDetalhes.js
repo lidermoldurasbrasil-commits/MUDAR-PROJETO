@@ -3241,14 +3241,24 @@ export default function MarketplaceProjetoDetalhes() {
                           <select
                             value={pedido.status_logistica || 'Aguardando'}
                             onChange={(e) => handleUpdatePedido(pedido.id, 'status_logistica', e.target.value)}
-                            className="w-full px-3 py-1.5 rounded-full text-white text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer"
+                            className={`w-full px-3 py-1.5 rounded-full text-white text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 cursor-pointer ${
+                              pedido.status_logistica === 'Finalizado' ? 'ring-2 ring-green-400 animate-pulse' : ''
+                            }`}
                             style={{ backgroundColor: STATUS_PRODUCAO_COLORS[pedido.status_logistica || 'Aguardando'] }}
                           >
                             <option value="Aguardando" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Aguardando'] }}>⏳ Aguardando</option>
                             <option value="Em montagem" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Em montagem'] }}>🔧 Em montagem</option>
                             <option value="Imprimindo" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Imprimindo'] }}>🖨️ Imprimindo</option>
                             <option value="Impresso" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Impresso'] }}>✅ Impresso</option>
+                            <option value="Finalizado" style={{ backgroundColor: STATUS_PRODUCAO_COLORS['Finalizado'] }}>✨ Finalizado</option>
                           </select>
+                          {pedido.status_logistica === 'Finalizado' && (
+                            <div className="mt-1 flex items-center justify-center gap-1">
+                              <span className="text-green-400 text-xs animate-bounce">🎉</span>
+                              <span className="text-green-400 text-xs font-medium">Pronto!</span>
+                              <span className="text-green-400 text-xs animate-bounce" style={{ animationDelay: '0.2s' }}>✨</span>
+                            </div>
+                          )}
                         </td>
                       </>
                     )}
