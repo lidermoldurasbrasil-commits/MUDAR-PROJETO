@@ -2147,7 +2147,7 @@ export default function MarketplaceProjetoDetalhes() {
       {/* Monday View */}
       {viewMode === 'monday' && (
         <div className="space-y-6">
-          {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
+          {Object.entries(pedidosAgrupados).map(([grupo, pedidosDoGrupo]) => (
             <div key={`grupo-${grupo}`} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
               {agruparPor && (
                 <div className="bg-gray-900 px-6 py-3 border-b border-gray-700">
@@ -2985,7 +2985,7 @@ export default function MarketplaceProjetoDetalhes() {
             )}
           </div>
           
-          {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
+          {Object.entries(pedidosAgrupados).map(([grupo, pedidosDoGrupo]) => (
             <div key={`grupo-${grupo}`} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
               {agruparPor && (
                 <div className="bg-gray-900 px-6 py-3 border-b border-gray-700">
@@ -3400,7 +3400,7 @@ export default function MarketplaceProjetoDetalhes() {
       {/* Financeiro View - Para Shopee e Mercado Livre com todos os campos */}
       {viewMode === 'financeiro' && (projeto?.plataforma === 'shopee' || projeto?.plataforma === 'mercadolivre') && (
         <div className="space-y-6">
-          {Object.entries(pedidosAgrupados()).map(([grupo, pedidosDoGrupo]) => (
+          {Object.entries(pedidosAgrupados).map(([grupo, pedidosDoGrupo]) => (
             <div key={`grupo-${grupo}`} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
               {agruparPor && (
                 <div className="bg-gray-900 px-6 py-3 border-b border-gray-700">
