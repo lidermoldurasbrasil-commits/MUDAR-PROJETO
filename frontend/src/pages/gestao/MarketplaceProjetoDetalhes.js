@@ -714,7 +714,8 @@ export default function MarketplaceProjetoDetalhes() {
     if (selectAll) {
       setSelectedPedidos([]);
     } else {
-      setSelectedPedidos(pedidos.map(p => p.id));
+      // Selecionar apenas os pedidos FILTRADOS que estão visíveis na tela
+      setSelectedPedidos(pedidosFiltrados.map(p => p.id));
     }
     setSelectAll(!selectAll);
   };
@@ -726,7 +727,8 @@ export default function MarketplaceProjetoDetalhes() {
     } else {
       const newSelected = [...selectedPedidos, pedidoId];
       setSelectedPedidos(newSelected);
-      setSelectAll(newSelected.length === pedidos.length);
+      // Verificar se todos os pedidos FILTRADOS estão selecionados
+      setSelectAll(newSelected.length === pedidosFiltrados.length);
     }
   };
 
