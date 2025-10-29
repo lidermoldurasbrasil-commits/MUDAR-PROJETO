@@ -42,7 +42,8 @@ const STATUS_PRODUCAO_COLORS = {
   'Aguardando': '#94A3B8',     // Cinza
   'Em montagem': '#F59E0B',    // Laranja
   'Imprimindo': '#3B82F6',     // Azul
-  'Impresso': '#10B981'        // Verde
+  'Impresso': '#10B981',       // Verde
+  'Finalizado': '#10B981'      // Verde (mesmo do Impresso para consistência)
 };
 
 export default function MarketplaceProjetoDetalhes() {
