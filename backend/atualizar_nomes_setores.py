@@ -1,47 +1,60 @@
 #!/usr/bin/env python3
 """
-Script para atualizar nomes dos operadores dos setores
+Script para atualizar os nomes dos usuários dos setores de produção.
 """
-import asyncio
+
+import sys
 import os
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import MongoClient
+from dotenv import load_dotenv
 
-MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+# Carregar variáveis de ambiente
+load_dotenv()
 
-# Mapeamento de username para nome real
-NOMES_OPERADORES = {
-    "expedicao": "Thalita",
-    "embalagem": "Ludmila",
-    "molduras": "Luiz",
-    "molduras-vidro": "Ronaldo",
-    "espelho": "Alex",
-    "impressao": "Camila"
-}
+# Obter MONGO_URL do ambiente
+mongo_url = os.environ.get('MONGO_URL')
+db_name = os.environ.get('DB_NAME', 'gestao_manufatura')
 
-async def atualizar_nomes():
-    """Atualiza os nomes dos operadores"""
-    client = AsyncIOMotorClient(MONGO_URL)
-    db = client['gestao_manufatura']
-    users_collection = db['users']
+if not mongo_url:
+    print("❌ ERRO: MONGO_URL não encontrado no .env")
+    sys.exit(1)
+
+try:
+    # Conectar ao MongoDB
+    client = MongoClient(mongo_url)
+    db = client[db_name]
     
-    print("🔧 Atualizando nomes dos operadores...")
-    print("-" * 60)
+    # Mapeamento de usernames para nomes
+    nomes_setores = {
+        'espelho': 'Alex',
+        'molduras-vidro': 'Ronaldo',
+        'molduras': 'Luiz',
+        'impressao': 'Camila',
+        'expedicao': 'Thalita',
+        'embalagem': 'Ludmila'
+    }
     
-    for username, nome in NOMES_OPERADORES.items():
-        result = await users_collection.update_one(
-            {"username": username},
-            {"$set": {"nome": nome}}
+    print(f"\n🔄 Atualizando nomes dos usuários de produção no banco '{db_name}'...")
+    print("=" * 60)
+    
+    for username, nome in nomes_setores.items():
+        result = db.users.update_one(
+            {'username': username},
+            {'$set': {'nome': nome}}
         )
         
         if result.modified_count > 0:
-            print(f"✅ {username} → {nome}")
+            print(f"✅ Atualizado: {username} → {nome}")
+        elif result.matched_count > 0:
+            print(f"ℹ️  Já estava correto: {username} → {nome}")
         else:
-            print(f"⚠️  {username} não encontrado ou já atualizado")
+            print(f"⚠️  Usuário não encontrado: {username}")
     
-    print("-" * 60)
-    print("✨ Nomes atualizados com sucesso!")
+    print("\n✅ Atualização concluída!")
     
-    client.close()
-
-if __name__ == "__main__":
-    asyncio.run(atualizar_nomes())
+except Exception as e:
+    print(f"\n❌ ERRO ao atualizar nomes: {e}")
+    sys.exit(1)
+finally:
+    if 'client' in locals():
+        client.close()
