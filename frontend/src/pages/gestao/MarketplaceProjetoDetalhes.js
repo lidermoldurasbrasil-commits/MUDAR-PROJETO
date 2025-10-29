@@ -968,7 +968,7 @@ export default function MarketplaceProjetoDetalhes() {
         p.status_montagem || '-'
       ]);
       
-      doc.autoTable({
+      autoTable(doc, {
         startY: 45,
         head: [['ID Pedido', 'Nº Venda', 'SKU', 'Variação', 'Cliente', 'Qtd', 'Data Prevista', 'Status Produção', 'Status Montagem']],
         body: tableData,
