@@ -13,7 +13,7 @@ from datetime import datetime
 class PreProductionTester:
     def __init__(self):
         # Get backend URL from environment
-        self.base_url = "https://shopeeml-sync.preview.emergentagent.com"
+        self.base_url = "https://production-tracker-27.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.tests_run = 0
         self.tests_passed = 0

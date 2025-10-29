@@ -9,7 +9,7 @@ import sys
 import json
 
 class ProductionLoginTester:
-    def __init__(self, base_url="https://shopeeml-sync.preview.emergentagent.com"):
+    def __init__(self, base_url="https://production-tracker-27.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
@@ -191,7 +191,7 @@ class ProductionLoginTester:
 
 def main():
     print("🚀 Starting Production Users Login Test...")
-    print("🌐 Testing against: https://shopeeml-sync.preview.emergentagent.com")
+    print("🌐 Testing against: https://production-tracker-27.preview.emergentagent.com")
     
     tester = ProductionLoginTester()
     

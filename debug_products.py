@@ -2,7 +2,7 @@ import requests
 import json
 
 # Test the products endpoint to see what was actually created
-base_url = "https://shopeeml-sync.preview.emergentagent.com"
+base_url = "https://production-tracker-27.preview.emergentagent.com"
 api_url = f"{base_url}/api"
 
 # First register and login to get a token
