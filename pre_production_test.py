@@ -404,10 +404,14 @@ class PreProductionTester:
         print(f"\n📋 Teste 3: Atualizando status_montagem do pedido {order3_id}")
         print(f"   Original: {original_status_montagem} → Novo: {new_status_montagem}")
         
+        # Create full order data with updated status_montagem
+        updated_order3 = order3.copy()
+        updated_order3['status_montagem'] = new_status_montagem
+        
         status, response = self.make_request(
             'PUT',
             f'gestao/marketplaces/pedidos/{order3_id}',
-            data={'status_montagem': new_status_montagem},
+            data=updated_order3,
             token=director_token
         )
         
