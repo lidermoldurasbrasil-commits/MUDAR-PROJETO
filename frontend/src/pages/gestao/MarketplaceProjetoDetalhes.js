@@ -1713,7 +1713,7 @@ export default function MarketplaceProjetoDetalhes() {
           {/* Métricas por Tipo de Envio */}
           <div>
             <h3 className="text-lg font-semibold text-gray-300 mb-3">Análise de Envios (Formas de Entrega)</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {(() => {
                 // Agrupar por forma de entrega real da planilha
                 const enviosMap = {};
@@ -3770,7 +3770,7 @@ export default function MarketplaceProjetoDetalhes() {
               </div>
 
               {/* Linha 4: Quantidade e Valores */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Quantidade *</label>
                   <input
