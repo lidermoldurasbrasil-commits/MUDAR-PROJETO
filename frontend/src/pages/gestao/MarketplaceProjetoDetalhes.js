@@ -2171,12 +2171,19 @@ export default function MarketplaceProjetoDetalhes() {
                   <thead className="bg-gray-900 border-b border-gray-700">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
-                        <input 
-                          type="checkbox" 
-                          className="rounded cursor-pointer" 
-                          checked={selectAll}
-                          onChange={handleSelectAll}
-                        />
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="checkbox" 
+                            className="rounded cursor-pointer" 
+                            checked={selectAll}
+                            onChange={handleSelectAll}
+                          />
+                          {selectedPedidos.length > 0 && (
+                            <span className="text-xs font-bold text-blue-400">
+                              ({selectedPedidos.length})
+                            </span>
+                          )}
+                        </div>
                       </th>
                       
                       {/* Colunas específicas para MERCADO LIVRE */}
@@ -3002,12 +3009,19 @@ export default function MarketplaceProjetoDetalhes() {
                   <thead className="bg-gray-900 border-b border-gray-700">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
-                        <input 
-                          type="checkbox" 
-                          className="rounded cursor-pointer" 
-                          checked={selectAll}
-                          onChange={handleSelectAll}
-                        />
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="checkbox" 
+                            className="rounded cursor-pointer" 
+                            checked={selectAll}
+                            onChange={handleSelectAll}
+                          />
+                          {selectedPedidos.length > 0 && (
+                            <span className="text-xs font-bold text-blue-400">
+                              ({selectedPedidos.length})
+                            </span>
+                          )}
+                        </div>
                       </th>
                       
                       {projeto?.plataforma === 'mercadolivre' ? (
@@ -3410,12 +3424,19 @@ export default function MarketplaceProjetoDetalhes() {
                   <thead className="bg-gray-900 border-b border-gray-700">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase w-8">
-                        <input 
-                          type="checkbox" 
-                          className="rounded cursor-pointer" 
-                          checked={selectAll}
-                          onChange={handleSelectAll}
-                        />
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="checkbox" 
+                            className="rounded cursor-pointer" 
+                            checked={selectAll}
+                            onChange={handleSelectAll}
+                          />
+                          {selectedPedidos.length > 0 && (
+                            <span className="text-xs font-bold text-blue-400">
+                              ({selectedPedidos.length})
+                            </span>
+                          )}
+                        </div>
                       </th>
                       
                       {/* Cabeçalhos condicionais por plataforma */}
