@@ -1032,29 +1032,89 @@ export default function MarketplaceProjetoDetalhes() {
       yPosition += 6;
       doc.text(`Aguardando: ${aguardando} | Em Montagem: ${emMontagem} | Imprimindo: ${imprimindo} | Impresso: ${impresso}`, 25, yPosition);
       
-      // Listar todos os SKUs com quantidades
-      yPosition += 10;
-      doc.setFontSize(11);
-      doc.setTextColor(79, 70, 229);
-      doc.text('Lista de SKUs e Quantidades:', 25, yPosition);
+      // Listar todos os SKUs com quantidades em TABELA
+      yPosition = doc.lastAutoTable.finalY + 15;
       
-      yPosition += 7;
-      doc.setFontSize(9);
-      doc.setTextColor(0, 0, 0);
+      if (yPosition > 170) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      doc.setFontSize(12);
+      doc.setTextColor(79, 70, 229);
+      doc.text('Lista de SKUs e Quantidades:', 20, yPosition);
+      
+      yPosition += 5;
       
       // Ordenar SKUs por quantidade (maior para menor)
       const skusOrdenados = Object.values(pedidosPorSKU).sort((a, b) => b.quantidadeTotal - a.quantidadeTotal);
       
-      skusOrdenados.forEach((grupo, index) => {
-        // Verificar se precisa de nova página
-        if (yPosition > 180) {
-          doc.addPage();
-          yPosition = 20;
-        }
-        
-        doc.text(`SKU ${grupo.sku}, QUANTIDADE: ${grupo.quantidadeTotal}`, 30, yPosition);
-        yPosition += 5;
+      // Criar dados da tabela de SKUs
+      const skuTableData = skusOrdenados.map((grupo, index) => [
+        index + 1,
+        grupo.sku,
+        grupo.quantidadeTotal,
+        grupo.pedidos.length
+      ]);
+      
+      autoTable(doc, {
+        startY: yPosition,
+        head: [['#', 'SKU', 'Quantidade Total', 'Nº Pedidos']],
+        body: skuTableData,
+        theme: 'grid',
+        headStyles: { 
+          fillColor: [79, 70, 229], 
+          textColor: 255, 
+          fontSize: 10,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        bodyStyles: { 
+          fontSize: 9,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { cellWidth: 15, halign: 'center' },
+          1: { cellWidth: 'auto', halign: 'left' },
+          2: { cellWidth: 35, halign: 'center', fontStyle: 'bold', textColor: [79, 70, 229] },
+          3: { cellWidth: 30, halign: 'center' }
+        },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { left: 20, right: 20 }
       });
+      
+      // TOTAIS DO SETOR (movido para depois da tabela de SKUs)
+      yPosition = doc.lastAutoTable.finalY + 15;
+      
+      if (yPosition > 250) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      doc.setFontSize(12);
+      doc.setTextColor(79, 70, 229);
+      doc.text('Resumo Geral:', 20, yPosition);
+      
+      yPosition += 8;
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      
+      const totalPedidos = pedidosDoSetor.length;
+      const totalQuantidade = pedidosDoSetor.reduce((sum, p) => sum + (parseInt(p.quantidade) || 0), 0);
+      const totalSKUs = Object.keys(pedidosPorSKU).length;
+      const aguardando = pedidosDoSetor.filter(p => p.status_logistica === 'Aguardando').length;
+      const emMontagem = pedidosDoSetor.filter(p => p.status_logistica === 'Em montagem').length;
+      const imprimindo = pedidosDoSetor.filter(p => p.status_logistica === 'Imprimindo').length;
+      const impresso = pedidosDoSetor.filter(p => p.status_logistica === 'Impresso').length;
+      
+      doc.text(`Total de SKUs diferentes: ${totalSKUs}`, 25, yPosition);
+      yPosition += 6;
+      doc.text(`Total de Pedidos: ${totalPedidos}`, 25, yPosition);
+      yPosition += 6;
+      doc.text(`Total de Peças: ${totalQuantidade}`, 25, yPosition);
+      yPosition += 8;
+      doc.setFontSize(9);
+      doc.text(`Status: Aguardando (${aguardando}) | Em Montagem (${emMontagem}) | Imprimindo (${imprimindo}) | Impresso (${impresso})`, 25, yPosition);
       
       // Salvar PDF
       const nomeArquivo = `ordem_producao_${nomeSetor.replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
