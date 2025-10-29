@@ -113,3 +113,189 @@ code {
         border-bottom-color: inherit;
     }
 }
+
+
+/* ================================================
+   RESPONSIVIDADE - MOBILE, TABLET, DESKTOP
+   ================================================ */
+
+/* Mobile First - Base styles para mobile */
+@media (max-width: 640px) {
+  /* Tables responsivas */
+  table {
+    font-size: 0.75rem;
+  }
+  
+  th, td {
+    padding: 0.5rem !important;
+    min-width: 80px !important;
+  }
+  
+  /* Filtros em coluna no mobile */
+  .filtros-container {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  
+  /* Cards menores no mobile */
+  .card, .bg-gray-800, .bg-gray-900 {
+    padding: 0.75rem !important;
+  }
+  
+  /* Botões menores */
+  button {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  /* Grid responsivo - 1 coluna */
+  .grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+  
+  /* Sidebar oculto no mobile */
+  .sidebar {
+    position: fixed;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  
+  /* Ajuste main content */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* Tablet - 768px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Tables com scroll horizontal */
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  table {
+    font-size: 0.875rem;
+  }
+  
+  th, td {
+    padding: 0.625rem !important;
+  }
+  
+  /* Grid 2 colunas */
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  /* Sidebar colapsável */
+  .sidebar.closed {
+    width: 70px;
+  }
+  
+  .main-content {
+    margin-left: 70px;
+  }
+  
+  .sidebar.open + .main-content {
+    margin-left: 250px;
+  }
+}
+
+/* Desktop - 1024px+ */
+@media (min-width: 1024px) {
+  /* Tables com espaçamento adequado */
+  th, td {
+    padding: 0.75rem !important;
+  }
+  
+  /* Grid mantém colunas originais */
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+  
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  
+  /* Sidebar sempre visível */
+  .sidebar {
+    position: relative;
+    transform: translateX(0);
+  }
+}
+
+/* Desktop Grande - 1280px+ */
+@media (min-width: 1280px) {
+  /* Mais espaço nas tabelas */
+  th, td {
+    padding: 1rem !important;
+  }
+  
+  /* Cards maiores */
+  .card, .bg-gray-800, .bg-gray-900 {
+    padding: 1.5rem !important;
+  }
+  
+  /* Fontes maiores */
+  .text-xl {
+    font-size: 1.5rem !important;
+  }
+  
+  .text-lg {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Desktop Ultra Wide - 1536px+ */
+@media (min-width: 1536px) {
+  /* Container limitado para não ficar muito largo */
+  .page-content {
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+  
+  /* Grid pode ter mais colunas */
+  .grid-cols-4 {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Ajustes gerais de responsividade */
+@layer utilities {
+  .responsive-padding {
+    @apply px-2 sm:px-4 md:px-6 lg:px-8;
+  }
+  
+  .responsive-text {
+    @apply text-sm sm:text-base md:text-lg;
+  }
+  
+  .responsive-container {
+    @apply w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16;
+  }
+}
+
+/* Print styles */
+@media print {
+  .sidebar, .header, .btn, button {
+    display: none !important;
+  }
+  
+  .main-content {
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  table {
+    page-break-inside: avoid;
+  }
+}
