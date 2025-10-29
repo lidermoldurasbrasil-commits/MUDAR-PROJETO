@@ -1476,27 +1476,6 @@ export default function MarketplaceProjetoDetalhes() {
           </div>
         )}
 
-        {/* Indicadores Rápidos */}
-        <div className="grid grid-cols-4 gap-4 mt-4">
-          <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-            <p className="text-sm text-gray-400">Em Produção</p>
-            <p className="text-2xl font-bold text-orange-400">{projeto.pedidos_em_producao}</p>
-          </div>
-          <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-            <p className="text-sm text-gray-400">Enviados</p>
-            <p className="text-2xl font-bold text-blue-400">{projeto.pedidos_enviados}</p>
-          </div>
-          <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-            <p className="text-sm text-gray-400">Entregues</p>
-            <p className="text-2xl font-bold text-green-400">{projeto.pedidos_entregues}</p>
-          </div>
-          <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-            <p className="text-sm text-gray-400">Atrasados</p>
-            <p className="text-2xl font-bold text-red-400">{projeto.pedidos_atrasados}</p>
-          </div>
-        </div>
-      </div>
-
       {/* Métricas Detalhadas - Mercado Livre */}
       {projeto?.plataforma === 'mercadolivre' && pedidos.length > 0 && (
         <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-700">
