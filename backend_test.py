@@ -5534,18 +5534,18 @@ class BusinessManagementSystemTester:
         print("🚀 Starting Business Management System Tests...")
         print(f"🌐 Testing against: {self.base_url}")
         
-        # Run production module complete test
-        production_success = self.test_production_module_complete()
+        # Run marketplace filters test as requested by user
+        filters_success = self.test_marketplace_filters()
         
-        if production_success:
-            print("\n🎉 PRODUCTION MODULE TESTS COMPLETED SUCCESSFULLY!")
+        if filters_success:
+            print("\n🎉 MARKETPLACE FILTER TESTS COMPLETED SUCCESSFULLY!")
         else:
-            print("\n❌ PRODUCTION MODULE TESTS FAILED!")
+            print("\n❌ MARKETPLACE FILTER TESTS FAILED!")
         
         # Print final results
         self.print_final_results()
         
-        return production_success
+        return filters_success
 
     def print_final_results(self):
         """Print final test results"""
