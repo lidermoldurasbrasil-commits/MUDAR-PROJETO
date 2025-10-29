@@ -959,6 +959,15 @@ export default function MarketplaceProjetoDetalhes() {
         pedidosPorSKU[sku].quantidadeTotal += parseInt(pedido.quantidade) || 0;
       });
       
+      // Calcular totais antecipadamente para usar em vários lugares
+      const totalPedidos = pedidosDoSetor.length;
+      const totalQuantidade = pedidosDoSetor.reduce((sum, p) => sum + (parseInt(p.quantidade) || 0), 0);
+      const totalSKUs = Object.keys(pedidosPorSKU).length;
+      const aguardando = pedidosDoSetor.filter(p => p.status_logistica === 'Aguardando').length;
+      const emMontagem = pedidosDoSetor.filter(p => p.status_logistica === 'Em montagem').length;
+      const imprimindo = pedidosDoSetor.filter(p => p.status_logistica === 'Imprimindo').length;
+      const impresso = pedidosDoSetor.filter(p => p.status_logistica === 'Impresso').length;
+      
       const doc = new jsPDF('l', 'mm', 'a4'); // Landscape para mais espaço
       
       // CABEÇALHO
