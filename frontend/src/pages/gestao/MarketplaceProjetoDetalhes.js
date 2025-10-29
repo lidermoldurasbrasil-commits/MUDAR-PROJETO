@@ -1032,6 +1032,30 @@ export default function MarketplaceProjetoDetalhes() {
       yPosition += 6;
       doc.text(`Aguardando: ${aguardando} | Em Montagem: ${emMontagem} | Imprimindo: ${imprimindo} | Impresso: ${impresso}`, 25, yPosition);
       
+      // Listar todos os SKUs com quantidades
+      yPosition += 10;
+      doc.setFontSize(11);
+      doc.setTextColor(79, 70, 229);
+      doc.text('Lista de SKUs e Quantidades:', 25, yPosition);
+      
+      yPosition += 7;
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      
+      // Ordenar SKUs por quantidade (maior para menor)
+      const skusOrdenados = Object.values(pedidosPorSKU).sort((a, b) => b.quantidadeTotal - a.quantidadeTotal);
+      
+      skusOrdenados.forEach((grupo, index) => {
+        // Verificar se precisa de nova página
+        if (yPosition > 180) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        doc.text(`SKU ${grupo.sku}, QUANTIDADE: ${grupo.quantidadeTotal}`, 30, yPosition);
+        yPosition += 5;
+      });
+      
       // Salvar PDF
       const nomeArquivo = `ordem_producao_${nomeSetor.replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(nomeArquivo);
