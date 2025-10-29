@@ -4373,6 +4373,9 @@ async def get_pedidos_marketplace(
     projeto_id: Optional[str] = None,
     status: Optional[str] = None,
     atrasado: Optional[bool] = None,
+    status_producao: Optional[str] = None,
+    status_logistica: Optional[str] = None,
+    status_montagem: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
     """Lista pedidos de marketplace com filtros"""
@@ -4383,6 +4386,12 @@ async def get_pedidos_marketplace(
         query['status'] = status
     if atrasado is not None:
         query['atrasado'] = atrasado
+    if status_producao:
+        query['status_producao'] = status_producao
+    if status_logistica:
+        query['status_logistica'] = status_logistica
+    if status_montagem:
+        query['status_montagem'] = status_montagem
     
     pedidos = await db.pedidos_marketplace.find(query).sort("created_at", -1).to_list(None)
     
