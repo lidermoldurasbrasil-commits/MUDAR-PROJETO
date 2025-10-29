@@ -5228,8 +5228,9 @@ class BusinessManagementSystemTester:
         # Check for status_montagem field in all orders
         orders_with_status_montagem = 0
         orders_with_null_fields = 0
+        null_field_details = []
         
-        for order in all_orders:
+        for i, order in enumerate(all_orders):
             # Check status_montagem exists
             if 'status_montagem' in order and order['status_montagem'] is not None:
                 orders_with_status_montagem += 1
@@ -5237,14 +5238,22 @@ class BusinessManagementSystemTester:
             # Check for null/undefined critical fields
             critical_fields = ['numero_pedido', 'sku', 'status_producao', 'status_logistica']
             has_null_critical = False
+            null_fields_in_order = []
             
             for field in critical_fields:
                 if field not in order or order[field] is None or order[field] == '':
                     has_null_critical = True
-                    break
+                    null_fields_in_order.append(field)
             
             if has_null_critical:
                 orders_with_null_fields += 1
+                null_field_details.append(f"Order {i+1} (ID: {order.get('id', 'N/A')[:8]}...): {null_fields_in_order}")
+        
+        # Print details of null fields for debugging
+        if null_field_details:
+            print(f"   📋 Details of orders with null fields:")
+            for detail in null_field_details[:3]:  # Show first 3 for brevity
+                print(f"      {detail}")
         
         # Report results
         print(f"   📊 Orders with status_montagem: {orders_with_status_montagem}/{total_orders}")
