@@ -5254,6 +5254,33 @@ class BusinessManagementSystemTester:
         
         return production_success
 
+    def print_final_results(self):
+        """Print final test results"""
+        print(f"\n📊 RESULTADOS FINAIS:")
+        print(f"Testes executados: {self.tests_run}")
+        print(f"Testes aprovados: {self.tests_passed}")
+        print(f"Testes falharam: {self.tests_run - self.tests_passed}")
+        
+        if self.tests_run > 0:
+            success_rate = (self.tests_passed / self.tests_run) * 100
+            print(f"Taxa de sucesso: {success_rate:.1f}%")
+            
+            if success_rate == 100:
+                print("🎉 TODOS OS TESTES PASSARAM!")
+            elif success_rate >= 90:
+                print("✅ SISTEMA MAJORITARIAMENTE FUNCIONAL")
+            elif success_rate >= 70:
+                print("⚠️ SISTEMA COM ALGUMAS FALHAS")
+            else:
+                print("❌ SISTEMA COM MUITAS FALHAS - NECESSITA CORREÇÕES")
+        
+        # Print failed tests if any
+        failed_tests = [test for test in self.test_results if not test['success']]
+        if failed_tests:
+            print(f"\n❌ TESTES QUE FALHARAM ({len(failed_tests)}):")
+            for test in failed_tests:
+                print(f"   • {test['name']}: {test['details']}")
+
     def print_summary(self):
         """Print test summary"""
         print(f"\n📊 Test Summary:")
