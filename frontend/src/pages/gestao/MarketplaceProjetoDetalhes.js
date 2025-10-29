@@ -933,7 +933,7 @@ export default function MarketplaceProjetoDetalhes() {
     try {
       // Importar jsPDF e autoTable dinamicamente
       const jsPDF = (await import('jspdf')).default;
-      const autoTable = (await import('jspdf-autotable')).default;
+      await import('jspdf-autotable');
       
       // Filtrar pedidos do setor
       const pedidosDoSetor = pedidos.filter(p => p.status_producao === nomeSetor);
