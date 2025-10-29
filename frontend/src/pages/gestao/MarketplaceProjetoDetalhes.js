@@ -931,12 +931,8 @@ export default function MarketplaceProjetoDetalhes() {
   };
 
   // 📄 GERAÇÃO DE PDF POR SETOR
-  const gerarPDFSetor = async (nomeSetor) => {
+  const gerarPDFSetor = (nomeSetor) => {
     try {
-      // Importar jsPDF e autoTable dinamicamente
-      const jsPDF = (await import('jspdf')).default;
-      await import('jspdf-autotable');
-      
       // Filtrar pedidos do setor
       const pedidosDoSetor = pedidos.filter(p => p.status_producao === nomeSetor);
       
