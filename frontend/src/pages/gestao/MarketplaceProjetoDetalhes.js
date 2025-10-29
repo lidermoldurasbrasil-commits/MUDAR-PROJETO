@@ -1304,8 +1304,8 @@ export default function MarketplaceProjetoDetalhes() {
     return dataPrevista < hoje; // Dias anteriores
   });
 
-  // Função de agrupamento
-  const pedidosAgrupados = () => {
+  // Função de agrupamento - MEMOIZADA para evitar recálculos
+  const pedidosAgrupados = useMemo(() => {
     // Decidir qual lista de pedidos usar baseado no viewMode
     const listaPedidos = viewMode === 'pedidos-antigos' ? pedidosAntigos : 
                          (viewMode === 'producao' || viewMode === 'financeiro') ? pedidosAtuais : 
@@ -1340,7 +1340,7 @@ export default function MarketplaceProjetoDetalhes() {
     }
     
     return { 'Todos': listaPedidos };
-  };
+  }, [viewMode, pedidosAntigos, pedidosAtuais, pedidosFiltrados, agruparPor]);
 
   // Agrupar pedidos por status para o Kanban
   const pedidosPorStatus = STATUS_OPTIONS.reduce((acc, status) => {
