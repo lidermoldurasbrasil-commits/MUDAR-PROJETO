@@ -5287,6 +5287,248 @@ class BusinessManagementSystemTester:
         
         return True
 
+    def test_marketplace_filters(self):
+        """Test marketplace order filters as requested by user"""
+        print("\n🔍 TESTING MARKETPLACE ORDER FILTERS...")
+        print("📋 Testing status_producao, status_logistica, status_montagem filters")
+        
+        # Step 1: Login with director credentials
+        print("\n📋 Step 1: Login with director credentials...")
+        login_success, login_response = self.run_test(
+            "Login Director for Filter Test",
+            "POST",
+            "auth/login",
+            200,
+            data={
+                "username": "diretor",
+                "password": "123"
+            }
+        )
+        
+        if not login_success or 'access_token' not in login_response:
+            print("❌ CRITICAL: Failed to login with director credentials")
+            self.log_test("Marketplace Filters Test", False, "Failed to login")
+            return False
+        
+        # Update token for subsequent requests
+        self.token = login_response['access_token']
+        print("✅ Login successful")
+        
+        # Step 2: Get shopee project ID
+        print("\n📋 Step 2: Getting Shopee project ID...")
+        success_projects, projects_response = self.run_test(
+            "Get Marketplace Projects",
+            "GET",
+            "gestao/marketplaces/projetos",
+            200
+        )
+        
+        if not success_projects or not isinstance(projects_response, list):
+            print("❌ CRITICAL: Failed to get marketplace projects")
+            self.log_test("Marketplace Filters Test", False, "Failed to get projects")
+            return False
+        
+        # Find Shopee project
+        shopee_project_id = None
+        for project in projects_response:
+            if 'shopee' in project.get('id', '').lower() or 'shopee' in project.get('nome', '').lower():
+                shopee_project_id = project.get('id')
+                break
+        
+        if not shopee_project_id:
+            print("❌ CRITICAL: Shopee project not found")
+            self.log_test("Marketplace Filters Test", False, "Shopee project not found")
+            return False
+        
+        print(f"✅ Found Shopee project ID: {shopee_project_id}")
+        
+        # Step 3: Test Filter by Status Produção (Setor)
+        print("\n📋 Step 3: Testing Filter by Status Produção (Molduras)...")
+        success_filter1, filter1_response = self.run_test(
+            "Filter by Status Produção - Molduras",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={shopee_project_id}&status_producao=Molduras",
+            200
+        )
+        
+        filter1_valid = False
+        if success_filter1 and isinstance(filter1_response, list):
+            print(f"✅ Filter by status_producao returned {len(filter1_response)} orders")
+            
+            # Verify all returned orders have status_producao = "Molduras"
+            all_molduras = True
+            for order in filter1_response:
+                if order.get('status_producao') != 'Molduras':
+                    all_molduras = False
+                    print(f"❌ Order {order.get('numero_pedido', 'N/A')} has status_producao: {order.get('status_producao')}")
+                    break
+            
+            if all_molduras and len(filter1_response) > 0:
+                print("✅ All returned orders have status_producao = 'Molduras'")
+                filter1_valid = True
+                self.log_test("Filter Status Produção - Molduras", True)
+            elif len(filter1_response) == 0:
+                print("⚠️ No orders found with status_producao = 'Molduras' (may be expected)")
+                filter1_valid = True  # Empty result is valid if no matching orders exist
+                self.log_test("Filter Status Produção - Molduras", True, "No matching orders found")
+            else:
+                print("❌ Some orders don't match the filter criteria")
+                self.log_test("Filter Status Produção - Molduras", False, "Filter not working correctly")
+        else:
+            print("❌ Filter by status_producao failed")
+            self.log_test("Filter Status Produção - Molduras", False, "Request failed")
+        
+        # Step 4: Test Filter by Status Logística
+        print("\n📋 Step 4: Testing Filter by Status Logística (Aguardando)...")
+        success_filter2, filter2_response = self.run_test(
+            "Filter by Status Logística - Aguardando",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={shopee_project_id}&status_logistica=Aguardando",
+            200
+        )
+        
+        filter2_valid = False
+        if success_filter2 and isinstance(filter2_response, list):
+            print(f"✅ Filter by status_logistica returned {len(filter2_response)} orders")
+            
+            # Verify all returned orders have status_logistica = "Aguardando"
+            all_aguardando = True
+            for order in filter2_response:
+                if order.get('status_logistica') != 'Aguardando':
+                    all_aguardando = False
+                    print(f"❌ Order {order.get('numero_pedido', 'N/A')} has status_logistica: {order.get('status_logistica')}")
+                    break
+            
+            if all_aguardando and len(filter2_response) > 0:
+                print("✅ All returned orders have status_logistica = 'Aguardando'")
+                filter2_valid = True
+                self.log_test("Filter Status Logística - Aguardando", True)
+            elif len(filter2_response) == 0:
+                print("⚠️ No orders found with status_logistica = 'Aguardando' (may be expected)")
+                filter2_valid = True  # Empty result is valid if no matching orders exist
+                self.log_test("Filter Status Logística - Aguardando", True, "No matching orders found")
+            else:
+                print("❌ Some orders don't match the filter criteria")
+                self.log_test("Filter Status Logística - Aguardando", False, "Filter not working correctly")
+        else:
+            print("❌ Filter by status_logistica failed")
+            self.log_test("Filter Status Logística - Aguardando", False, "Request failed")
+        
+        # Step 5: Test Filter by Status Montagem
+        print("\n📋 Step 5: Testing Filter by Status Montagem (Aguardando Montagem)...")
+        success_filter3, filter3_response = self.run_test(
+            "Filter by Status Montagem - Aguardando Montagem",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={shopee_project_id}&status_montagem=Aguardando Montagem",
+            200
+        )
+        
+        filter3_valid = False
+        if success_filter3 and isinstance(filter3_response, list):
+            print(f"✅ Filter by status_montagem returned {len(filter3_response)} orders")
+            
+            # Verify all returned orders have status_montagem = "Aguardando Montagem"
+            all_aguardando_montagem = True
+            for order in filter3_response:
+                if order.get('status_montagem') != 'Aguardando Montagem':
+                    all_aguardando_montagem = False
+                    print(f"❌ Order {order.get('numero_pedido', 'N/A')} has status_montagem: {order.get('status_montagem')}")
+                    break
+            
+            if all_aguardando_montagem and len(filter3_response) > 0:
+                print("✅ All returned orders have status_montagem = 'Aguardando Montagem'")
+                filter3_valid = True
+                self.log_test("Filter Status Montagem - Aguardando Montagem", True)
+            elif len(filter3_response) == 0:
+                print("⚠️ No orders found with status_montagem = 'Aguardando Montagem' (may be expected)")
+                filter3_valid = True  # Empty result is valid if no matching orders exist
+                self.log_test("Filter Status Montagem - Aguardando Montagem", True, "No matching orders found")
+            else:
+                print("❌ Some orders don't match the filter criteria")
+                self.log_test("Filter Status Montagem - Aguardando Montagem", False, "Filter not working correctly")
+        else:
+            print("❌ Filter by status_montagem failed")
+            self.log_test("Filter Status Montagem - Aguardando Montagem", False, "Request failed")
+        
+        # Step 6: Test Combined Filters
+        print("\n📋 Step 6: Testing Combined Filters...")
+        success_filter4, filter4_response = self.run_test(
+            "Combined Filters - Multiple Status",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={shopee_project_id}&status_producao=Molduras&status_logistica=Aguardando&status_montagem=Aguardando Montagem",
+            200
+        )
+        
+        filter4_valid = False
+        if success_filter4 and isinstance(filter4_response, list):
+            print(f"✅ Combined filters returned {len(filter4_response)} orders")
+            
+            # Verify all returned orders match ALL filter criteria
+            all_match = True
+            for order in filter4_response:
+                if (order.get('status_producao') != 'Molduras' or 
+                    order.get('status_logistica') != 'Aguardando' or 
+                    order.get('status_montagem') != 'Aguardando Montagem'):
+                    all_match = False
+                    print(f"❌ Order {order.get('numero_pedido', 'N/A')} doesn't match all criteria:")
+                    print(f"   status_producao: {order.get('status_producao')} (expected: Molduras)")
+                    print(f"   status_logistica: {order.get('status_logistica')} (expected: Aguardando)")
+                    print(f"   status_montagem: {order.get('status_montagem')} (expected: Aguardando Montagem)")
+                    break
+            
+            if all_match:
+                print("✅ All returned orders match combined filter criteria")
+                filter4_valid = True
+                self.log_test("Combined Filters - Multiple Status", True)
+            else:
+                print("❌ Some orders don't match combined filter criteria")
+                self.log_test("Combined Filters - Multiple Status", False, "Combined filters not working correctly")
+        else:
+            print("❌ Combined filters failed")
+            self.log_test("Combined Filters - Multiple Status", False, "Request failed")
+        
+        # Step 7: Test No Filters (baseline)
+        print("\n📋 Step 7: Testing baseline (no filters)...")
+        success_baseline, baseline_response = self.run_test(
+            "Baseline - No Filters",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={shopee_project_id}",
+            200
+        )
+        
+        baseline_valid = False
+        if success_baseline and isinstance(baseline_response, list):
+            print(f"✅ Baseline query returned {len(baseline_response)} total orders")
+            baseline_valid = True
+            self.log_test("Baseline - No Filters", True)
+        else:
+            print("❌ Baseline query failed")
+            self.log_test("Baseline - No Filters", False, "Request failed")
+        
+        # Overall result
+        all_filters_valid = filter1_valid and filter2_valid and filter3_valid and filter4_valid and baseline_valid
+        
+        if all_filters_valid:
+            print("\n✅ ALL MARKETPLACE FILTER TESTS PASSED!")
+            print("✅ status_producao filter working correctly")
+            print("✅ status_logistica filter working correctly") 
+            print("✅ status_montagem filter working correctly")
+            print("✅ Combined filters working correctly")
+            self.log_test("Marketplace Filters - OVERALL", True)
+        else:
+            failed_filters = []
+            if not filter1_valid: failed_filters.append("status_producao")
+            if not filter2_valid: failed_filters.append("status_logistica")
+            if not filter3_valid: failed_filters.append("status_montagem")
+            if not filter4_valid: failed_filters.append("combined")
+            if not baseline_valid: failed_filters.append("baseline")
+            
+            print(f"\n❌ MARKETPLACE FILTER TESTS FAILED!")
+            print(f"❌ Failed filters: {', '.join(failed_filters)}")
+            self.log_test("Marketplace Filters - OVERALL", False, f"Failed filters: {', '.join(failed_filters)}")
+        
+        return all_filters_valid
+
     def run_all_tests(self):
         """Run all test suites"""
         print("🚀 Starting Business Management System Tests...")
