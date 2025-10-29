@@ -18,6 +18,7 @@ const frasesDoDia = [
 export default function Layout({ user, onLogout }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Verificar se usuário é production
   const isProduction = user?.role === 'production';
