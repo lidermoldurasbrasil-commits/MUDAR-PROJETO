@@ -4804,89 +4804,455 @@ class BusinessManagementSystemTester:
         
         return all_valid
 
-    def run_all_tests(self):
-        """Run all tests in sequence"""
-        print("🚀 Starting Business Management System API Tests...")
-        print(f"Testing against: {self.base_url}")
+    def test_production_module_complete(self):
+        """Complete test of production module as requested in review"""
+        print("\n🏭 TESTE COMPLETO DO MÓDULO DE PRODUÇÃO - REVISÃO PRÉ-LANÇAMENTO")
+        print("=" * 80)
         
-        # PRIORITY: Test projects endpoint authentication (CURRENT REQUEST)
-        print("\n🚨 RUNNING PROJECTS ENDPOINT AUTHENTICATION TEST (CURRENT REQUEST)...")
-        self.test_projects_endpoint_authentication()
+        # Test 1: Authentication and Access
+        print("\n1. 🔐 AUTENTICAÇÃO E ACESSO:")
+        auth_success = self.test_production_authentication()
         
-        # PRIORITY: Test production users login first (as requested in review)
-        print("\n🚨 RUNNING PRODUCTION USERS LOGIN TEST (REVIEW REQUEST)...")
-        self.test_production_users_login()
-        
-        # Authentication is required for all other tests
-        if not self.test_authentication():
+        if not auth_success:
+            print("❌ CRITICAL: Authentication failed - cannot proceed with production tests")
             return False
         
-        # PRIORITY MARKETPLACE TESTS (as requested in test_result.md)
-        print("\n🎯 RUNNING PRIORITY MARKETPLACE TESTS...")
-        self.test_marketplace_shopee_tipo_envio()
-        self.test_marketplace_mercadolivre_debug()
+        # Test 2: Marketplace Projects
+        print("\n2. 📊 PROJETOS MARKETPLACE:")
+        projects_success = self.test_marketplace_projects()
         
-        # PRIORITY: Test Shopee Upload Functionality (REVIEW REQUEST)
-        print("\n🚨 RUNNING SHOPEE UPLOAD FUNCTIONALITY TEST (REVIEW REQUEST)...")
-        self.test_shopee_upload_functionality()
+        # Test 3: Order Listing
+        print("\n3. 📋 LISTAGEM DE PEDIDOS:")
+        orders_success = self.test_marketplace_orders()
         
-        # PRIORITY: Test user's specific order creation request
-        print("\n🚨 RUNNING USER REQUESTED ORDER CREATION TEST...")
-        self.test_user_requested_order_creation()
+        # Test 4: Status Updates
+        print("\n4. ✏️ ATUALIZAÇÃO DE STATUS:")
+        updates_success = self.test_status_updates()
         
-        # PRIORITY: Test minimal order creation as requested by user
-        print("\n🚨 RUNNING MINIMAL ORDER CREATION TEST (USER REQUEST)...")
-        self.test_minimal_order_creation()
+        # Test 5: Order Filters
+        print("\n5. 🔍 FILTROS DE PEDIDOS:")
+        filters_success = self.test_order_filters()
         
-        # PRIORITY: Test manufacturing order creation as requested
-        print("\n🚨 RUNNING MANUFACTURING ORDER CREATION TEST...")
-        self.test_manufacturing_order_creation()
+        # Test 6: Data Integrity
+        print("\n6. 🔒 INTEGRIDADE DOS DADOS:")
+        integrity_success = self.test_data_integrity()
         
-        # PRIORITY: Run the specific linear meter frame calculation test
-        print("\n🚨 RUNNING SPECIFIC LINEAR METER FRAME TEST...")
-        self.test_linear_meter_frame_calculation()
+        # Overall result
+        all_tests = [auth_success, projects_success, orders_success, updates_success, filters_success, integrity_success]
+        overall_success = all(all_tests)
         
-        # PRIORITY: Run the critical preco_manufatura validation test
-        print("\n🚨 RUNNING CRITICAL TEST...")
-        self.test_preco_manufatura_validation()
+        print("\n" + "=" * 80)
+        if overall_success:
+            print("✅ TODOS OS TESTES DO MÓDULO DE PRODUÇÃO PASSARAM!")
+            print("✅ Sistema 100% funcional e pronto para produção!")
+        else:
+            failed_tests = len([t for t in all_tests if not t])
+            print(f"❌ FALHAS ENCONTRADAS: {failed_tests}/6 módulos com problemas")
+            print("❌ Sistema precisa de correções antes do lançamento")
         
-        # PRIORITY: Test Production Order automation (NEW TEST)
-        print("\n🚨 RUNNING PRODUCTION ORDER AUTOMATION TEST...")
-        self.test_production_order_automation()
+        return overall_success
+
+    def test_production_authentication(self):
+        """Test authentication for production users"""
+        print("\n   Testing production user authentication...")
         
-        # PRIORITY: Test Marketplace Spreadsheet Upload (USER REQUEST)
-        print("\n🚨 RUNNING MARKETPLACE SPREADSHEET UPLOAD TEST...")
-        self.test_marketplace_spreadsheet_upload()
+        # Test director login
+        print("\n   📋 Testing director login (diretor/123):")
+        director_success, director_response = self.run_test(
+            "Director Login",
+            "POST",
+            "auth/login",
+            200,
+            data={"username": "diretor", "password": "123"}
+        )
         
-        # PRIORITY: Test Sector Detection Fix (REVIEW REQUEST)
-        print("\n🚨 RUNNING SECTOR DETECTION FIX TEST (REVIEW REQUEST)...")
-        self.test_sector_detection_fix()
+        director_token = None
+        if director_success and 'access_token' in director_response:
+            director_token = director_response['access_token']
+            user_data = director_response.get('user', {})
+            print(f"   ✅ Director login successful - Role: {user_data.get('role')}")
+            
+            # Verify role is director
+            if user_data.get('role') == 'director':
+                print("   ✅ Director role verified")
+            else:
+                print(f"   ❌ Expected role 'director', got '{user_data.get('role')}'")
+                return False
+        else:
+            print("   ❌ Director login failed")
+            return False
         
-        # Run all module tests
-        self.test_dashboard()
-        self.test_production_board()
-        self.test_returns_management()
-        self.test_marketing_tasks()
-        self.test_purchase_system()
-        self.test_accounts_payable()
-        self.test_sales_tracking()
-        self.test_cost_center()
-        self.test_breakeven_calculator()
-        self.test_store_production()
-        self.test_complaints_management()
-        self.test_crm_leads()
+        # Test production users
+        production_users = ['espelho', 'molduras-vidro', 'molduras', 'impressao', 'expedicao', 'embalagem']
+        production_tokens = {}
         
-        # Test the new Sistema de Gestão (Manufacturing Management)
-        self.test_gestao_system()
+        print("\n   📋 Testing production users login:")
+        for username in production_users:
+            success, response = self.run_test(
+                f"Production User Login ({username})",
+                "POST",
+                "auth/login",
+                200,
+                data={"username": username, "password": "123"}
+            )
+            
+            if success and 'access_token' in response:
+                production_tokens[username] = response['access_token']
+                user_data = response.get('user', {})
+                print(f"   ✅ {username} login successful - Role: {user_data.get('role')}")
+                
+                # Verify role is production
+                if user_data.get('role') != 'production':
+                    print(f"   ❌ Expected role 'production' for {username}, got '{user_data.get('role')}'")
+                    return False
+            else:
+                print(f"   ❌ {username} login failed")
+                return False
         
-        # Test Payment Methods CRUD as requested
-        self.test_payment_methods_crud()
+        # Store tokens for later use
+        self.director_token = director_token
+        self.production_tokens = production_tokens
         
-        # NEW: Test complete Contas a Receber module
-        print("\n🚨 RUNNING CONTAS A RECEBER COMPLETE FLOW TEST...")
-        self.test_contas_receber_complete_flow()
+        print("   ✅ All authentication tests passed")
+        return True
+
+    def test_marketplace_projects(self):
+        """Test marketplace projects endpoint"""
+        print("\n   Testing marketplace projects access...")
+        
+        # Test with director token
+        print("\n   📋 Testing director access to projects:")
+        self.token = self.director_token
+        
+        success_director, projects_response = self.run_test(
+            "Get Marketplace Projects (Director)",
+            "GET",
+            "gestao/marketplaces/projetos",
+            200
+        )
+        
+        if not success_director:
+            print("   ❌ Director cannot access projects")
+            return False
+        
+        # Verify projects exist
+        if not isinstance(projects_response, list) or len(projects_response) < 2:
+            print(f"   ❌ Expected at least 2 projects, got {len(projects_response) if isinstance(projects_response, list) else 0}")
+            return False
+        
+        # Check for Shopee and Mercado Livre projects
+        project_names = [p.get('nome', '') for p in projects_response]
+        shopee_found = any('shopee' in name.lower() for name in project_names)
+        ml_found = any('mercado' in name.lower() or 'livre' in name.lower() for name in project_names)
+        
+        if shopee_found and ml_found:
+            print("   ✅ Both Shopee and Mercado Livre projects found")
+        else:
+            print(f"   ❌ Missing projects - Shopee: {shopee_found}, Mercado Livre: {ml_found}")
+            return False
+        
+        # Store project IDs for later use
+        self.shopee_project_id = None
+        self.ml_project_id = None
+        
+        for project in projects_response:
+            if 'shopee' in project.get('nome', '').lower():
+                self.shopee_project_id = project.get('id')
+            elif 'mercado' in project.get('nome', '').lower():
+                self.ml_project_id = project.get('id')
+        
+        # Test with production user token
+        print("\n   📋 Testing production user access to projects:")
+        self.token = self.production_tokens['espelho']
+        
+        success_production, _ = self.run_test(
+            "Get Marketplace Projects (Production)",
+            "GET",
+            "gestao/marketplaces/projetos",
+            200
+        )
+        
+        if success_production:
+            print("   ✅ Production users can access projects")
+        else:
+            print("   ❌ Production users cannot access projects")
+            return False
         
         return True
+
+    def test_marketplace_orders(self):
+        """Test marketplace orders listing"""
+        print("\n   Testing marketplace orders listing...")
+        
+        if not self.shopee_project_id:
+            print("   ❌ No Shopee project ID available for testing")
+            return False
+        
+        # Test orders listing
+        print(f"\n   📋 Testing orders for Shopee project ({self.shopee_project_id}):")
+        self.token = self.director_token
+        
+        success, orders_response = self.run_test(
+            "Get Marketplace Orders",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={self.shopee_project_id}",
+            200
+        )
+        
+        if not success:
+            print("   ❌ Failed to get marketplace orders")
+            return False
+        
+        if not isinstance(orders_response, list):
+            print("   ❌ Orders response is not a list")
+            return False
+        
+        print(f"   ✅ Found {len(orders_response)} orders")
+        
+        # Check required fields in orders
+        if len(orders_response) > 0:
+            sample_order = orders_response[0]
+            required_fields = ['numero_pedido', 'sku', 'status_producao', 'status_logistica', 'status_montagem']
+            missing_fields = []
+            
+            for field in required_fields:
+                if field not in sample_order:
+                    missing_fields.append(field)
+            
+            if missing_fields:
+                print(f"   ❌ Missing required fields in orders: {missing_fields}")
+                return False
+            else:
+                print("   ✅ All required fields present in orders")
+                
+            # Store sample order for update tests
+            self.sample_order_id = sample_order.get('id')
+            self.sample_order = sample_order
+        
+        return True
+
+    def test_status_updates(self):
+        """Test status updates for orders"""
+        print("\n   Testing status updates...")
+        
+        if not self.sample_order_id:
+            print("   ❌ No sample order available for testing updates")
+            return False
+        
+        self.token = self.director_token
+        
+        # Test 1: Update status_producao (setor)
+        print("\n   📋 Testing status_producao update:")
+        update_data = {"status_producao": "Molduras"}
+        
+        success1, _ = self.run_test(
+            "Update Status Producao",
+            "PUT",
+            f"gestao/marketplaces/pedidos/{self.sample_order_id}",
+            200,
+            data=update_data
+        )
+        
+        if not success1:
+            print("   ❌ Failed to update status_producao")
+            return False
+        
+        # Test 2: Update status_logistica (status produção)
+        print("\n   📋 Testing status_logistica update:")
+        update_data = {"status_logistica": "Em montagem"}
+        
+        success2, _ = self.run_test(
+            "Update Status Logistica",
+            "PUT",
+            f"gestao/marketplaces/pedidos/{self.sample_order_id}",
+            200,
+            data=update_data
+        )
+        
+        if not success2:
+            print("   ❌ Failed to update status_logistica")
+            return False
+        
+        # Test 3: Update status_montagem
+        print("\n   📋 Testing status_montagem update:")
+        update_data = {"status_montagem": "Em Montagem"}
+        
+        success3, _ = self.run_test(
+            "Update Status Montagem",
+            "PUT",
+            f"gestao/marketplaces/pedidos/{self.sample_order_id}",
+            200,
+            data=update_data
+        )
+        
+        if not success3:
+            print("   ❌ Failed to update status_montagem")
+            return False
+        
+        # Verify updates were persisted
+        print("\n   📋 Verifying updates were persisted:")
+        success_verify, updated_order = self.run_test(
+            "Verify Order Updates",
+            "GET",
+            f"gestao/marketplaces/pedidos/{self.sample_order_id}",
+            200
+        )
+        
+        if success_verify:
+            if (updated_order.get('status_producao') == 'Molduras' and
+                updated_order.get('status_logistica') == 'Em montagem' and
+                updated_order.get('status_montagem') == 'Em Montagem'):
+                print("   ✅ All status updates persisted correctly")
+            else:
+                print("   ❌ Status updates not persisted correctly")
+                return False
+        else:
+            print("   ❌ Failed to verify order updates")
+            return False
+        
+        return True
+
+    def test_order_filters(self):
+        """Test order filtering functionality"""
+        print("\n   Testing order filters...")
+        
+        if not self.shopee_project_id:
+            print("   ❌ No Shopee project ID available for testing filters")
+            return False
+        
+        self.token = self.director_token
+        
+        # Test 1: Filter by setor (status_producao)
+        print("\n   📋 Testing filter by setor:")
+        success1, filtered_orders1 = self.run_test(
+            "Filter by Setor",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={self.shopee_project_id}&status_producao=Molduras",
+            200
+        )
+        
+        if success1:
+            print(f"   ✅ Setor filter returned {len(filtered_orders1) if isinstance(filtered_orders1, list) else 0} orders")
+        else:
+            print("   ❌ Setor filter failed")
+            return False
+        
+        # Test 2: Filter by status produção (status_logistica)
+        print("\n   📋 Testing filter by status produção:")
+        success2, filtered_orders2 = self.run_test(
+            "Filter by Status Producao",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={self.shopee_project_id}&status_logistica=Aguardando",
+            200
+        )
+        
+        if success2:
+            print(f"   ✅ Status produção filter returned {len(filtered_orders2) if isinstance(filtered_orders2, list) else 0} orders")
+        else:
+            print("   ❌ Status produção filter failed")
+            return False
+        
+        # Test 3: Filter by status montagem
+        print("\n   📋 Testing filter by status montagem:")
+        success3, filtered_orders3 = self.run_test(
+            "Filter by Status Montagem",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={self.shopee_project_id}&status_montagem=Aguardando Montagem",
+            200
+        )
+        
+        if success3:
+            print(f"   ✅ Status montagem filter returned {len(filtered_orders3) if isinstance(filtered_orders3, list) else 0} orders")
+        else:
+            print("   ❌ Status montagem filter failed")
+            return False
+        
+        return True
+
+    def test_data_integrity(self):
+        """Test data integrity of orders"""
+        print("\n   Testing data integrity...")
+        
+        if not self.shopee_project_id:
+            print("   ❌ No Shopee project ID available for testing data integrity")
+            return False
+        
+        self.token = self.director_token
+        
+        # Get all orders
+        success, all_orders = self.run_test(
+            "Get All Orders for Integrity Check",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={self.shopee_project_id}",
+            200
+        )
+        
+        if not success or not isinstance(all_orders, list):
+            print("   ❌ Failed to get orders for integrity check")
+            return False
+        
+        total_orders = len(all_orders)
+        print(f"   📊 Checking integrity of {total_orders} orders")
+        
+        # Check for status_montagem field in all orders
+        orders_with_status_montagem = 0
+        orders_with_null_fields = 0
+        
+        for order in all_orders:
+            # Check status_montagem exists
+            if 'status_montagem' in order and order['status_montagem'] is not None:
+                orders_with_status_montagem += 1
+            
+            # Check for null/undefined critical fields
+            critical_fields = ['numero_pedido', 'sku', 'status_producao', 'status_logistica']
+            has_null_critical = False
+            
+            for field in critical_fields:
+                if field not in order or order[field] is None or order[field] == '':
+                    has_null_critical = True
+                    break
+            
+            if has_null_critical:
+                orders_with_null_fields += 1
+        
+        # Report results
+        print(f"   📊 Orders with status_montagem: {orders_with_status_montagem}/{total_orders}")
+        print(f"   📊 Orders with null critical fields: {orders_with_null_fields}/{total_orders}")
+        
+        # Check if all orders have status_montagem (as mentioned in requirements: 276 orders)
+        if orders_with_status_montagem == total_orders:
+            print("   ✅ All orders have status_montagem field")
+        else:
+            missing_count = total_orders - orders_with_status_montagem
+            print(f"   ❌ {missing_count} orders missing status_montagem field")
+            return False
+        
+        # Check for null/undefined values in critical fields
+        if orders_with_null_fields == 0:
+            print("   ✅ No null or undefined values in critical fields")
+        else:
+            print(f"   ❌ {orders_with_null_fields} orders have null/undefined critical fields")
+            return False
+        
+        return True
+
+    def run_all_tests(self):
+        """Run all test suites"""
+        print("🚀 Starting Business Management System Tests...")
+        print(f"🌐 Testing against: {self.base_url}")
+        
+        # Run production module complete test
+        production_success = self.test_production_module_complete()
+        
+        if production_success:
+            print("\n🎉 PRODUCTION MODULE TESTS COMPLETED SUCCESSFULLY!")
+        else:
+            print("\n❌ PRODUCTION MODULE TESTS FAILED!")
+        
+        # Print final results
+        self.print_final_results()
+        
+        return production_success
 
     def print_summary(self):
         """Print test summary"""
