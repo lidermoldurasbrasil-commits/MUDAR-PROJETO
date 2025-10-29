@@ -1100,14 +1100,6 @@ export default function MarketplaceProjetoDetalhes() {
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
       
-      const totalPedidos = pedidosDoSetor.length;
-      const totalQuantidade = pedidosDoSetor.reduce((sum, p) => sum + (parseInt(p.quantidade) || 0), 0);
-      const totalSKUs = Object.keys(pedidosPorSKU).length;
-      const aguardando = pedidosDoSetor.filter(p => p.status_logistica === 'Aguardando').length;
-      const emMontagem = pedidosDoSetor.filter(p => p.status_logistica === 'Em montagem').length;
-      const imprimindo = pedidosDoSetor.filter(p => p.status_logistica === 'Imprimindo').length;
-      const impresso = pedidosDoSetor.filter(p => p.status_logistica === 'Impresso').length;
-      
       doc.text(`Total de SKUs diferentes: ${totalSKUs}`, 25, yPosition);
       yPosition += 6;
       doc.text(`Total de Pedidos: ${totalPedidos}`, 25, yPosition);
