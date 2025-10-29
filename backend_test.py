@@ -5035,15 +5035,27 @@ class BusinessManagementSystemTester:
         """Test status updates for orders"""
         print("\n   Testing status updates...")
         
-        if not self.sample_order_id:
+        if not self.sample_order_id or not self.sample_order:
             print("   ❌ No sample order available for testing updates")
             return False
         
         self.token = self.director_token
         
+        # Create complete update data with required fields from the sample order
+        base_update_data = {
+            "projeto_id": self.sample_order.get('projeto_id', self.shopee_project_id),
+            "plataforma": self.sample_order.get('plataforma', 'shopee'),
+            "numero_pedido": self.sample_order.get('numero_pedido', 'TEST-001'),
+            "sku": self.sample_order.get('sku', 'TEST-SKU'),
+            "status_producao": self.sample_order.get('status_producao', 'Espelho'),
+            "status_logistica": self.sample_order.get('status_logistica', 'Aguardando'),
+            "status_montagem": self.sample_order.get('status_montagem', 'Aguardando Montagem')
+        }
+        
         # Test 1: Update status_producao (setor)
         print("\n   📋 Testing status_producao update:")
-        update_data = {"status_producao": "Molduras"}
+        update_data = base_update_data.copy()
+        update_data["status_producao"] = "Molduras"
         
         success1, _ = self.run_test(
             "Update Status Producao",
@@ -5059,7 +5071,9 @@ class BusinessManagementSystemTester:
         
         # Test 2: Update status_logistica (status produção)
         print("\n   📋 Testing status_logistica update:")
-        update_data = {"status_logistica": "Em montagem"}
+        update_data = base_update_data.copy()
+        update_data["status_producao"] = "Molduras"  # Keep previous update
+        update_data["status_logistica"] = "Em montagem"
         
         success2, _ = self.run_test(
             "Update Status Logistica",
@@ -5075,7 +5089,10 @@ class BusinessManagementSystemTester:
         
         # Test 3: Update status_montagem
         print("\n   📋 Testing status_montagem update:")
-        update_data = {"status_montagem": "Em Montagem"}
+        update_data = base_update_data.copy()
+        update_data["status_producao"] = "Molduras"  # Keep previous updates
+        update_data["status_logistica"] = "Em montagem"
+        update_data["status_montagem"] = "Em Montagem"
         
         success3, _ = self.run_test(
             "Update Status Montagem",
@@ -5089,22 +5106,36 @@ class BusinessManagementSystemTester:
             print("   ❌ Failed to update status_montagem")
             return False
         
-        # Verify updates were persisted
+        # Verify updates were persisted by getting the specific order
         print("\n   📋 Verifying updates were persisted:")
-        success_verify, updated_order = self.run_test(
+        success_verify, orders_list = self.run_test(
             "Verify Order Updates",
             "GET",
-            f"gestao/marketplaces/pedidos/{self.sample_order_id}",
+            f"gestao/marketplaces/pedidos?projeto_id={self.shopee_project_id}",
             200
         )
         
-        if success_verify:
-            if (updated_order.get('status_producao') == 'Molduras' and
-                updated_order.get('status_logistica') == 'Em montagem' and
-                updated_order.get('status_montagem') == 'Em Montagem'):
-                print("   ✅ All status updates persisted correctly")
+        if success_verify and isinstance(orders_list, list):
+            # Find our updated order
+            updated_order = None
+            for order in orders_list:
+                if order.get('id') == self.sample_order_id:
+                    updated_order = order
+                    break
+            
+            if updated_order:
+                if (updated_order.get('status_producao') == 'Molduras' and
+                    updated_order.get('status_logistica') == 'Em montagem' and
+                    updated_order.get('status_montagem') == 'Em Montagem'):
+                    print("   ✅ All status updates persisted correctly")
+                else:
+                    print(f"   ❌ Status updates not persisted correctly:")
+                    print(f"      status_producao: {updated_order.get('status_producao')} (expected: Molduras)")
+                    print(f"      status_logistica: {updated_order.get('status_logistica')} (expected: Em montagem)")
+                    print(f"      status_montagem: {updated_order.get('status_montagem')} (expected: Em Montagem)")
+                    return False
             else:
-                print("   ❌ Status updates not persisted correctly")
+                print("   ❌ Updated order not found in response")
                 return False
         else:
             print("   ❌ Failed to verify order updates")
