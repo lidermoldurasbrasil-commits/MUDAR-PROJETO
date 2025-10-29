@@ -1570,7 +1570,7 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
             
             {expandedSections.distribuicaoSetor && (
-              <div className="grid grid-cols-4 gap-4 mt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mt-3">
                 {[
                   { nome: 'Espelho', emoji: '🪞', cor: '#3B82F6' },
                   { nome: 'Molduras com Vidro', emoji: '🖼️', cor: '#8B5CF6' },
@@ -1626,7 +1626,7 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
             
             {expandedSections.statusProducao && (
-              <div className="grid grid-cols-4 gap-4 mt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mt-3">
                 {[
                   { nome: 'Aguardando', emoji: '⏳', cor: '#94A3B8' },
                   { nome: 'Em montagem', emoji: '🔧', cor: '#F59E0B' },
@@ -1791,7 +1791,7 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
             
             {expandedSections.distribuicaoSetor && (
-              <div className="grid grid-cols-4 gap-4 mt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mt-3">
                 {[
                   { nome: 'Espelho', emoji: '🪞', cor: '#3B82F6' },
                   { nome: 'Molduras com Vidro', emoji: '🖼️', cor: '#8B5CF6' },
@@ -1847,7 +1847,7 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
             
             {expandedSections.statusProducao && (
-              <div className="grid grid-cols-4 gap-4 mt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mt-3">
                 {[
                   { nome: 'Aguardando', emoji: '⏳', cor: '#94A3B8' },
                   { nome: 'Em montagem', emoji: '🔧', cor: '#F59E0B' },
