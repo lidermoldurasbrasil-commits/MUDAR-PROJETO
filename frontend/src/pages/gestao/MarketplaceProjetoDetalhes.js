@@ -1475,6 +1475,7 @@ export default function MarketplaceProjetoDetalhes() {
             </div>
           </div>
         )}
+      </div>
 
       {/* Métricas Detalhadas - Mercado Livre */}
       {projeto?.plataforma === 'mercadolivre' && pedidos.length > 0 && (
