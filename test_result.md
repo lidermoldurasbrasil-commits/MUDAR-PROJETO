@@ -445,6 +445,18 @@ frontend:
           agent: "testing"
           comment: "✅ ENDPOINT DE PROJETOS MARKETPLACE TESTADO COM SUCESSO TOTAL! Executado teste completo conforme solicitação específica da revisão: 1) Login diretor (diretor/123) ✅ - Token JWT gerado corretamente, role 'director' verificado ✅ 2) GET /api/gestao/marketplaces/projetos com token diretor ✅ - Status 200 OK, retorna array com 2 projetos ✅ - Projeto Shopee presente (id: shopee-projeto) ✅ - Projeto Mercado Livre presente (id: mercadolivre-projeto) ✅ 3) Login usuário produção (espelho/123) ✅ - Token JWT gerado corretamente, role 'production' verificado ✅ 4) GET /api/gestao/marketplaces/projetos com token produção ✅ - Status 200 OK, retorna mesmos 2 projetos ✅ - Usuários production conseguem acessar projetos ✅ - Usuários director conseguem acessar projetos ✅. TODAS AS VALIDAÇÕES APROVADAS: Login retorna access_token e user, endpoint retorna status 200, array com 2+ projetos, ambos projetos presentes, ambos tipos de usuário conseguem acessar. Taxa de sucesso: 100% (4/4 testes). Sistema de projetos marketplace 100% funcional!"
 
+  - task: "Filtros de Status Marketplace (Backend)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ FILTROS MARKETPLACE TESTADOS COM SUCESSO TOTAL! Executado teste rápido pós-correção conforme solicitação específica do usuário. VALIDAÇÕES APROVADAS: 1) FILTRO STATUS PRODUÇÃO (SETOR): GET /api/gestao/marketplaces/pedidos?projeto_id=shopee-projeto&status_producao=Molduras retorna 20 pedidos, TODOS com status_producao='Molduras' ✅ 2) FILTRO STATUS LOGÍSTICA: GET /api/gestao/marketplaces/pedidos?projeto_id=shopee-projeto&status_logistica=Aguardando retorna 44 pedidos, TODOS com status_logistica='Aguardando' ✅ 3) FILTRO STATUS MONTAGEM: GET /api/gestao/marketplaces/pedidos?projeto_id=shopee-projeto&status_montagem=Aguardando Montagem retorna 43 pedidos, TODOS com status_montagem='Aguardando Montagem' ✅ 4) FILTROS COMBINADOS: Múltiplos filtros simultaneamente funcionando - retorna 17 pedidos que atendem TODOS os critérios ✅ 5) BASELINE: Sem filtros retorna 45 pedidos totais ✅. CRITÉRIOS DE SUCESSO ATENDIDOS: ✅ Todos os filtros retornam resultados corretos ✅ Filtros combinados funcionam ✅ Sem erros 500. Taxa sucesso: 100% (13/13 testes). Sistema de filtros 100% funcional e pronto para produção!"
+
   - task: "AI SKU Classification Frontend Integration"
     implemented: true
     working: "unknown"
