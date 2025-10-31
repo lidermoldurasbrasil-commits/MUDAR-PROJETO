@@ -13,24 +13,30 @@ export default function IntegradorML() {
   const [daysBack, setDaysBack] = useState(30);
 
   useEffect(() => {
-    checkConnectionStatus();
+    let mounted = true;
     
-    // Verificar se voltou do OAuth
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('ml_connected') === 'true') {
-      toast.success('✅ Mercado Livre conectado com sucesso!');
-      checkConnectionStatus();
-      window.history.replaceState({}, '', window.location.pathname);
-    } else if (params.get('ml_error')) {
-      toast.error(`Erro ao conectar: ${params.get('ml_error')}`);
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-    
-    // Cleanup ao desmontar
-    return () => {
-      setSyncing(false);
+    const init = async () => {
+      if (mounted) {
+        await checkConnectionStatus();
+        
+        // Verificar se voltou do OAuth
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('ml_connected') === 'true') {
+          toast.success('✅ Mercado Livre conectado com sucesso!');
+          window.history.replaceState({}, '', window.location.pathname);
+        } else if (params.get('ml_error')) {
+          toast.error(`Erro ao conectar: ${params.get('ml_error')}`);
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }
     };
-  }, []);
+    
+    init();
+    
+    return () => {
+      mounted = false;
+    };
+  }, [checkConnectionStatus]);
 
   const checkConnectionStatus = useCallback(async () => {
     try {
