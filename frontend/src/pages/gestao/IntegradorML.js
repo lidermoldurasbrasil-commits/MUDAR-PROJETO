@@ -116,7 +116,7 @@ export default function IntegradorML() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6" key="integrador-ml-page">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Integrador Mercado Livre</h1>
         <p className="text-gray-600">Conecte sua conta do Mercado Livre e sincronize pedidos automaticamente</p>
