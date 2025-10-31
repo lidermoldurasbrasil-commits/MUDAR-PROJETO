@@ -32,7 +32,7 @@ export default function IntegradorML() {
     };
   }, []);
 
-  const checkConnectionStatus = async () => {
+  const checkConnectionStatus = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(`${API}/integrator/mercadolivre/status`, {
@@ -45,9 +45,9 @@ export default function IntegradorML() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleConnect = async () => {
+  const handleConnect = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       console.log('🔍 Chamando endpoint:', `${API}/integrator/mercadolivre/auth-url`);
@@ -71,33 +71,28 @@ export default function IntegradorML() {
       const errorMsg = error.response?.data?.detail || error.message || 'Erro ao iniciar conexão com Mercado Livre';
       toast.error(errorMsg);
     }
-  };
+  }, []);
 
-  const handleSync = async () => {
-    if (syncing) return; // Prevenir múltiplos cliques
+  const handleSync = useCallback(async () => {
+    if (syncing) return;
     
     setSyncing(true);
     
     try {
       const token = localStorage.getItem('token');
-      toast.info('⏳ Iniciando sincronização... Isso pode levar alguns minutos.');
+      toast.info('⏳ Iniciando sincronização...');
       
       const response = await axios.post(
         `${API}/integrator/mercadolivre/sync`,
         { days_back: parseInt(daysBack) },
         {
           headers: { Authorization: `Bearer ${token}` },
-          timeout: 120000 // 120 segundos
+          timeout: 120000
         }
       );
       
       if (response.data.success) {
-        toast.success(`✅ ${response.data.orders_synced} pedidos sincronizados com sucesso!`);
-        
-        // Aguardar um pouco antes de atualizar status
-        setTimeout(() => {
-          checkConnectionStatus();
-        }, 1000);
+        toast.success(`✅ ${response.data.orders_synced} pedidos sincronizados!`);
       }
     } catch (error) {
       console.error('Erro ao sincronizar:', error);
@@ -106,16 +101,15 @@ export default function IntegradorML() {
     } finally {
       setSyncing(false);
     }
-  };
+  }, [syncing, daysBack]);
 
-  const handleImport = async () => {
+  const handleImport = useCallback(async () => {
     if (importing) return;
     
     setImporting(true);
     
     try {
       const token = localStorage.getItem('token');
-      toast.info('📦 Importando pedidos para o sistema...');
       
       const response = await axios.post(
         `${API}/integrator/mercadolivre/import-to-system`,
@@ -127,24 +121,21 @@ export default function IntegradorML() {
       );
       
       if (response.data.success) {
-        toast.success(response.data.message);
-        
-        if (response.data.imported_count > 0) {
-          setTimeout(() => {
-            toast.info(`Ir para Marketplaces para visualizar os pedidos`, {
-              duration: 5000
-            });
-          }, 1000);
-        }
+        // Usar setTimeout para evitar conflitos de re-render
+        setTimeout(() => {
+          toast.success(response.data.message, { duration: 3000 });
+        }, 100);
       }
     } catch (error) {
       console.error('Erro ao importar:', error);
-      const errorMsg = error.response?.data?.detail || error.message || 'Erro ao importar pedidos';
-      toast.error(errorMsg);
+      setTimeout(() => {
+        const errorMsg = error.response?.data?.detail || error.message || 'Erro ao importar pedidos';
+        toast.error(errorMsg);
+      }, 100);
     } finally {
       setImporting(false);
     }
-  };
+  }, [importing]);
 
   if (loading) {
     return (
