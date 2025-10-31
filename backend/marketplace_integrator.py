@@ -30,7 +30,7 @@ class MercadoLivreIntegrator:
         self.client_secret = os.environ.get('ML_CLIENT_SECRET', '')
         self.redirect_uri = os.environ.get('ML_REDIRECT_URI', 'http://localhost:8001/api/integrator/mercadolivre/callback')
         self.base_url = 'https://api.mercadolibre.com'
-        self.auth_url = 'https://auth.mercadolibre.com.br'
+        self.auth_url = 'https://auth.mercadolivre.com.br'
         
     def generate_pkce_pair(self) -> tuple:
         """Gera code_verifier e code_challenge para PKCE"""
