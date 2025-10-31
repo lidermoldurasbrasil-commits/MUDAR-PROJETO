@@ -5957,10 +5957,9 @@ async def ml_callback(code: str, state: str):
         )
 
 @api_router.get("/integrator/mercadolivre/status")
-async def ml_connection_status(credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def ml_connection_status(current_user: dict = Depends(get_current_user)):
     """Verifica status da conexão com Mercado Livre"""
     try:
-        verify_token(credentials.credentials)
         creds = await ml_integrator.get_credentials()
         
         if not creds:
