@@ -108,6 +108,44 @@ export default function IntegradorML() {
     }
   };
 
+  const handleImport = async () => {
+    if (importing) return;
+    
+    setImporting(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      toast.info('📦 Importando pedidos para o sistema...');
+      
+      const response = await axios.post(
+        `${API}/integrator/mercadolivre/import-to-system`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 60000
+        }
+      );
+      
+      if (response.data.success) {
+        toast.success(response.data.message);
+        
+        if (response.data.imported_count > 0) {
+          setTimeout(() => {
+            toast.info(`Ir para Marketplaces para visualizar os pedidos`, {
+              duration: 5000
+            });
+          }, 1000);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao importar:', error);
+      const errorMsg = error.response?.data?.detail || error.message || 'Erro ao importar pedidos';
+      toast.error(errorMsg);
+    } finally {
+      setImporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
