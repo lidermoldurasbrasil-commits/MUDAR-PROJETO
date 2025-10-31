@@ -4046,7 +4046,15 @@ export default function MarketplaceProjetoDetalhes() {
                 <p className="text-xs text-gray-500 mt-3 italic">
                   {uploadFormato === 'shopee' 
                     ? '📌 A planilha deve conter todos os 17 campos acima para importação completa.'
-                    : '📌 A planilha deve conter os campos acima. O cabeçalho começa na linha 6.'}
+                    : (
+                      <>
+                        📌 A planilha deve conter os campos acima. O cabeçalho começa na linha 6.
+                        <br />
+                        <span className="text-blue-400 mt-2 block">
+                          💡 <strong>Como exportar do Bling:</strong> Acesse Vendas → Pedidos de Venda → Relatórios → Exportar Excel
+                        </span>
+                      </>
+                    )}
                 </p>
               </div>
             </div>
