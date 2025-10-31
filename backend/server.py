@@ -5977,12 +5977,10 @@ async def ml_connection_status(current_user: dict = Depends(get_current_user)):
 @api_router.post("/integrator/mercadolivre/sync")
 async def ml_sync_orders(
     days_back: int = 30,
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    current_user: dict = Depends(get_current_user)
 ):
     """Sincroniza pedidos do Mercado Livre"""
     try:
-        verify_token(credentials.credentials)
-        
         # Data inicial
         date_from = datetime.now(timezone.utc) - timedelta(days=days_back)
         
