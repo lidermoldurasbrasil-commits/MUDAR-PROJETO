@@ -24,6 +24,11 @@ export default function IntegradorML() {
       toast.error(`Erro ao conectar: ${params.get('ml_error')}`);
       window.history.replaceState({}, '', window.location.pathname);
     }
+    
+    // Cleanup ao desmontar
+    return () => {
+      setSyncing(false);
+    };
   }, []);
 
   const checkConnectionStatus = async () => {
