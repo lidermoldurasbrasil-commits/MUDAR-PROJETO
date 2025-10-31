@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Plug, RefreshCw, CheckCircle, XCircle, ExternalLink, Loader, ShoppingCart } from 'lucide-react';
