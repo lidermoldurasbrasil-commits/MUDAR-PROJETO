@@ -322,14 +322,14 @@ export default function IntegradorML() {
           <div className="flex items-start gap-3">
             <span className="text-2xl">2️⃣</span>
             <div>
-              <p className="font-semibold text-gray-800">Sincronizar Pedidos</p>
+              <p className="font-semibold text-gray-800">Sincronizar Pedidos (API)</p>
               <p className="text-sm text-gray-600">Baixa os pedidos do ML para o banco de dados intermediário (collection "orders")</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <span className="text-2xl">3️⃣</span>
             <div>
-              <p className="font-semibold text-gray-800">Importar para o Sistema</p>
+              <p className="font-semibold text-gray-800">Importar para o Sistema (API)</p>
               <p className="text-sm text-gray-600">Converte os pedidos para o formato Bling e adiciona ao sistema (collection "pedidos")</p>
             </div>
           </div>
@@ -340,6 +340,24 @@ export default function IntegradorML() {
               <p className="text-sm text-gray-600">Os pedidos aparecem em <strong>Marketplaces → Mercado Livre</strong> com todos os campos do Bling</p>
             </div>
           </div>
+        </div>
+        
+        <div className="mt-4 pt-4 border-t border-gray-300">
+          <p className="text-sm text-gray-700 font-semibold mb-2">📦 Ou use Planilha Bling (Alternativa):</p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+            <p className="text-sm text-blue-800 mb-2">
+              Se você já tem as planilhas exportadas do <strong>Bling ERP</strong> ou <strong>Mercado Livre</strong>, pode fazer upload direto:
+            </p>
+            <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+              <li>Acesse <strong>Marketplaces → Mercado Livre</strong></li>
+              <li>Clique no botão <strong>"Upload Planilha"</strong></li>
+              <li>Selecione a planilha .xlsx ou .csv</li>
+              <li>Os pedidos serão importados automaticamente</li>
+            </ol>
+          </div>
+          <p className="text-xs text-gray-600 italic">
+            💡 <strong>Dica:</strong> A planilha do Bling já vem com os campos corretos. Basta exportar e fazer upload!
+          </p>
         </div>
         
         <div className="mt-4 pt-4 border-t border-gray-300">
