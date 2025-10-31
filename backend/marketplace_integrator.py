@@ -143,18 +143,21 @@ class MercadoLivreIntegrator:
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{self.auth_url}/oauth/token",
+                f"{self.base_url}/oauth/token",
                 data={
                     'grant_type': 'refresh_token',
                     'client_id': self.client_id,
                     'client_secret': self.client_secret,
                     'refresh_token': creds['refresh_token']
                 },
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                headers={
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
             )
             
             if response.status_code != 200:
-                raise Exception(f"Erro ao renovar token: {response.text}")
+                raise Exception(f"Erro ao renovar token: {response.text[:500]}")
             
             token_data = response.json()
             await self.save_credentials(token_data)
