@@ -313,25 +313,55 @@ export default function IntegradorML() {
 
       {/* Informações adicionais */}
       <div className="bg-gray-50 rounded-lg p-6">
-        <h3 className="font-semibold text-gray-900 mb-3">ℹ️ Informações</h3>
-        <ul className="space-y-2 text-sm text-gray-700">
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600">•</span>
-            <span>Os pedidos sincronizados serão salvos automaticamente na collection "orders"</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600">•</span>
-            <span>O token de acesso é renovado automaticamente quando necessário</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600">•</span>
-            <span>Você pode receber notificações em tempo real via webhooks configurados</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600">•</span>
-            <span>A sincronização pode levar alguns minutos dependendo da quantidade de pedidos</span>
-          </li>
-        </ul>
+        <h3 className="font-semibold text-gray-900 mb-3">ℹ️ Como Funciona</h3>
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">1️⃣</span>
+            <div>
+              <p className="font-semibold text-gray-800">Conectar Conta</p>
+              <p className="text-sm text-gray-600">Autorize o aplicativo a acessar sua conta do Mercado Livre</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">2️⃣</span>
+            <div>
+              <p className="font-semibold text-gray-800">Sincronizar Pedidos</p>
+              <p className="text-sm text-gray-600">Baixa os pedidos do ML para o banco de dados intermediário (collection "orders")</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">3️⃣</span>
+            <div>
+              <p className="font-semibold text-gray-800">Importar para o Sistema</p>
+              <p className="text-sm text-gray-600">Converte os pedidos para o formato Bling e adiciona ao sistema (collection "pedidos")</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">4️⃣</span>
+            <div>
+              <p className="font-semibold text-gray-800">Visualizar e Gerenciar</p>
+              <p className="text-sm text-gray-600">Os pedidos aparecem em <strong>Marketplaces → Mercado Livre</strong> com todos os campos do Bling</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-4 pt-4 border-t border-gray-300">
+          <p className="text-sm text-gray-700 font-semibold mb-2">📋 Campos Importados (Padrão Bling):</p>
+          <ul className="text-sm text-gray-600 grid grid-cols-2 gap-2">
+            <li>• Número do Pedido</li>
+            <li>• Cliente (Nome e Contato)</li>
+            <li>• Produto e SKU</li>
+            <li>• Quantidade e Valores</li>
+            <li>• Endereço Completo</li>
+            <li>• Cidade e Estado</li>
+            <li>• Status de Produção</li>
+            <li>• Status de Montagem</li>
+            <li>• Taxas e Comissões</li>
+            <li>• Datas (Venda, Entrega)</li>
+            <li>• Opções de Envio</li>
+            <li>• Observações</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
