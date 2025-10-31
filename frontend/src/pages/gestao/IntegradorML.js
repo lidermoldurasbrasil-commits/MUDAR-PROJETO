@@ -227,7 +227,8 @@ export default function IntegradorML() {
 
             {/* Sincronização */}
             <div className="border-t pt-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Sincronizar Pedidos</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">🔄 Sincronizar Pedidos do Mercado Livre</h3>
+              <p className="text-sm text-gray-600 mb-3">Baixa os pedidos do Mercado Livre para o banco de dados intermediário.</p>
               
               <div className="flex items-center gap-4 mb-4">
                 <label className="text-sm text-gray-700">
@@ -267,6 +268,42 @@ export default function IntegradorML() {
               {syncing && (
                 <p className="text-sm text-gray-600 mt-2">
                   ⏳ Buscando pedidos do Mercado Livre... Isso pode levar alguns minutos.
+                </p>
+              )}
+            </div>
+
+            {/* Importação */}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="font-semibold text-gray-900 mb-3">📦 Importar para o Sistema</h3>
+              <p className="text-sm text-gray-600 mb-3">Importa os pedidos sincronizados para o sistema de gestão (formato Bling).</p>
+              
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-amber-800">
+                  ℹ️ Após sincronizar, clique aqui para importar os pedidos ao sistema e visualizá-los em <strong>Marketplaces</strong>.
+                </p>
+              </div>
+
+              <button
+                onClick={handleImport}
+                disabled={importing}
+                className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors"
+              >
+                {importing ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin" />
+                    Importando...
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-5 h-5" />
+                    Importar Pedidos para o Sistema
+                  </>
+                )}
+              </button>
+
+              {importing && (
+                <p className="text-sm text-gray-600 mt-2">
+                  📦 Importando pedidos para o sistema... Aguarde.
                 </p>
               )}
             </div>
