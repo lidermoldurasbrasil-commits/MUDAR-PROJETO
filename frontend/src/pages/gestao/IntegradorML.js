@@ -68,24 +68,35 @@ export default function IntegradorML() {
   };
 
   const handleSync = async () => {
+    if (syncing) return; // Prevenir múltiplos cliques
+    
     setSyncing(true);
+    
     try {
       const token = localStorage.getItem('token');
+      toast.info('⏳ Iniciando sincronização... Isso pode levar alguns minutos.');
+      
       const response = await axios.post(
         `${API}/integrator/mercadolivre/sync`,
         { days_back: parseInt(daysBack) },
         {
           headers: { Authorization: `Bearer ${token}` },
-          timeout: 60000 // 60 segundos
+          timeout: 120000 // 120 segundos
         }
       );
       
       if (response.data.success) {
-        toast.success(`✅ ${response.data.orders_synced} pedidos sincronizados!`);
+        toast.success(`✅ ${response.data.orders_synced} pedidos sincronizados com sucesso!`);
+        
+        // Aguardar um pouco antes de atualizar status
+        setTimeout(() => {
+          checkConnectionStatus();
+        }, 1000);
       }
     } catch (error) {
       console.error('Erro ao sincronizar:', error);
-      toast.error(error.response?.data?.detail || 'Erro ao sincronizar pedidos');
+      const errorMsg = error.response?.data?.detail || error.message || 'Erro ao sincronizar pedidos';
+      toast.error(errorMsg);
     } finally {
       setSyncing(false);
     }
