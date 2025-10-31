@@ -5908,6 +5908,149 @@ async def get_dashboard_marketplaces(current_user: dict = Depends(get_current_us
         }
     }
 
+# ============= INTEGRADOR DE MARKETPLACES =============
+
+from marketplace_integrator import MercadoLivreIntegrator
+from fastapi.responses import RedirectResponse
+
+ml_integrator = MercadoLivreIntegrator()
+
+@api_router.get("/integrator/mercadolivre/auth-url")
+async def get_ml_auth_url(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Gera URL de autorização do Mercado Livre"""
+    try:
+        verify_token(credentials.credentials)
+        auth_data = await ml_integrator.get_authorization_url()
+        return {
+            "success": True,
+            "auth_url": auth_data['url'],
+            "state": auth_data['state']
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/integrator/mercadolivre/callback")
+async def ml_callback(code: str, state: str):
+    """Callback OAuth2 do Mercado Livre"""
+    try:
+        # Buscar code_verifier do banco
+        pkce_session = await db.ml_pkce_sessions.find_one(
+            {'code_challenge': {'$exists': True}},
+            sort=[('created_at', -1)]
+        )
+        
+        if not pkce_session:
+            raise HTTPException(status_code=400, detail="Sessão PKCE não encontrada")
+        
+        code_verifier = pkce_session['code_verifier']
+        
+        # Trocar código por token
+        token_data = await ml_integrator.exchange_code_for_token(code, code_verifier)
+        
+        # Redirecionar para frontend com sucesso
+        return RedirectResponse(
+            url=f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/gestao/marketplaces?ml_connected=true"
+        )
+    except Exception as e:
+        logger.error(f"Erro no callback ML: {e}")
+        return RedirectResponse(
+            url=f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/gestao/marketplaces?ml_error={str(e)}"
+        )
+
+@api_router.get("/integrator/mercadolivre/status")
+async def ml_connection_status(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Verifica status da conexão com Mercado Livre"""
+    try:
+        verify_token(credentials.credentials)
+        creds = await ml_integrator.get_credentials()
+        
+        if not creds:
+            return {"connected": False}
+        
+        return {
+            "connected": True,
+            "user_id": creds.get('user_id', ''),
+            "expires_at": creds.get('token_expires_at'),
+            "updated_at": creds.get('updated_at')
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/integrator/mercadolivre/sync")
+async def ml_sync_orders(
+    days_back: int = 30,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Sincroniza pedidos do Mercado Livre"""
+    try:
+        verify_token(credentials.credentials)
+        
+        # Data inicial
+        date_from = datetime.now(timezone.utc) - timedelta(days=days_back)
+        
+        # Buscar pedidos
+        orders = await ml_integrator.fetch_orders_since(date_from)
+        
+        # Processar e salvar
+        from marketplace_integrator import save_or_update_order, save_or_update_order_items
+        
+        orders_saved = 0
+        for ml_order in orders:
+            # Mapear para formato interno
+            internal_order = ml_integrator.map_to_internal_order(ml_order)
+            
+            # Salvar pedido
+            internal_order_id = await save_or_update_order(internal_order)
+            
+            # Mapear e salvar itens
+            internal_items = ml_integrator.map_to_internal_items(ml_order, internal_order_id)
+            await save_or_update_order_items(internal_items)
+            
+            orders_saved += 1
+        
+        return {
+            "success": True,
+            "orders_synced": orders_saved,
+            "date_from": date_from.isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Erro ao sincronizar pedidos ML: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/integrator/mercadolivre/notifications")
+async def ml_webhook(request: Request):
+    """Webhook para receber notificações do Mercado Livre"""
+    try:
+        data = await request.json()
+        logger.info(f"Webhook ML recebido: {data}")
+        
+        # Processar notificação
+        topic = data.get('topic')
+        resource = data.get('resource')
+        
+        if topic == 'orders_v2':
+            # Extrair order_id do resource
+            # Ex: /orders/123456789
+            order_id = resource.split('/')[-1]
+            
+            # Buscar detalhes do pedido
+            order_detail = await ml_integrator.fetch_order_detail(order_id)
+            
+            if order_detail:
+                # Mapear e salvar
+                internal_order = ml_integrator.map_to_internal_order(order_detail)
+                internal_order_id = await save_or_update_order(internal_order)
+                
+                internal_items = ml_integrator.map_to_internal_items(order_detail, internal_order_id)
+                await save_or_update_order_items(internal_items)
+                
+                logger.info(f"✅ Pedido {order_id} atualizado via webhook")
+        
+        return {"success": True}
+    except Exception as e:
+        logger.error(f"Erro ao processar webhook ML: {e}")
+        return {"success": False, "error": str(e)}
+
 # Include the router in the main app
 app.include_router(api_router)
 
