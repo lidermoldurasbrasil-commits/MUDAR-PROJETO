@@ -6013,6 +6013,152 @@ async def ml_sync_orders(
         logger.error(f"Erro ao sincronizar pedidos ML: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/integrator/mercadolivre/import-to-system")
+async def ml_import_to_system(
+    projeto_id: str = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Importa pedidos sincronizados do ML para o sistema de gestão"""
+    try:
+        # Buscar pedidos do ML que ainda não foram importados
+        ml_orders = await db.orders.find({
+            'marketplace': 'MERCADO_LIVRE',
+            'imported_to_system': {'$ne': True}
+        }).to_list(length=1000)
+        
+        if not ml_orders:
+            return {
+                "success": True,
+                "message": "Nenhum pedido novo para importar",
+                "imported_count": 0
+            }
+        
+        # Se não tem projeto_id, criar/buscar projeto Mercado Livre
+        if not projeto_id:
+            projeto = await db.projetos.find_one({'plataforma': 'mercadolivre', 'nome': 'Mercado Livre'})
+            if not projeto:
+                # Criar projeto Mercado Livre
+                projeto = {
+                    'id': str(uuid.uuid4()),
+                    'nome': 'Mercado Livre',
+                    'plataforma': 'mercadolivre',
+                    'icone': '🟡',
+                    'descricao': 'Pedidos do Mercado Livre',
+                    'ativo': True,
+                    'created_at': datetime.now(timezone.utc)
+                }
+                await db.projetos.insert_one(projeto)
+            projeto_id = projeto['id']
+        
+        # Mapear e importar cada pedido
+        imported_count = 0
+        for ml_order in ml_orders:
+            try:
+                # Mapear pedido ML para formato do sistema
+                pedido_sistema = {
+                    'id': str(uuid.uuid4()),
+                    'projeto_id': projeto_id,
+                    'plataforma': 'mercadolivre',
+                    
+                    # Dados básicos
+                    'numero_pedido': ml_order.get('marketplace_order_id', ''),
+                    'numero_referencia_sku': '',
+                    'sku': '',
+                    'cliente_nome': ml_order.get('buyer_full_name', '') or ml_order.get('buyer_username', ''),
+                    'cliente_contato': ml_order.get('buyer_phone', ''),
+                    
+                    # Endereço
+                    'endereco': f"{ml_order.get('ship_to_street', '')} {ml_order.get('ship_to_number', '')} {ml_order.get('ship_to_complement', '')}",
+                    'cidade': ml_order.get('ship_to_city', ''),
+                    'estado_endereco': ml_order.get('ship_to_state', ''),
+                    'uf': ml_order.get('ship_to_state', '')[:2] if ml_order.get('ship_to_state') else '',
+                    'endereco_entrega': f"{ml_order.get('ship_to_street', '')} {ml_order.get('ship_to_number', '')}, {ml_order.get('ship_to_district', '')} - {ml_order.get('ship_to_city', '')}/{ml_order.get('ship_to_state', '')} - CEP: {ml_order.get('ship_to_zipcode', '')}",
+                    
+                    # Valores
+                    'quantidade': 1,  # Será somado dos itens
+                    'valor_unitario': ml_order.get('subtotal_items', 0),
+                    'valor_total': ml_order.get('total_amount_buyer', 0),
+                    'preco_acordado': ml_order.get('subtotal_items', 0),
+                    
+                    # Taxas e comissões
+                    'tarifas_envio': ml_order.get('shipping_cost_charged', 0),
+                    'valor_liquido': ml_order.get('subtotal_items', 0),  # Será calculado
+                    
+                    # Envio
+                    'opcao_envio': ml_order.get('shipping_method', ''),
+                    'tipo_envio': ml_order.get('shipping_status', ''),
+                    
+                    # Status
+                    'status': 'Aguardando Produção',
+                    'status_cor': '#94A3B8',
+                    'status_producao': 'Impressão',  # Setor padrão
+                    'status_logistica': 'Aguardando',
+                    'status_montagem': 'Aguardando Montagem',
+                    'descricao_status': ml_order.get('status_general', ''),
+                    
+                    # Datas
+                    'data_pedido': ml_order.get('created_at_marketplace', datetime.now(timezone.utc)),
+                    'data_venda': ml_order.get('created_at_marketplace', datetime.now(timezone.utc)).strftime('%d/%m/%Y') if ml_order.get('created_at_marketplace') else '',
+                    'prazo_entrega': ml_order.get('created_at_marketplace', datetime.now(timezone.utc)) + timedelta(days=7),
+                    
+                    # Mercado Livre específico
+                    'receita_produtos': ml_order.get('subtotal_items', 0),
+                    
+                    # Controle
+                    'responsavel': '',
+                    'prioridade': 'Normal',
+                    'observacoes': f"Importado do Mercado Livre - ID: {ml_order.get('marketplace_order_id', '')}",
+                    'atrasado': False,
+                    
+                    # Metadata
+                    'created_at': datetime.now(timezone.utc),
+                    'updated_at': datetime.now(timezone.utc),
+                    'ml_order_id': ml_order.get('marketplace_order_id', '')  # Referência
+                }
+                
+                # Buscar itens do pedido
+                ml_items = await db.order_items.find({
+                    'marketplace_order_id': ml_order.get('marketplace_order_id')
+                }).to_list(length=100)
+                
+                if ml_items:
+                    # Pegar dados do primeiro item (ou somar se houver múltiplos)
+                    first_item = ml_items[0]
+                    pedido_sistema['produto_nome'] = first_item.get('product_title', '')
+                    pedido_sistema['nome_variacao'] = first_item.get('variation_name', '')
+                    pedido_sistema['sku'] = first_item.get('seller_sku', '')
+                    pedido_sistema['numero_referencia_sku'] = first_item.get('seller_sku', '')
+                    
+                    # Somar quantidades
+                    total_qty = sum(item.get('quantity', 0) for item in ml_items)
+                    pedido_sistema['quantidade'] = total_qty
+                
+                # Inserir no sistema
+                await db.pedidos.insert_one(pedido_sistema)
+                
+                # Marcar como importado
+                await db.orders.update_one(
+                    {'_id': ml_order['_id']},
+                    {'$set': {'imported_to_system': True, 'imported_at': datetime.now(timezone.utc)}}
+                )
+                
+                imported_count += 1
+                
+            except Exception as item_error:
+                logger.error(f"Erro ao importar pedido {ml_order.get('marketplace_order_id')}: {item_error}")
+                continue
+        
+        return {
+            "success": True,
+            "message": f"{imported_count} pedidos importados com sucesso!",
+            "imported_count": imported_count,
+            "projeto_id": projeto_id
+        }
+        
+    except Exception as e:
+        logger.error(f"Erro ao importar pedidos ML: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/integrator/mercadolivre/notifications")
 async def ml_webhook(request: Request):
     """Webhook para receber notificações do Mercado Livre"""
