@@ -5916,10 +5916,9 @@ from fastapi.responses import RedirectResponse
 ml_integrator = MercadoLivreIntegrator()
 
 @api_router.get("/integrator/mercadolivre/auth-url")
-async def get_ml_auth_url(credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def get_ml_auth_url(current_user: dict = Depends(get_current_user)):
     """Gera URL de autorização do Mercado Livre"""
     try:
-        verify_token(credentials.credentials)
         auth_data = await ml_integrator.get_authorization_url()
         return {
             "success": True,
