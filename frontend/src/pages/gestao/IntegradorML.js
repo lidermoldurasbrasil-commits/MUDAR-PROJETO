@@ -12,6 +12,21 @@ export default function IntegradorML() {
   const [importing, setImporting] = useState(false);
   const [daysBack, setDaysBack] = useState(30);
 
+  const checkConnectionStatus = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API}/integrator/mercadolivre/status`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setConnectionStatus(response.data);
+    } catch (error) {
+      console.error('Erro ao verificar status:', error);
+      setConnectionStatus({ connected: false });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     
@@ -37,21 +52,6 @@ export default function IntegradorML() {
       mounted = false;
     };
   }, [checkConnectionStatus]);
-
-  const checkConnectionStatus = useCallback(async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API}/integrator/mercadolivre/status`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setConnectionStatus(response.data);
-    } catch (error) {
-      console.error('Erro ao verificar status:', error);
-      setConnectionStatus({ connected: false });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const handleConnect = useCallback(async () => {
     try {
