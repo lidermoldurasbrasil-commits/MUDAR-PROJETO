@@ -9,6 +9,7 @@ export default function IntegradorML() {
   const [connectionStatus, setConnectionStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [daysBack, setDaysBack] = useState(30);
 
   useEffect(() => {
