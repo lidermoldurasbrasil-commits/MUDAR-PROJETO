@@ -80,8 +80,11 @@ class MercadoLivreIntegrator:
         Troca o código de autorização por access_token usando PKCE
         """
         async with httpx.AsyncClient() as client:
+            # URL correta para trocar token
+            token_url = f"{self.base_url}/oauth/token"
+            
             response = await client.post(
-                f"{self.auth_url}/oauth/token",
+                token_url,
                 data={
                     'grant_type': 'authorization_code',
                     'client_id': self.client_id,
@@ -90,11 +93,14 @@ class MercadoLivreIntegrator:
                     'redirect_uri': self.redirect_uri,
                     'code_verifier': code_verifier
                 },
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                headers={
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
             )
             
             if response.status_code != 200:
-                raise Exception(f"Erro ao obter token: {response.text}")
+                raise Exception(f"Erro ao obter token (status {response.status_code}): {response.text[:500]}")
             
             token_data = response.json()
             
