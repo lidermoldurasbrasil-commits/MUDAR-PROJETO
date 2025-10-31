@@ -115,6 +115,7 @@ function App() {
               <Route path="marketplaces/projeto/:projetoId" element={<MarketplaceProjetoDetalhes />} />
               <Route path="marketplaces/relatorio-vendas" element={<RelatorioVendasMarketplace />} />
               <Route path="marketplaces/configuracoes-status" element={<ConfiguracoesStatus />} />
+              <Route path="marketplaces/integrador-ml" element={<IntegradorML />} />
               <Route path="cadastros" element={<Clientes />} />
               <Route path="usuarios" element={<GestaoUsuarios />} />
               <Route path="relatorios" element={<Relatorios />} />
