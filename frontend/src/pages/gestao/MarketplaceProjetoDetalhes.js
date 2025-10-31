@@ -3968,8 +3968,10 @@ export default function MarketplaceProjetoDetalhes() {
                     </>
                   ) : (
                     <>
-                      Faça upload da planilha de pedidos exportada do <span className="text-yellow-400 font-semibold">Mercado Livre</span>. 
+                      Faça upload da planilha de pedidos exportada do <span className="text-yellow-400 font-semibold">Mercado Livre / Bling</span>. 
                       O cabeçalho da planilha começa na <span className="text-white font-semibold">linha 6</span>.
+                      <br />
+                      <span className="text-green-400 text-xs mt-1 block">✅ Formato compatível com exportação do Bling ERP</span>
                     </>
                   )}
                   <br />
