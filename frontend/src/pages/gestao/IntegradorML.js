@@ -44,17 +44,26 @@ export default function IntegradorML() {
   const handleConnect = async () => {
     try {
       const token = localStorage.getItem('token');
+      console.log('🔍 Chamando endpoint:', `${API}/integrator/mercadolivre/auth-url`);
+      
       const response = await axios.get(`${API}/integrator/mercadolivre/auth-url`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
+      console.log('✅ Resposta recebida:', response.data);
+      
       if (response.data.success && response.data.auth_url) {
         // Redirecionar para autorização
+        console.log('🚀 Redirecionando para:', response.data.auth_url);
         window.location.href = response.data.auth_url;
+      } else {
+        toast.error('Resposta inválida do servidor');
       }
     } catch (error) {
-      console.error('Erro ao gerar URL de autorização:', error);
-      toast.error('Erro ao iniciar conexão com Mercado Livre');
+      console.error('❌ Erro completo:', error);
+      console.error('❌ Resposta do servidor:', error.response?.data);
+      const errorMsg = error.response?.data?.detail || error.message || 'Erro ao iniciar conexão com Mercado Livre';
+      toast.error(errorMsg);
     }
   };
 
