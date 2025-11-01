@@ -173,10 +173,22 @@ class MercadoLivreIntegrator:
         
         # Verificar se token está próximo de expirar (menos de 5 minutos)
         expires_at = creds.get('token_expires_at')
-        if expires_at and datetime.now(timezone.utc) >= expires_at - timedelta(minutes=5):
-            print("🔄 Token expirando, renovando...")
-            token_data = await self.refresh_token()
-            return token_data['access_token']
+        if expires_at:
+            # Garantir que expires_at tem timezone
+            if not isinstance(expires_at, datetime):
+                # Se for string, converter
+                if isinstance(expires_at, str):
+                    expires_at = datetime.fromisoformat(expires_at.replace('Z', '+00:00'))
+                else:
+                    expires_at = None
+            elif expires_at.tzinfo is None:
+                # Se não tem timezone, adicionar UTC
+                expires_at = expires_at.replace(tzinfo=timezone.utc)
+            
+            if expires_at and datetime.now(timezone.utc) >= expires_at - timedelta(minutes=5):
+                print("🔄 Token expirando, renovando...")
+                token_data = await self.refresh_token()
+                return token_data['access_token']
         
         return creds['access_token']
     
