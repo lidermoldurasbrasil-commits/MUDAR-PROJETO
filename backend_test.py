@@ -6078,11 +6078,28 @@ class BusinessManagementSystemTester:
         print("🚀 Starting Business Management System Tests...")
         print(f"🌐 Testing against: {self.base_url}")
         
-        # URGENT: Run Mercado Livre investigation first
+        # Authentication is required for all other tests
+        if not self.test_authentication():
+            print("❌ Authentication failed - stopping tests")
+            return False
+        
+        # Run CRITICAL Mercado Livre Import Test FIRST
+        print("\n" + "="*80)
+        print("🔥 RUNNING CRITICAL MERCADO LIVRE IMPORT TEST")
+        print("="*80)
+        
+        ml_import_success = self.test_mercado_livre_import_process()
+        
+        if ml_import_success:
+            print("\n✅ CRITICAL TEST PASSED - ML Import Process Working!")
+        else:
+            print("\n❌ CRITICAL TEST FAILED - ML Import Process Has Issues!")
+        
+        # URGENT: Run Mercado Livre investigation 
         print("\n🚨 URGENT: Investigating Mercado Livre Orders Import Flow...")
         self.test_mercado_livre_orders_investigation()
         
-        # CRITICAL: Test Mercado Livre Integration Bug Fix FIRST
+        # CRITICAL: Test Mercado Livre Integration Bug Fix
         print("\n🚨 PRIORITY: Testing Mercado Livre Integration Bug Fix...")
         self.test_mercado_livre_integration()
         
@@ -6097,7 +6114,7 @@ class BusinessManagementSystemTester:
         # Print final results
         self.print_final_results()
         
-        return filters_success
+        return ml_import_success and filters_success
 
     def print_final_results(self):
         """Print final test results"""
