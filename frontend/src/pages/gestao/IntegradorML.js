@@ -291,6 +291,46 @@ export default function IntegradorML() {
                 </p>
               </div>
 
+              {/* Resultado da Importação */}
+              {importResult && (
+                <div className={`mb-4 p-4 rounded-lg border ${
+                  importResult.success 
+                    ? 'bg-green-50 border-green-200' 
+                    : 'bg-red-50 border-red-200'
+                }`}>
+                  <div className="flex items-start gap-3">
+                    {importResult.success ? (
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    )}
+                    <div className="flex-1">
+                      <p className={`font-semibold ${
+                        importResult.success ? 'text-green-800' : 'text-red-800'
+                      }`}>
+                        {importResult.success ? '✅ Sucesso!' : '❌ Erro'}
+                      </p>
+                      <p className={`text-sm mt-1 ${
+                        importResult.success ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        {importResult.message}
+                      </p>
+                      {importResult.success && importResult.count > 0 && (
+                        <p className="text-sm text-green-600 mt-2">
+                          📍 Acesse <strong>Marketplaces → Mercado Livre</strong> para visualizar os pedidos
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => setImportResult(null)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={handleImport}
                 disabled={importing}
