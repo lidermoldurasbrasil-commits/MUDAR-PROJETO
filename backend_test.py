@@ -5976,12 +5976,17 @@ class BusinessManagementSystemTester:
 def main():
     tester = BusinessManagementSystemTester()
     
-    # Run the Production Users Login test as requested in review
-    print("🚀 Starting Production Users Login Test...")
+    # Run the Mercado Livre Orders Investigation as requested in review
+    print("🚀 Starting Mercado Livre Orders Investigation...")
     print(f"🌐 Testing against: {tester.base_url}")
     
-    # Run the production users login test (no authentication needed as this IS the authentication test)
-    success = tester.test_production_users_login()
+    # Authentication is required for ML investigation
+    if not tester.test_authentication():
+        print("❌ Authentication failed - cannot proceed")
+        return 1
+    
+    # Run the ML investigation
+    success = tester.test_mercado_livre_orders_investigation()
     
     # Print final results
     all_passed = tester.print_summary()
