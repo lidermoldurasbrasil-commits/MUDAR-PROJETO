@@ -288,6 +288,22 @@ backend:
           agent: "testing"
           comment: "✅ MERCADO LIVRE FUNCIONANDO PERFEITAMENTE! Problema '0 pedidos importados' NÃO reproduzido. Teste completo executado: 1) Projeto ML criado/encontrado ✅ 2) Planilha Excel de teste criada com formato correto (header=5, 4 pedidos de teste) ✅ 3) Upload realizado com SUCESSO (4 pedidos importados, 0 erros) ✅ 4) Verificação no banco: 190 pedidos ML encontrados, incluindo todos os 4 pedidos de teste ✅ 5) Tipos de envio identificados corretamente: 'Mercado Envios Flex', 'Correios e pontos de envio', 'Coleta', 'Agência Mercado Livre' ✅. Sistema ML 100% operacional. Possível que problema reportado pelo usuário tenha sido resolvido pelos logs de debug adicionados ou seja específico de determinado formato de planilha."
 
+
+  - task: "Mercado Livre API Integration - Order Import Bug Fix"
+    implemented: true
+    working: "unknown"
+    file: "/app/backend/marketplace_integrator.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "CRITICAL BUG: Mercado Livre orders not importing into system. Backend logs show recurring '400 Bad Request' error when fetching order details from ML API. Root cause: code was passing entire order object as ID to API endpoint instead of extracting the specific 'order_id' field."
+        - working: "unknown"
+          agent: "main"
+          comment: "BUG FIX IMPLEMENTED: Updated fetch_orders_since() method in marketplace_integrator.py (lines 245-253). Changed loop from 'for order_id in results:' to 'for order in results:' with proper ID extraction: order_id = str(order.get('id')). Now correctly extracts the 'id' field from each order object before calling fetch_order_detail(). Added safety check for both dict and non-dict responses. Backend restarted successfully. Ready for backend testing to verify ML order sync and import to pedidos_marketplace collection."
+
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
     implemented: true
