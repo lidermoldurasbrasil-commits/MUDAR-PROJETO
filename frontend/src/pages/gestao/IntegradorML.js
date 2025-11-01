@@ -339,7 +339,6 @@ export default function IntegradorML() {
               {/* Resultado da Importação */}
               {importResult && (
                 <div 
-                  key={`import-result-${Date.now()}`}
                   className={`mb-4 p-4 rounded-lg border ${
                     importResult.success 
                       ? 'bg-green-50 border-green-200' 
