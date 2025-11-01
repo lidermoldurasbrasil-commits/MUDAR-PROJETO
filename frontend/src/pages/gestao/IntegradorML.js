@@ -236,6 +236,46 @@ export default function IntegradorML() {
               <h3 className="font-semibold text-gray-900 mb-3">🔄 Sincronizar Pedidos do Mercado Livre</h3>
               <p className="text-sm text-gray-600 mb-3">Baixa os pedidos do Mercado Livre para o banco de dados intermediário.</p>
               
+              {/* Resultado da Sincronização */}
+              {syncResult && (
+                <div className={`mb-4 p-4 rounded-lg border ${
+                  syncResult.success 
+                    ? 'bg-green-50 border-green-200' 
+                    : 'bg-red-50 border-red-200'
+                }`}>
+                  <div className="flex items-start gap-3">
+                    {syncResult.success ? (
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    )}
+                    <div className="flex-1">
+                      <p className={`font-semibold ${
+                        syncResult.success ? 'text-green-800' : 'text-red-800'
+                      }`}>
+                        {syncResult.success ? '✅ Sincronização Completa' : '❌ Erro na Sincronização'}
+                      </p>
+                      <p className={`text-sm mt-1 ${
+                        syncResult.success ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        {syncResult.message}
+                      </p>
+                      {syncResult.success && syncResult.count > 0 && (
+                        <p className="text-sm text-green-600 mt-2">
+                          👉 Agora clique em <strong>"Importar Pedidos"</strong> abaixo
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => setSyncResult(null)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              )}
+              
               <div className="flex items-center gap-4 mb-4">
                 <label className="text-sm text-gray-700">
                   Sincronizar últimos:
