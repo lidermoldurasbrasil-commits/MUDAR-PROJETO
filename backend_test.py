@@ -5980,10 +5980,25 @@ def main():
     print("🚀 Starting Mercado Livre Orders Investigation...")
     print(f"🌐 Testing against: {tester.base_url}")
     
-    # Authentication is required for ML investigation
-    if not tester.test_authentication():
-        print("❌ Authentication failed - cannot proceed")
+    # Use director login for authentication
+    print("\n🔐 Authenticating with director credentials...")
+    success_login, login_response = tester.run_test(
+        "Director Login",
+        "POST",
+        "auth/login",
+        200,
+        data={
+            "username": "diretor",
+            "password": "123"
+        }
+    )
+    
+    if not success_login or 'access_token' not in login_response:
+        print("❌ Director authentication failed - cannot proceed")
         return 1
+    
+    tester.token = login_response['access_token']
+    print("✅ Director authentication successful")
     
     # Run the ML investigation
     success = tester.test_mercado_livre_orders_investigation()
