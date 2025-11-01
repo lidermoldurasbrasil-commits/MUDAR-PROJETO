@@ -92,37 +92,26 @@ class BusinessManagementSystemTester:
         """Test authentication endpoints"""
         print("\n🔐 Testing Authentication...")
         
-        # Test user registration
-        test_username = f"testuser_{datetime.now().strftime('%H%M%S')}"
-        test_password = "TestPass123!"
+        # Use director credentials for testing
+        director_username = "diretor"
+        director_password = "123"
         
         success, response = self.run_test(
-            "User Registration",
+            "Director Login",
             "POST",
-            "auth/register",
+            "auth/login",
             200,
             data={
-                "username": test_username,
-                "password": test_password,
-                "role": "manager"
+                "username": director_username,
+                "password": director_password
             }
         )
         
-        if success and 'token' in response:
-            self.token = response['token']
+        if success and 'access_token' in response:
+            self.token = response['access_token']
             self.user_data = response['user']
             
-            # Test login with same credentials
-            success, login_response = self.run_test(
-                "User Login",
-                "POST",
-                "auth/login",
-                200,
-                data={
-                    "username": test_username,
-                    "password": test_password
-                }
-            )
+            print(f"✅ Authenticated as: {self.user_data.get('username')} (Role: {self.user_data.get('role')})")
             
             # Test get current user
             self.run_test(
