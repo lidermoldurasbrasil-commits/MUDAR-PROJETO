@@ -6055,6 +6055,20 @@ async def ml_import_to_system(
         imported_count = 0
         for ml_order in ml_orders:
             try:
+                # Guardar o _id para atualização posterior e converter para string
+                ml_order_id_obj = ml_order.get('_id')
+                ml_order_id_str = str(ml_order.get('marketplace_order_id', ''))
+                
+                # Converter datetime se necessário
+                created_at = ml_order.get('created_at_marketplace')
+                if isinstance(created_at, str):
+                    try:
+                        created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                    except:
+                        created_at = datetime.now(timezone.utc)
+                elif not isinstance(created_at, datetime):
+                    created_at = datetime.now(timezone.utc)
+                
                 # Mapear pedido ML para formato do sistema
                 pedido_sistema = {
                     'id': str(uuid.uuid4()),
@@ -6062,32 +6076,32 @@ async def ml_import_to_system(
                     'plataforma': 'mercadolivre',
                     
                     # Dados básicos
-                    'numero_pedido': ml_order.get('marketplace_order_id', ''),
+                    'numero_pedido': ml_order_id_str,
                     'numero_referencia_sku': '',
                     'sku': '',
-                    'cliente_nome': ml_order.get('buyer_full_name', '') or ml_order.get('buyer_username', ''),
-                    'cliente_contato': ml_order.get('buyer_phone', ''),
+                    'cliente_nome': str(ml_order.get('buyer_full_name', '') or ml_order.get('buyer_username', '')),
+                    'cliente_contato': str(ml_order.get('buyer_phone', '')),
                     
                     # Endereço
                     'endereco': f"{ml_order.get('ship_to_street', '')} {ml_order.get('ship_to_number', '')} {ml_order.get('ship_to_complement', '')}",
-                    'cidade': ml_order.get('ship_to_city', ''),
-                    'estado_endereco': ml_order.get('ship_to_state', ''),
-                    'uf': ml_order.get('ship_to_state', '')[:2] if ml_order.get('ship_to_state') else '',
+                    'cidade': str(ml_order.get('ship_to_city', '')),
+                    'estado_endereco': str(ml_order.get('ship_to_state', '')),
+                    'uf': str(ml_order.get('ship_to_state', ''))[:2] if ml_order.get('ship_to_state') else '',
                     'endereco_entrega': f"{ml_order.get('ship_to_street', '')} {ml_order.get('ship_to_number', '')}, {ml_order.get('ship_to_district', '')} - {ml_order.get('ship_to_city', '')}/{ml_order.get('ship_to_state', '')} - CEP: {ml_order.get('ship_to_zipcode', '')}",
                     
                     # Valores
                     'quantidade': 1,  # Será somado dos itens
-                    'valor_unitario': ml_order.get('subtotal_items', 0),
-                    'valor_total': ml_order.get('total_amount_buyer', 0),
-                    'preco_acordado': ml_order.get('subtotal_items', 0),
+                    'valor_unitario': float(ml_order.get('subtotal_items', 0)),
+                    'valor_total': float(ml_order.get('total_amount_buyer', 0)),
+                    'preco_acordado': float(ml_order.get('subtotal_items', 0)),
                     
                     # Taxas e comissões
-                    'tarifas_envio': ml_order.get('shipping_cost_charged', 0),
-                    'valor_liquido': ml_order.get('subtotal_items', 0),  # Será calculado
+                    'tarifas_envio': float(ml_order.get('shipping_cost_charged', 0)),
+                    'valor_liquido': float(ml_order.get('subtotal_items', 0)),  # Será calculado
                     
                     # Envio
-                    'opcao_envio': ml_order.get('shipping_method', ''),
-                    'tipo_envio': ml_order.get('shipping_status', ''),
+                    'opcao_envio': str(ml_order.get('shipping_method', '')),
+                    'tipo_envio': str(ml_order.get('shipping_status', '')),
                     
                     # Status
                     'status': 'Aguardando Produção',
@@ -6095,28 +6109,28 @@ async def ml_import_to_system(
                     'status_producao': 'Impressão',  # Setor padrão
                     'status_logistica': 'Aguardando',
                     'status_montagem': 'Aguardando Montagem',
-                    'descricao_status': ml_order.get('status_general', ''),
+                    'descricao_status': str(ml_order.get('status_general', '')),
                     
-                    # Datas
-                    'data_pedido': ml_order.get('created_at_marketplace', datetime.now(timezone.utc)),
-                    'data_venda': ml_order.get('created_at_marketplace', datetime.now(timezone.utc)).strftime('%d/%m/%Y') if ml_order.get('created_at_marketplace') else '',
-                    'prazo_entrega': ml_order.get('created_at_marketplace', datetime.now(timezone.utc)) + timedelta(days=7),
+                    # Datas - garantir que são datetime e depois converter para ISO string
+                    'data_pedido': created_at.isoformat(),
+                    'data_venda': created_at.strftime('%d/%m/%Y'),
+                    'prazo_entrega': (created_at + timedelta(days=7)).isoformat(),
                     
                     # Mercado Livre específico
-                    'receita_produtos': ml_order.get('subtotal_items', 0),
+                    'receita_produtos': float(ml_order.get('subtotal_items', 0)),
                     'numero_anuncio': '',  # Será preenchido dos itens
-                    'preco_unitario_venda': ml_order.get('subtotal_items', 0),
+                    'preco_unitario_venda': float(ml_order.get('subtotal_items', 0)),
                     
                     # Controle
                     'responsavel': '',
                     'prioridade': 'Normal',
-                    'observacoes': f"Importado do Mercado Livre - ID: {ml_order.get('marketplace_order_id', '')}",
+                    'observacoes': f"Importado do Mercado Livre - ID: {ml_order_id_str}",
                     'atrasado': False,
                     
                     # Metadata
-                    'created_at': datetime.now(timezone.utc),
-                    'updated_at': datetime.now(timezone.utc),
-                    'ml_order_id': ml_order.get('marketplace_order_id', '')  # Referência
+                    'created_at': datetime.now(timezone.utc).isoformat(),
+                    'updated_at': datetime.now(timezone.utc).isoformat(),
+                    'ml_order_id': ml_order_id_str  # Referência
                 }
                 
                 # Buscar itens do pedido
