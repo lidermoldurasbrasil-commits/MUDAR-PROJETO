@@ -187,12 +187,12 @@ export default function IntegradorML() {
           
           {connectionStatus?.connected ? (
             <div className="flex items-center gap-2 text-green-600">
-              <CheckCircle className="w-5 h-5" />
+              <span className="text-xl">✅</span>
               <span className="font-semibold">Conectado</span>
             </div>
           ) : (
             <div className="flex items-center gap-2 text-red-600">
-              <XCircle className="w-5 h-5" />
+              <span className="text-xl">❌</span>
               <span className="font-semibold">Desconectado</span>
             </div>
           )}
