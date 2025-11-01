@@ -243,13 +243,15 @@ class MercadoLivreIntegrator:
                     break
                 
                 # Para cada pedido, buscar detalhes completos
-                for order_id in results:
+                for order in results:
                     try:
+                        # Extrair o ID do pedido do objeto
+                        order_id = str(order.get('id')) if isinstance(order, dict) else str(order)
                         order_detail = await self.fetch_order_detail(order_id, access_token)
                         if order_detail:
                             all_orders.append(order_detail)
                     except Exception as e:
-                        print(f"❌ Erro ao buscar detalhes do pedido {order_id}: {e}")
+                        print(f"❌ Erro ao buscar detalhes do pedido: {e}")
                         continue
                 
                 # Paginação
