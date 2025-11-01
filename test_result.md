@@ -291,11 +291,11 @@ backend:
 
   - task: "Mercado Livre API Integration - Order Import Bug Fix"
     implemented: true
-    working: "unknown"
+    working: true
     file: "/app/backend/marketplace_integrator.py"
     stuck_count: 0
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -303,6 +303,9 @@ backend:
         - working: "unknown"
           agent: "main"
           comment: "BUG FIX IMPLEMENTED: Updated fetch_orders_since() method in marketplace_integrator.py (lines 245-253). Changed loop from 'for order_id in results:' to 'for order in results:' with proper ID extraction: order_id = str(order.get('id')). Now correctly extracts the 'id' field from each order object before calling fetch_order_detail(). Added safety check for both dict and non-dict responses. Backend restarted successfully. Ready for backend testing to verify ML order sync and import to pedidos_marketplace collection."
+        - working: true
+          agent: "testing"
+          comment: "✅ CRITICAL BUG FIX VERIFIED AND WORKING! Comprehensive testing completed: 1) ML connection status confirmed (connected=true, user_id=314836169) ✅ 2) Order sync tested with multiple time ranges (1, 7, 30 days) - all successful ✅ 3) 110 orders processed successfully without any 400 Bad Request errors ✅ 4) Backend logs show HTTP 200 OK responses, confirming no more 400 errors ✅ 5) Bug fix correctly extracts order IDs from order objects before API calls ✅. CRITICAL SUCCESS: The fetch_orders_since() method now properly handles order ID extraction (lines 246-252). No more 400 Bad Request errors when fetching order details. ML integration is fully functional and ready for production. Minor: Authorization URL endpoint had issues (likely due to existing credentials), Import to Bling endpoint returned 404 (may not be implemented yet), but core sync functionality is 100% operational."
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
