@@ -6021,10 +6021,11 @@ async def ml_import_to_system(
     """Importa pedidos sincronizados do ML para o sistema de gestão"""
     try:
         # Buscar pedidos do ML que ainda não foram importados
-        ml_orders = await db.orders.find({
+        ml_orders_cursor = db.orders.find({
             'marketplace': 'MERCADO_LIVRE',
             'imported_to_system': {'$ne': True}
-        }).to_list(length=1000)
+        })
+        ml_orders = await ml_orders_cursor.to_list(length=1000)
         
         if not ml_orders:
             return {
