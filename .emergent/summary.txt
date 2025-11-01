@@ -1,106 +1,117 @@
 <analysis>
-The AI engineer's work focused on iteratively enhancing the Marcos manufacturing system, addressing new feature requests and critical bug fixes. Initially, core UI elements were improved, including collapsible metric sections and sector-specific PDF generation. Significant effort went into refining the PDF output, first by grouping orders by SKU and then by improving its visual layout. A critical bug involving incorrect selection counts was identified and fixed, ensuring  only targeted filtered items. The AI engineer also tackled a recurring React  error, ultimately resolving it by memoizing the  function and ensuring full frontend restarts. The final phase involved making the application fully responsive for various devices and conducting thorough pre-deployment checks, including fixing hardcoded database names in utility scripts. The trajectory concluded with a successful redeploy, confirming all features are active and the system is deemed production-ready.
+The previous AI engineer meticulously worked on enhancing the Marcos manufacturing system, focusing heavily on a Mercado Livre integration and UI/UX improvements. The process was iterative, involving extensive debugging, particularly with persistent React rendering () errors and API integration nuances. Key challenges included ensuring correct OAuth2 flow, fixing URL typos for Mercado Livre, and handling timezone-aware datetimes in the backend. Despite numerous attempts, React errors proved difficult to resolve definitively, often requiring multiple passes of simplification, key additions, and removing third-party toast notifications. The trajectory concluded with the identification of a critical backend issue: incorrect order ID usage during Mercado Livre API calls, preventing successful order imports.
 </analysis>
 
 <product_requirements>
 The Marcos project manages manufacturing for Shopee and Mercado Livre, requiring distinct Financeiro and Produção views, editable Trello-like statuses, SKU automation, role-based access, real-time updates, multi-format spreadsheet uploads, Pedidos Antigos, personalized greetings, AI SKU classification, and batch status updates.
 
-During this trajectory, new features and refinements included:
-- **AI SKU Classification Frontend:** Display suggested sector and Reclassificar button (later removed, but AI learning maintained).
-- **Project & User Fixes:** Rename Shopee Brasil to Shopee - Diamonds, fix molduras user access.
-- **Data Integrity:** Prevent duplicate orders during uploads.
-- **Production Enhancements:** Implement real-time status updates, add Status Montagem column with , ,  statuses and animations.
-- **UI/UX:** Relocate filters for better visibility, add a universal search bar.
-- **Dashboard & Reporting:** Integrate Status Montagem and Status Produção into reports, graphs, and dashboards.
-- **PDF Generation:** Create sector-specific production order PDFs with company header, order details, grouped by SKU with total quantities, and a visually improved layout. Remove individual service order listings.
-- **Selection Count:** Display the accurate count of selected orders.
-- **Responsiveness:** Ensure the application is fully responsive for tablet, desktop, and various resolutions.
+During this trajectory, the engineer addressed several key requirements:
+- **Production Status Enhancements:** Addition of a FINALIZADO button/status to Status Produção, operating independently from Status Montagem, including UI updates for filters and metrics.
+- **Mercado Livre Integration:** Full implementation of Mercado Livre (ML) integration, including OAuth2 authorization, syncing orders via API, and importing them into the system in a Bling-style format. This involved setting up environment variables, backend endpoints, and a dedicated frontend integration page with Connect and Synchronize buttons.
+- **UI Robustness:** Addressing persistent React rendering issues ( errors) and refining UI feedback mechanisms, moving away from toast notifications towards native loading states and visual success/error indicators.
+- **Domain Configuration Assistance:** Providing detailed guidance for custom domain setup for the deployed application.
+- **Order Data Mapping:** Ensuring Mercado Livre orders are correctly mapped to the internal  collection and include necessary fields like .
 </product_requirements>
 
 <key_technical_concepts>
 - **Full-stack Architecture**: React, FastAPI, MongoDB.
-- **Frontend**: React (Hooks: , , , ),  for client-side PDF generation,  for tables in PDF, Tailwind CSS for styling and responsiveness.
-- **Backend**: FastAPI, MongoDB (UUIDs for IDs, ISO strings for DateTime).
-- **Data Handling**: Real-time updates via polling, batch updates.
-- **Deployment**: Supervisor, Kubernetes, environment variables.
+- **Frontend**: React (Hooks: , , ), , , Tailwind CSS.
+- **Backend**: FastAPI, MongoDB (UUIDs, ISO DateTime), OAuth2 (PKCE flow), HTTPX for API calls, environment variables.
+- **Deployment**: Supervisor, Kubernetes, DNS configuration.
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a React frontend, a FastAPI backend, and MongoDB.
+/app/
+├── backend/
+│   ├── .env
+│   ├── requirements.txt
+│   ├── server.py
+│   ├── marketplace_integrator.py
+│   ├── ... (other existing and new utility scripts)
+├── frontend/
+│   ├── .env
+│   ├── package.json
+│   ├── public/
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── components/
+│   │   │   ├── gestao/
+│   │   │   │   └── GestaoLayout.js
+│   │   │   └── Layout.js
+│   │   ├── lib/
+│   │   ├── pages/
+│   │   │   ├── auth/
+│   │   │   │   └── Login.js
+│   │   │   └── gestao/
+│   │   │       ├── ConfiguracoesStatus.js
+│   │   │       ├── GestaoUsuarios.js
+│   │   │       ├── MarketplacesCentral.js
+│   │   │       ├── MarketplaceProjetoDetalhes.js
+│   │   │       ├── MarketplaceIntegrator.js
+│   │   │       ├── IntegradorML.js (NEW)
+│   │   │       ├── Pedidos.js
+│   │   │       └── Producao.js
+│   │   └── index.css
+│   └── yarn.lock
+├── ... (various documentation and utility files)
 
-
+- ****:
+    - **Importance**: Stores environment-specific variables like API keys and database connections.
+    - **Changes**: Added ,  for Mercado Livre integration, and .
 
 - ****:
     - **Importance**: Core backend API endpoints and MongoDB interactions.
-    - **Changes**: Modified  endpoint to correctly apply various filters (, , , , , , , ) for improved filtering functionality. Also updated database name usage to use  for robustness.
-
-- ****:
-    - **Importance**: The most heavily modified file, managing detailed project views, order lists, and production features.
     - **Changes**:
-        - Implemented collapsible sections for Distribuição por Setor, Status de Produção, and Status de Montagem metrics using  and conditional rendering.
-        - Added sector-specific PDF generation using  and . The PDF now groups orders by SKU, displays total quantities per SKU in a structured table, and removes individual service order listings. The Resumo do Setor in the PDF was enhanced with a visually organized table for SKUs and quantities.
-        - The Indicadores Rápidos section (containing Em Produção, Enviados, Entregues, Atrasados cards) was removed.
-        - AI SKU suggestion column (🤖 Sugestão IA) and Reclassificar button were removed for a cleaner UI, while maintaining background AI learning logic.
-        - Corrected the Select All checkbox logic to only select currently filtered/displayed orders () and implemented a real-time counter for selected orders next to the checkbox.
-        - Enhanced responsiveness with Tailwind CSS classes for grid layouts, filter sections, and added  to tables for horizontal scrolling on smaller screens.
-        - Resolved a critical React  error by memoizing the  function with  to optimize re-renders and key handling.
-        - Added  and  dependencies via yarn install v1.22.22
-info No lockfile found.
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-[3/4] Linking dependencies...
-[4/4] Building fresh packages...
-success Saved lockfile.
-Done in 0.05s..
+        - Added new API routes for Mercado Livre integration: , , , .
+        - Corrected  to  when inserting Mercado Livre orders after import.
+        - Ensured  (not ) is used for authentication in new endpoints.
+        - Updated  Pydantic model to include .
 
 - ****:
-    - **Importance**: Defines the main application layout and sidebar navigation.
-    - **Changes**: Updated to include responsive Tailwind CSS classes for flexible layout across devices.
+    - **Importance**: Contains the logic for integrating with marketplace APIs (Mercado Livre, Shopee).
+    - **Changes**:
+        - Corrected Mercado Livre authentication URL from  to .
+        - Corrected the token exchange URL from  to  (and for refresh token).
+        - Added  header for API calls.
+        - Modified  to handle timezone-aware  objects for  comparison.
+        - Identified that the  function was incorrectly using the full order object as an ID instead of extracting the .
 
 - ****:
-    - **Importance**: Global CSS styles.
-    - **Changes**: Added media queries and responsive CSS rules to support different screen sizes, complementing Tailwind's utility classes.
+    - **Importance**: Manages detailed project views, order lists, and production features.
+    - **Changes**: Added Finalizado option to  (Status Produção) selects, filters, and metric calculations, mimicking existing Status Montagem logic.
 
 - ****:
-- ****:
-- ****:
-- **
-============================================================
-🔄 INICIANDO SINCRONIZAÇÃO AUTOMÁTICA
-============================================================
-============================================================
-🛍️  MERCADO LIVRE SYNC - 2025-10-29 02:37:31
-============================================================
-⚠️  Mercado Livre não autenticado - pulando sincronização
-============================================================
-🛒 SHOPEE SYNC - 2025-10-29 02:37:31
-============================================================
-⚠️  Shopee sync ainda não implementado
+    - **Importance**: Central page for managing marketplaces.
+    - **Changes**: Added a navigation link/button to the new Mercado Livre Integrator page.
 
-============================================================
-✅ SINCRONIZAÇÃO CONCLUÍDA
-============================================================**:
-    - **Importance**: Utility scripts for database operations and marketplace synchronization.
-    - **Changes**: Modified to use  instead of hardcoded database names for improved environment variable adherence.
+- ** (NEW FILE)**:
+    - **Importance**: Dedicated component for Mercado Livre integration.
+    - **Changes**:
+        - Implemented UI for connecting to Mercado Livre (OAuth flow).
+        - UI for syncing orders and importing them into the Bling format.
+        - Numerous iterations to resolve persistent React  errors:
+            - Simplified component structure, added  props.
+            - Replaced  (Sonner) notifications with native UI messages (loading states on buttons, success/error emojis).
+            - Corrected  definition order.
+            - Re-added  variable definition.
+            - Removed all  and  icon imports and replaced their usage with emojis to prevent .
+
+- ****:
+    - **Importance**: Defines the main application routes.
+    - **Changes**: Added a new route for  to link to the new  component.
 </code_architecture>
 
 <pending_tasks>
-- User needs to provide Mercado Livre  and  to enable the full integration.
+- User needs to provide Mercado Livre  and  to enable the full integration. (Addressed in trajectory)
 - Implement the complete Shopee integration within .
 - Finalize the cron job setup for automatic marketplace synchronization.
+- Resolve the  error during Mercado Livre order detail fetching, where the entire order object is used as ID instead of the specific .
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer completed a redeploy operation. This involved restarting all core services (nginx, frontend, mongodb, backend, code-server) to ensure that all recent updates and bug fixes were fully applied and to verify the system's stability.
-
-The preceding work focused on resolving a critical  in the frontend, which occurred when clicking the Todos filter for Coleta Shopee Flex and Mercado Livre. The AI engineer diagnosed this as a React rendering issue potentially related to duplicate keys or excessive re-renders. The solution involved:
-1.  Memoizing the  function using  in  to prevent unnecessary recalculations and stabilize the component tree during re-renders.
-2.  Ensuring  was correctly imported and the function calls were updated to reference the memoized value.
-3.  Performing a full frontend restart to guarantee the changes were loaded, as hot-reloading was inconsistently applying updates.
-
-This fix successfully eliminated the  error for both Shopee and Mercado Livre filters, bringing the system to a stable, production-ready state with all requested features active and verified. The redeploy was the final step to confirm everything was live and functioning.
+Immediately before this summary, the AI engineer was addressing an issue where Mercado Livre orders were not importing into the system. Upon inspecting the backend logs, a recurring 400 Bad Request error was identified when the  tried to fetch order *details* from the Mercado Livre API. The root cause was diagnosed as the code attempting to pass the *entire order object* as an ID to the API endpoint, instead of correctly extracting and using only the specific  for each individual order. The trajectory ended with the AI engineer acknowledging this specific problem and stating they would continue to investigate and fix the relevant code in . This is a critical bug preventing the successful transfer of synchronized Mercado Livre orders into the application's order management system.
 </current_work>
 
 <optional_next_step>
-User should thoroughly test the deployed application in their real production environment.
+Fix the  to correctly extract and use  when fetching Mercado Livre order details.
 </optional_next_step>
