@@ -84,6 +84,7 @@ export default function IntegradorML() {
     if (syncing) return;
     
     setSyncing(true);
+    setSyncResult(null); // Limpar resultado anterior
     
     try {
       const token = localStorage.getItem('token');
@@ -97,25 +98,21 @@ export default function IntegradorML() {
         }
       );
       
-      if (response.data.success) {
-        // Aguardar setState completar
-        await new Promise(resolve => setTimeout(resolve, 200));
-        setSyncing(false);
-        
-        // Mostrar toast após estado atualizado
-        await new Promise(resolve => setTimeout(resolve, 100));
-        toast.success(`✅ ${response.data.orders_synced} pedidos sincronizados!`, { duration: 4000 });
-      }
+      // Atualizar estado com resultado
+      setSyncing(false);
+      setSyncResult({
+        success: true,
+        message: `${response.data.orders_synced} pedidos sincronizados com sucesso!`,
+        count: response.data.orders_synced
+      });
+      
     } catch (error) {
       console.error('Erro ao sincronizar:', error);
-      // Aguardar setState completar
-      await new Promise(resolve => setTimeout(resolve, 200));
       setSyncing(false);
-      
-      // Mostrar erro após estado atualizado
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const errorMsg = error.response?.data?.detail || error.message || 'Erro ao sincronizar pedidos';
-      toast.error(errorMsg);
+      setSyncResult({
+        success: false,
+        message: error.response?.data?.detail || error.message || 'Erro ao sincronizar pedidos'
+      });
     }
   }, [syncing, daysBack]);
 
