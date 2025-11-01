@@ -86,7 +86,6 @@ export default function IntegradorML() {
     
     try {
       const token = localStorage.getItem('token');
-      toast.info('⏳ Iniciando sincronização...');
       
       const response = await axios.post(
         `${API}/integrator/mercadolivre/sync`,
@@ -98,14 +97,24 @@ export default function IntegradorML() {
       );
       
       if (response.data.success) {
-        toast.success(`✅ ${response.data.orders_synced} pedidos sincronizados!`);
+        // Aguardar setState completar
+        await new Promise(resolve => setTimeout(resolve, 200));
+        setSyncing(false);
+        
+        // Mostrar toast após estado atualizado
+        await new Promise(resolve => setTimeout(resolve, 100));
+        toast.success(`✅ ${response.data.orders_synced} pedidos sincronizados!`, { duration: 4000 });
       }
     } catch (error) {
       console.error('Erro ao sincronizar:', error);
+      // Aguardar setState completar
+      await new Promise(resolve => setTimeout(resolve, 200));
+      setSyncing(false);
+      
+      // Mostrar erro após estado atualizado
+      await new Promise(resolve => setTimeout(resolve, 100));
       const errorMsg = error.response?.data?.detail || error.message || 'Erro ao sincronizar pedidos';
       toast.error(errorMsg);
-    } finally {
-      setSyncing(false);
     }
   }, [syncing, daysBack]);
 
