@@ -6130,6 +6130,7 @@ async def ml_import_to_system(
                     pedido_sistema['nome_variacao'] = first_item.get('variation_name', '')
                     pedido_sistema['sku'] = first_item.get('seller_sku', '')
                     pedido_sistema['numero_referencia_sku'] = first_item.get('seller_sku', '')
+                    pedido_sistema['numero_anuncio'] = first_item.get('listing_id', '')  # ID do anúncio
                     
                     # Somar quantidades
                     total_qty = sum(item.get('quantity', 0) for item in ml_items)
