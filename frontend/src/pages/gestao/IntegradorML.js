@@ -122,6 +122,7 @@ export default function IntegradorML() {
     if (importing) return;
     
     setImporting(true);
+    setImportResult(null); // Limpar resultado anterior
     
     try {
       const token = localStorage.getItem('token');
@@ -135,25 +136,21 @@ export default function IntegradorML() {
         }
       );
       
-      if (response.data.success) {
-        // Aguardar setState completar antes de mostrar toast
-        await new Promise(resolve => setTimeout(resolve, 200));
-        setImporting(false);
-        
-        // Agora mostrar toast após estado atualizado
-        await new Promise(resolve => setTimeout(resolve, 100));
-        toast.success(response.data.message, { duration: 4000 });
-      }
+      // Atualizar estado com resultado
+      setImporting(false);
+      setImportResult({
+        success: true,
+        message: response.data.message,
+        count: response.data.imported_count
+      });
+      
     } catch (error) {
       console.error('Erro ao importar:', error);
-      // Aguardar setState completar
-      await new Promise(resolve => setTimeout(resolve, 200));
       setImporting(false);
-      
-      // Mostrar erro após estado atualizado
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const errorMsg = error.response?.data?.detail || error.message || 'Erro ao importar pedidos';
-      toast.error(errorMsg);
+      setImportResult({
+        success: false,
+        message: error.response?.data?.detail || error.message || 'Erro ao importar pedidos'
+      });
     }
   }, [importing]);
 
