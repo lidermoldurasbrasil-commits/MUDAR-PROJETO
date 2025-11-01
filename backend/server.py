@@ -6134,7 +6134,7 @@ async def ml_import_to_system(
                     pedido_sistema['quantidade'] = total_qty
                 
                 # Inserir no sistema
-                await db.pedidos.insert_one(pedido_sistema)
+                await db.pedidos_marketplace.insert_one(pedido_sistema)
                 
                 # Marcar como importado
                 await db.orders.update_one(
