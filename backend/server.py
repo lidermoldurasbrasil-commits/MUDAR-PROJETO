@@ -6103,6 +6103,8 @@ async def ml_import_to_system(
                     
                     # Mercado Livre específico
                     'receita_produtos': ml_order.get('subtotal_items', 0),
+                    'numero_anuncio': '',  # Será preenchido dos itens
+                    'preco_unitario_venda': ml_order.get('subtotal_items', 0),
                     
                     # Controle
                     'responsavel': '',
