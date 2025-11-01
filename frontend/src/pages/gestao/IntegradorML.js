@@ -127,19 +127,24 @@ export default function IntegradorML() {
       );
       
       if (response.data.success) {
-        // Usar setTimeout para evitar conflitos de re-render
-        setTimeout(() => {
-          toast.success(response.data.message, { duration: 3000 });
-        }, 100);
+        // Aguardar setState completar antes de mostrar toast
+        await new Promise(resolve => setTimeout(resolve, 200));
+        setImporting(false);
+        
+        // Agora mostrar toast após estado atualizado
+        await new Promise(resolve => setTimeout(resolve, 100));
+        toast.success(response.data.message, { duration: 4000 });
       }
     } catch (error) {
       console.error('Erro ao importar:', error);
-      setTimeout(() => {
-        const errorMsg = error.response?.data?.detail || error.message || 'Erro ao importar pedidos';
-        toast.error(errorMsg);
-      }, 100);
-    } finally {
+      // Aguardar setState completar
+      await new Promise(resolve => setTimeout(resolve, 200));
       setImporting(false);
+      
+      // Mostrar erro após estado atualizado
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const errorMsg = error.response?.data?.detail || error.message || 'Erro ao importar pedidos';
+      toast.error(errorMsg);
     }
   }, [importing]);
 
