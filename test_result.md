@@ -291,9 +291,9 @@ backend:
 
   - task: "Mercado Livre API Integration - Order Import Bug Fix"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/marketplace_integrator.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "critical"
     needs_retesting: false
     status_history:
@@ -306,6 +306,12 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ CRITICAL BUG FIX VERIFIED AND WORKING! Comprehensive testing completed: 1) ML connection status confirmed (connected=true, user_id=314836169) ✅ 2) Order sync tested with multiple time ranges (1, 7, 30 days) - all successful ✅ 3) 110 orders processed successfully without any 400 Bad Request errors ✅ 4) Backend logs show HTTP 200 OK responses, confirming no more 400 errors ✅ 5) Bug fix correctly extracts order IDs from order objects before API calls ✅. CRITICAL SUCCESS: The fetch_orders_since() method now properly handles order ID extraction (lines 246-252). No more 400 Bad Request errors when fetching order details. ML integration is fully functional and ready for production. Minor: Authorization URL endpoint had issues (likely due to existing credentials), Import to Bling endpoint returned 404 (may not be implemented yet), but core sync functionality is 100% operational."
+        - working: false
+          agent: "user"
+          comment: "URGENT: User reports Mercado Livre orders not found after synchronization. 110 orders synced earlier but orders not visible in system."
+        - working: false
+          agent: "testing"
+          comment: "🚨 CRITICAL IMPORT BUG DISCOVERED! Full investigation completed: ❌ ROOT CAUSE IDENTIFIED: 113 ML orders exist in intermediate 'orders' collection and ALL are marked as imported_to_system=True, but 0 orders exist in final 'pedidos_marketplace' collection. ❌ IMPORT PROCESS BUG: The import-to-system endpoint marks orders as imported but fails to actually insert them into pedidos_marketplace collection. ❌ BACKEND ERRORS: ObjectId serialization errors found in logs during import process. 🔍 INVESTIGATION RESULTS: Intermediate collection: 113 ML orders (all marked imported), Final collection: 0 ML orders, ML Project exists correctly (ID: mercadolivre-projeto). 🔧 SOLUTION NEEDED: Fix import-to-system endpoint to properly move orders from 'orders' to 'pedidos_marketplace' collection and resolve ObjectId serialization issues."
 
 frontend:
   - task: "Aba Orçamento no PedidoForm com lista de insumos detalhada"
