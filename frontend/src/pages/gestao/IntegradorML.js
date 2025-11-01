@@ -314,7 +314,7 @@ export default function IntegradorML() {
 
               {importing && (
                 <p className="text-sm text-gray-600 mt-2">
-                  📦 Importando pedidos para o sistema... Aguarde.
+                  📦 Convertendo pedidos para formato Bling... Aguarde.
                 </p>
               )}
             </div>
