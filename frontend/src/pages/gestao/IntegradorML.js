@@ -239,22 +239,27 @@ export default function IntegradorML() {
               
               {/* Resultado da Sincronização */}
               {syncResult && (
-                <div className={`mb-4 p-4 rounded-lg border ${
-                  syncResult.success 
-                    ? 'bg-green-50 border-green-200' 
-                    : 'bg-red-50 border-red-200'
-                }`}>
+                <div 
+                  key={`sync-result-${Date.now()}`}
+                  className={`mb-4 p-4 rounded-lg border ${
+                    syncResult.success 
+                      ? 'bg-green-50 border-green-200' 
+                      : 'bg-red-50 border-red-200'
+                  }`}
+                >
                   <div className="flex items-start gap-3">
-                    {syncResult.success ? (
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    )}
+                    <div className="flex-shrink-0 mt-0.5">
+                      {syncResult.success ? (
+                        <span className="text-green-600 text-xl">✅</span>
+                      ) : (
+                        <span className="text-red-600 text-xl">❌</span>
+                      )}
+                    </div>
                     <div className="flex-1">
                       <p className={`font-semibold ${
                         syncResult.success ? 'text-green-800' : 'text-red-800'
                       }`}>
-                        {syncResult.success ? '✅ Sincronização Completa' : '❌ Erro na Sincronização'}
+                        {syncResult.success ? 'Sincronização Completa' : 'Erro na Sincronização'}
                       </p>
                       <p className={`text-sm mt-1 ${
                         syncResult.success ? 'text-green-700' : 'text-red-700'
@@ -263,13 +268,15 @@ export default function IntegradorML() {
                       </p>
                       {syncResult.success && syncResult.count > 0 && (
                         <p className="text-sm text-green-600 mt-2">
-                          👉 Agora clique em <strong>"Importar Pedidos"</strong> abaixo
+                          👉 Agora clique em Importar Pedidos abaixo
                         </p>
                       )}
                     </div>
                     <button
+                      type="button"
                       onClick={() => setSyncResult(null)}
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+                      aria-label="Fechar"
                     >
                       ×
                     </button>
