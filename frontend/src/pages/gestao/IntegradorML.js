@@ -240,7 +240,6 @@ export default function IntegradorML() {
               {/* Resultado da Sincronização */}
               {syncResult && (
                 <div 
-                  key={`sync-result-${Date.now()}`}
                   className={`mb-4 p-4 rounded-lg border ${
                     syncResult.success 
                       ? 'bg-green-50 border-green-200' 
