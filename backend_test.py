@@ -5722,32 +5722,7 @@ class BusinessManagementSystemTester:
         print(f"   📊 Not imported: {not_imported_count}")
         print("   ⚠️ CRITICAL FINDING: All orders marked as imported but not in final collection!")
         
-        ml_orders_count = 0
-        imported_count = 0
-        not_imported_count = 0
-        
-        if success_orders and isinstance(orders_response, list):
-            ml_orders_count = len(orders_response)
-            for order in orders_response:
-                if order.get('imported_to_system'):
-                    imported_count += 1
-                else:
-                    not_imported_count += 1
-            
-            print(f"✅ Found {ml_orders_count} ML orders in intermediate collection")
-            print(f"   📊 Imported to system: {imported_count}")
-            print(f"   📊 Not imported: {not_imported_count}")
-        else:
-            print("❌ Failed to retrieve orders from intermediate collection")
-            # Try alternative endpoint
-            success_alt, alt_response = self.run_test(
-                "Check Alternative Orders Endpoint",
-                "GET", 
-                "integrator/orders?filter=mercadolivre",
-                200
-            )
-            if success_alt:
-                print(f"✅ Alternative endpoint returned: {len(alt_response) if isinstance(alt_response, list) else 'non-list response'}")
+        # Values already set above from database check
         
         # Step 2: Check Final Orders Collection (pedidos_marketplace)
         print("\n📋 Step 2: Checking final 'pedidos_marketplace' collection...")
