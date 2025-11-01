@@ -6135,30 +6135,31 @@ async def ml_import_to_system(
                 
                 # Buscar itens do pedido
                 ml_items = await db.order_items.find({
-                    'marketplace_order_id': ml_order.get('marketplace_order_id')
+                    'marketplace_order_id': ml_order_id_str
                 }).to_list(length=100)
                 
                 if ml_items:
                     # Pegar dados do primeiro item (ou somar se houver múltiplos)
                     first_item = ml_items[0]
-                    pedido_sistema['produto_nome'] = first_item.get('product_title', '')
-                    pedido_sistema['nome_variacao'] = first_item.get('variation_name', '')
-                    pedido_sistema['sku'] = first_item.get('seller_sku', '')
-                    pedido_sistema['numero_referencia_sku'] = first_item.get('seller_sku', '')
-                    pedido_sistema['numero_anuncio'] = first_item.get('listing_id', '')  # ID do anúncio
+                    pedido_sistema['produto_nome'] = str(first_item.get('product_title', ''))
+                    pedido_sistema['nome_variacao'] = str(first_item.get('variation_name', ''))
+                    pedido_sistema['sku'] = str(first_item.get('seller_sku', ''))
+                    pedido_sistema['numero_referencia_sku'] = str(first_item.get('seller_sku', ''))
+                    pedido_sistema['numero_anuncio'] = str(first_item.get('marketplace_item_id', ''))  # ID do anúncio
                     
                     # Somar quantidades
-                    total_qty = sum(item.get('quantity', 0) for item in ml_items)
+                    total_qty = sum(int(item.get('quantity', 0)) for item in ml_items)
                     pedido_sistema['quantidade'] = total_qty
                 
                 # Inserir no sistema
                 await db.pedidos_marketplace.insert_one(pedido_sistema)
                 
-                # Marcar como importado
-                await db.orders.update_one(
-                    {'_id': ml_order['_id']},
-                    {'$set': {'imported_to_system': True, 'imported_at': datetime.now(timezone.utc)}}
-                )
+                # Marcar como importado (usar o ObjectId original)
+                if ml_order_id_obj:
+                    await db.orders.update_one(
+                        {'_id': ml_order_id_obj},
+                        {'$set': {'imported_to_system': True, 'imported_at': datetime.now(timezone.utc).isoformat()}}
+                    )
                 
                 imported_count += 1
                 
