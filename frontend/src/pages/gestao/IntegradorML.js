@@ -10,7 +10,7 @@ export default function IntegradorML() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [daysBack, setDaysBack] = useState(30);
+  const [importResult, setImportResult] = useState(null);
 
   const checkConnectionStatus = useCallback(async () => {
     try {
