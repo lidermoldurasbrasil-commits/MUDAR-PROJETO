@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Plug, RefreshCw, CheckCircle, XCircle, ExternalLink, Loader, ShoppingCart } from 'lucide-react';
+import { Plug, RefreshCw, ExternalLink, Loader, ShoppingCart } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
