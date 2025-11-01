@@ -5705,6 +5705,10 @@ class BusinessManagementSystemTester:
         print("🚀 Starting Business Management System Tests...")
         print(f"🌐 Testing against: {self.base_url}")
         
+        # CRITICAL: Test Mercado Livre Integration Bug Fix FIRST
+        print("\n🚨 PRIORITY: Testing Mercado Livre Integration Bug Fix...")
+        self.test_mercado_livre_integration()
+        
         # Run marketplace filters test as requested by user
         filters_success = self.test_marketplace_filters()
         
