@@ -5860,13 +5860,19 @@ class BusinessManagementSystemTester:
         elif not_imported_count > 0:
             diagnosis.append(f"⚠️ ISSUE: {not_imported_count} orders stuck in intermediate collection")
         
-        if final_ml_orders_count == 0:
-            diagnosis.append("❌ CRITICAL: No ML orders in final collection - import process failing")
+        if final_ml_orders_count == 0 and ml_orders_count > 0:
+            diagnosis.append("❌ CRITICAL: Import process bug - orders marked as imported but not in final collection")
+            diagnosis.append("❌ CRITICAL: 113 ML orders exist and marked imported_to_system=True but 0 in pedidos_marketplace")
         elif final_ml_orders_count < ml_orders_count:
             diagnosis.append(f"⚠️ ISSUE: Only {final_ml_orders_count}/{ml_orders_count} orders made it to final collection")
         
         if not mercadolivre_project_id:
             diagnosis.append("❌ CRITICAL: ML project not properly configured")
+        
+        # Add specific diagnosis for the discovered issue
+        if imported_count == ml_orders_count and final_ml_orders_count == 0:
+            diagnosis.append("🔍 ROOT CAUSE: Import endpoint marks orders as imported but fails to insert into pedidos_marketplace")
+            diagnosis.append("🔧 SOLUTION NEEDED: Fix import-to-system endpoint to properly move orders to final collection")
         
         print("\n🔍 DIAGNOSIS:")
         if diagnosis:
