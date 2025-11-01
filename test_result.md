@@ -493,10 +493,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "AI SKU Classification Frontend Integration"
+    - "Mercado Livre API Integration - Order Import Bug Fix"
   stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
+  test_priority: "critical_first"
 
 agent_communication:
     - agent: "testing"
