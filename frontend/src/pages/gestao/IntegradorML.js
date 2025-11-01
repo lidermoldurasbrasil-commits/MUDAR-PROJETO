@@ -339,22 +339,27 @@ export default function IntegradorML() {
 
               {/* Resultado da Importação */}
               {importResult && (
-                <div className={`mb-4 p-4 rounded-lg border ${
-                  importResult.success 
-                    ? 'bg-green-50 border-green-200' 
-                    : 'bg-red-50 border-red-200'
-                }`}>
+                <div 
+                  key={`import-result-${Date.now()}`}
+                  className={`mb-4 p-4 rounded-lg border ${
+                    importResult.success 
+                      ? 'bg-green-50 border-green-200' 
+                      : 'bg-red-50 border-red-200'
+                  }`}
+                >
                   <div className="flex items-start gap-3">
-                    {importResult.success ? (
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    )}
+                    <div className="flex-shrink-0 mt-0.5">
+                      {importResult.success ? (
+                        <span className="text-green-600 text-xl">✅</span>
+                      ) : (
+                        <span className="text-red-600 text-xl">❌</span>
+                      )}
+                    </div>
                     <div className="flex-1">
                       <p className={`font-semibold ${
                         importResult.success ? 'text-green-800' : 'text-red-800'
                       }`}>
-                        {importResult.success ? '✅ Sucesso!' : '❌ Erro'}
+                        {importResult.success ? 'Sucesso!' : 'Erro'}
                       </p>
                       <p className={`text-sm mt-1 ${
                         importResult.success ? 'text-green-700' : 'text-red-700'
@@ -363,13 +368,15 @@ export default function IntegradorML() {
                       </p>
                       {importResult.success && importResult.count > 0 && (
                         <p className="text-sm text-green-600 mt-2">
-                          📍 Acesse <strong>Marketplaces → Mercado Livre</strong> para visualizar os pedidos
+                          📍 Acesse Marketplaces → Mercado Livre para visualizar os pedidos
                         </p>
                       )}
                     </div>
                     <button
+                      type="button"
                       onClick={() => setImportResult(null)}
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+                      aria-label="Fechar"
                     >
                       ×
                     </button>
