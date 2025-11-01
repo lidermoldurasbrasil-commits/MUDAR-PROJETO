@@ -6162,9 +6162,12 @@ async def ml_import_to_system(
                     )
                 
                 imported_count += 1
+                print(f"✅ Pedido {ml_order_id_str} importado com sucesso")
                 
             except Exception as item_error:
-                logger.error(f"Erro ao importar pedido {ml_order.get('marketplace_order_id')}: {item_error}")
+                logger.error(f"Erro ao importar pedido {ml_order.get('marketplace_order_id', 'UNKNOWN')}: {item_error}")
+                import traceback
+                traceback.print_exc()
                 continue
         
         return {
