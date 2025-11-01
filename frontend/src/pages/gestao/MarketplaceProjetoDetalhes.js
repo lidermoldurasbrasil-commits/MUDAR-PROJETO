@@ -468,20 +468,14 @@ export default function MarketplaceProjetoDetalhes() {
     try {
       setUploadProgress(true);
       
-      // Fechar modal IMEDIATAMENTE para evitar conflitos de renderização
+      // Fechar modal IMEDIATAMENTE
       setShowUploadModal(false);
       
-      // Colocar em modo loading ANTES de limpar estado
+      // Colocar em modo loading ANTES de fazer qualquer operação
       setLoading(true);
       
-      // Aguardar um pouco para garantir que modal fechou
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Limpar TUDO
-      setPedidos([]);
-      setSelectedPedidos([]);
-      setSelectAll(false);
-      setAgruparPor('');
+      // Aguardar modal fechar completamente
+      await new Promise(resolve => setTimeout(resolve, 150));
       
       const token = localStorage.getItem('token');
       
@@ -515,20 +509,17 @@ export default function MarketplaceProjetoDetalhes() {
         });
       }
       
-      // Aguardar mais tempo para garantir que React processou tudo
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Aguardar um pouco antes de recarregar dados
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Buscar novos dados
+      // Buscar novos dados (fetchDados já limpa o estado antes de buscar)
       await fetchDados();
       
     } catch (error) {
       console.error('Erro ao fazer upload:', error);
       toast.error(error.response?.data?.detail || 'Erro ao processar planilha');
       
-      // Em caso de erro, também limpar e recarregar
-      setPedidos([]);
-      setSelectedPedidos([]);
-      setSelectAll(false);
+      // Em caso de erro, recarregar dados
       await fetchDados();
       
     } finally {
