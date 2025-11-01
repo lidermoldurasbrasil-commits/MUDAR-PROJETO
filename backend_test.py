@@ -5700,10 +5700,217 @@ class BusinessManagementSystemTester:
                 print(f"❌ Sync failed for {test_case['description']}")
                 self.log_test(f"ML Sync - {test_case['description']}", False, "Sync request failed")
 
+    def test_mercado_livre_orders_investigation(self):
+        """URGENT: Investigate Mercado Livre Orders Not Found - Full Import Flow Investigation"""
+        print("\n🔍 URGENT: MERCADO LIVRE ORDERS INVESTIGATION...")
+        print("📋 Investigating why ML orders are not visible after synchronization")
+        
+        # Step 1: Check Intermediate Orders Collection
+        print("\n📋 Step 1: Checking intermediate 'orders' collection for ML orders...")
+        success_orders, orders_response = self.run_test(
+            "Check Orders Collection for ML Orders",
+            "GET",
+            "integrator/mercadolivre/orders?marketplace=MERCADO_LIVRE",
+            200
+        )
+        
+        ml_orders_count = 0
+        imported_count = 0
+        not_imported_count = 0
+        
+        if success_orders and isinstance(orders_response, list):
+            ml_orders_count = len(orders_response)
+            for order in orders_response:
+                if order.get('imported_to_system'):
+                    imported_count += 1
+                else:
+                    not_imported_count += 1
+            
+            print(f"✅ Found {ml_orders_count} ML orders in intermediate collection")
+            print(f"   📊 Imported to system: {imported_count}")
+            print(f"   📊 Not imported: {not_imported_count}")
+        else:
+            print("❌ Failed to retrieve orders from intermediate collection")
+            # Try alternative endpoint
+            success_alt, alt_response = self.run_test(
+                "Check Alternative Orders Endpoint",
+                "GET", 
+                "integrator/orders?filter=mercadolivre",
+                200
+            )
+            if success_alt:
+                print(f"✅ Alternative endpoint returned: {len(alt_response) if isinstance(alt_response, list) else 'non-list response'}")
+        
+        # Step 2: Check Final Orders Collection (pedidos_marketplace)
+        print("\n📋 Step 2: Checking final 'pedidos_marketplace' collection...")
+        
+        # First, get Mercado Livre project ID
+        success_projects, projects_response = self.run_test(
+            "Get Marketplace Projects",
+            "GET",
+            "gestao/marketplaces/projetos",
+            200
+        )
+        
+        mercadolivre_project_id = None
+        if success_projects and isinstance(projects_response, list):
+            for project in projects_response:
+                if project.get('plataforma', '').lower() in ['mercadolivre', 'mercado_livre']:
+                    mercadolivre_project_id = project.get('id')
+                    print(f"✅ Found Mercado Livre project: {project.get('nome', 'Unknown')} (ID: {mercadolivre_project_id})")
+                    break
+        
+        if not mercadolivre_project_id:
+            print("❌ CRITICAL: Mercado Livre project not found!")
+            self.log_test("ML Investigation - Project Found", False, "ML project not found")
+            return False
+        
+        # Check final orders collection
+        success_final, final_response = self.run_test(
+            "Check Final Orders Collection (pedidos_marketplace)",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={mercadolivre_project_id}",
+            200
+        )
+        
+        final_ml_orders_count = 0
+        if success_final and isinstance(final_response, list):
+            final_ml_orders_count = len(final_response)
+            print(f"✅ Found {final_ml_orders_count} ML orders in final collection")
+            
+            # Sample some orders to check fields
+            if final_ml_orders_count > 0:
+                sample_order = final_response[0]
+                print(f"   📊 Sample order fields: marketplace={sample_order.get('marketplace')}, "
+                      f"marketplace_order_id={sample_order.get('marketplace_order_id')}, "
+                      f"numero_pedido={sample_order.get('numero_pedido')}")
+        else:
+            print("❌ No ML orders found in final collection or failed to retrieve")
+        
+        # Step 3: Verify Mercado Livre Project Configuration
+        print("\n📋 Step 3: Verifying Mercado Livre project configuration...")
+        success_project_detail, project_detail = self.run_test(
+            "Get ML Project Details",
+            "GET",
+            f"gestao/marketplaces/projetos/{mercadolivre_project_id}",
+            200
+        )
+        
+        if success_project_detail:
+            print(f"✅ ML Project details: nome={project_detail.get('nome')}, "
+                  f"plataforma={project_detail.get('plataforma')}")
+            if project_detail.get('plataforma', '').lower() != 'mercadolivre':
+                print("⚠️ WARNING: Project platform may not be correctly set")
+        
+        # Step 4: Test Import Endpoint
+        print("\n📋 Step 4: Testing import endpoint...")
+        success_import, import_response = self.run_test(
+            "Test ML Import to System Endpoint",
+            "POST",
+            "integrator/mercadolivre/import-to-system",
+            200
+        )
+        
+        if success_import:
+            imported_orders = import_response.get('imported_orders', 0)
+            print(f"✅ Import endpoint response: {imported_orders} orders imported")
+            if imported_orders == 0:
+                print("⚠️ WARNING: Import endpoint returned 0 orders imported")
+        else:
+            print("❌ Import endpoint failed or returned error")
+        
+        # Step 5: Re-check final collection after import
+        print("\n📋 Step 5: Re-checking final collection after import attempt...")
+        success_recheck, recheck_response = self.run_test(
+            "Re-check Final Orders After Import",
+            "GET",
+            f"gestao/marketplaces/pedidos?projeto_id={mercadolivre_project_id}",
+            200
+        )
+        
+        final_orders_after_import = 0
+        if success_recheck and isinstance(recheck_response, list):
+            final_orders_after_import = len(recheck_response)
+            print(f"✅ After import: {final_orders_after_import} ML orders in final collection")
+        
+        # Step 6: Check data mapping and required fields
+        print("\n📋 Step 6: Verifying data mapping and required fields...")
+        if success_recheck and final_orders_after_import > 0:
+            sample_orders = recheck_response[:3]  # Check first 3 orders
+            mapping_issues = []
+            
+            for i, order in enumerate(sample_orders):
+                print(f"   📊 Order {i+1} mapping check:")
+                required_fields = ['marketplace', 'marketplace_order_id', 'numero_pedido', 'sku', 'quantidade', 'preco_acordado']
+                missing_fields = []
+                
+                for field in required_fields:
+                    if not order.get(field):
+                        missing_fields.append(field)
+                
+                if missing_fields:
+                    mapping_issues.append(f"Order {i+1} missing: {missing_fields}")
+                    print(f"      ❌ Missing fields: {missing_fields}")
+                else:
+                    print(f"      ✅ All required fields present")
+            
+            if mapping_issues:
+                print(f"⚠️ Data mapping issues found: {len(mapping_issues)} orders with missing fields")
+            else:
+                print("✅ Data mapping appears correct")
+        
+        # Step 7: Summary and Diagnosis
+        print("\n📋 Step 7: Investigation Summary...")
+        print("=" * 60)
+        print(f"📊 INVESTIGATION RESULTS:")
+        print(f"   Intermediate collection (orders): {ml_orders_count} ML orders")
+        print(f"   - Imported to system: {imported_count}")
+        print(f"   - Not imported: {not_imported_count}")
+        print(f"   Final collection (pedidos_marketplace): {final_ml_orders_count} ML orders")
+        print(f"   After import attempt: {final_orders_after_import} ML orders")
+        print(f"   ML Project ID: {mercadolivre_project_id}")
+        
+        # Diagnosis
+        diagnosis = []
+        if ml_orders_count == 0:
+            diagnosis.append("❌ CRITICAL: No ML orders found in intermediate collection")
+        elif not_imported_count > 0:
+            diagnosis.append(f"⚠️ ISSUE: {not_imported_count} orders stuck in intermediate collection")
+        
+        if final_ml_orders_count == 0:
+            diagnosis.append("❌ CRITICAL: No ML orders in final collection - import process failing")
+        elif final_ml_orders_count < ml_orders_count:
+            diagnosis.append(f"⚠️ ISSUE: Only {final_ml_orders_count}/{ml_orders_count} orders made it to final collection")
+        
+        if not mercadolivre_project_id:
+            diagnosis.append("❌ CRITICAL: ML project not properly configured")
+        
+        print("\n🔍 DIAGNOSIS:")
+        if diagnosis:
+            for issue in diagnosis:
+                print(f"   {issue}")
+        else:
+            print("   ✅ No critical issues detected - orders should be visible")
+        
+        print("=" * 60)
+        
+        # Log overall result
+        critical_issues = len([d for d in diagnosis if "CRITICAL" in d])
+        if critical_issues == 0:
+            self.log_test("ML Orders Investigation - OVERALL", True)
+            return True
+        else:
+            self.log_test("ML Orders Investigation - OVERALL", False, f"{critical_issues} critical issues found")
+            return False
+
     def run_all_tests(self):
         """Run all test suites"""
         print("🚀 Starting Business Management System Tests...")
         print(f"🌐 Testing against: {self.base_url}")
+        
+        # URGENT: Run Mercado Livre investigation first
+        print("\n🚨 URGENT: Investigating Mercado Livre Orders Import Flow...")
+        self.test_mercado_livre_orders_investigation()
         
         # CRITICAL: Test Mercado Livre Integration Bug Fix FIRST
         print("\n🚨 PRIORITY: Testing Mercado Livre Integration Bug Fix...")
