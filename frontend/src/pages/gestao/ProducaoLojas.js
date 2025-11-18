@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { Plus, X, Upload, Eye, Trash2, Edit, Filter, Calendar, User, Package } from 'lucide-react';
 import GestaoLayout from '../../components/gestao/GestaoLayout';
 
