@@ -1858,6 +1858,59 @@ class PedidoMarketplace(BaseModel):
 
 class SKUFeedback(BaseModel):
     """Feedback de classificação de SKU - Sistema de Aprendizado"""
+
+# ============= MODELO PEDIDO LOJA FÍSICA =============
+class PedidoLoja(BaseModel):
+    """Modelo para pedidos de lojas físicas com controle de produção"""
+    model_config = ConfigDict(extra="ignore")
+    
+    # Identificação
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    numero_pedido: str = ""  # Gerado automaticamente (ex: LJ-SJB-001)
+    loja: str  # São João Batista, Mantiqueira, Lagoa Santa, Fábrica
+    
+    # Cliente
+    cliente_nome: str
+    cliente_contato: str  # WhatsApp/Telefone
+    
+    # Produto/Serviço
+    produto_descricao: str
+    medidas_dimensoes: str = ""
+    tipo_acabamento: str = ""  # Tipo de moldura, acabamento, etc
+    
+    # Comercial
+    vendedor_responsavel: str = ""
+    valor_acordado: float = 0
+    forma_pagamento: str = ""  # Dinheiro, Cartão, PIX, etc
+    
+    # Status e Fluxo de Produção
+    status: str = "Aguardando Arte"  # Aguardando Arte, Arte em Desenvolvimento, Aguardando Aprovação, Aprovado, Impressão, Montagem, Finalizado, Entregue
+    status_cor: str = "#94A3B8"
+    
+    # Controle de Setores
+    setor_arte_responsavel: str = ""
+    data_envio_arte: Optional[datetime] = None
+    data_aprovacao_cliente: Optional[datetime] = None
+    data_inicio_producao: Optional[datetime] = None
+    data_finalizacao: Optional[datetime] = None
+    data_entrega: Optional[datetime] = None
+    
+    # Prazos
+    prazo_entrega: datetime = Field(default_factory=lambda: datetime.now(timezone.utc) + timedelta(days=7))
+    
+    # Fotos
+    fotos: List[str] = []  # URLs das fotos do produto
+    
+    # Observações e Controle
+    observacoes: str = ""
+    prioridade: str = "Normal"  # Baixa, Normal, Alta, Urgente
+    atrasado: bool = False
+    
+    # Metadata
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = ""  # Username do criador
+
     model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
