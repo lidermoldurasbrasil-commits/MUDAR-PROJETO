@@ -24,7 +24,7 @@ if not mongo_url:
 
 # Definir usuários dos setores
 users_production = [
-    {'username': 'espelho', 'nome': 'Alex', 'password': '123', 'role': 'production', 'ativo': True},
+    {'username': 'espelho', 'nome': 'Mateus', 'password': '123', 'role': 'production', 'ativo': True},
     {'username': 'molduras-vidro', 'nome': 'Ronaldo', 'password': '123', 'role': 'production', 'ativo': True},
     {'username': 'molduras', 'nome': 'Luiz', 'password': '123', 'role': 'production', 'ativo': True},
     {'username': 'impressao', 'nome': 'Camila', 'password': '123', 'role': 'production', 'ativo': True},
