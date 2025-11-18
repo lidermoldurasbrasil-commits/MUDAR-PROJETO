@@ -6268,6 +6268,168 @@ async def ml_webhook(request: Request):
         logger.error(f"Erro ao processar webhook ML: {e}")
         return {"success": False, "error": str(e)}
 
+
+
+# ============= ENDPOINTS PRODUÇÃO LOJAS FÍSICAS =============
+
+@api_router.post("/gestao/lojas/pedidos")
+async def create_pedido_loja(pedido: PedidoLoja, credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Criar novo pedido de loja física"""
+    try:
+        user = decode_token(credentials.credentials)
+        
+        # Gerar número do pedido automaticamente
+        loja_prefix = {
+            "São João Batista": "SJB",
+            "Mantiqueira": "MTQ",
+            "Lagoa Santa": "LGS",
+            "Fábrica": "FAB"
+        }.get(pedido.loja, "LJ")
+        
+        # Buscar último número
+        last_pedido = await db.pedidos_lojas.find_one(
+            {"loja": pedido.loja},
+            sort=[("created_at", -1)]
+        )
+        
+        if last_pedido and last_pedido.get('numero_pedido'):
+            try:
+                last_num = int(last_pedido['numero_pedido'].split('-')[-1])
+                new_num = last_num + 1
+            except:
+                new_num = 1
+        else:
+            new_num = 1
+        
+        pedido.numero_pedido = f"LJ-{loja_prefix}-{new_num:04d}"
+        pedido.created_by = user['username']
+        pedido.created_at = datetime.now(timezone.utc)
+        pedido.updated_at = datetime.now(timezone.utc)
+        
+        pedido_dict = pedido.model_dump()
+        await db.pedidos_lojas.insert_one(pedido_dict)
+        
+        return {"success": True, "pedido": pedido_dict}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.get("/gestao/lojas/pedidos")
+async def get_pedidos_loja(
+    loja: Optional[str] = None,
+    status: Optional[str] = None,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Listar pedidos de lojas físicas com filtros"""
+    try:
+        user = decode_token(credentials.credentials)
+        
+        query = {}
+        if loja:
+            query['loja'] = loja
+        if status:
+            query['status'] = status
+        
+        pedidos = await db.pedidos_lojas.find(query).sort('created_at', -1).to_list(length=1000)
+        
+        return {"success": True, "pedidos": pedidos}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.put("/gestao/lojas/pedidos/{pedido_id}")
+async def update_pedido_loja(
+    pedido_id: str,
+    pedido: dict,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Atualizar pedido de loja"""
+    try:
+        user = decode_token(credentials.credentials)
+        
+        pedido['updated_at'] = datetime.now(timezone.utc).isoformat()
+        
+        result = await db.pedidos_lojas.update_one(
+            {'id': pedido_id},
+            {'$set': pedido}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Pedido não encontrado")
+        
+        return {"success": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.delete("/gestao/lojas/pedidos/{pedido_id}")
+async def delete_pedido_loja(
+    pedido_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Deletar pedido de loja"""
+    try:
+        user = decode_token(credentials.credentials)
+        
+        result = await db.pedidos_lojas.delete_one({'id': pedido_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Pedido não encontrado")
+        
+        return {"success": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/gestao/lojas/pedidos/{pedido_id}/status")
+async def update_status_pedido_loja(
+    pedido_id: str,
+    status_data: dict,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Atualizar status do pedido"""
+    try:
+        user = decode_token(credentials.credentials)
+        
+        new_status = status_data.get('status')
+        if not new_status:
+            raise HTTPException(status_code=400, detail="Status é obrigatório")
+        
+        update_data = {
+            'status': new_status,
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Atualizar datas específicas baseado no status
+        now_iso = datetime.now(timezone.utc).isoformat()
+        if new_status == "Arte em Desenvolvimento":
+            update_data['data_envio_arte'] = now_iso
+        elif new_status == "Aprovado":
+            update_data['data_aprovacao_cliente'] = now_iso
+            update_data['data_inicio_producao'] = now_iso
+        elif new_status == "Finalizado":
+            update_data['data_finalizacao'] = now_iso
+        elif new_status == "Entregue":
+            update_data['data_entrega'] = now_iso
+        
+        result = await db.pedidos_lojas.update_one(
+            {'id': pedido_id},
+            {'$set': update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Pedido não encontrado")
+        
+        return {"success": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
