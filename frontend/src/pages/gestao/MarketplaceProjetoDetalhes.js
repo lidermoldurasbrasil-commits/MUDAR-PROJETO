@@ -661,7 +661,7 @@ export default function MarketplaceProjetoDetalhes() {
       };
       
       await axios.post(
-        `${API}/gestao/marketplaces/pedidos`,
+        `${API}/pedidos`,
         pedidoData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
