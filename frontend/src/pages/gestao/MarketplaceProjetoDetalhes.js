@@ -552,20 +552,34 @@ export default function MarketplaceProjetoDetalhes() {
   const handleAddPedido = async () => {
     try {
       // Validações básicas
-      if (!novoPedido.numero_pedido || !novoPedido.cliente_nome) {
-        toast.error('Preencha os campos obrigatórios: Número do Pedido e Nome do Cliente');
+      if (!novoPedido.numero_pedido || !novoPedido.cliente_nome || !novoPedido.produto_nome || !novoPedido.sku) {
+        toast.error('Preencha os campos obrigatórios: Número do Pedido, SKU, Nome do Produto e Cliente');
         return;
       }
 
       const token = localStorage.getItem('token');
       
-      // Calcular valor total
-      const valorTotal = novoPedido.quantidade * novoPedido.valor_unitario;
+      // Calcular valores
+      const valorTotal = novoPedido.quantidade * novoPedido.preco_acordado;
       
-      // Converter data para ISO
+      // Calcular taxas e valor líquido para Shopee
+      let valorTaxaComissao = 0;
+      let valorTaxaServico = 0;
+      let valorLiquido = valorTotal;
+      
+      if (projeto.plataforma === 'shopee') {
+        valorTaxaComissao = valorTotal * (novoPedido.taxa_comissao / 100);
+        valorTaxaServico = valorTotal * (novoPedido.taxa_servico / 100);
+        valorLiquido = valorTotal - valorTaxaComissao - valorTaxaServico;
+      }
+      
+      // Converter datas para ISO
       const prazoEntrega = novoPedido.prazo_entrega ? 
         new Date(novoPedido.prazo_entrega).toISOString() : 
         new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      
+      const dataPrevistaEnvio = novoPedido.data_prevista_envio ? 
+        new Date(novoPedido.data_prevista_envio).toISOString() : null;
       
       // Detectar setor automaticamente baseado no SKU
       let statusProducao = 'Impressão'; // Default
@@ -583,36 +597,67 @@ export default function MarketplaceProjetoDetalhes() {
       }
       
       const pedidoData = {
+        // Campos base
         projeto_id: projetoId,
         plataforma: projeto.plataforma,
         numero_pedido: novoPedido.numero_pedido,
-        sku: novoPedido.sku || '',
-        numero_referencia_sku: novoPedido.sku || '',
+        sku: novoPedido.sku,
+        numero_referencia_sku: novoPedido.sku,
+        
+        // Produto
+        produto_nome: novoPedido.produto_nome,
+        nome_variacao: novoPedido.nome_variacao || '',
+        
+        // Cliente
         cliente_nome: novoPedido.cliente_nome,
         cliente_contato: novoPedido.cliente_contato || '',
-        produto_nome: novoPedido.produto_nome || '',
-        nome_variacao: '',
+        
+        // Valores
         quantidade: novoPedido.quantidade,
-        valor_unitario: novoPedido.valor_unitario,
-        preco_acordado: novoPedido.valor_unitario,
+        valor_unitario: novoPedido.preco_acordado,
+        preco_acordado: novoPedido.preco_acordado,
         valor_total: valorTotal,
-        valor_liquido: valorTotal,
-        status: novoPedido.status,
+        
+        // Campos Shopee
+        ...(projeto.plataforma === 'shopee' && {
+          taxa_comissao: novoPedido.taxa_comissao,
+          taxa_servico: novoPedido.taxa_servico,
+          valor_taxa_comissao: valorTaxaComissao,
+          valor_taxa_servico: valorTaxaServico,
+          valor_liquido: valorLiquido,
+          opcao_envio: novoPedido.opcao_envio || '',
+          data_prevista_envio: dataPrevistaEnvio
+        }),
+        
+        // Campos Mercado Livre
+        ...(projeto.plataforma === 'mercadolivre' && {
+          data_venda: novoPedido.data_venda || new Date().toISOString().split('T')[0],
+          descricao_status: novoPedido.descricao_status || '',
+          cancelamentos_reembolsos: novoPedido.cancelamentos_reembolsos || 0,
+          endereco: novoPedido.endereco || '',
+          cidade: novoPedido.cidade || '',
+          estado_endereco: novoPedido.estado_endereco || '',
+          uf: novoPedido.estado_endereco || '',
+          receita_produtos: novoPedido.receita_produtos || novoPedido.preco_acordado,
+          tarifa_venda_impostos: novoPedido.tarifa_venda_impostos || 0,
+          tarifas_envio: novoPedido.tarifas_envio || 0,
+          opcao_envio: novoPedido.opcao_envio || '',
+          valor_liquido: novoPedido.receita_produtos - novoPedido.tarifa_venda_impostos - novoPedido.tarifas_envio
+        }),
+        
+        // Status
+        status: 'Aguardando Produção',
         status_cor: '#94A3B8',
         status_producao: statusProducao,
         status_logistica: 'Aguardando',
         status_montagem: 'Aguardando Montagem',
-        prioridade: novoPedido.prioridade,
+        
+        // Controle
+        prioridade: 'Normal',
         prazo_entrega: prazoEntrega,
         responsavel: novoPedido.responsavel || '',
         observacoes: (novoPedido.observacoes || '') + ' [Pedido criado manualmente]',
-        loja_id: lojaAtual || 'fabrica',
-        opcao_envio: '',
-        tipo_envio: '',
-        endereco: '',
-        cidade: '',
-        estado_endereco: '',
-        uf: ''
+        loja_id: lojaAtual || 'fabrica'
       };
       
       await axios.post(
@@ -623,21 +668,40 @@ export default function MarketplaceProjetoDetalhes() {
       
       toast.success('✅ Pedido criado com sucesso!');
       setShowAddModal(false);
+      
+      // Resetar form
       setNovoPedido({
         numero_pedido: '',
         sku: '',
         cliente_nome: '',
         cliente_contato: '',
         produto_nome: '',
+        nome_variacao: '',
         quantidade: 1,
         valor_unitario: 0,
+        preco_acordado: 0,
         valor_total: 0,
         status: 'Aguardando Produção',
         prioridade: 'Normal',
         prazo_entrega: '',
         responsavel: '',
-        observacoes: ''
+        observacoes: '',
+        taxa_comissao: 0,
+        taxa_servico: 0,
+        valor_liquido: 0,
+        opcao_envio: '',
+        data_prevista_envio: '',
+        data_venda: '',
+        descricao_status: '',
+        cancelamentos_reembolsos: 0,
+        endereco: '',
+        cidade: '',
+        estado_endereco: '',
+        receita_produtos: 0,
+        tarifa_venda_impostos: 0,
+        tarifas_envio: 0
       });
+      
       fetchDados();
     } catch (error) {
       console.error('Erro ao criar pedido:', error);
