@@ -530,6 +530,12 @@ export default function MarketplaceProjetoDetalhes() {
 
   const handleAddPedido = async () => {
     try {
+      // Validações básicas
+      if (!novoPedido.numero_pedido || !novoPedido.cliente_nome) {
+        toast.error('Preencha os campos obrigatórios: Número do Pedido e Nome do Cliente');
+        return;
+      }
+
       const token = localStorage.getItem('token');
       
       // Calcular valor total
@@ -540,22 +546,61 @@ export default function MarketplaceProjetoDetalhes() {
         new Date(novoPedido.prazo_entrega).toISOString() : 
         new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       
+      // Detectar setor automaticamente baseado no SKU
+      let statusProducao = 'Impressão'; // Default
+      if (novoPedido.sku) {
+        const skuUpper = novoPedido.sku.toUpperCase();
+        if (skuUpper.includes('ESPELHO') || skuUpper.includes('LED') || skuUpper.includes('ESP')) {
+          statusProducao = 'Espelho';
+        } else if (skuUpper.includes('VIDRO') || skuUpper.includes('CV') || skuUpper.includes('MF') || skuUpper.includes('MD') || skuUpper.includes('CX')) {
+          statusProducao = 'Molduras com Vidro';
+        } else if (skuUpper.includes('MOLDURA') || skuUpper.includes('MM') || skuUpper.includes('MB') || skuUpper.includes('MP')) {
+          statusProducao = 'Molduras';
+        } else if (skuUpper.includes('PD') || skuUpper.includes('PRINT')) {
+          statusProducao = 'Impressão';
+        }
+      }
+      
       const pedidoData = {
-        ...novoPedido,
         projeto_id: projetoId,
         plataforma: projeto.plataforma,
+        numero_pedido: novoPedido.numero_pedido,
+        sku: novoPedido.sku || '',
+        numero_referencia_sku: novoPedido.sku || '',
+        cliente_nome: novoPedido.cliente_nome,
+        cliente_contato: novoPedido.cliente_contato || '',
+        produto_nome: novoPedido.produto_nome || '',
+        nome_variacao: '',
+        quantidade: novoPedido.quantidade,
+        valor_unitario: novoPedido.valor_unitario,
+        preco_acordado: novoPedido.valor_unitario,
         valor_total: valorTotal,
+        valor_liquido: valorTotal,
+        status: novoPedido.status,
+        status_cor: '#94A3B8',
+        status_producao: statusProducao,
+        status_logistica: 'Aguardando',
+        status_montagem: 'Aguardando Montagem',
+        prioridade: novoPedido.prioridade,
         prazo_entrega: prazoEntrega,
-        loja_id: lojaAtual
+        responsavel: novoPedido.responsavel || '',
+        observacoes: (novoPedido.observacoes || '') + ' [Pedido criado manualmente]',
+        loja_id: lojaAtual || 'fabrica',
+        opcao_envio: '',
+        tipo_envio: '',
+        endereco: '',
+        cidade: '',
+        estado_endereco: '',
+        uf: ''
       };
       
       await axios.post(
-        `${API}/pedidos`,
+        `${API}/gestao/marketplaces/pedidos`,
         pedidoData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      toast.success('Pedido criado com sucesso!');
+      toast.success('✅ Pedido criado com sucesso!');
       setShowAddModal(false);
       setNovoPedido({
         numero_pedido: '',
@@ -575,7 +620,7 @@ export default function MarketplaceProjetoDetalhes() {
       fetchDados();
     } catch (error) {
       console.error('Erro ao criar pedido:', error);
-      toast.error('Erro ao criar pedido');
+      toast.error(error.response?.data?.detail || 'Erro ao criar pedido');
     }
   };
 
