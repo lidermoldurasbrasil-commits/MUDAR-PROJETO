@@ -3789,9 +3789,11 @@ export default function MarketplaceProjetoDetalhes() {
       {/* Modal de Adicionar Pedido */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-gray-700">
-            <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-6 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white">Adicionar Novo Pedido - {projeto.nome}</h3>
+          <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-6 flex items-center justify-between z-10">
+              <h3 className="text-xl font-bold text-white">
+                Adicionar Novo Pedido - {projeto.nome} ({projeto.plataforma === 'shopee' ? 'Shopee' : 'Mercado Livre'})
+              </h3>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="p-2 hover:bg-gray-700 rounded-full transition-colors"
@@ -3800,166 +3802,329 @@ export default function MarketplaceProjetoDetalhes() {
               </button>
             </div>
             
-            <div className="p-6 space-y-4">
-              {/* Linha 1: Número do Pedido e SKU */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Número do Pedido *</label>
-                  <input
-                    type="text"
-                    value={novoPedido.numero_pedido}
-                    onChange={(e) => setNovoPedido({...novoPedido, numero_pedido: e.target.value})}
-                    placeholder="Ex: ML-12345"
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
+            <div className="p-6 space-y-6">
+              {/* CAMPOS COMUNS */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">Informações Básicas</h4>
+                
+                {/* Linha 1: Número do Pedido e SKU */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      {projeto.plataforma === 'mercadolivre' ? 'N.º de Venda' : 'ID do Pedido'} *
+                    </label>
+                    <input
+                      type="text"
+                      value={novoPedido.numero_pedido}
+                      onChange={(e) => setNovoPedido({...novoPedido, numero_pedido: e.target.value})}
+                      placeholder={projeto.plataforma === 'mercadolivre' ? "Ex: ML-12345" : "Ex: SHP-12345"}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">SKU *</label>
+                    <input
+                      type="text"
+                      value={novoPedido.sku}
+                      onChange={(e) => setNovoPedido({...novoPedido, sku: e.target.value})}
+                      placeholder="Ex: PROD-001"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">SKU</label>
-                  <input
-                    type="text"
-                    value={novoPedido.sku}
-                    onChange={(e) => setNovoPedido({...novoPedido, sku: e.target.value})}
-                    placeholder="Ex: PROD-001"
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
+
+                {/* Linha 2: Produto e Variação */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Nome do Produto *</label>
+                    <input
+                      type="text"
+                      value={novoPedido.produto_nome}
+                      onChange={(e) => setNovoPedido({...novoPedido, produto_nome: e.target.value})}
+                      placeholder="Descrição do produto"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Nome da Variação</label>
+                    <input
+                      type="text"
+                      value={novoPedido.nome_variacao}
+                      onChange={(e) => setNovoPedido({...novoPedido, nome_variacao: e.target.value})}
+                      placeholder="Ex: Cor Preta, Tamanho M"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Linha 3: Cliente e Contato */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      {projeto.plataforma === 'mercadolivre' ? 'Comprador' : 'Cliente'} *
+                    </label>
+                    <input
+                      type="text"
+                      value={novoPedido.cliente_nome}
+                      onChange={(e) => setNovoPedido({...novoPedido, cliente_nome: e.target.value})}
+                      placeholder="Nome completo"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Telefone/Contato</label>
+                    <input
+                      type="text"
+                      value={novoPedido.cliente_contato}
+                      onChange={(e) => setNovoPedido({...novoPedido, cliente_contato: e.target.value})}
+                      placeholder="(11) 98765-4321"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Linha 2: Cliente e Contato */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Nome do Cliente *</label>
-                  <input
-                    type="text"
-                    value={novoPedido.cliente_nome}
-                    onChange={(e) => setNovoPedido({...novoPedido, cliente_nome: e.target.value})}
-                    placeholder="Nome completo"
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
+              {/* CAMPOS DE VALORES */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">Valores e Quantidade</h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Quantidade *</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={novoPedido.quantidade}
+                      onChange={(e) => setNovoPedido({...novoPedido, quantidade: parseInt(e.target.value) || 1})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Preço Acordado (R$) *</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={novoPedido.preco_acordado}
+                      onChange={(e) => setNovoPedido({...novoPedido, preco_acordado: parseFloat(e.target.value) || 0})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Valor Total (R$)</label>
+                    <input
+                      type="text"
+                      value={formatCurrency(novoPedido.quantidade * novoPedido.preco_acordado)}
+                      disabled
+                      className="w-full px-3 py-2 bg-gray-900 border border-gray-600 text-gray-400 rounded-lg"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Contato</label>
-                  <input
-                    type="text"
-                    value={novoPedido.cliente_contato}
-                    onChange={(e) => setNovoPedido({...novoPedido, cliente_contato: e.target.value})}
-                    placeholder="Telefone ou email"
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+
+                {/* CAMPOS ESPECÍFICOS SHOPEE */}
+                {projeto.plataforma === 'shopee' && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Taxa Comissão (%)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={novoPedido.taxa_comissao}
+                        onChange={(e) => setNovoPedido({...novoPedido, taxa_comissao: parseFloat(e.target.value) || 0})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Taxa Serviço (%)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={novoPedido.taxa_servico}
+                        onChange={(e) => setNovoPedido({...novoPedido, taxa_servico: parseFloat(e.target.value) || 0})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Valor Líquido (R$)</label>
+                      <input
+                        type="text"
+                        value={formatCurrency(
+                          novoPedido.preco_acordado * novoPedido.quantidade - 
+                          (novoPedido.preco_acordado * novoPedido.quantidade * novoPedido.taxa_comissao / 100) - 
+                          (novoPedido.preco_acordado * novoPedido.quantidade * novoPedido.taxa_servico / 100)
+                        )}
+                        disabled
+                        className="w-full px-3 py-2 bg-gray-900 border border-gray-600 text-gray-400 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* CAMPOS ESPECÍFICOS MERCADO LIVRE */}
+                {projeto.plataforma === 'mercadolivre' && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Receita Produtos (R$)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={novoPedido.receita_produtos}
+                        onChange={(e) => setNovoPedido({...novoPedido, receita_produtos: parseFloat(e.target.value) || 0})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Tarifa Venda (R$)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={novoPedido.tarifa_venda_impostos}
+                        onChange={(e) => setNovoPedido({...novoPedido, tarifa_venda_impostos: parseFloat(e.target.value) || 0})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Tarifa Envio (R$)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={novoPedido.tarifas_envio}
+                        onChange={(e) => setNovoPedido({...novoPedido, tarifas_envio: parseFloat(e.target.value) || 0})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Linha 3: Produto */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Nome do Produto *</label>
-                <input
-                  type="text"
-                  value={novoPedido.produto_nome}
-                  onChange={(e) => setNovoPedido({...novoPedido, produto_nome: e.target.value})}
-                  placeholder="Descrição do produto"
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
+              {/* CAMPOS DE ENVIO */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">Informações de Envio</h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      {projeto.plataforma === 'mercadolivre' ? 'Forma de Entrega' : 'Opção de Envio'}
+                    </label>
+                    <input
+                      type="text"
+                      value={novoPedido.opcao_envio}
+                      onChange={(e) => setNovoPedido({...novoPedido, opcao_envio: e.target.value})}
+                      placeholder={projeto.plataforma === 'mercadolivre' ? "Ex: Mercado Envios Flex" : "Ex: Standard, Express"}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  {projeto.plataforma === 'shopee' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Data Prevista Envio</label>
+                      <input
+                        type="date"
+                        value={novoPedido.data_prevista_envio}
+                        onChange={(e) => setNovoPedido({...novoPedido, data_prevista_envio: e.target.value})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  )}
+                  {projeto.plataforma === 'mercadolivre' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Data da Venda</label>
+                      <input
+                        type="date"
+                        value={novoPedido.data_venda}
+                        onChange={(e) => setNovoPedido({...novoPedido, data_venda: e.target.value})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Endereço (Mercado Livre) */}
+                {projeto.plataforma === 'mercadolivre' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Endereço</label>
+                      <input
+                        type="text"
+                        value={novoPedido.endereco}
+                        onChange={(e) => setNovoPedido({...novoPedido, endereco: e.target.value})}
+                        placeholder="Rua, Número, Complemento"
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
+                        <input
+                          type="text"
+                          value={novoPedido.cidade}
+                          onChange={(e) => setNovoPedido({...novoPedido, cidade: e.target.value})}
+                          placeholder="Ex: São Paulo"
+                          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Estado</label>
+                        <input
+                          type="text"
+                          value={novoPedido.estado_endereco}
+                          onChange={(e) => setNovoPedido({...novoPedido, estado_endereco: e.target.value})}
+                          placeholder="Ex: SP"
+                          maxLength={2}
+                          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* Linha 4: Quantidade e Valores */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Quantidade *</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={novoPedido.quantidade}
-                    onChange={(e) => setNovoPedido({...novoPedido, quantidade: parseInt(e.target.value) || 1})}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
+              {/* OUTROS CAMPOS */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">Controle e Status</h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {projeto.plataforma === 'mercadolivre' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Descrição do Status</label>
+                      <input
+                        type="text"
+                        value={novoPedido.descricao_status}
+                        onChange={(e) => setNovoPedido({...novoPedido, descricao_status: e.target.value})}
+                        placeholder="Ex: Pedido Confirmado"
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Prazo de Entrega</label>
+                    <input
+                      type="date"
+                      value={novoPedido.prazo_entrega}
+                      onChange={(e) => setNovoPedido({...novoPedido, prazo_entrega: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Valor Unitário (R$) *</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={novoPedido.valor_unitario}
-                    onChange={(e) => setNovoPedido({...novoPedido, valor_unitario: parseFloat(e.target.value) || 0})}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Valor Total (R$)</label>
-                  <input
-                    type="text"
-                    value={formatCurrency(novoPedido.quantidade * novoPedido.valor_unitario)}
-                    disabled
-                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 text-gray-400 rounded-lg"
-                  />
-                </div>
-              </div>
 
-              {/* Linha 5: Status e Prioridade */}
-              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Status Inicial</label>
-                  <select
-                    value={novoPedido.status}
-                    onChange={(e) => setNovoPedido({...novoPedido, status: e.target.value})}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    {statusOptions.map(s => (
-                      <option key={s.value} value={s.value}>{s.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Prioridade</label>
-                  <select
-                    value={novoPedido.prioridade}
-                    onChange={(e) => setNovoPedido({...novoPedido, prioridade: e.target.value})}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    {PRIORIDADE_OPTIONS.map(p => (
-                      <option key={p} value={p}>{p}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Linha 6: Prazo e Responsável */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Prazo de Entrega *</label>
-                  <input
-                    type="date"
-                    value={novoPedido.prazo_entrega}
-                    onChange={(e) => setNovoPedido({...novoPedido, prazo_entrega: e.target.value})}
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Observações</label>
+                  <textarea
+                    value={novoPedido.observacoes}
+                    onChange={(e) => setNovoPedido({...novoPedido, observacoes: e.target.value})}
+                    rows={3}
+                    placeholder="Detalhes adicionais sobre o pedido..."
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Responsável</label>
-                  <input
-                    type="text"
-                    value={novoPedido.responsavel}
-                    onChange={(e) => setNovoPedido({...novoPedido, responsavel: e.target.value})}
-                    placeholder="Nome do responsável"
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Linha 7: Observações */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Observações</label>
-                <textarea
-                  value={novoPedido.observacoes}
-                  onChange={(e) => setNovoPedido({...novoPedido, observacoes: e.target.value})}
-                  rows={3}
-                  placeholder="Detalhes adicionais sobre o pedido..."
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
               </div>
             </div>
 
-            <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-6 flex gap-3">
+            <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-6 flex gap-3 z-10">
               <button
                 onClick={handleAddPedido}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
