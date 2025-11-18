@@ -26,7 +26,7 @@ try:
     
     # Mapeamento de usernames para nomes
     nomes_setores = {
-        'espelho': 'Alex',
+        'espelho': 'Mateus',
         'molduras-vidro': 'Ronaldo',
         'molduras': 'Luiz',
         'impressao': 'Camila',
