@@ -191,19 +191,40 @@ export default function MarketplaceProjetoDetalhes() {
   });
   const [showAddModal, setShowAddModal] = useState(false);
   const [novoPedido, setNovoPedido] = useState({
+    // Campos comuns
     numero_pedido: '',
     sku: '',
     cliente_nome: '',
     cliente_contato: '',
     produto_nome: '',
+    nome_variacao: '',
     quantidade: 1,
     valor_unitario: 0,
+    preco_acordado: 0,
     valor_total: 0,
     status: 'Aguardando Produção',
     prioridade: 'Normal',
     prazo_entrega: '',
     responsavel: '',
-    observacoes: ''
+    observacoes: '',
+    
+    // Shopee específico
+    taxa_comissao: 0,
+    taxa_servico: 0,
+    valor_liquido: 0,
+    opcao_envio: '',
+    data_prevista_envio: '',
+    
+    // Mercado Livre específico
+    data_venda: '',
+    descricao_status: '',
+    cancelamentos_reembolsos: 0,
+    endereco: '',
+    cidade: '',
+    estado_endereco: '',
+    receita_produtos: 0,
+    tarifa_venda_impostos: 0,
+    tarifas_envio: 0
   });
 
   useEffect(() => {
