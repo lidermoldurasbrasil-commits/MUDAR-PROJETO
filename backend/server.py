@@ -1529,6 +1529,16 @@ class OrdemProducao(BaseModel):
     responsavel_pendente: str = ""  # Quem precisa aprovar para assumir a ordem
     historico_aprovacoes: List[dict] = []  # Histórico de quem aprovou e quando
     
+    # Aprovação Dupla Inicial (Gerência + Financeiro)
+    aprovacao_gerencia_producao: bool = False  # Gerente de produção aprovou?
+    aprovacao_financeiro: bool = False  # Financeiro aprovou pagamento?
+    gerente_que_aprovou: str = ""
+    financeiro_que_aprovou: str = ""
+    data_aprovacao_gerencia: Optional[datetime] = None
+    data_aprovacao_financeiro: Optional[datetime] = None
+    observacoes_gerencia: str = ""  # Observações do gerente sobre insumos/dados
+    observacoes_financeiro: str = ""  # Observações do financeiro sobre pagamento
+    
     # Checklist
     checklist: ChecklistProducao = Field(default_factory=ChecklistProducao)
     
