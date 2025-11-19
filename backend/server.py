@@ -2936,7 +2936,7 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     """Retorna estatísticas para o dashboard"""
     # Total por status
     stats_status = {}
-    for status in ["Aguardando Arte", "Armazenado Fábrica", "Produção", "Acabamento", "Pronto", "Entregue", "Reparo"]:
+    for status in ["Armazenado na Loja", "Aguardando Arte", "Armazenado Fábrica", "Produção", "Acabamento", "Pronto", "Entregue", "Reparo"]:
         count = await db.ordens_producao.count_documents({"status_interno": status})
         stats_status[status] = count
     
