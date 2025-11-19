@@ -500,35 +500,59 @@ export default function Producao() {
         marginBottom: '30px',
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
       }}>
-        <h3 style={{marginBottom: '20px', color: '#1f2937'}}>📊 Ordens por Status</h3>
-        <div style={{display: 'flex', flexWrap: 'wrap', gap: '15px'}}>
-          {Object.entries(stats.por_status || {}).map(([status, count]) => (
-            <div key={status} style={{
-              flex: '1 1 200px',
-              padding: '15px',
-              borderRadius: '8px',
-              background: '#f3f4f6',
-              border: '1px solid #e5e7eb'
-            }}>
-              <div style={{fontSize: '12px', color: '#6b7280', marginBottom: '5px'}}>{status}</div>
-              <div style={{fontSize: '24px', fontWeight: 'bold', color: '#1f2937'}}>{count}</div>
-              <div style={{
-                marginTop: '8px',
-                height: '4px',
-                borderRadius: '2px',
-                background: '#e5e7eb'
-              }}>
-                <div style={{
-                  height: '100%',
-                  borderRadius: '2px',
-                  background: '#3b82f6',
-                  width: `${(count / stats.total) * 100}%`,
-                  transition: 'width 0.3s'
-                }}></div>
-              </div>
-            </div>
-          ))}
+        <div 
+          onClick={() => setShowGraficoStatus(!showGraficoStatus)}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+            marginBottom: showGraficoStatus ? '20px' : '0'
+          }}
+        >
+          <h3 style={{color: '#1f2937', margin: 0}}>📊 Ordens por Status</h3>
+          <button style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#6b7280',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            {showGraficoStatus ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+          </button>
         </div>
+        
+        {showGraficoStatus && (
+          <div style={{display: 'flex', flexWrap: 'wrap', gap: '15px'}}>
+            {Object.entries(stats.por_status || {}).map(([status, count]) => (
+              <div key={status} style={{
+                flex: '1 1 200px',
+                padding: '15px',
+                borderRadius: '8px',
+                background: '#f3f4f6',
+                border: '1px solid #e5e7eb'
+              }}>
+                <div style={{fontSize: '12px', color: '#6b7280', marginBottom: '5px'}}>{status}</div>
+                <div style={{fontSize: '24px', fontWeight: 'bold', color: '#1f2937'}}>{count}</div>
+                <div style={{
+                  marginTop: '8px',
+                  height: '4px',
+                  borderRadius: '2px',
+                  background: '#e5e7eb'
+                }}>
+                  <div style={{
+                    height: '100%',
+                    borderRadius: '2px',
+                    background: '#3b82f6',
+                    width: `${(count / stats.total) * 100}%`,
+                    transition: 'width 0.3s'
+                  }}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Gráfico de Lojas */}
