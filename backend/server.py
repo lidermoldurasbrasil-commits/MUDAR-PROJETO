@@ -2983,6 +2983,175 @@ async def upload_imagem_pedido(file: UploadFile, current_user: dict = Depends(ge
     
     # Retornar URL data
     return {
+
+
+# ============= SISTEMA DE APROVAÇÃO EM CASCATA =============
+
+@api_router.get("/gestao/producao/pendentes-aprovacao")
+async def get_ordens_pendentes_aprovacao(
+    responsavel: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Listar ordens que aguardam aprovação de um responsável específico"""
+    try:
+        query = {"aguardando_aprovacao": True}
+        
+        if responsavel:
+            query["responsavel_pendente"] = responsavel
+        
+        ordens = await db.ordens_producao.find(query).to_list(length=1000)
+        
+        return {
+            "success": True,
+            "ordens": ordens,
+            "total": len(ordens)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/gestao/producao/{ordem_id}/aprovar")
+async def aprovar_ordem(
+    ordem_id: str,
+    dados: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Aprovar e assumir responsabilidade sobre uma ordem de produção"""
+    try:
+        # Buscar a ordem
+        ordem = await db.ordens_producao.find_one({"id": ordem_id})
+        if not ordem:
+            raise HTTPException(status_code=404, detail="Ordem não encontrada")
+        
+        # Verificar se está aguardando aprovação
+        if not ordem.get("aguardando_aprovacao"):
+            raise HTTPException(status_code=400, detail="Esta ordem não está aguardando aprovação")
+        
+        # Verificar se o usuário é o responsável pendente
+        responsavel_pendente = ordem.get("responsavel_pendente")
+        if responsavel_pendente and responsavel_pendente != current_user.get("nome"):
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Você não tem permissão. Aguardando aprovação de: {responsavel_pendente}"
+            )
+        
+        # Registrar aprovação no histórico
+        aprovacao = {
+            "responsavel": current_user.get("nome") or current_user.get("username"),
+            "data_aprovacao": datetime.now(timezone.utc).isoformat(),
+            "observacao": dados.get("observacao", "")
+        }
+        
+        historico = ordem.get("historico_aprovacoes", [])
+        historico.append(aprovacao)
+        
+        # Atualizar ordem
+        resultado = await db.ordens_producao.update_one(
+            {"id": ordem_id},
+            {
+                "$set": {
+                    "aguardando_aprovacao": False,
+                    "responsavel_atual": responsavel_pendente,
+                    "responsavel_pendente": "",
+                    "historico_aprovacoes": historico,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        if resultado.modified_count == 0:
+            raise HTTPException(status_code=500, detail="Erro ao aprovar ordem")
+        
+        return {
+            "success": True,
+            "message": f"Ordem aprovada! Você assumiu a responsabilidade.",
+            "responsavel": responsavel_pendente
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/gestao/producao/{ordem_id}/rejeitar")
+async def rejeitar_ordem(
+    ordem_id: str,
+    dados: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Rejeitar ordem e devolver para o responsável anterior"""
+    try:
+        motivo = dados.get("motivo", "")
+        if not motivo:
+            raise HTTPException(status_code=400, detail="Motivo da rejeição é obrigatório")
+        
+        # Buscar a ordem
+        ordem = await db.ordens_producao.find_one({"id": ordem_id})
+        if not ordem:
+            raise HTTPException(status_code=404, detail="Ordem não encontrada")
+        
+        # Voltar para o responsável anterior
+        resultado = await db.ordens_producao.update_one(
+            {"id": ordem_id},
+            {
+                "$set": {
+                    "aguardando_aprovacao": False,
+                    "responsavel_pendente": "",
+                    "observacoes_internas": f"{ordem.get('observacoes_internas', '')}\n\n❌ REJEITADO por {current_user.get('nome')}: {motivo}",
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        return {
+            "success": True,
+            "message": "Ordem rejeitada e devolvida"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.put("/gestao/producao/{ordem_id}/transferir")
+async def transferir_responsavel(
+    ordem_id: str,
+    dados: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Transferir ordem para próximo responsável (com aprovação pendente)"""
+    try:
+        novo_responsavel = dados.get("novo_responsavel")
+        if not novo_responsavel:
+            raise HTTPException(status_code=400, detail="Novo responsável é obrigatório")
+        
+        # Atualizar ordem para aguardar aprovação
+        resultado = await db.ordens_producao.update_one(
+            {"id": ordem_id},
+            {
+                "$set": {
+                    "aguardando_aprovacao": True,
+                    "responsavel_pendente": novo_responsavel,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        if resultado.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Ordem não encontrada")
+        
+        return {
+            "success": True,
+            "message": f"Ordem transferida para {novo_responsavel}. Aguardando aprovação."
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
         "url": f"data:image/jpeg;base64,{image_base64}",
         "filename": file.filename,
         "timestamp": datetime.now(timezone.utc).isoformat()
