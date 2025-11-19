@@ -1522,7 +1522,7 @@ class OrdemProducao(BaseModel):
     
     # Controle de Produção
     responsavel_atual: str = "Vendedor"  # Vendedor, Arte, Subgerente Fábrica, Molduraria, Acabamento, Qualidade, Embalagem, Expedição, Reparo
-    status_interno: str = "Armazenado na Loja"  # Armazenado na Loja, Aguardando Arte, Armazenado Fábrica, Produção, Acabamento, Pronto, Entregue, Reparo
+    status_interno: str = "Armazenado na Loja"  # Armazenado na Loja, Aguardando Arte, Armazenado Fábrica, Pronto para Impressão, Impresso, Produção, Acabamento, Pronto, Entregue, Reparo
     
     # Sistema de Aprovação em Cascata
     aguardando_aprovacao: bool = False  # Se está aguardando aprovação do próximo responsável
