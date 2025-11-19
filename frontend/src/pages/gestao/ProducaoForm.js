@@ -271,7 +271,7 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
                   </div>
 
                   <div className="input-group">
-                    <label>Data de Pagamento</label>
+                    <label>DATA DE PAGAMENTO</label>
                     <input 
                       type="date" 
                       name="data_pagamento"
