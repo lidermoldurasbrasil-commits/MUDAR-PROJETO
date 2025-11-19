@@ -155,6 +155,24 @@ export default function Producao() {
     }
   };
 
+  const handleTransferirOrdem = async (ordemId, novoResponsavel) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `${API}/producao/${ordemId}/transferir`,
+        { novo_responsavel: novoResponsavel },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success(`✅ Ordem transferida para ${novoResponsavel}. Aguardando aprovação.`);
+      fetchOrdens();
+      fetchOrdensPendentes();
+    } catch (error) {
+      console.error('Erro ao transferir ordem:', error);
+      toast.error('Erro ao transferir ordem');
+    }
+  };
+
   const fetchOrdens = async () => {
     setLoading(true);
     try {
