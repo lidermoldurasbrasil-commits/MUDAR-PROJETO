@@ -159,7 +159,8 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
         data_pagamento: formData.data_pagamento ? new Date(formData.data_pagamento).toISOString() : null,
         data_entrega_prometida: formData.data_entrega_prometida ? new Date(formData.data_entrega_prometida).toISOString() : null,
         fotos_entrada_material: fotosEntradaMaterial,
-        fotos_trabalho_pronto: fotosTrabalhoPronto
+        fotos_trabalho_pronto: fotosTrabalhoPronto,
+        comprovante_pagamento: comprovantePagamento
       };
 
       if (ordem?.id) {
