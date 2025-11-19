@@ -3156,11 +3156,6 @@ async def transferir_responsavel(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-        "url": f"data:image/jpeg;base64,{image_base64}",
-        "filename": file.filename,
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
-
 
 
 @api_router.post("/gestao/producao/{ordem_id}/fotos")
