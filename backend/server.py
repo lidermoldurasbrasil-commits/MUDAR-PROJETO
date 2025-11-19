@@ -6296,6 +6296,25 @@ async def create_pedido_loja(pedido: PedidoLoja, credentials: HTTPAuthorizationC
         pedido.updated_at = datetime.now(timezone.utc)
         
         pedido_dict = pedido.model_dump()
+        
+        # Convert datetime objects to ISO format strings for MongoDB
+        if 'created_at' in pedido_dict and isinstance(pedido_dict['created_at'], datetime):
+            pedido_dict['created_at'] = pedido_dict['created_at'].isoformat()
+        if 'updated_at' in pedido_dict and isinstance(pedido_dict['updated_at'], datetime):
+            pedido_dict['updated_at'] = pedido_dict['updated_at'].isoformat()
+        if 'prazo_entrega' in pedido_dict and isinstance(pedido_dict['prazo_entrega'], datetime):
+            pedido_dict['prazo_entrega'] = pedido_dict['prazo_entrega'].isoformat()
+        if 'data_envio_arte' in pedido_dict and isinstance(pedido_dict['data_envio_arte'], datetime):
+            pedido_dict['data_envio_arte'] = pedido_dict['data_envio_arte'].isoformat()
+        if 'data_aprovacao_cliente' in pedido_dict and isinstance(pedido_dict['data_aprovacao_cliente'], datetime):
+            pedido_dict['data_aprovacao_cliente'] = pedido_dict['data_aprovacao_cliente'].isoformat()
+        if 'data_inicio_producao' in pedido_dict and isinstance(pedido_dict['data_inicio_producao'], datetime):
+            pedido_dict['data_inicio_producao'] = pedido_dict['data_inicio_producao'].isoformat()
+        if 'data_finalizacao' in pedido_dict and isinstance(pedido_dict['data_finalizacao'], datetime):
+            pedido_dict['data_finalizacao'] = pedido_dict['data_finalizacao'].isoformat()
+        if 'data_entrega' in pedido_dict and isinstance(pedido_dict['data_entrega'], datetime):
+            pedido_dict['data_entrega'] = pedido_dict['data_entrega'].isoformat()
+        
         await db.pedidos_lojas.insert_one(pedido_dict)
         
         return {"success": True, "pedido": pedido_dict}
