@@ -200,6 +200,12 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
             Dados da Ordem
           </button>
           <button 
+            className={`tab ${activeTab === 'fotos' ? 'active' : ''}`}
+            onClick={() => setActiveTab('fotos')}
+          >
+            📸 Fotos
+          </button>
+          <button 
             className={`tab ${activeTab === 'checklist' ? 'active' : ''}`}
             onClick={() => setActiveTab('checklist')}
           >
