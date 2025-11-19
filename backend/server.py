@@ -6340,10 +6340,6 @@ async def create_pedido_loja(pedido_data: dict, credentials: HTTPAuthorizationCr
         
         return {"success": True, "pedido": response_pedido}
     except Exception as e:
-        print(f"DEBUG: Exception occurred: {str(e)}")
-        print(f"DEBUG: Exception type: {type(e)}")
-        import traceback
-        print(f"DEBUG: Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
