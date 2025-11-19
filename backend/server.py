@@ -6324,10 +6324,16 @@ async def create_pedido_loja(pedido_data: dict, credentials: HTTPAuthorizationCr
             "created_by": user['username']
         }
         
+        print(f"DEBUG: About to insert pedido_dict: {pedido_dict}")
         await db.pedidos_lojas.insert_one(pedido_dict)
+        print("DEBUG: Successfully inserted into database")
         
         return {"success": True, "pedido": pedido_dict}
     except Exception as e:
+        print(f"DEBUG: Exception occurred: {str(e)}")
+        print(f"DEBUG: Exception type: {type(e)}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
