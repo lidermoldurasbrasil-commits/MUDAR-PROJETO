@@ -67,6 +67,10 @@ export default function Producao() {
     atrasados: 0,
     em_reparo: 0
   });
+  const [ordensPendentes, setOrdensPendentes] = useState([]);
+  const [showPendentes, setShowPendentes] = useState(false);
+  const [showAprovarModal, setShowAprovarModal] = useState(false);
+  const [ordemParaAprovar, setOrdemParaAprovar] = useState(null);
 
   useEffect(() => {
     fetchOrdens();
