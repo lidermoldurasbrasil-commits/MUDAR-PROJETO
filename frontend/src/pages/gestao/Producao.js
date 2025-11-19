@@ -69,11 +69,24 @@ export default function Producao() {
 
   useEffect(() => {
     fetchOrdens();
+    fetchStats();
   }, []);
 
   useEffect(() => {
     filterOrdens();
   }, [ordens, searchTerm, lojaFilter, statusFilter, responsavelFilter, showAtrasados]);
+
+  const fetchStats = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API}/producao/dashboard/stats`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setStats(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas:', error);
+    }
+  };
 
   const fetchOrdens = async () => {
     setLoading(true);
