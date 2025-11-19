@@ -56,7 +56,6 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
     data_pagamento: ordem?.data_pagamento ? ordem.data_pagamento.split('T')[0] : '',
     data_entrega_prometida: ordem?.data_entrega_prometida ? ordem.data_entrega_prometida.split('T')[0] : '',
     descricao_itens: ordem?.descricao_itens || '',
-    valor_total: ordem?.valor_total || 0,
     responsavel_atual: ordem?.responsavel_atual || 'Vendedor',
     status_interno: ordem?.status_interno || 'Armazenado na Loja',
     prioridade: ordem?.prioridade || 'Normal',
