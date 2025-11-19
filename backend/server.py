@@ -2983,6 +2983,45 @@ async def upload_imagem_pedido(file: UploadFile, current_user: dict = Depends(ge
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
+
+
+@api_router.post("/gestao/producao/{ordem_id}/fotos")
+async def upload_fotos_producao(
+    ordem_id: str,
+    tipo_foto: str,  # "entrada_material" ou "trabalho_pronto"
+    file: UploadFile,
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload de fotos para ordem de produção"""
+    import base64
+    
+    try:
+        # Ler arquivo
+        contents = await file.read()
+        
+        # Converter para base64
+        image_base64 = base64.b64encode(contents).decode('utf-8')
+        foto_url = f"data:image/jpeg;base64,{image_base64}"
+        
+        # Atualizar ordem com a nova foto
+        campo_foto = f"fotos_{tipo_foto}"
+        resultado = await db.ordens_producao.update_one(
+            {"id": ordem_id},
+            {"$push": {campo_foto: foto_url}}
+        )
+        
+        if resultado.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Ordem não encontrada")
+        
+        return {
+            "success": True,
+            "url": foto_url,
+            "filename": file.filename,
+            "tipo": tipo_foto
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ============= LANÇAMENTOS FINANCEIROS =============
 
 class LancamentoFinanceiro(BaseModel):
