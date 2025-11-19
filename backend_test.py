@@ -6062,6 +6062,208 @@ class BusinessManagementSystemTester:
         
         return all_critical_passed
 
+    def test_physical_store_production(self):
+        """Test Physical Store Production endpoints as requested"""
+        print("\n🏪 TESTING PHYSICAL STORE PRODUCTION ENDPOINTS...")
+        print("📋 Testing GET /api/gestao/lojas/pedidos and POST /api/gestao/lojas/pedidos")
+        
+        # Step 1: List existing orders (may be empty)
+        print("\n📋 Step 1: Listing existing orders...")
+        success_list1, list1_response = self.run_test(
+            "List Physical Store Orders (Initial)",
+            "GET",
+            "gestao/lojas/pedidos",
+            200
+        )
+        
+        if success_list1:
+            initial_count = len(list1_response.get('pedidos', []))
+            print(f"✅ Initial order count: {initial_count}")
+        else:
+            print("❌ Failed to list initial orders")
+            self.log_test("Physical Store Production - Initial List", False, "Failed to get initial orders")
+            return False
+        
+        # Step 2: Create a test order with the exact format requested
+        print("\n📋 Step 2: Creating test order...")
+        test_order_data = {
+            "loja": "São João Batista",
+            "cliente_nome": "Cliente Teste",
+            "cliente_contato": "(11) 98765-4321",
+            "produto_descricao": "Quadro com moldura preta",
+            "valor_acordado": 150.00
+        }
+        
+        success_create, create_response = self.run_test(
+            "Create Physical Store Order",
+            "POST",
+            "gestao/lojas/pedidos",
+            200,
+            data=test_order_data
+        )
+        
+        if not success_create:
+            print("❌ CRITICAL: Failed to create physical store order")
+            self.log_test("Physical Store Production - Create Order", False, "Failed to create order")
+            return False
+        
+        print("✅ Order created successfully!")
+        
+        # Step 3: Verify response structure
+        print("\n📋 Step 3: Verifying order response...")
+        validation_results = []
+        
+        # Check success field
+        if create_response.get('success') == True:
+            print("✅ Response has success: true")
+            validation_results.append(True)
+        else:
+            print(f"❌ Response success field incorrect: {create_response.get('success')}")
+            validation_results.append(False)
+        
+        # Check pedido field exists
+        if 'pedido' in create_response:
+            pedido = create_response['pedido']
+            print("✅ Response contains pedido object")
+            validation_results.append(True)
+            
+            # Check automatic number generation
+            numero_pedido = pedido.get('numero_pedido', '')
+            if numero_pedido.startswith('LJ-SJB-') and len(numero_pedido) >= 10:
+                print(f"✅ Automatic number generated: {numero_pedido}")
+                validation_results.append(True)
+            else:
+                print(f"❌ Invalid numero_pedido format: {numero_pedido}")
+                validation_results.append(False)
+            
+            # Check required fields
+            required_fields = ['loja', 'cliente_nome', 'cliente_contato', 'produto_descricao', 'valor_acordado']
+            for field in required_fields:
+                if field in pedido and pedido[field] == test_order_data[field]:
+                    print(f"✅ Field {field} correctly saved: {pedido[field]}")
+                    validation_results.append(True)
+                else:
+                    print(f"❌ Field {field} incorrect: expected {test_order_data[field]}, got {pedido.get(field)}")
+                    validation_results.append(False)
+            
+            # Check ID field
+            if 'id' in pedido and pedido['id']:
+                print(f"✅ Order has ID: {pedido['id']}")
+                validation_results.append(True)
+                order_id = pedido['id']
+            else:
+                print("❌ Order missing ID field")
+                validation_results.append(False)
+                order_id = None
+        else:
+            print("❌ Response missing pedido object")
+            validation_results.append(False)
+            order_id = None
+        
+        # Step 4: List orders again to verify it appears
+        print("\n📋 Step 4: Listing orders again to verify creation...")
+        success_list2, list2_response = self.run_test(
+            "List Physical Store Orders (After Creation)",
+            "GET",
+            "gestao/lojas/pedidos",
+            200
+        )
+        
+        if success_list2:
+            final_count = len(list2_response.get('pedidos', []))
+            print(f"✅ Final order count: {final_count}")
+            
+            if final_count > initial_count:
+                print(f"✅ Order count increased from {initial_count} to {final_count}")
+                validation_results.append(True)
+                
+                # Look for our specific order
+                if order_id:
+                    order_found = False
+                    for pedido in list2_response.get('pedidos', []):
+                        if pedido.get('id') == order_id:
+                            order_found = True
+                            print(f"✅ Created order found in list: {pedido.get('numero_pedido')}")
+                            validation_results.append(True)
+                            break
+                    
+                    if not order_found:
+                        print(f"❌ Created order with ID {order_id} not found in list")
+                        validation_results.append(False)
+                else:
+                    print("⚠️ Cannot verify specific order (no ID available)")
+                    validation_results.append(True)  # Don't fail for this
+            else:
+                print(f"❌ Order count did not increase (still {final_count})")
+                validation_results.append(False)
+        else:
+            print("❌ Failed to list orders after creation")
+            validation_results.append(False)
+        
+        # Step 5: Test filtering by loja
+        print("\n📋 Step 5: Testing filter by loja...")
+        success_filter, filter_response = self.run_test(
+            "List Orders Filtered by Loja",
+            "GET",
+            "gestao/lojas/pedidos?loja=São João Batista",
+            200
+        )
+        
+        if success_filter:
+            filtered_orders = filter_response.get('pedidos', [])
+            print(f"✅ Filtered orders count: {len(filtered_orders)}")
+            
+            # Verify all orders are from the correct loja
+            all_correct_loja = True
+            for pedido in filtered_orders:
+                if pedido.get('loja') != 'São João Batista':
+                    all_correct_loja = False
+                    break
+            
+            if all_correct_loja:
+                print("✅ All filtered orders are from 'São João Batista'")
+                validation_results.append(True)
+            else:
+                print("❌ Some filtered orders are from wrong loja")
+                validation_results.append(False)
+        else:
+            print("❌ Failed to filter orders by loja")
+            validation_results.append(False)
+        
+        # Step 6: Test filtering by status
+        print("\n📋 Step 6: Testing filter by status...")
+        success_status_filter, status_filter_response = self.run_test(
+            "List Orders Filtered by Status",
+            "GET",
+            "gestao/lojas/pedidos?status=Aguardando Arte",
+            200
+        )
+        
+        if success_status_filter:
+            status_filtered_orders = status_filter_response.get('pedidos', [])
+            print(f"✅ Status filtered orders count: {len(status_filtered_orders)}")
+            validation_results.append(True)
+        else:
+            print("❌ Failed to filter orders by status")
+            validation_results.append(False)
+        
+        # Overall result
+        all_valid = all(validation_results)
+        
+        if all_valid:
+            print("✅ ALL PHYSICAL STORE PRODUCTION TESTS PASSED!")
+            print("✅ Endpoints respond 200 OK")
+            print("✅ Order creation works")
+            print("✅ Automatic numbering works (LJ-SJB-0001 format)")
+            print("✅ No 404 or 500 errors")
+            self.log_test("Physical Store Production - OVERALL", True)
+        else:
+            failed_count = len([r for r in validation_results if not r])
+            print(f"❌ PHYSICAL STORE PRODUCTION TESTS FAILED: {failed_count}/{len(validation_results)} checks failed")
+            self.log_test("Physical Store Production - OVERALL", False, f"{failed_count} validation checks failed")
+        
+        return all_valid
+
     def run_all_tests(self):
         """Run all test suites"""
         print("🚀 Starting Business Management System Tests...")
