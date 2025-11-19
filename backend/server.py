@@ -1534,6 +1534,10 @@ class OrdemProducao(BaseModel):
     observacoes_internas: str = ""
     arquivo_anexo_url: Optional[str] = None
     
+    # Fotos
+    fotos_entrada_material: List[str] = []  # URLs das fotos dos materiais recebidos
+    fotos_trabalho_pronto: List[str] = []  # URLs das fotos do trabalho finalizado antes de embalar
+    
     # Timeline / Histórico
     timeline: List[TimelineEntry] = []
     
