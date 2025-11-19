@@ -1522,7 +1522,7 @@ class OrdemProducao(BaseModel):
     
     # Controle de Produção
     responsavel_atual: str = "Vendedor"  # Vendedor, Arte, Subgerente Fábrica, Molduraria, Acabamento, Qualidade, Embalagem, Expedição, Reparo
-    status_interno: str = "Aguardando Arte"  # Aguardando Arte, Armazenado Fábrica, Produção, Acabamento, Pronto, Entregue, Reparo
+    status_interno: str = "Armazenado na Loja"  # Armazenado na Loja, Aguardando Arte, Armazenado Fábrica, Produção, Acabamento, Pronto, Entregue, Reparo
     
     # Checklist
     checklist: ChecklistProducao = Field(default_factory=ChecklistProducao)
