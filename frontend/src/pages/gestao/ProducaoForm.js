@@ -116,9 +116,12 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
         if (tipoFoto === 'entrada_material') {
           setFotosEntradaMaterial(prev => [...prev, base64]);
           toast.success('Foto de entrada adicionada!');
-        } else {
+        } else if (tipoFoto === 'trabalho_pronto') {
           setFotosTrabalhoPronto(prev => [...prev, base64]);
           toast.success('Foto do trabalho pronto adicionada!');
+        } else if (tipoFoto === 'comprovante_pagamento') {
+          setComprovantePagamento(prev => [...prev, base64]);
+          toast.success('Comprovante de pagamento adicionado!');
         }
       };
       reader.readAsDataURL(file);
@@ -134,8 +137,10 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
   const handleRemoveFoto = (index, tipoFoto) => {
     if (tipoFoto === 'entrada_material') {
       setFotosEntradaMaterial(prev => prev.filter((_, i) => i !== index));
-    } else {
+    } else if (tipoFoto === 'trabalho_pronto') {
       setFotosTrabalhoPronto(prev => prev.filter((_, i) => i !== index));
+    } else if (tipoFoto === 'comprovante_pagamento') {
+      setComprovantePagamento(prev => prev.filter((_, i) => i !== index));
     }
     toast.success('Foto removida');
   };
