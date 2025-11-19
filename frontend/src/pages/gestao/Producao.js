@@ -229,6 +229,132 @@ export default function Producao() {
         </button>
       </div>
 
+
+      {/* Seção de Estatísticas e Gráficos */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '20px',
+        marginBottom: '30px'
+      }}>
+        {/* Card Total de Ordens */}
+        <div style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: '10px',
+          padding: '20px',
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{fontSize: '14px', opacity: 0.9, marginBottom: '8px'}}>Total de Ordens</div>
+          <div style={{fontSize: '32px', fontWeight: 'bold'}}>{stats.total}</div>
+        </div>
+
+        {/* Card Atrasados */}
+        <div style={{
+          background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          borderRadius: '10px',
+          padding: '20px',
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{fontSize: '14px', opacity: 0.9, marginBottom: '8px'}}>⚠️ Atrasados</div>
+          <div style={{fontSize: '32px', fontWeight: 'bold'}}>{stats.atrasados}</div>
+        </div>
+
+        {/* Card Em Reparo */}
+        <div style={{
+          background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+          borderRadius: '10px',
+          padding: '20px',
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{fontSize: '14px', opacity: 0.9, marginBottom: '8px'}}>🔧 Em Reparo</div>
+          <div style={{fontSize: '32px', fontWeight: 'bold'}}>{stats.em_reparo}</div>
+        </div>
+
+        {/* Card Em Produção */}
+        <div style={{
+          background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          borderRadius: '10px',
+          padding: '20px',
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{fontSize: '14px', opacity: 0.9, marginBottom: '8px'}}>🏭 Em Produção</div>
+          <div style={{fontSize: '32px', fontWeight: 'bold'}}>
+            {stats.por_status?.['Produção'] || 0}
+          </div>
+        </div>
+      </div>
+
+      {/* Gráfico de Status */}
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '10px',
+        padding: '25px',
+        marginBottom: '30px',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+      }}>
+        <h3 style={{marginBottom: '20px', color: '#1f2937'}}>📊 Ordens por Status</h3>
+        <div style={{display: 'flex', flexWrap: 'wrap', gap: '15px'}}>
+          {Object.entries(stats.por_status || {}).map(([status, count]) => (
+            <div key={status} style={{
+              flex: '1 1 200px',
+              padding: '15px',
+              borderRadius: '8px',
+              background: '#f3f4f6',
+              border: '1px solid #e5e7eb'
+            }}>
+              <div style={{fontSize: '12px', color: '#6b7280', marginBottom: '5px'}}>{status}</div>
+              <div style={{fontSize: '24px', fontWeight: 'bold', color: '#1f2937'}}>{count}</div>
+              <div style={{
+                marginTop: '8px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#e5e7eb'
+              }}>
+                <div style={{
+                  height: '100%',
+                  borderRadius: '2px',
+                  background: '#3b82f6',
+                  width: `${(count / stats.total) * 100}%`,
+                  transition: 'width 0.3s'
+                }}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Gráfico de Lojas */}
+      {Object.keys(stats.por_loja || {}).length > 0 && (
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '10px',
+          padding: '25px',
+          marginBottom: '30px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+        }}>
+          <h3 style={{marginBottom: '20px', color: '#1f2937'}}>🏪 Ordens por Loja</h3>
+          <div style={{display: 'flex', flexWrap: 'wrap', gap: '15px'}}>
+            {Object.entries(stats.por_loja || {}).map(([loja, count]) => (
+              <div key={loja} style={{
+                flex: '1 1 200px',
+                padding: '15px',
+                borderRadius: '8px',
+                background: '#ecfdf5',
+                border: '1px solid #10b981'
+              }}>
+                <div style={{fontSize: '12px', color: '#065f46', marginBottom: '5px'}}>{loja}</div>
+                <div style={{fontSize: '24px', fontWeight: 'bold', color: '#065f46'}}>{count}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+
       {/* Filtros */}
       <div className="filters-section">
         <div className="search-box">
