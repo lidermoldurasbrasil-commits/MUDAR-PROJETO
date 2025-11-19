@@ -6322,9 +6322,7 @@ async def create_pedido_loja(pedido_data: dict, credentials: HTTPAuthorizationCr
             "created_by": user['username']
         }
         
-        print(f"DEBUG: About to insert pedido_dict: {pedido_dict}")
         await db.pedidos_lojas.insert_one(pedido_dict)
-        print("DEBUG: Successfully inserted into database")
         
         # Create a clean response dict to avoid serialization issues
         response_pedido = {
