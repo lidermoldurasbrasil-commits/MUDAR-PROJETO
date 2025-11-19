@@ -8,6 +8,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 const API = `${BACKEND_URL}/api/gestao`;
 
 const STATUS_OPTIONS = [
+  'Armazenado na Loja',
   'Aguardando Arte',
   'Armazenado Fábrica',
   'Produção',
