@@ -256,16 +256,6 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
                       placeholder="ID do pedido de venda"
                     />
                   </div>
-
-                  <div className="input-group">
-                    <label>Nº Pedido Original</label>
-                    <input 
-                      type="number" 
-                      name="numero_pedido"
-                      value={formData.numero_pedido}
-                      onChange={handleChange}
-                    />
-                  </div>
                 </div>
 
                 <h3 style={{marginTop: '30px'}}>Datas</h3>
