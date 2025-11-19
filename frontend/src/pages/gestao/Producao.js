@@ -11,6 +11,8 @@ const STATUS_OPTIONS = [
   'Armazenado na Loja',
   'Aguardando Arte',
   'Armazenado Fábrica',
+  'Pronto para Impressão',
+  'Impresso',
   'Produção',
   'Acabamento',
   'Pronto',
