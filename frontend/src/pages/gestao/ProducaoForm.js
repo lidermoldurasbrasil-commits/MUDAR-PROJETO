@@ -553,6 +553,104 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
                   )}
                 </div>
 
+
+                {/* Comprovante de Pagamento */}
+                <div style={{marginTop: '40px'}}>
+                  <h4 style={{marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px'}}>
+                    <span style={{fontSize: '24px'}}>💳</span>
+                    Comprovante de Pagamento
+                  </h4>
+                  <p style={{color: '#6b7280', fontSize: '14px', marginBottom: '15px'}}>
+                    Anexe o(s) comprovante(s) de pagamento do cliente
+                  </p>
+
+                  <div style={{marginBottom: '15px'}}>
+                    <label style={{
+                      display: 'inline-block',
+                      padding: '10px 20px',
+                      backgroundColor: '#8b5cf6',
+                      color: 'white',
+                      borderRadius: '5px',
+                      cursor: uploadingFoto ? 'not-allowed' : 'pointer',
+                      opacity: uploadingFoto ? 0.6 : 1
+                    }}>
+                      {uploadingFoto ? 'Adicionando...' : '+ Adicionar Comprovante'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{display: 'none'}}
+                        onChange={(e) => handleUploadFoto(e, 'comprovante_pagamento')}
+                        disabled={uploadingFoto}
+                      />
+                    </label>
+                    <span style={{marginLeft: '10px', fontSize: '12px', color: '#6b7280'}}>
+                      Máx 5MB por foto
+                    </span>
+                  </div>
+
+                  {/* Grid de Comprovantes */}
+                  {comprovantePagamento.length > 0 ? (
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                      gap: '15px',
+                      marginTop: '15px'
+                    }}>
+                      {comprovantePagamento.map((foto, index) => (
+                        <div key={index} style={{
+                          position: 'relative',
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '8px',
+                          overflow: 'hidden'
+                        }}>
+                          <img 
+                            src={foto} 
+                            alt={`Comprovante ${index + 1}`}
+                            style={{
+                              width: '100%',
+                              height: '150px',
+                              objectFit: 'cover'
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFoto(index, 'comprovante_pagamento')}
+                            style={{
+                              position: 'absolute',
+                              top: '5px',
+                              right: '5px',
+                              background: 'rgba(239, 68, 68, 0.9)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '28px',
+                              height: '28px',
+                              cursor: 'pointer',
+                              fontSize: '18px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{
+                      padding: '40px',
+                      border: '2px dashed #d1d5db',
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      color: '#9ca3af'
+                    }}>
+                      Nenhum comprovante adicionado ainda
+                    </div>
+                  )}
+                </div>
+
+
                 <div style={{
                   marginTop: '30px',
                   padding: '15px',
