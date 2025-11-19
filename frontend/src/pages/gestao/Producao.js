@@ -59,6 +59,13 @@ export default function Producao() {
   const [statusFilter, setStatusFilter] = useState('Todos');
   const [responsavelFilter, setResponsavelFilter] = useState('Todos');
   const [showAtrasados, setShowAtrasados] = useState(false);
+  const [stats, setStats] = useState({
+    por_status: {},
+    por_loja: {},
+    total: 0,
+    atrasados: 0,
+    em_reparo: 0
+  });
 
   useEffect(() => {
     fetchOrdens();
