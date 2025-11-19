@@ -6328,7 +6328,21 @@ async def create_pedido_loja(pedido_data: dict, credentials: HTTPAuthorizationCr
         await db.pedidos_lojas.insert_one(pedido_dict)
         print("DEBUG: Successfully inserted into database")
         
-        return {"success": True, "pedido": pedido_dict}
+        # Create a clean response dict to avoid serialization issues
+        response_pedido = {
+            "id": pedido_dict["id"],
+            "numero_pedido": pedido_dict["numero_pedido"],
+            "loja": pedido_dict["loja"],
+            "cliente_nome": pedido_dict["cliente_nome"],
+            "cliente_contato": pedido_dict["cliente_contato"],
+            "produto_descricao": pedido_dict["produto_descricao"],
+            "valor_acordado": pedido_dict["valor_acordado"],
+            "status": pedido_dict["status"],
+            "created_at": pedido_dict["created_at"],
+            "created_by": pedido_dict["created_by"]
+        }
+        
+        return {"success": True, "pedido": response_pedido}
     except Exception as e:
         print(f"DEBUG: Exception occurred: {str(e)}")
         print(f"DEBUG: Exception type: {type(e)}")
