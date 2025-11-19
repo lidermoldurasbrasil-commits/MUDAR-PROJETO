@@ -6265,9 +6265,7 @@ async def ml_webhook(request: Request):
 async def create_pedido_loja(pedido_data: dict, credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Criar novo pedido de loja física"""
     try:
-        print(f"DEBUG: Received pedido_data: {pedido_data}")
         user = decode_token(credentials.credentials)
-        print(f"DEBUG: User authenticated: {user['username']}")
         
         # Gerar número do pedido automaticamente
         loja = pedido_data.get('loja', '')
