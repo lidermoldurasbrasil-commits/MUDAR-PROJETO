@@ -367,6 +367,220 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
               </div>
             )}
 
+
+            {/* Aba: Fotos */}
+            {activeTab === 'fotos' && (
+              <div>
+                <h3>📸 Fotos da Ordem de Produção</h3>
+                <p style={{color: '#6b7280', marginBottom: '30px'}}>
+                  Adicione fotos dos materiais recebidos e do trabalho finalizado
+                </p>
+
+                {/* Fotos Entrada de Material */}
+                <div style={{marginBottom: '40px'}}>
+                  <h4 style={{marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px'}}>
+                    <span style={{fontSize: '24px'}}>📦</span>
+                    Fotos - Entrada de Material
+                  </h4>
+                  <p style={{color: '#6b7280', fontSize: '14px', marginBottom: '15px'}}>
+                    Fotografe os objetos/materiais que o cliente deixou para emoldurar
+                  </p>
+
+                  <div style={{marginBottom: '15px'}}>
+                    <label style={{
+                      display: 'inline-block',
+                      padding: '10px 20px',
+                      backgroundColor: '#3b82f6',
+                      color: 'white',
+                      borderRadius: '5px',
+                      cursor: uploadingFoto ? 'not-allowed' : 'pointer',
+                      opacity: uploadingFoto ? 0.6 : 1
+                    }}>
+                      {uploadingFoto ? 'Adicionando...' : '+ Adicionar Foto de Entrada'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{display: 'none'}}
+                        onChange={(e) => handleUploadFoto(e, 'entrada_material')}
+                        disabled={uploadingFoto}
+                      />
+                    </label>
+                    <span style={{marginLeft: '10px', fontSize: '12px', color: '#6b7280'}}>
+                      Máx 5MB por foto
+                    </span>
+                  </div>
+
+                  {/* Grid de Fotos Entrada */}
+                  {fotosEntradaMaterial.length > 0 ? (
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                      gap: '15px',
+                      marginTop: '15px'
+                    }}>
+                      {fotosEntradaMaterial.map((foto, index) => (
+                        <div key={index} style={{
+                          position: 'relative',
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '8px',
+                          overflow: 'hidden'
+                        }}>
+                          <img 
+                            src={foto} 
+                            alt={`Entrada ${index + 1}`}
+                            style={{
+                              width: '100%',
+                              height: '150px',
+                              objectFit: 'cover'
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFoto(index, 'entrada_material')}
+                            style={{
+                              position: 'absolute',
+                              top: '5px',
+                              right: '5px',
+                              background: 'rgba(239, 68, 68, 0.9)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '28px',
+                              height: '28px',
+                              cursor: 'pointer',
+                              fontSize: '18px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{
+                      padding: '40px',
+                      border: '2px dashed #d1d5db',
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      color: '#9ca3af'
+                    }}>
+                      Nenhuma foto de entrada adicionada ainda
+                    </div>
+                  )}
+                </div>
+
+                {/* Fotos Trabalho Pronto */}
+                <div>
+                  <h4 style={{marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px'}}>
+                    <span style={{fontSize: '24px'}}>✅</span>
+                    Fotos - Trabalho Pronto
+                  </h4>
+                  <p style={{color: '#6b7280', fontSize: '14px', marginBottom: '15px'}}>
+                    Fotografe o trabalho finalizado antes de embalar para documentação
+                  </p>
+
+                  <div style={{marginBottom: '15px'}}>
+                    <label style={{
+                      display: 'inline-block',
+                      padding: '10px 20px',
+                      backgroundColor: '#10b981',
+                      color: 'white',
+                      borderRadius: '5px',
+                      cursor: uploadingFoto ? 'not-allowed' : 'pointer',
+                      opacity: uploadingFoto ? 0.6 : 1
+                    }}>
+                      {uploadingFoto ? 'Adicionando...' : '+ Adicionar Foto do Trabalho Pronto'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{display: 'none'}}
+                        onChange={(e) => handleUploadFoto(e, 'trabalho_pronto')}
+                        disabled={uploadingFoto}
+                      />
+                    </label>
+                    <span style={{marginLeft: '10px', fontSize: '12px', color: '#6b7280'}}>
+                      Máx 5MB por foto
+                    </span>
+                  </div>
+
+                  {/* Grid de Fotos Trabalho Pronto */}
+                  {fotosTrabalhoPronto.length > 0 ? (
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                      gap: '15px',
+                      marginTop: '15px'
+                    }}>
+                      {fotosTrabalhoPronto.map((foto, index) => (
+                        <div key={index} style={{
+                          position: 'relative',
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '8px',
+                          overflow: 'hidden'
+                        }}>
+                          <img 
+                            src={foto} 
+                            alt={`Trabalho Pronto ${index + 1}`}
+                            style={{
+                              width: '100%',
+                              height: '150px',
+                              objectFit: 'cover'
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFoto(index, 'trabalho_pronto')}
+                            style={{
+                              position: 'absolute',
+                              top: '5px',
+                              right: '5px',
+                              background: 'rgba(239, 68, 68, 0.9)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '28px',
+                              height: '28px',
+                              cursor: 'pointer',
+                              fontSize: '18px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{
+                      padding: '40px',
+                      border: '2px dashed #d1d5db',
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      color: '#9ca3af'
+                    }}>
+                      Nenhuma foto do trabalho pronto adicionada ainda
+                    </div>
+                  )}
+                </div>
+
+                <div style={{
+                  marginTop: '30px',
+                  padding: '15px',
+                  backgroundColor: '#f3f4f6',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  color: '#4b5563'
+                }}>
+                  <strong>💡 Dica:</strong> As fotos serão salvas automaticamente ao criar/salvar a ordem de produção.
+                </div>
+              </div>
+            )}
+
             {/* Aba: Checklist */}
             {activeTab === 'checklist' && (
               <div>
