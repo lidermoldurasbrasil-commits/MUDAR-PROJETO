@@ -45,6 +45,7 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
   const [activeTab, setActiveTab] = useState('dados');
   const [fotosEntradaMaterial, setFotosEntradaMaterial] = useState(ordem?.fotos_entrada_material || []);
   const [fotosTrabalhoPronto, setFotosTrabalhoPronto] = useState(ordem?.fotos_trabalho_pronto || []);
+  const [comprovantePagamento, setComprovantePagamento] = useState(ordem?.comprovante_pagamento || []);
   const [uploadingFoto, setUploadingFoto] = useState(false);
   
   const [formData, setFormData] = useState({
