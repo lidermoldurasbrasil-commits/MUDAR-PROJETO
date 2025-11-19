@@ -1552,6 +1552,7 @@ class OrdemProducao(BaseModel):
     # Fotos
     fotos_entrada_material: List[str] = []  # URLs das fotos dos materiais recebidos
     fotos_trabalho_pronto: List[str] = []  # URLs das fotos do trabalho finalizado antes de embalar
+    comprovante_pagamento: List[str] = []  # URLs dos comprovantes de pagamento do cliente
     
     # Timeline / Histórico
     timeline: List[TimelineEntry] = []
