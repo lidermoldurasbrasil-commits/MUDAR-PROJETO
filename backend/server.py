@@ -6262,22 +6262,23 @@ async def ml_webhook(request: Request):
 # ============= ENDPOINTS PRODUÇÃO LOJAS FÍSICAS =============
 
 @api_router.post("/gestao/lojas/pedidos")
-async def create_pedido_loja(pedido: PedidoLoja, credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def create_pedido_loja(pedido_data: dict, credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Criar novo pedido de loja física"""
     try:
         user = decode_token(credentials.credentials)
         
         # Gerar número do pedido automaticamente
+        loja = pedido_data.get('loja', '')
         loja_prefix = {
             "São João Batista": "SJB",
             "Mantiqueira": "MTQ",
             "Lagoa Santa": "LGS",
             "Fábrica": "FAB"
-        }.get(pedido.loja, "LJ")
+        }.get(loja, "LJ")
         
         # Buscar último número
         last_pedido = await db.pedidos_lojas.find_one(
-            {"loja": pedido.loja},
+            {"loja": loja},
             sort=[("created_at", -1)]
         )
         
@@ -6290,30 +6291,36 @@ async def create_pedido_loja(pedido: PedidoLoja, credentials: HTTPAuthorizationC
         else:
             new_num = 1
         
-        pedido.numero_pedido = f"LJ-{loja_prefix}-{new_num:04d}"
-        pedido.created_by = user['username']
-        pedido.created_at = datetime.now(timezone.utc)
-        pedido.updated_at = datetime.now(timezone.utc)
-        
-        pedido_dict = pedido.model_dump()
-        
-        # Convert datetime objects to ISO format strings for MongoDB
-        if 'created_at' in pedido_dict and isinstance(pedido_dict['created_at'], datetime):
-            pedido_dict['created_at'] = pedido_dict['created_at'].isoformat()
-        if 'updated_at' in pedido_dict and isinstance(pedido_dict['updated_at'], datetime):
-            pedido_dict['updated_at'] = pedido_dict['updated_at'].isoformat()
-        if 'prazo_entrega' in pedido_dict and isinstance(pedido_dict['prazo_entrega'], datetime):
-            pedido_dict['prazo_entrega'] = pedido_dict['prazo_entrega'].isoformat()
-        if 'data_envio_arte' in pedido_dict and isinstance(pedido_dict['data_envio_arte'], datetime):
-            pedido_dict['data_envio_arte'] = pedido_dict['data_envio_arte'].isoformat()
-        if 'data_aprovacao_cliente' in pedido_dict and isinstance(pedido_dict['data_aprovacao_cliente'], datetime):
-            pedido_dict['data_aprovacao_cliente'] = pedido_dict['data_aprovacao_cliente'].isoformat()
-        if 'data_inicio_producao' in pedido_dict and isinstance(pedido_dict['data_inicio_producao'], datetime):
-            pedido_dict['data_inicio_producao'] = pedido_dict['data_inicio_producao'].isoformat()
-        if 'data_finalizacao' in pedido_dict and isinstance(pedido_dict['data_finalizacao'], datetime):
-            pedido_dict['data_finalizacao'] = pedido_dict['data_finalizacao'].isoformat()
-        if 'data_entrega' in pedido_dict and isinstance(pedido_dict['data_entrega'], datetime):
-            pedido_dict['data_entrega'] = pedido_dict['data_entrega'].isoformat()
+        # Create pedido document
+        pedido_dict = {
+            "id": str(uuid.uuid4()),
+            "numero_pedido": f"LJ-{loja_prefix}-{new_num:04d}",
+            "loja": loja,
+            "cliente_nome": pedido_data.get('cliente_nome', ''),
+            "cliente_contato": pedido_data.get('cliente_contato', ''),
+            "produto_descricao": pedido_data.get('produto_descricao', ''),
+            "medidas_dimensoes": pedido_data.get('medidas_dimensoes', ''),
+            "tipo_acabamento": pedido_data.get('tipo_acabamento', ''),
+            "vendedor_responsavel": pedido_data.get('vendedor_responsavel', ''),
+            "valor_acordado": pedido_data.get('valor_acordado', 0),
+            "forma_pagamento": pedido_data.get('forma_pagamento', ''),
+            "status": pedido_data.get('status', 'Aguardando Arte'),
+            "status_cor": pedido_data.get('status_cor', '#94A3B8'),
+            "setor_arte_responsavel": pedido_data.get('setor_arte_responsavel', ''),
+            "data_envio_arte": None,
+            "data_aprovacao_cliente": None,
+            "data_inicio_producao": None,
+            "data_finalizacao": None,
+            "data_entrega": None,
+            "prazo_entrega": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+            "fotos": pedido_data.get('fotos', []),
+            "observacoes": pedido_data.get('observacoes', ''),
+            "prioridade": pedido_data.get('prioridade', 'Normal'),
+            "atrasado": pedido_data.get('atrasado', False),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "created_by": user['username']
+        }
         
         await db.pedidos_lojas.insert_one(pedido_dict)
         
