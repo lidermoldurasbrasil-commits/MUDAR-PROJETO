@@ -75,6 +75,7 @@ export default function Producao() {
   useEffect(() => {
     fetchOrdens();
     fetchStats();
+    fetchOrdensPendentes();
   }, []);
 
   useEffect(() => {
@@ -90,6 +91,67 @@ export default function Producao() {
       setStats(response.data);
     } catch (error) {
       console.error('Erro ao buscar estatísticas:', error);
+    }
+  };
+
+  const fetchOrdensPendentes = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const nome = user.nome || user.username;
+      
+      const response = await axios.get(`${API}/producao/pendentes-aprovacao?responsavel=${nome}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setOrdensPendentes(response.data.ordens || []);
+    } catch (error) {
+      console.error('Erro ao buscar ordens pendentes:', error);
+    }
+  };
+
+  const handleAprovarOrdem = async (ordem, observacao = '') => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${API}/producao/${ordem.id}/aprovar`,
+        { observacao },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success('✅ Ordem aprovada! Você assumiu a responsabilidade.');
+      setShowAprovarModal(false);
+      setOrdemParaAprovar(null);
+      fetchOrdens();
+      fetchOrdensPendentes();
+    } catch (error) {
+      console.error('Erro ao aprovar ordem:', error);
+      toast.error(error.response?.data?.detail || 'Erro ao aprovar ordem');
+    }
+  };
+
+  const handleRejeitarOrdem = async (ordem, motivo) => {
+    if (!motivo) {
+      toast.error('Informe o motivo da rejeição');
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${API}/producao/${ordem.id}/rejeitar`,
+        { motivo },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success('Ordem rejeitada e devolvida');
+      setShowAprovarModal(false);
+      setOrdemParaAprovar(null);
+      fetchOrdens();
+      fetchOrdensPendentes();
+    } catch (error) {
+      console.error('Erro ao rejeitar ordem:', error);
+      toast.error('Erro ao rejeitar ordem');
     }
   };
 
