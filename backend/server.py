@@ -3156,6 +3156,148 @@ async def transferir_responsavel(
         
         if resultado.modified_count == 0:
             raise HTTPException(status_code=404, detail="Ordem não encontrada")
+
+
+@api_router.post("/gestao/producao/{ordem_id}/aprovar-gerencia")
+async def aprovar_gerencia_producao(
+    ordem_id: str,
+    dados: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Gerente de produção aprova após conferir insumos e dados do cliente"""
+    try:
+        observacoes = dados.get("observacoes", "")
+        
+        resultado = await db.ordens_producao.update_one(
+            {"id": ordem_id},
+            {
+                "$set": {
+                    "aprovacao_gerencia_producao": True,
+                    "gerente_que_aprovou": current_user.get("nome") or current_user.get("username"),
+                    "data_aprovacao_gerencia": datetime.now(timezone.utc).isoformat(),
+                    "observacoes_gerencia": observacoes,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        if resultado.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Ordem não encontrada")
+        
+        return {
+            "success": True,
+            "message": "✅ Aprovado pela Gerência de Produção!"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/gestao/producao/{ordem_id}/aprovar-financeiro")
+async def aprovar_financeiro(
+    ordem_id: str,
+    dados: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Financeiro aprova após verificar pagamento"""
+    try:
+        observacoes = dados.get("observacoes", "")
+        
+        resultado = await db.ordens_producao.update_one(
+            {"id": ordem_id},
+            {
+                "$set": {
+                    "aprovacao_financeiro": True,
+                    "financeiro_que_aprovou": current_user.get("nome") or current_user.get("username"),
+                    "data_aprovacao_financeiro": datetime.now(timezone.utc).isoformat(),
+                    "observacoes_financeiro": observacoes,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        if resultado.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Ordem não encontrada")
+        
+        return {
+            "success": True,
+            "message": "✅ Aprovado pelo Financeiro!"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.get("/gestao/producao/aguardando-aprovacao-dupla")
+async def get_ordens_aprovacao_dupla(
+    current_user: dict = Depends(get_current_user)
+):
+    """Listar ordens que aguardam aprovação dupla (gerência e financeiro)"""
+    try:
+        # Ordens que ainda não têm as duas aprovações
+        ordens = await db.ordens_producao.find({
+            "$or": [
+                {"aprovacao_gerencia_producao": False},
+                {"aprovacao_financeiro": False}
+            ],
+            "responsavel_atual": "Vendedor"
+        }).to_list(length=1000)
+        
+        return {
+            "success": True,
+            "ordens": ordens,
+            "total": len(ordens)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/gestao/producao/{ordem_id}/enviar-para-setor")
+async def enviar_para_setor(
+    ordem_id: str,
+    dados: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Após aprovação dupla, escolher manualmente o próximo setor"""
+    try:
+        proximo_setor = dados.get("proximo_setor")
+        if not proximo_setor:
+            raise HTTPException(status_code=400, detail="Próximo setor é obrigatório")
+        
+        # Verificar se tem as duas aprovações
+        ordem = await db.ordens_producao.find_one({"id": ordem_id})
+        if not ordem:
+            raise HTTPException(status_code=404, detail="Ordem não encontrada")
+        
+        if not ordem.get("aprovacao_gerencia_producao"):
+            raise HTTPException(status_code=400, detail="Aguardando aprovação da Gerência de Produção")
+        
+        if not ordem.get("aprovacao_financeiro"):
+            raise HTTPException(status_code=400, detail="Aguardando aprovação do Financeiro")
+        
+        # Enviar para o próximo setor
+        resultado = await db.ordens_producao.update_one(
+            {"id": ordem_id},
+            {
+                "$set": {
+                    "aguardando_aprovacao": True,
+                    "responsavel_pendente": proximo_setor,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        return {
+            "success": True,
+            "message": f"✅ Ordem enviada para {proximo_setor}. Aguardando aprovação."
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
         
         return {
             "success": True,
