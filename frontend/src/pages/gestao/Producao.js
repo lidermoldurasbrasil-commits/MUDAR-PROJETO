@@ -34,11 +34,9 @@ const RESPONSAVEL_OPTIONS = [
 
 const LOJA_OPTIONS = [
   { value: 'fabrica', label: 'Fábrica' },
-  { value: 'loja1', label: 'Loja 1' },
-  { value: 'loja2', label: 'Loja 2' },
-  { value: 'loja3', label: 'Loja 3' },
-  { value: 'loja4', label: 'Loja 4' },
-  { value: 'loja5', label: 'Loja 5' }
+  { value: 'mantiqueira', label: 'Mantiqueira' },
+  { value: 'lagoa_santa', label: 'Lagoa Santa' },
+  { value: 'sao_joao_batista', label: 'São João Batista' }
 ];
 
 const STATUS_COLORS = {
