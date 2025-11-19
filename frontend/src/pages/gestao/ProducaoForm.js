@@ -58,7 +58,7 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
     descricao_itens: ordem?.descricao_itens || '',
     valor_total: ordem?.valor_total || 0,
     responsavel_atual: ordem?.responsavel_atual || 'Vendedor',
-    status_interno: ordem?.status_interno || 'Aguardando Arte',
+    status_interno: ordem?.status_interno || 'Armazenado na Loja',
     prioridade: ordem?.prioridade || 'Normal',
     observacoes_internas: ordem?.observacoes_internas || '',
     checklist: ordem?.checklist || {
