@@ -331,17 +331,6 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
                       ))}
                     </select>
                   </div>
-
-                  <div className="input-group">
-                    <label>Valor Total</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      name="valor_total"
-                      value={formData.valor_total}
-                      onChange={handleChange}
-                    />
-                  </div>
                 </div>
 
                 <h3 style={{marginTop: '30px'}}>Descrição dos Itens</h3>
