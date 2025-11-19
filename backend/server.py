@@ -6319,7 +6319,7 @@ async def get_pedidos_loja(
         if status:
             query['status'] = status
         
-        pedidos = await db.pedidos_lojas.find(query).sort('created_at', -1).to_list(length=1000)
+        pedidos = await db.pedidos_lojas.find(query, {"_id": 0}).sort('created_at', -1).to_list(length=1000)
         
         return {"success": True, "pedidos": pedidos}
     except Exception as e:
