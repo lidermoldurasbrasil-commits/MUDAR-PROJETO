@@ -608,45 +608,82 @@ export default function Producao() {
 
 
       {/* Filtros */}
-      <div className="filters-section">
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Buscar por cliente, nº ordem ou itens..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <select value={lojaFilter} onChange={(e) => setLojaFilter(e.target.value)}>
-          <option value="Todos">Todas as Lojas</option>
-          {LOJA_OPTIONS.map(loja => (
-            <option key={loja.value} value={loja.value}>{loja.label}</option>
-          ))}
-        </select>
-
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-          <option value="Todos">Todos os Status</option>
-          {STATUS_OPTIONS.map(status => (
-            <option key={status} value={status}>{status}</option>
-          ))}
-        </select>
-
-        <select value={responsavelFilter} onChange={(e) => setResponsavelFilter(e.target.value)}>
-          <option value="Todos">Todos Responsáveis</option>
-          {RESPONSAVEL_OPTIONS.map(resp => (
-            <option key={resp} value={resp}>{resp}</option>
-          ))}
-        </select>
-
-        <button
-          className={`btn-filter ${showAtrasados ? 'active' : ''}`}
-          onClick={() => setShowAtrasados(!showAtrasados)}
+      <div className="filters-section" style={{
+        backgroundColor: 'white',
+        borderRadius: '10px',
+        padding: '20px',
+        marginBottom: '30px',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div 
+          onClick={() => setShowFiltros(!showFiltros)}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+            marginBottom: showFiltros ? '20px' : '0'
+          }}
         >
-          <AlertCircle size={18} />
-          {showAtrasados ? 'Mostrar Todos' : 'Apenas Atrasados'}
-        </button>
+          <h3 style={{color: '#1f2937', margin: 0, display: 'flex', alignItems: 'center', gap: '10px'}}>
+            <Filter size={20} />
+            Filtros de Pesquisa
+          </h3>
+          <button style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#6b7280',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            {showFiltros ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+          </button>
+        </div>
+        
+        {showFiltros && (
+          <div style={{display: 'flex', flexWrap: 'wrap', gap: '15px', alignItems: 'center'}}>
+            <div className="search-box" style={{flex: '1 1 300px'}}>
+              <Search size={20} />
+              <input
+                type="text"
+                placeholder="Buscar por cliente, nº ordem ou itens..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <select value={lojaFilter} onChange={(e) => setLojaFilter(e.target.value)} style={{flex: '0 1 200px'}}>
+              <option value="Todos">Todas as Lojas</option>
+              {LOJA_OPTIONS.map(loja => (
+                <option key={loja.value} value={loja.value}>{loja.label}</option>
+              ))}
+            </select>
+
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={{flex: '0 1 200px'}}>
+              <option value="Todos">Todos os Status</option>
+              {STATUS_OPTIONS.map(status => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+
+            <select value={responsavelFilter} onChange={(e) => setResponsavelFilter(e.target.value)} style={{flex: '0 1 200px'}}>
+              <option value="Todos">Todos Responsáveis</option>
+              {RESPONSAVEL_OPTIONS.map(resp => (
+                <option key={resp} value={resp}>{resp}</option>
+              ))}
+            </select>
+
+            <button
+              className={`btn-filter ${showAtrasados ? 'active' : ''}`}
+              onClick={() => setShowAtrasados(!showAtrasados)}
+              style={{flex: '0 0 auto'}}
+            >
+              <AlertCircle size={18} />
+              {showAtrasados ? 'Mostrar Todos' : 'Apenas Atrasados'}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tabela */}
