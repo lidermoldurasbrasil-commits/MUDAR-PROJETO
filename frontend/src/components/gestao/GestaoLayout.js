@@ -4,11 +4,9 @@ import { Package, ShoppingCart, Archive, DollarSign, Users, BarChart3, LogOut, F
 
 const LOJAS = [
   { id: 'fabrica', nome: 'Fábrica' },
-  { id: 'loja1', nome: 'Loja 1' },
-  { id: 'loja2', nome: 'Loja 2' },
-  { id: 'loja3', nome: 'Loja 3' },
-  { id: 'loja4', nome: 'Loja 4' },
-  { id: 'loja5', nome: 'Loja 5' }
+  { id: 'mantiqueira', nome: 'Mantiqueira' },
+  { id: 'lagoa_santa', nome: 'Lagoa Santa' },
+  { id: 'sao_joao_batista', nome: 'São João Batista' }
 ];
 
 export default function GestaoLayout({ user, onLogout }) {
