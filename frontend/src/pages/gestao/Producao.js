@@ -290,11 +290,123 @@ export default function Producao() {
           <h1>Gestão de Produção da Fábrica</h1>
           <p className="subtitle">Controle completo das ordens de produção</p>
         </div>
-        <button className="btn-primary" onClick={handleNewOrdem}>
-          <Plus size={20} />
-          Nova Ordem de Produção
-        </button>
+        <div style={{display: 'flex', gap: '10px'}}>
+          {ordensPendentes.length > 0 && (
+            <button 
+              className="btn-warning" 
+              onClick={() => setShowPendentes(!showPendentes)}
+              style={{position: 'relative'}}
+            >
+              <AlertCircle size={20} />
+              Pendentes de Aprovação
+              <span style={{
+                position: 'absolute',
+                top: '-8px',
+                right: '-8px',
+                background: '#ef4444',
+                color: 'white',
+                borderRadius: '50%',
+                width: '24px',
+                height: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              }}>
+                {ordensPendentes.length}
+              </span>
+            </button>
+          )}
+          <button className="btn-primary" onClick={handleNewOrdem}>
+            <Plus size={20} />
+            Nova Ordem de Produção
+          </button>
+        </div>
       </div>
+
+      {/* Seção de Ordens Pendentes de Aprovação */}
+      {showPendentes && ordensPendentes.length > 0 && (
+        <div style={{
+          backgroundColor: '#fef3c7',
+          border: '2px solid #f59e0b',
+          borderRadius: '10px',
+          padding: '20px',
+          marginBottom: '30px'
+        }}>
+          <h3 style={{marginBottom: '15px', color: '#92400e', display: 'flex', alignItems: 'center', gap: '10px'}}>
+            <AlertCircle size={24} />
+            Ordens Aguardando Sua Aprovação ({ordensPendentes.length})
+          </h3>
+          <p style={{color: '#78350f', marginBottom: '20px', fontSize: '14px'}}>
+            ⚠️ Estas ordens foram transferidas para você. Revise o processo anterior e aprove para assumir a responsabilidade.
+          </p>
+          
+          <div style={{display: 'grid', gap: '15px'}}>
+            {ordensPendentes.map(ordem => (
+              <div key={ordem.id} style={{
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                padding: '15px',
+                border: '1px solid #fbbf24',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div style={{flex: 1}}>
+                  <div style={{fontWeight: 'bold', fontSize: '16px', marginBottom: '5px'}}>
+                    Ordem #{ordem.numero_ordem} - {ordem.cliente_nome}
+                  </div>
+                  <div style={{fontSize: '14px', color: '#6b7280', marginBottom: '5px'}}>
+                    📦 {ordem.descricao_itens?.substring(0, 100)}...
+                  </div>
+                  <div style={{fontSize: '12px', color: '#9ca3af'}}>
+                    Transferido de: {ordem.responsavel_atual} → Status: {ordem.status_interno}
+                  </div>
+                </div>
+                
+                <div style={{display: 'flex', gap: '10px'}}>
+                  <button
+                    onClick={() => {
+                      setOrdemParaAprovar(ordem);
+                      setShowAprovarModal(true);
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                      fontWeight: '500'
+                    }}
+                  >
+                    ✓ Aprovar e Assumir
+                  </button>
+                  <button
+                    onClick={() => {
+                      setOrdemParaAprovar(ordem);
+                      const motivo = prompt('Motivo da rejeição:');
+                      if (motivo) handleRejeitarOrdem(ordem, motivo);
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#ef4444',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                      fontWeight: '500'
+                    }}
+                  >
+                    × Rejeitar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
 
       {/* Seção de Estatísticas e Gráficos */}
