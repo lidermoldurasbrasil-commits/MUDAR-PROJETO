@@ -73,6 +73,11 @@ export default function Producao() {
   const [showPendentes, setShowPendentes] = useState(false);
   const [showAprovarModal, setShowAprovarModal] = useState(false);
   const [ordemParaAprovar, setOrdemParaAprovar] = useState(null);
+  
+  // Estados para controlar menus recolhíveis
+  const [showGraficoStatus, setShowGraficoStatus] = useState(true);
+  const [showGraficoLojas, setShowGraficoLojas] = useState(true);
+  const [showFiltros, setShowFiltros] = useState(true);
 
   useEffect(() => {
     fetchOrdens();
