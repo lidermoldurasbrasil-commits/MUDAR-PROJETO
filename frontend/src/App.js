@@ -37,7 +37,6 @@ import RelatorioVendasMarketplace from './pages/gestao/RelatorioVendasMarketplac
 import ConfiguracoesStatus from './pages/gestao/ConfiguracoesStatus';
 import MarketplaceIntegrator from './pages/gestao/MarketplaceIntegrator';
 import IntegradorML from './pages/gestao/IntegradorML';
-import ProducaoLojas from './pages/gestao/ProducaoLojas';
 
 import axios from 'axios';
 import './App.css';
