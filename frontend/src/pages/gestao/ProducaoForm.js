@@ -88,6 +88,57 @@ export default function ProducaoForm({ ordem, onClose, onSave }) {
     }));
   };
 
+  const handleUploadFoto = async (e, tipoFoto) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validar tamanho (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Arquivo muito grande! Máximo 5MB');
+      return;
+    }
+
+    // Validar tipo
+    if (!file.type.startsWith('image/')) {
+      toast.error('Apenas imagens são permitidas');
+      return;
+    }
+
+    try {
+      setUploadingFoto(true);
+      
+      // Converter para base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result;
+        
+        if (tipoFoto === 'entrada_material') {
+          setFotosEntradaMaterial(prev => [...prev, base64]);
+          toast.success('Foto de entrada adicionada!');
+        } else {
+          setFotosTrabalhoPronto(prev => [...prev, base64]);
+          toast.success('Foto do trabalho pronto adicionada!');
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error);
+      toast.error('Erro ao adicionar foto');
+    } finally {
+      setUploadingFoto(false);
+      e.target.value = ''; // Limpar input
+    }
+  };
+
+  const handleRemoveFoto = (index, tipoFoto) => {
+    if (tipoFoto === 'entrada_material') {
+      setFotosEntradaMaterial(prev => prev.filter((_, i) => i !== index));
+    } else {
+      setFotosTrabalhoPronto(prev => prev.filter((_, i) => i !== index));
+    }
+    toast.success('Foto removida');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
