@@ -564,21 +564,45 @@ export default function Producao() {
           marginBottom: '30px',
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}>
-          <h3 style={{marginBottom: '20px', color: '#1f2937'}}>🏪 Ordens por Loja</h3>
-          <div style={{display: 'flex', flexWrap: 'wrap', gap: '15px'}}>
-            {Object.entries(stats.por_loja || {}).map(([loja, count]) => (
-              <div key={loja} style={{
-                flex: '1 1 200px',
-                padding: '15px',
-                borderRadius: '8px',
-                background: '#ecfdf5',
-                border: '1px solid #10b981'
-              }}>
-                <div style={{fontSize: '12px', color: '#065f46', marginBottom: '5px'}}>{loja}</div>
-                <div style={{fontSize: '24px', fontWeight: 'bold', color: '#065f46'}}>{count}</div>
-              </div>
-            ))}
+          <div 
+            onClick={() => setShowGraficoLojas(!showGraficoLojas)}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              cursor: 'pointer',
+              marginBottom: showGraficoLojas ? '20px' : '0'
+            }}
+          >
+            <h3 style={{color: '#1f2937', margin: 0}}>🏪 Ordens por Loja</h3>
+            <button style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#6b7280',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              {showGraficoLojas ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+            </button>
           </div>
+          
+          {showGraficoLojas && (
+            <div style={{display: 'flex', flexWrap: 'wrap', gap: '15px'}}>
+              {Object.entries(stats.por_loja || {}).map(([loja, count]) => (
+                <div key={loja} style={{
+                  flex: '1 1 200px',
+                  padding: '15px',
+                  borderRadius: '8px',
+                  background: '#ecfdf5',
+                  border: '1px solid #10b981'
+                }}>
+                  <div style={{fontSize: '12px', color: '#065f46', marginBottom: '5px'}}>{loja}</div>
+                  <div style={{fontSize: '24px', fontWeight: 'bold', color: '#065f46'}}>{count}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
