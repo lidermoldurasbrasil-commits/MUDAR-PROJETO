@@ -20,7 +20,7 @@ export default function GestaoLayout({ user, onLogout }) {
     { path: '/gestao/produtos', icon: Package, label: 'Produtos' },
     { path: '/gestao/pedidos', icon: ShoppingCart, label: 'Pedidos' },
     { path: '/gestao/producao', icon: Factory, label: 'Produção' },
-    { path: '/gestao/producao-lojas', icon: Store, label: 'Produção Lojas' },
+    { path: '/gestao/producao-lojas', icon: Building2, label: 'Produção Lojas' },
     { path: '/gestao/marketplaces', icon: Store, label: 'Marketplaces' },
     { path: '/gestao/estoque', icon: Archive, label: 'Estoque' },
     { path: '/gestao/financeiro', icon: DollarSign, label: 'Financeiro' },
