@@ -6274,38 +6274,22 @@ class BusinessManagementSystemTester:
             print("❌ Authentication failed - stopping tests")
             return False
         
-        # Run CRITICAL Mercado Livre Import Test FIRST
+        # Run Physical Store Production Test as requested
         print("\n" + "="*80)
-        print("🔥 RUNNING CRITICAL MERCADO LIVRE IMPORT TEST")
+        print("🏪 RUNNING PHYSICAL STORE PRODUCTION TEST")
         print("="*80)
         
-        ml_import_success = self.test_mercado_livre_import_process()
+        physical_store_success = self.test_physical_store_production()
         
-        if ml_import_success:
-            print("\n✅ CRITICAL TEST PASSED - ML Import Process Working!")
+        if physical_store_success:
+            print("\n✅ PHYSICAL STORE PRODUCTION TEST PASSED!")
         else:
-            print("\n❌ CRITICAL TEST FAILED - ML Import Process Has Issues!")
-        
-        # URGENT: Run Mercado Livre investigation 
-        print("\n🚨 URGENT: Investigating Mercado Livre Orders Import Flow...")
-        self.test_mercado_livre_orders_investigation()
-        
-        # CRITICAL: Test Mercado Livre Integration Bug Fix
-        print("\n🚨 PRIORITY: Testing Mercado Livre Integration Bug Fix...")
-        self.test_mercado_livre_integration()
-        
-        # Run marketplace filters test as requested by user
-        filters_success = self.test_marketplace_filters()
-        
-        if filters_success:
-            print("\n🎉 MARKETPLACE FILTER TESTS COMPLETED SUCCESSFULLY!")
-        else:
-            print("\n❌ MARKETPLACE FILTER TESTS FAILED!")
+            print("\n❌ PHYSICAL STORE PRODUCTION TEST FAILED!")
         
         # Print final results
         self.print_final_results()
         
-        return ml_import_success and filters_success
+        return physical_store_success
 
     def print_final_results(self):
         """Print final test results"""
