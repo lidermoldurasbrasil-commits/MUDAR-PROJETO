@@ -6338,8 +6338,8 @@ class BusinessManagementSystemTester:
 def main():
     tester = BusinessManagementSystemTester()
     
-    # Run the Mercado Livre Orders Investigation as requested in review
-    print("🚀 Starting Mercado Livre Orders Investigation...")
+    # Run the Physical Store Production Test as requested in review
+    print("🚀 Starting Physical Store Production Test...")
     print(f"🌐 Testing against: {tester.base_url}")
     
     # Use director login for authentication
@@ -6362,8 +6362,8 @@ def main():
     tester.token = login_response['access_token']
     print("✅ Director authentication successful")
     
-    # Run the ML investigation
-    success = tester.test_mercado_livre_orders_investigation()
+    # Run the Physical Store Production test
+    success = tester.test_physical_store_production()
     
     # Print final results
     all_passed = tester.print_summary()
