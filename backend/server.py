@@ -2983,6 +2983,10 @@ async def upload_imagem_pedido(file: UploadFile, current_user: dict = Depends(ge
     
     # Retornar URL data
     return {
+        "success": True,
+        "url": f"data:image/jpeg;base64,{image_base64}",
+        "filename": file.filename
+    }
 
 
 # ============= SISTEMA DE APROVAÇÃO EM CASCATA =============
