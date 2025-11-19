@@ -664,6 +664,35 @@ export default function Producao() {
                       >
                         <Eye size={16} />
                       </button>
+                      {!ordem.aguardando_aprovacao && (
+                        <button
+                          className="btn-icon"
+                          onClick={() => {
+                            const novoResp = prompt(`Transferir para qual responsável?\n\nOpções:\n${RESPONSAVEL_OPTIONS.join('\n')}`);
+                            if (novoResp && RESPONSAVEL_OPTIONS.includes(novoResp)) {
+                              handleTransferirOrdem(ordem.id, novoResp);
+                            } else if (novoResp) {
+                              toast.error('Responsável inválido');
+                            }
+                          }}
+                          title="Transferir para próximo responsável"
+                          style={{background: '#f59e0b', color: 'white'}}
+                        >
+                          ➜
+                        </button>
+                      )}
+                      {ordem.aguardando_aprovacao && (
+                        <span style={{
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          background: '#fef3c7',
+                          color: '#92400e',
+                          borderRadius: '3px',
+                          fontWeight: 'bold'
+                        }}>
+                          ⏳ Aguardando
+                        </span>
+                      )}
                       <button
                         className="btn-icon btn-delete"
                         onClick={() => handleDeleteOrdem(ordem.id)}
