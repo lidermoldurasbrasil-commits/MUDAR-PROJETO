@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Users, Plus, Edit2, Trash2, Trophy, TrendingUp, Clock } from 'lucide-react';
+import { Users, Plus, Edit2, Trash2, Trophy, TrendingUp, Clock, FileText } from 'lucide-react';
+import ModalRelatorioDiario from '../../components/marketing/ModalRelatorioDiario';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
