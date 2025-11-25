@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { Package, ShoppingCart, Archive, DollarSign, Users, BarChart3, LogOut, Factory, Store, UserCog, Building2 } from 'lucide-react';
+import { Package, ShoppingCart, Archive, DollarSign, Users, BarChart3, LogOut, Factory, Store, UserCog, Building2, Megaphone } from 'lucide-react';
 
 const LOJAS = [
   { id: 'fabrica', nome: 'Fábrica' },
