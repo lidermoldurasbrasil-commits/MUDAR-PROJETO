@@ -120,6 +120,9 @@ function App() {
               <Route path="marketplaces/relatorio-vendas" element={<RelatorioVendasMarketplace />} />
               <Route path="marketplaces/configuracoes-status" element={<ConfiguracoesStatus />} />
               <Route path="marketplaces/integrador-ml" element={<IntegradorML />} />
+              <Route path="marketing/membros" element={<MembrosMarketing />} />
+              <Route path="marketing/calendario" element={<CalendarioTarefas />} />
+              <Route path="marketing/dashboard" element={<DashboardMarketing />} />
               <Route path="cadastros" element={<Clientes />} />
               <Route path="usuarios" element={<GestaoUsuarios />} />
               <Route path="relatorios" element={<Relatorios />} />
