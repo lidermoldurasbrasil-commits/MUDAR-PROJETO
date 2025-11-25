@@ -19,6 +19,11 @@ export default function GestaoLayout({ user, onLogout }) {
     { path: '/gestao/pedidos', icon: ShoppingCart, label: 'Pedidos' },
     { path: '/gestao/producao', icon: Factory, label: 'Produção' },
     { path: '/gestao/marketplaces', icon: Store, label: 'Marketplaces' },
+    { path: '/gestao/marketing', icon: Megaphone, label: 'Marketing', submenu: [
+      { path: '/gestao/marketing/membros', label: 'Equipe' },
+      { path: '/gestao/marketing/calendario', label: 'Calendário' },
+      { path: '/gestao/marketing/dashboard', label: 'Dashboard' }
+    ]},
     { path: '/gestao/estoque', icon: Archive, label: 'Estoque' },
     { path: '/gestao/financeiro', icon: DollarSign, label: 'Financeiro' },
     { path: '/gestao/cadastros', icon: Users, label: 'Cadastros' },
