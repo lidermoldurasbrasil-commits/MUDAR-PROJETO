@@ -37,9 +37,13 @@ import RelatorioVendasMarketplace from './pages/gestao/RelatorioVendasMarketplac
 import ConfiguracoesStatus from './pages/gestao/ConfiguracoesStatus';
 import MarketplaceIntegrator from './pages/gestao/MarketplaceIntegrator';
 import IntegradorML from './pages/gestao/IntegradorML';
+import MembrosMarketing from './pages/gestao/marketing/MembrosMarketing';
+import CalendarioTarefas from './pages/gestao/marketing/CalendarioTarefas';
+import DashboardMarketing from './pages/gestao/marketing/DashboardMarketing';
 
 import axios from 'axios';
 import './App.css';
+import './styles/calendar-custom.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
