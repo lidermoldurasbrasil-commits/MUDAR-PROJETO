@@ -22,7 +22,7 @@
 
 ### Base URL:
 ```
-https://marcos-marketplace.preview.emergentagent.com
+https://factory-mgmt-1.preview.emergentagent.com
 ```
 
 ### 1️⃣ Verificar Status das Integrações
@@ -33,7 +33,7 @@ Authorization: Bearer {seu_token}
 
 **Teste agora:**
 ```bash
-curl -X GET "https://marcos-marketplace.preview.emergentagent.com/api/integrator/status" \
+curl -X GET "https://factory-mgmt-1.preview.emergentagent.com/api/integrator/status" \
   -H "Authorization: Bearer SEU_TOKEN_AQUI"
 ```
 
@@ -68,7 +68,7 @@ Authorization: Bearer {seu_token}
 
 **Teste agora:**
 ```bash
-curl -X GET "https://marcos-marketplace.preview.emergentagent.com/api/integrator/mercadolivre/authorize" \
+curl -X GET "https://factory-mgmt-1.preview.emergentagent.com/api/integrator/mercadolivre/authorize" \
   -H "Authorization: Bearer SEU_TOKEN_AQUI"
 ```
 
@@ -97,7 +97,7 @@ Content-Type: application/json
 
 **Teste:**
 ```bash
-curl -X POST "https://marcos-marketplace.preview.emergentagent.com/api/integrator/mercadolivre/sync" \
+curl -X POST "https://factory-mgmt-1.preview.emergentagent.com/api/integrator/mercadolivre/sync" \
   -H "Authorization: Bearer SEU_TOKEN_AQUI" \
   -H "Content-Type: application/json" \
   -d '{"days_back": 7}'
@@ -113,7 +113,7 @@ Authorization: Bearer {seu_token}
 
 **Teste:**
 ```bash
-curl -X GET "https://marcos-marketplace.preview.emergentagent.com/api/integrator/orders?limit=10" \
+curl -X GET "https://factory-mgmt-1.preview.emergentagent.com/api/integrator/orders?limit=10" \
   -H "Authorization: Bearer SEU_TOKEN_AQUI"
 ```
 
@@ -272,7 +272,7 @@ db.order_items.find().limit(5).pretty()
    - **Secret Key** (Client Secret)
 5. Configure **Redirect URI**: 
    ```
-   https://marcos-marketplace.preview.emergentagent.com/api/integrator/mercadolivre/callback
+   https://factory-mgmt-1.preview.emergentagent.com/api/integrator/mercadolivre/callback
    ```
 
 ### Passo 2: Adicionar no .env
@@ -284,7 +284,7 @@ nano /app/backend/.env
 # Adicionar:
 ML_CLIENT_ID=seu_app_id_aqui
 ML_CLIENT_SECRET=seu_client_secret_aqui
-ML_REDIRECT_URI=https://marcos-marketplace.preview.emergentagent.com/api/integrator/mercadolivre/callback
+ML_REDIRECT_URI=https://factory-mgmt-1.preview.emergentagent.com/api/integrator/mercadolivre/callback
 
 # Salvar (Ctrl+O, Enter, Ctrl+X)
 
@@ -296,7 +296,7 @@ sudo supervisorctl restart backend
 
 ```bash
 # Login como diretor
-curl -X POST "https://marcos-marketplace.preview.emergentagent.com/api/auth/login" \
+curl -X POST "https://factory-mgmt-1.preview.emergentagent.com/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"username":"diretor","password":"123"}'
 
@@ -307,7 +307,7 @@ curl -X POST "https://marcos-marketplace.preview.emergentagent.com/api/auth/logi
 
 ```bash
 # Substituir SEU_TOKEN pelo token copiado
-curl -X GET "https://marcos-marketplace.preview.emergentagent.com/api/integrator/mercadolivre/authorize" \
+curl -X GET "https://factory-mgmt-1.preview.emergentagent.com/api/integrator/mercadolivre/authorize" \
   -H "Authorization: Bearer SEU_TOKEN"
 
 # Copiar a URL retornada
@@ -320,7 +320,7 @@ curl -X GET "https://marcos-marketplace.preview.emergentagent.com/api/integrator
 
 ```bash
 # Após autorizar
-curl -X POST "https://marcos-marketplace.preview.emergentagent.com/api/integrator/mercadolivre/sync" \
+curl -X POST "https://factory-mgmt-1.preview.emergentagent.com/api/integrator/mercadolivre/sync" \
   -H "Authorization: Bearer SEU_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"days_back": 30}'
@@ -329,7 +329,7 @@ curl -X POST "https://marcos-marketplace.preview.emergentagent.com/api/integrato
 ### Passo 6: Ver Pedidos Importados
 
 ```bash
-curl -X GET "https://marcos-marketplace.preview.emergentagent.com/api/integrator/orders?limit=10" \
+curl -X GET "https://factory-mgmt-1.preview.emergentagent.com/api/integrator/orders?limit=10" \
   -H "Authorization: Bearer SEU_TOKEN"
 ```
 
@@ -341,18 +341,18 @@ Você pode testar os endpoints mesmo sem credenciais:
 
 ```bash
 # 1. Login
-TOKEN=$(curl -s -X POST "https://marcos-marketplace.preview.emergentagent.com/api/auth/login" \
+TOKEN=$(curl -s -X POST "https://factory-mgmt-1.preview.emergentagent.com/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"username":"diretor","password":"123"}' | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4)
 
 echo "Token: $TOKEN"
 
 # 2. Verificar status
-curl -X GET "https://marcos-marketplace.preview.emergentagent.com/api/integrator/status" \
+curl -X GET "https://factory-mgmt-1.preview.emergentagent.com/api/integrator/status" \
   -H "Authorization: Bearer $TOKEN"
 
 # 3. Tentar autorizar (vai pedir credenciais no .env)
-curl -X GET "https://marcos-marketplace.preview.emergentagent.com/api/integrator/mercadolivre/authorize" \
+curl -X GET "https://factory-mgmt-1.preview.emergentagent.com/api/integrator/mercadolivre/authorize" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
