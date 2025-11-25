@@ -323,6 +323,20 @@ export default function MembrosMarketing() {
           </div>
         </div>
       )}
+
+      {/* Modal de Relatório Diário */}
+      {modalRelatorioAberto && membroRelatorio && (
+        <ModalRelatorioDiario
+          membro={membroRelatorio}
+          onFechar={() => {
+            setModalRelatorioAberto(false);
+            setMembroRelatorio(null);
+          }}
+          onEnviado={() => {
+            fetchMembros(); // Atualizar pontuação
+          }}
+        />
+      )}
     </div>
   );
 }
