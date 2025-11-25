@@ -11,6 +11,8 @@ export default function MembrosMarketing() {
   const [loading, setLoading] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
   const [membroSelecionado, setMembroSelecionado] = useState(null);
+  const [modalRelatorioAberto, setModalRelatorioAberto] = useState(false);
+  const [membroRelatorio, setMembroRelatorio] = useState(null);
   const [formData, setFormData] = useState({
     nome: '',
     funcao: '',
