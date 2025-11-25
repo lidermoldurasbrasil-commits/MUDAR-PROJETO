@@ -258,6 +258,58 @@ export default function GestaoLayout({ user, onLogout }) {
           font-weight: 500;
         }
 
+        .menu-item-container {
+          position: relative;
+        }
+
+        .submenu-arrow {
+          font-size: 10px;
+          margin-left: 8px;
+          transition: transform 0.2s;
+        }
+
+        .submenu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background: #374151;
+          border: 1px solid #4B5563;
+          border-radius: 8px;
+          min-width: 180px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+          z-index: 1000;
+          margin-top: 5px;
+          overflow: hidden;
+        }
+
+        .submenu-item {
+          width: 100%;
+          background: none;
+          border: none;
+          padding: 12px 20px;
+          color: #D1D5DB;
+          cursor: pointer;
+          transition: all 0.2s;
+          text-align: left;
+          font-size: 14px;
+          border-bottom: 1px solid #4B5563;
+        }
+
+        .submenu-item:last-child {
+          border-bottom: none;
+        }
+
+        .submenu-item:hover {
+          background: rgba(59, 130, 246, 0.1);
+          color: #60A5FA;
+        }
+
+        .submenu-item.active {
+          background: rgba(59, 130, 246, 0.2);
+          color: #3B82F6;
+          font-weight: 600;
+        }
+
         .gestao-content {
           flex: 1;
           padding: 0;
