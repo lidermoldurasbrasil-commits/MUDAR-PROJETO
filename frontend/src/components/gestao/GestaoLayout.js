@@ -72,15 +72,42 @@ export default function GestaoLayout({ user, onLogout }) {
       <div className="gestao-menu">
         {menuItems.map(item => {
           const Icon = item.icon;
+          const hasSubmenu = item.submenu && item.submenu.length > 0;
+          const isMenuOpen = menuAberto === item.path;
+          
           return (
-            <button
-              key={item.path}
-              className={`menu-item ${isActive(item.path) ? 'active' : ''}`}
-              onClick={() => navigate(item.path)}
-            >
-              <Icon size={24} />
-              <span>{item.label}</span>
-            </button>
+            <div key={item.path} className="menu-item-container">
+              <button
+                className={`menu-item ${isActive(item.path) ? 'active' : ''}`}
+                onClick={() => {
+                  if (hasSubmenu) {
+                    setMenuAberto(isMenuOpen ? null : item.path);
+                  } else {
+                    navigate(item.path);
+                  }
+                }}
+              >
+                <Icon size={24} />
+                <span>{item.label}</span>
+                {hasSubmenu && (
+                  <span className="submenu-arrow">{isMenuOpen ? '▼' : '▶'}</span>
+                )}
+              </button>
+              
+              {hasSubmenu && isMenuOpen && (
+                <div className="submenu">
+                  {item.submenu.map(subitem => (
+                    <button
+                      key={subitem.path}
+                      className={`submenu-item ${location.pathname === subitem.path ? 'active' : ''}`}
+                      onClick={() => navigate(subitem.path)}
+                    >
+                      {subitem.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
