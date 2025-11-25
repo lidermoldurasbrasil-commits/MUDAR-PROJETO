@@ -58,6 +58,8 @@ export default function CalendarioTarefas() {
 
   const [novaTag, setNovaTag] = useState('');
   const [novoItemChecklist, setNovoItemChecklist] = useState('');
+  const [novoComentario, setNovoComentario] = useState('');
+  const [abaSelecionada, setAbaSelecionada] = useState('detalhes'); // detalhes, checklist, comentarios
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
