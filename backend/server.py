@@ -3156,6 +3156,17 @@ async def transferir_responsavel(
         
         if resultado.modified_count == 0:
             raise HTTPException(status_code=404, detail="Ordem não encontrada")
+        
+        return {
+            "success": True,
+            "message": "Ordem transferida com sucesso",
+            "responsavel_pendente": novo_responsavel
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @api_router.post("/gestao/producao/{ordem_id}/aprovar-gerencia")
