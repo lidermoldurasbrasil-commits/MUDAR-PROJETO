@@ -6860,6 +6860,624 @@ async def delete_pedido_loja(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ============= ENDPOINTS - GESTÃO DE TAREFAS MARKETING =============
+
+# ========== MEMBROS MARKETING ==========
+
+@api_router.get("/gestao/marketing/membros")
+async def get_membros_marketing(current_user: dict = Depends(get_current_user)):
+    """Lista todos os membros da equipe de marketing"""
+    try:
+        membros = await db.membros_marketing.find().to_list(None)
+        
+        # Remover _id do MongoDB
+        for membro in membros:
+            if '_id' in membro:
+                del membro['_id']
+        
+        return membros
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/gestao/marketing/membros")
+async def criar_membro_marketing(membro: MembroMarketing, current_user: dict = Depends(get_current_user)):
+    """Cria um novo membro da equipe de marketing"""
+    try:
+        membro_data = membro.model_dump()
+        membro_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+        membro_data['created_at'] = datetime.now(timezone.utc).isoformat()
+        
+        await db.membros_marketing.insert_one(membro_data)
+        
+        if '_id' in membro_data:
+            del membro_data['_id']
+        
+        return membro_data
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.put("/gestao/marketing/membros/{membro_id}")
+async def atualizar_membro_marketing(
+    membro_id: str,
+    membro: MembroMarketing,
+    current_user: dict = Depends(get_current_user)
+):
+    """Atualiza um membro da equipe de marketing"""
+    try:
+        membro_data = membro.model_dump()
+        membro_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+        
+        # Remover campos que não devem ser alterados diretamente
+        if 'id' in membro_data:
+            del membro_data['id']
+        if 'created_at' in membro_data:
+            del membro_data['created_at']
+        
+        resultado = await db.membros_marketing.update_one(
+            {"id": membro_id},
+            {"$set": membro_data}
+        )
+        
+        if resultado.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Membro não encontrado")
+        
+        return {"success": True, "message": "Membro atualizado com sucesso"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.delete("/gestao/marketing/membros/{membro_id}")
+async def deletar_membro_marketing(membro_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta um membro da equipe de marketing"""
+    try:
+        # Verificar se há tarefas associadas
+        tarefas_count = await db.tarefas_marketing.count_documents({"membro_id": membro_id})
+        
+        if tarefas_count > 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Não é possível deletar membro com {tarefas_count} tarefas associadas. Reatribua as tarefas primeiro."
+            )
+        
+        resultado = await db.membros_marketing.delete_one({"id": membro_id})
+        
+        if resultado.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Membro não encontrado")
+        
+        return {"success": True, "message": "Membro deletado com sucesso"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ========== TAREFAS MARKETING ==========
+
+async def atualizar_status_tarefas_atrasadas():
+    """Função auxiliar para atualizar status de tarefas atrasadas"""
+    agora = datetime.now(timezone.utc)
+    
+    # Atualizar tarefas que passaram do prazo e não estão concluídas
+    await db.tarefas_marketing.update_many(
+        {
+            "data_hora": {"$lt": agora.isoformat()},
+            "status": {"$in": ["A Fazer", "Em Andamento"]}
+        },
+        {"$set": {"status": "Atrasado"}}
+    )
+
+
+async def contar_tarefas_atrasadas(membro_id: str) -> int:
+    """Conta quantas tarefas atrasadas um membro possui"""
+    await atualizar_status_tarefas_atrasadas()
+    count = await db.tarefas_marketing.count_documents({
+        "membro_id": membro_id,
+        "status": "Atrasado"
+    })
+    return count
+
+
+async def calcular_pontos_tarefa(tarefa: dict) -> int:
+    """Calcula quantos pontos uma tarefa vale baseado em quando foi concluída"""
+    if tarefa['status'] != 'Concluído':
+        return 0
+    
+    data_conclusao = datetime.fromisoformat(tarefa['concluida_em'].replace('Z', '+00:00')) if isinstance(tarefa['concluida_em'], str) else tarefa['concluida_em']
+    data_prevista = datetime.fromisoformat(tarefa['data_hora'].replace('Z', '+00:00')) if isinstance(tarefa['data_hora'], str) else tarefa['data_hora']
+    
+    # Calcular diferença em dias
+    diferenca = (data_conclusao - data_prevista).days
+    
+    if diferenca <= -1:
+        # Concluída 1+ dia antes do prazo
+        return 15
+    elif diferenca == 0 or (diferenca == 1 and (data_conclusao - data_prevista).seconds < 86400):
+        # Concluída no prazo
+        return 10
+    else:
+        # Concluída atrasada
+        return -5
+
+
+async def atualizar_estatisticas_membro(membro_id: str):
+    """Atualiza as estatísticas de um membro (tarefas concluídas, atrasadas, pontuação)"""
+    try:
+        # Atualizar status de tarefas atrasadas primeiro
+        await atualizar_status_tarefas_atrasadas()
+        
+        # Contar tarefas por status
+        tarefas_concluidas = await db.tarefas_marketing.count_documents({
+            "membro_id": membro_id,
+            "status": "Concluído"
+        })
+        
+        tarefas_atrasadas = await db.tarefas_marketing.count_documents({
+            "membro_id": membro_id,
+            "status": "Atrasado"
+        })
+        
+        tarefas_em_andamento = await db.tarefas_marketing.count_documents({
+            "membro_id": membro_id,
+            "status": "Em Andamento"
+        })
+        
+        # Calcular pontuação total
+        todas_tarefas = await db.tarefas_marketing.find({"membro_id": membro_id}).to_list(None)
+        pontuacao_total = 0
+        
+        for tarefa in todas_tarefas:
+            if tarefa.get('pontos_ganhos'):
+                pontuacao_total += tarefa['pontos_ganhos']
+        
+        # Adicionar pontos dos relatórios
+        relatorios = await db.relatorios_progresso.find({"membro_id": membro_id}).to_list(None)
+        for relatorio in relatorios:
+            pontuacao_total += relatorio.get('total_pontos_dia', 0)
+        
+        # Atualizar membro
+        await db.membros_marketing.update_one(
+            {"id": membro_id},
+            {
+                "$set": {
+                    "tarefas_concluidas": tarefas_concluidas,
+                    "tarefas_atrasadas": tarefas_atrasadas,
+                    "tarefas_em_andamento": tarefas_em_andamento,
+                    "pontuacao": pontuacao_total,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+    except Exception as e:
+        print(f"Erro ao atualizar estatísticas do membro: {e}")
+
+
+@api_router.get("/gestao/marketing/tarefas")
+async def get_tarefas_marketing(
+    membro_id: Optional[str] = None,
+    status: Optional[str] = None,
+    data_inicio: Optional[str] = None,
+    data_fim: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Lista tarefas com filtros opcionais"""
+    try:
+        # Atualizar status de tarefas atrasadas
+        await atualizar_status_tarefas_atrasadas()
+        
+        query = {}
+        
+        if membro_id:
+            query['membro_id'] = membro_id
+        
+        if status:
+            query['status'] = status
+        
+        if data_inicio and data_fim:
+            query['data_hora'] = {
+                "$gte": data_inicio,
+                "$lte": data_fim
+            }
+        
+        tarefas = await db.tarefas_marketing.find(query).sort("data_hora", 1).to_list(None)
+        
+        # Remover _id do MongoDB
+        for tarefa in tarefas:
+            if '_id' in tarefa:
+                del tarefa['_id']
+        
+        return tarefas
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/gestao/marketing/tarefas")
+async def criar_tarefa_marketing(tarefa: TarefaMarketing, current_user: dict = Depends(get_current_user)):
+    """Cria uma nova tarefa com validação de tarefas atrasadas (máximo 2)"""
+    try:
+        # VALIDAÇÃO: Verificar se o membro tem 2 ou mais tarefas atrasadas
+        tarefas_atrasadas_count = await contar_tarefas_atrasadas(tarefa.membro_id)
+        
+        if tarefas_atrasadas_count >= 2:
+            raise HTTPException(
+                status_code=400,
+                detail=f"O membro possui {tarefas_atrasadas_count} tarefas atrasadas. Conclua as tarefas atrasadas antes de criar novas!"
+            )
+        
+        # Buscar nome do membro
+        membro = await db.membros_marketing.find_one({"id": tarefa.membro_id})
+        if not membro:
+            raise HTTPException(status_code=404, detail="Membro não encontrado")
+        
+        tarefa_data = tarefa.model_dump()
+        tarefa_data['membro_nome'] = membro['nome']
+        tarefa_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+        tarefa_data['created_at'] = datetime.now(timezone.utc).isoformat()
+        
+        # Converter datetime para ISO string
+        if isinstance(tarefa_data['data_hora'], datetime):
+            tarefa_data['data_hora'] = tarefa_data['data_hora'].isoformat()
+        
+        await db.tarefas_marketing.insert_one(tarefa_data)
+        
+        # Atualizar estatísticas do membro
+        await atualizar_estatisticas_membro(tarefa.membro_id)
+        
+        if '_id' in tarefa_data:
+            del tarefa_data['_id']
+        
+        return tarefa_data
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.put("/gestao/marketing/tarefas/{tarefa_id}")
+async def atualizar_tarefa_marketing(
+    tarefa_id: str,
+    tarefa: TarefaMarketing,
+    current_user: dict = Depends(get_current_user)
+):
+    """Atualiza uma tarefa existente"""
+    try:
+        tarefa_antiga = await db.tarefas_marketing.find_one({"id": tarefa_id})
+        if not tarefa_antiga:
+            raise HTTPException(status_code=404, detail="Tarefa não encontrada")
+        
+        tarefa_data = tarefa.model_dump()
+        tarefa_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+        
+        # Converter datetime para ISO string
+        if isinstance(tarefa_data['data_hora'], datetime):
+            tarefa_data['data_hora'] = tarefa_data['data_hora'].isoformat()
+        
+        # Se mudou para Concluído, registrar data de conclusão e calcular pontos
+        if tarefa.status == "Concluído" and tarefa_antiga['status'] != "Concluído":
+            tarefa_data['concluida_em'] = datetime.now(timezone.utc).isoformat()
+            
+            # Calcular pontos
+            pontos = await calcular_pontos_tarefa(tarefa_data)
+            tarefa_data['pontos_ganhos'] = pontos
+        
+        # Remover campos que não devem ser alterados
+        if 'id' in tarefa_data:
+            del tarefa_data['id']
+        if 'created_at' in tarefa_data:
+            del tarefa_data['created_at']
+        
+        resultado = await db.tarefas_marketing.update_one(
+            {"id": tarefa_id},
+            {"$set": tarefa_data}
+        )
+        
+        if resultado.modified_count == 0 and resultado.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Tarefa não encontrada")
+        
+        # Atualizar estatísticas do membro
+        await atualizar_estatisticas_membro(tarefa.membro_id)
+        
+        return {"success": True, "message": "Tarefa atualizada com sucesso"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.delete("/gestao/marketing/tarefas/{tarefa_id}")
+async def deletar_tarefa_marketing(tarefa_id: str, current_user: dict = Depends(get_current_user)):
+    """Deleta uma tarefa"""
+    try:
+        tarefa = await db.tarefas_marketing.find_one({"id": tarefa_id})
+        if not tarefa:
+            raise HTTPException(status_code=404, detail="Tarefa não encontrada")
+        
+        membro_id = tarefa['membro_id']
+        
+        resultado = await db.tarefas_marketing.delete_one({"id": tarefa_id})
+        
+        if resultado.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Tarefa não encontrada")
+        
+        # Atualizar estatísticas do membro
+        await atualizar_estatisticas_membro(membro_id)
+        
+        return {"success": True, "message": "Tarefa deletada com sucesso"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ========== CHECKLIST E COMENTÁRIOS ==========
+
+@api_router.post("/gestao/marketing/tarefas/{tarefa_id}/checklist")
+async def adicionar_item_checklist(
+    tarefa_id: str,
+    item: ItemChecklist,
+    current_user: dict = Depends(get_current_user)
+):
+    """Adiciona um item ao checklist da tarefa"""
+    try:
+        item_data = item.model_dump()
+        if isinstance(item_data.get('created_at'), datetime):
+            item_data['created_at'] = item_data['created_at'].isoformat()
+        
+        resultado = await db.tarefas_marketing.update_one(
+            {"id": tarefa_id},
+            {
+                "$push": {"checklist": item_data},
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+            }
+        )
+        
+        if resultado.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Tarefa não encontrada")
+        
+        return {"success": True, "item": item_data}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.put("/gestao/marketing/tarefas/{tarefa_id}/checklist/{item_id}")
+async def atualizar_item_checklist(
+    tarefa_id: str,
+    item_id: str,
+    concluido: bool,
+    current_user: dict = Depends(get_current_user)
+):
+    """Atualiza o status de um item do checklist"""
+    try:
+        resultado = await db.tarefas_marketing.update_one(
+            {"id": tarefa_id, "checklist.id": item_id},
+            {
+                "$set": {
+                    "checklist.$.concluido": concluido,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        if resultado.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Tarefa ou item do checklist não encontrado")
+        
+        return {"success": True}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/gestao/marketing/tarefas/{tarefa_id}/comentario")
+async def adicionar_comentario_tarefa(
+    tarefa_id: str,
+    comentario: ComentarioTarefa,
+    current_user: dict = Depends(get_current_user)
+):
+    """Adiciona um comentário à tarefa"""
+    try:
+        comentario_data = comentario.model_dump()
+        if isinstance(comentario_data.get('created_at'), datetime):
+            comentario_data['created_at'] = comentario_data['created_at'].isoformat()
+        
+        resultado = await db.tarefas_marketing.update_one(
+            {"id": tarefa_id},
+            {
+                "$push": {"comentarios": comentario_data},
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+            }
+        )
+        
+        if resultado.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Tarefa não encontrada")
+        
+        return {"success": True, "comentario": comentario_data}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ========== RELATÓRIOS DE PROGRESSO ==========
+
+@api_router.post("/gestao/marketing/relatorios")
+async def criar_relatorio_progresso(
+    relatorio: RelatorioProgresso,
+    current_user: dict = Depends(get_current_user)
+):
+    """Cria um relatório diário de progresso"""
+    try:
+        # Verificar se já existe relatório para o membro nesta data
+        relatorio_existente = await db.relatorios_progresso.find_one({
+            "membro_id": relatorio.membro_id,
+            "data": relatorio.data
+        })
+        
+        if relatorio_existente:
+            raise HTTPException(
+                status_code=400,
+                detail="Já existe um relatório para este membro nesta data"
+            )
+        
+        relatorio_data = relatorio.model_dump()
+        relatorio_data['created_at'] = datetime.now(timezone.utc).isoformat()
+        
+        # Dar 3 pontos por enviar relatório
+        relatorio_data['total_pontos_dia'] = 3
+        
+        await db.relatorios_progresso.insert_one(relatorio_data)
+        
+        # Atualizar estatísticas do membro
+        await atualizar_estatisticas_membro(relatorio.membro_id)
+        
+        if '_id' in relatorio_data:
+            del relatorio_data['_id']
+        
+        return relatorio_data
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.get("/gestao/marketing/relatorios")
+async def get_relatorios_progresso(
+    membro_id: Optional[str] = None,
+    data_inicio: Optional[str] = None,
+    data_fim: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Lista relatórios de progresso com filtros"""
+    try:
+        query = {}
+        
+        if membro_id:
+            query['membro_id'] = membro_id
+        
+        if data_inicio and data_fim:
+            query['data'] = {
+                "$gte": data_inicio,
+                "$lte": data_fim
+            }
+        
+        relatorios = await db.relatorios_progresso.find(query).sort("data", -1).to_list(None)
+        
+        # Remover _id do MongoDB
+        for relatorio in relatorios:
+            if '_id' in relatorio:
+                del relatorio['_id']
+        
+        return relatorios
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ========== DASHBOARD E ESTATÍSTICAS ==========
+
+@api_router.get("/gestao/marketing/dashboard")
+async def get_dashboard_marketing(current_user: dict = Depends(get_current_user)):
+    """Retorna estatísticas e métricas do dashboard"""
+    try:
+        # Atualizar status de tarefas atrasadas
+        await atualizar_status_tarefas_atrasadas()
+        
+        # Total de tarefas por status
+        total_a_fazer = await db.tarefas_marketing.count_documents({"status": "A Fazer"})
+        total_em_andamento = await db.tarefas_marketing.count_documents({"status": "Em Andamento"})
+        total_concluido = await db.tarefas_marketing.count_documents({"status": "Concluído"})
+        total_atrasado = await db.tarefas_marketing.count_documents({"status": "Atrasado"})
+        
+        # Tarefas concluídas hoje
+        hoje = datetime.now(timezone.utc).date().isoformat()
+        tarefas_concluidas_hoje = await db.tarefas_marketing.count_documents({
+            "status": "Concluído",
+            "concluida_em": {"$gte": f"{hoje}T00:00:00", "$lte": f"{hoje}T23:59:59"}
+        })
+        
+        # Produtividade por membro (últimos 30 dias)
+        data_30_dias_atras = (datetime.now(timezone.utc) - timedelta(days=30)).date().isoformat()
+        
+        membros = await db.membros_marketing.find({"ativo": True}).to_list(None)
+        produtividade_membros = []
+        
+        for membro in membros:
+            tarefas_concluidas_30d = await db.tarefas_marketing.count_documents({
+                "membro_id": membro['id'],
+                "status": "Concluído",
+                "concluida_em": {"$gte": f"{data_30_dias_atras}T00:00:00"}
+            })
+            
+            produtividade_membros.append({
+                "membro_id": membro['id'],
+                "membro_nome": membro['nome'],
+                "tarefas_concluidas": tarefas_concluidas_30d,
+                "pontuacao": membro.get('pontuacao', 0)
+            })
+        
+        # Ordenar por pontuação (ranking)
+        produtividade_membros.sort(key=lambda x: x['pontuacao'], reverse=True)
+        
+        # Taxa de cumprimento de prazos (últimos 30 dias)
+        tarefas_concluidas_30d = await db.tarefas_marketing.count_documents({
+            "status": "Concluído",
+            "concluida_em": {"$gte": f"{data_30_dias_atras}T00:00:00"}
+        })
+        
+        tarefas_com_pontos_positivos = await db.tarefas_marketing.count_documents({
+            "status": "Concluído",
+            "pontos_ganhos": {"$gt": 0},
+            "concluida_em": {"$gte": f"{data_30_dias_atras}T00:00:00"}
+        })
+        
+        taxa_cumprimento = 0
+        if tarefas_concluidas_30d > 0:
+            taxa_cumprimento = (tarefas_com_pontos_positivos / tarefas_concluidas_30d) * 100
+        
+        # Distribuição de tarefas por status
+        distribuicao_status = {
+            "A Fazer": total_a_fazer,
+            "Em Andamento": total_em_andamento,
+            "Concluído": total_concluido,
+            "Atrasado": total_atrasado
+        }
+        
+        return {
+            "total_tarefas": total_a_fazer + total_em_andamento + total_concluido + total_atrasado,
+            "tarefas_concluidas_hoje": tarefas_concluidas_hoje,
+            "tarefas_atrasadas": total_atrasado,
+            "taxa_cumprimento_prazos": round(taxa_cumprimento, 1),
+            "distribuicao_status": distribuicao_status,
+            "produtividade_membros": produtividade_membros,
+            "tarefas_por_status": {
+                "labels": ["A Fazer", "Em Andamento", "Concluído", "Atrasado"],
+                "valores": [total_a_fazer, total_em_andamento, total_concluido, total_atrasado]
+            }
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
 @api_router.post("/gestao/lojas/pedidos/{pedido_id}/status")
 async def update_status_pedido_loja(
     pedido_id: str,
