@@ -6144,6 +6144,72 @@ class StatusCustomizado(BaseModel):
     ativo: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+
+# ============= SISTEMA DE GESTÃO DE TAREFAS - MARKETING =============
+
+class ItemChecklist(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    texto: str
+    concluido: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ComentarioTarefa(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    autor: str  # Nome do usuário que comentou
+    texto: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ArquivoAnexo(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nome: str
+    url: str
+    tamanho: Optional[int] = None  # em bytes
+    tipo: Optional[str] = None  # mime type
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class MembroMarketing(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nome: str
+    foto_url: Optional[str] = None
+    funcao: str  # Ex: "Designer", "Copywriter", "Social Media"
+    pontuacao: int = 0
+    tarefas_concluidas: int = 0
+    tarefas_atrasadas: int = 0
+    tarefas_em_andamento: int = 0
+    ativo: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class TarefaMarketing(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    titulo: str
+    descricao: Optional[str] = None
+    data_hora: datetime  # Data e hora da tarefa
+    membro_id: str  # ID do membro responsável
+    membro_nome: Optional[str] = None  # Nome do membro (para facilitar consultas)
+    status: str = "A Fazer"  # "A Fazer", "Em Andamento", "Concluído", "Atrasado"
+    prioridade: str = "Média"  # "Alta", "Média", "Baixa"
+    tags: List[str] = []
+    checklist: List[ItemChecklist] = []
+    arquivos: List[ArquivoAnexo] = []
+    comentarios: List[ComentarioTarefa] = []
+    concluida_em: Optional[datetime] = None
+    pontos_ganhos: Optional[int] = None  # Pontos que essa tarefa deu ao membro
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class RelatorioProgresso(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    membro_id: str
+    membro_nome: str
+    data: str  # Data do relatório no formato YYYY-MM-DD
+    progresso_texto: str  # Texto descritivo do progresso
+    tarefas_concluidas: List[str] = []  # IDs das tarefas concluídas no dia
+    total_pontos_dia: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 @api_router.get("/gestao/marketplaces/status")
 async def get_status_customizados(tipo: str = None, current_user: dict = Depends(get_current_user)):
     """Retorna lista de status customizados"""
