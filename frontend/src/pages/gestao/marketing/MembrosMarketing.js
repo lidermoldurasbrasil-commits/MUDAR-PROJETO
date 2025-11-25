@@ -205,20 +205,32 @@ export default function MembrosMarketing() {
             </div>
 
             {/* Ações */}
-            <div className="flex gap-2">
+            <div className="space-y-2">
               <button
-                onClick={() => handleAbrirModal(membro)}
-                className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 flex items-center justify-center gap-2"
+                onClick={() => {
+                  setMembroRelatorio(membro);
+                  setModalRelatorioAberto(true);
+                }}
+                className="w-full bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 flex items-center justify-center gap-2"
               >
-                <Edit2 className="w-4 h-4" />
-                Editar
+                <FileText className="w-4 h-4" />
+                Relatório Diário
               </button>
-              <button
-                onClick={() => handleDeletar(membro)}
-                className="bg-red-100 text-red-700 px-3 py-2 rounded-lg hover:bg-red-200 flex items-center justify-center"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleAbrirModal(membro)}
+                  className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 flex items-center justify-center gap-2"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDeletar(membro)}
+                  className="bg-red-100 text-red-700 px-3 py-2 rounded-lg hover:bg-red-200 flex items-center justify-center"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         ))}
