@@ -1,0 +1,135 @@
+/* Customização do React Big Calendar */
+
+.rbc-calendar {
+  font-family: inherit;
+}
+
+.rbc-header {
+  padding: 10px 3px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #4B5563;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.rbc-today {
+  background-color: #EEF2FF;
+}
+
+.rbc-event {
+  padding: 2px 5px;
+  background-color: #6366F1;
+  border-radius: 5px;
+  color: white;
+  border: none;
+  font-size: 0.85rem;
+}
+
+.rbc-event:hover {
+  opacity: 1 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.rbc-event-label {
+  font-size: 0.75rem;
+}
+
+.rbc-event-content {
+  font-size: 0.85rem;
+}
+
+.rbc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  margin-bottom: 15px;
+}
+
+.rbc-toolbar button {
+  color: #4B5563;
+  border: 1px solid #D1D5DB;
+  padding: 8px 15px;
+  background-color: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rbc-toolbar button:hover {
+  background-color: #F3F4F6;
+  border-color: #9CA3AF;
+}
+
+.rbc-toolbar button:active,
+.rbc-toolbar button.rbc-active {
+  background-color: #6366F1;
+  color: white;
+  border-color: #6366F1;
+}
+
+.rbc-toolbar-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.rbc-month-view {
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rbc-date-cell {
+  padding: 5px;
+  text-align: right;
+}
+
+.rbc-off-range {
+  color: #9CA3AF;
+}
+
+.rbc-off-range-bg {
+  background-color: #F9FAFB;
+}
+
+.rbc-day-bg {
+  border-left: 1px solid #E5E7EB;
+}
+
+.rbc-month-row {
+  border-top: 1px solid #E5E7EB;
+  min-height: 100px;
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid #F3F4F6;
+}
+
+.rbc-time-header-content {
+  border-left: 1px solid #E5E7EB;
+}
+
+.rbc-time-content {
+  border-top: 1px solid #E5E7EB;
+}
+
+.rbc-current-time-indicator {
+  background-color: #EF4444;
+  height: 2px;
+}
+
+.rbc-show-more {
+  background-color: #EEF2FF;
+  color: #4F46E5;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.rbc-show-more:hover {
+  background-color: #E0E7FF;
+}
