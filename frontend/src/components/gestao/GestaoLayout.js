@@ -13,6 +13,7 @@ export default function GestaoLayout({ user, onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [lojaAtual, setLojaAtual] = useState('fabrica');
+  const [menuAberto, setMenuAberto] = useState(null);
 
   const menuItems = [
     { path: '/gestao/produtos', icon: Package, label: 'Produtos' },
