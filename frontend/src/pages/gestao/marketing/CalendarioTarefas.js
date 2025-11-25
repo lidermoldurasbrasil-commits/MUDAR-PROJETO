@@ -337,6 +337,39 @@ export default function CalendarioTarefas() {
     }
   };
 
+  const handleAdicionarComentario = async () => {
+    if (!novoComentario.trim() || !tarefaSelecionada) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const userName = user?.nome || user?.username || 'Usuário';
+      
+      await axios.post(
+        `${BACKEND_URL}/api/gestao/marketing/tarefas/${tarefaSelecionada.id}/comentario`,
+        { 
+          autor: userName,
+          texto: novoComentario.trim() 
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setNovoComentario('');
+      toast.success('Comentário adicionado');
+      
+      // Recarregar tarefa
+      const response = await axios.get(
+        `${BACKEND_URL}/api/gestao/marketing/tarefas?membro_id=${membroSelecionado.id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const tarefaAtualizada = response.data.find(t => t.id === tarefaSelecionada.id);
+      setTarefaSelecionada(tarefaAtualizada);
+      fetchTarefas();
+    } catch (error) {
+      console.error('Erro ao adicionar comentário:', error);
+      toast.error('Erro ao adicionar comentário');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
