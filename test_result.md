@@ -500,6 +500,21 @@ frontend:
           agent: "main"
           comment: "Implementado frontend completo de classificação de SKU com IA: 1) Adicionada coluna '🤖 Sugestão IA' nas tabelas de Produção (Shopee e Mercado Livre) ✅ 2) Botão 'Reclassificar' para análise individual de pedidos ✅ 3) Estados de gerenciamento (aiAnalysis, analyzingAI) ✅ 4) Funções handleAnalisarSKU() e handleAplicarSugestaoIA() ✅ 5) UI completa: loading spinner durante análise, display de sugestão com badge colorido do setor, percentual de confiança, texto de razão, botões 'Aplicar' e 'Ignorar' ✅ 6) Integração com endpoint backend POST /api/gestao/marketplaces/pedidos/analisar-sku ✅. Pronto para teste frontend completo."
 
+  - task: "Correção Crítica do Backend - Login não funcionando"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "CRÍTICO: Usuário reportou 'Quando clico em entrar nao está entrando'. Login completamente não funcionando."
+        - working: true
+          agent: "main"
+          comment: "BUG CORRIGIDO COM SUCESSO! Problema identificado: SyntaxError no backend/server.py linha 3161 ('expected except or finally block'). Causa raiz: Função transferir_responsavel() (linha 3133-3159) tinha bloco try incompleto - faltava bloco except e return statement. Correção aplicada: Adicionado bloco except completo (HTTPException e Exception) e return com success/message/responsavel_pendente. Validação: 1) Compilação Python bem-sucedida ✅ 2) Backend reiniciado com sucesso ✅ 3) Logs mostram 'Application startup complete' ✅ 4) Endpoint POST /api/auth/login testado via curl - retorna status 200 com access_token, token_type=bearer, user completo (username, nome, role, ativo) ✅. Login funcionando 100%!"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
